@@ -10,10 +10,8 @@ import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateProhibitionStatement;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
 
@@ -185,7 +183,7 @@ public class JSONSerializer implements PolicySerializer {
 
         Collection<Long> policyClasses = policyQuery.graph().getPolicyClasses();
         for (long pc : policyClasses) {
-            if (AdminPolicy.isAdminPolicyId(pc)) {
+            if (AdminPolicyNode.isAdminPolicyNode(pc)) {
                 continue;
             }
 

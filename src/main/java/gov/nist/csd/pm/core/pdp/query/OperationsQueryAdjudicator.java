@@ -23,21 +23,21 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
 
     @Override
     public AccessRightSet getResourceOperations() throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), AdminAccessRights.QUERY_RESOURCE_OPERATIONS);
 
         return pap.query().operations().getResourceOperations();
     }
 
     @Override
     public Collection<String> getAdminOperationNames() throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), AdminAccessRights.QUERY_ADMIN_OPERATIONS);
 
         return pap.query().operations().getAdminOperationNames();
     }
 
     @Override
     public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), AdminAccessRights.QUERY_ADMIN_OPERATIONS);
 
         return pap.query().operations().getAdminOperation(operationName);
     }

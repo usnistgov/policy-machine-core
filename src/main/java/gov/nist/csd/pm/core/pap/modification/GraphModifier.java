@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.allAdminAccessRights;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.wildcardAccessRights;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
 
 public class GraphModifier extends Modifier implements GraphModification {
 
@@ -326,7 +326,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             throw new NodeDoesNotExistException(ascendant);
         } else if (!policyStore.graph().nodeExists(descendant)) {
             throw new NodeDoesNotExistException(descendant);
-        } else if (ascendant == AdminPolicyNode.PM_ADMIN_OBJECT.nodeId() &&
+        } else if (ascendant == AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId() &&
                 descendant == AdminPolicyNode.PM_ADMIN_PC.nodeId()) {
             throw new CannotDeleteAdminPolicyConfigException();
         }
@@ -401,8 +401,8 @@ public class GraphModifier extends Modifier implements GraphModification {
     static void checkAccessRightsValid(AccessRightSet resourceAccessRights, AccessRightSet accessRightSet) throws PMException {
         for (String ar : accessRightSet) {
             if (!resourceAccessRights.contains(ar)
-                    && !allAdminAccessRights().contains(ar)
-                    && !wildcardAccessRights().contains(ar)) {
+                    && !isAdminAccessRight(ar)
+                    && !isWildcardAccessRight(ar)) {
                 throw new UnknownAccessRightException(ar);
             }
         }
@@ -426,8 +426,8 @@ public class GraphModifier extends Modifier implements GraphModification {
             throws PMException {
         long id = idGenerator.generateId(name, type);
 
-        if (name.equals(AdminPolicyNode.PM_ADMIN_OBJECT.nodeName())) {
-            return AdminPolicyNode.PM_ADMIN_OBJECT.nodeId();
+        if (name.equals(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeName())) {
+            return AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId();
         } else if (policyStore.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
         } else if (policyStore.graph().nodeExists(id)) {

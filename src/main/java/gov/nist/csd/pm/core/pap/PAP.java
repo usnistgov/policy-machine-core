@@ -2,12 +2,12 @@ package gov.nist.csd.pm.core.pap;
 
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.AdminFunction;
 import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.function.arg.NoArgs;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
@@ -28,8 +28,6 @@ import java.util.*;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicy.ALL_NODES;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicy.ALL_NODE_NAMES;
 
 public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
@@ -45,7 +43,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         this.privilegeChecker = privilegeChecker;
 
         // verify admin policy
-        this.policyStore.verifyAdminPolicy();
+        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
     }
 
     public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) {
@@ -82,7 +80,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
     public void reset() throws PMException {
         policyStore.reset();
-        policyStore.verifyAdminPolicy();
+        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
     }
 
     public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
@@ -103,7 +101,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         }
 
         // verify the admin nodes exist in the policy
-        policyStore.verifyAdminPolicy();
+        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
 
         // execute the bootstrapper
         runTx(bootstrapper::bootstrap);
@@ -129,9 +127,10 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     /**
      * Deserialize the given input string into the current policy state. The user defined in the UserContext needs to exist
      * in the graph created if any obligations are created. If the user does not exist before an obligation is created
-     * an exception will be thrown. This method also resets the policy before deserialization. However, the {@link AdminPolicy}
-     * nodes are assumed to be created and can be referenced in the input string without explicit creation. If any of the
-     * admin policy nodes are created in the input string an exception will be thrown.
+     * an exception will be thrown. This method also resets the policy before deserialization. However, the
+     * {@link gov.nist.csd.pm.core.pap.admin.AdminPolicyNode} nodes are assumed to be created and can be referenced in
+     * the input string without explicit creation. If any of the admin policy nodes are created in the input string an
+     * exception will be thrown.
      *
      * @param input The string representation of the policy to deserialize.
      * @param policyDeserializer The PolicyDeserializer to apply the input string to the policy.
@@ -208,7 +207,9 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         boolean adminOpsEmpty =  query().operations().getAdminOperationNames().isEmpty();
         boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
 
-        return (nodes.size() == ALL_NODE_NAMES.size() && nodes.containsAll(ALL_NODES))
+        nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
+
+        return nodes.isEmpty()
             && prohibitionsEmpty
             && obligationsEmpty
             && resOpsEmpty

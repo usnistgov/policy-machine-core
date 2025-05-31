@@ -84,7 +84,7 @@ class CheckStatementTest {
     void testOperationInCheck() throws PMException {
         String pml = """
                 operation testOp() string {
-                    return PM_ADMIN_OBJECT
+                    return PM_ADMIN_BASE_OA
                 }
                 
                 operation op1() {
@@ -96,7 +96,7 @@ class CheckStatementTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                                
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create u "u1" in ["ua1"]                
                 """;

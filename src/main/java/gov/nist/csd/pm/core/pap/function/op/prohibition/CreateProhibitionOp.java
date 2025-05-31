@@ -1,43 +1,22 @@
 package gov.nist.csd.pm.core.pap.function.op.prohibition;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 
-import java.util.ArrayList;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROCESS_PROHIBITION;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROHIBITION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER;
 
-public class CreateProhibitionOp extends ProhibitionOp<ProhibitionOpArgs> {
+public class CreateProhibitionOp extends ProhibitionOp {
 
     public CreateProhibitionOp() {
         super(
             "create_prohibition",
-            List.of(NAME_PARAM, SUBJECT_PARAM, ARSET_PARAM, INTERSECTION_PARAM, CONTAINERS_PARAM),
-            CREATE_PROCESS_PROHIBITION,
-            CREATE_PROHIBITION
+            List.of(NAME_PARAM, SUBJECT_PARAM, ARSET_PARAM, INTERSECTION_PARAM, CONTAINERS_PARAM)
         );
-    }
-
-    @Override
-    protected ProhibitionOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_PARAM, argsMap);
-        ProhibitionSubject subject = (ProhibitionSubject) prepareArg(SUBJECT_PARAM, argsMap);
-        AccessRightSet arset = new AccessRightSet(prepareArg(ARSET_PARAM, argsMap));
-        Boolean intersection = prepareArg(INTERSECTION_PARAM, argsMap);
-        Map<Long, Boolean> containers = prepareArg(CONTAINERS_PARAM, argsMap);
-        List<ContainerCondition> containerConditions = new ArrayList<>();
-        for (var container : containers.entrySet()) {
-            containerConditions.add(new ContainerCondition(container.getKey(), container.getValue()));
-        }
-        return new ProhibitionOpArgs(name, subject, arset, intersection, containerConditions);
     }
 
     @Override
@@ -50,5 +29,11 @@ public class CreateProhibitionOp extends ProhibitionOp<ProhibitionOpArgs> {
             args.getContainers()
         );
         return null;
+    }
+
+    @Override
+    public void canExecute(PAP pap, UserContext userCtx, ProhibitionOpArgs args) throws PMException {
+        checkSubject(pap, userCtx, args.getSubject(), CREATE_PROHIBITION, CREATE_PROCESS_PROHIBITION);
+        checkContainers(pap, userCtx, args.getContainers(), CREATE_PROHIBITION, CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER);
     }
 }

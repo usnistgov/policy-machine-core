@@ -18,7 +18,7 @@ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.*;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
 
 public class TargetEvaluator {
 
@@ -32,7 +32,7 @@ public class TargetEvaluator {
 	 * Perform a depth first search on the object side of the graph.  Start at the target node and recursively visit nodes
 	 * until a policy class is reached.  On each node visited, collect any operation the user has on the target. At the
 	 * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
-	 * each policy class. If the PM_ADMIN_OBJECT is a border target, then add the association access rights to every policy
+	 * each policy class. If the PM_ADMIN_POLICY_CLASSES is a border target, then add the associated access rights to every policy
 	 * class by default.
 	 */
 	public TargetDagResult evaluate(UserDagResult userCtx, TargetContext targetCtx) throws PMException {
@@ -40,7 +40,6 @@ public class TargetEvaluator {
 
 		Set<Long> policyClasses = new LongOpenHashSet(policyStore.graph().getPolicyClasses());
 		Map<Long, AccessRightSet> borderTargets = userCtx.borderTargets();
-		boolean isAdminObjBorderTarget = borderTargets.containsKey(PM_ADMIN_OBJECT.nodeId());
 		Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userCtx.prohibitions());
 		Map<Long, Map<Long, AccessRightSet>> visitedNodes = new Long2ObjectOpenHashMap<>();
 		Set<Long> reachedTargets = new LongOpenHashSet();
@@ -57,12 +56,7 @@ public class TargetEvaluator {
 			}
 
 			if (policyClasses.contains(node)) {
-				AccessRightSet arset = new AccessRightSet();
-				if (isAdminObjBorderTarget) {
-					arset.addAll(borderTargets.get(PM_ADMIN_OBJECT.nodeId()));
-				}
-
-				nodeCtx.put(node, arset);
+				nodeCtx.put(node, new AccessRightSet());
 			} else if (borderTargets.containsKey(node)) {
 				Set<String> uaOps = borderTargets.get(node);
 
@@ -94,11 +88,11 @@ public class TargetEvaluator {
 
 		Collection<Long> targetNodes;
 		if (targetCtx.isNode()) {
-			// if target of decision is a PC, use the PM_ADMIN_OBJECT as the target node
+			// if target of decision is a PC, use the PM_ADMIN_POLICY_CLASSES as the target node
 			long target = targetCtx.getTargetId();
 			Node targetNode = policyStore.graph().getNodeById(target);
 			if (targetNode.getType().equals(PC)) {
-				target = PM_ADMIN_OBJECT.nodeId();
+				target = PM_ADMIN_POLICY_CLASSES.nodeId();
 			}
 
 			targetNodes = new LongArrayList(LongList.of(target));

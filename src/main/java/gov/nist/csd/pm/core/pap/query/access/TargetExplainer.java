@@ -13,7 +13,7 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.*;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
 
 public class TargetExplainer {
 
@@ -67,7 +67,7 @@ public class TargetExplainer {
 			long target = targetCtx.getTargetId();
 			Node targetNode = policyStore.graph().getNodeById(target);
 			if (targetNode.getType().equals(PC)) {
-				target = PM_ADMIN_OBJECT.nodeId();
+				target = PM_ADMIN_POLICY_CLASSES.nodeId();
 			}
 
 			nodes.add(targetNode);

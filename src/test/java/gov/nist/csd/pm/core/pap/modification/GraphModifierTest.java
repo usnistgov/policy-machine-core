@@ -698,9 +698,12 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             assertThrows(UnknownAccessRightException.class,
                     () -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("write")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read")));
-            assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(ALL_ACCESS_RIGHTS)));
-            assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS)));
-            assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(ALL_ADMIN_ACCESS_RIGHTS)));
+            assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
+                WC_ALL)));
+            assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
+                WC_RESOURCE)));
+            assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
+                WC_RESOURCE)));
         }
 
         @Test

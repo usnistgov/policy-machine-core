@@ -1,28 +1,28 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.AdminFunction;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.core.pap.pml.function.routine.PMLStmtsRoutine;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
 
 public class ExecuteScope extends Scope<Object, AdminFunction<?, ?>> {
 
     public ExecuteScope(PAP pap) throws PMException {
         // add constants
         Map<String, Object> constants = new HashMap<>();
-        constants.put(PM_ADMIN_PC.constantName(), PM_ADMIN_PC.nodeName());
-        constants.put(PM_ADMIN_OBJECT.constantName(), PM_ADMIN_OBJECT.nodeName());
+        for (AdminPolicyNode adminPolicyNode : AdminPolicyNode.values()) {
+            constants.put(adminPolicyNode.constantName(), adminPolicyNode.nodeName());
+        }
         setConstants(constants);
 
         // add pml operations and routines stored in PAP

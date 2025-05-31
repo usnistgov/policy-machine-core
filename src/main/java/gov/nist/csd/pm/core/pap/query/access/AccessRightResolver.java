@@ -9,7 +9,6 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import java.util.*;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_RESOURCE_ACCESS_RIGHTS;
 
 public class AccessRightResolver {
 
@@ -87,20 +86,18 @@ public class AccessRightResolver {
     }
 
     private static void resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
-        // if the permission set includes *, remove the * and add all resource operations
-        if (accessRightSet.contains(ALL_ACCESS_RIGHTS)) {
-            accessRightSet.remove(ALL_ACCESS_RIGHTS);
-            accessRightSet.addAll(allAdminAccessRights());
+        if (accessRightSet.contains(WC_ALL)) {
+            accessRightSet.clear();
+            accessRightSet.addAll(ALL_ACCESS_RIGHTS_SET);
             accessRightSet.addAll(resourceOps);
-        } else {
-            // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
-            if (accessRightSet.contains(ALL_ADMIN_ACCESS_RIGHTS)) {
-                accessRightSet.remove(ALL_ADMIN_ACCESS_RIGHTS);
-                accessRightSet.addAll(allAdminAccessRights());
-            }
-            if (accessRightSet.contains(ALL_RESOURCE_ACCESS_RIGHTS)) {
-                accessRightSet.remove(ALL_RESOURCE_ACCESS_RIGHTS);
-                accessRightSet.addAll(resourceOps);
+            return;
+        }
+
+        for (Map.Entry<String, Set<String>> entry : WILDCARD_MAP.entrySet()) {
+            String wildcard = entry.getKey();
+            if (accessRightSet.contains(wildcard)) {
+                accessRightSet.remove(wildcard);
+                accessRightSet.addAll(entry.getValue());
             }
         }
     }

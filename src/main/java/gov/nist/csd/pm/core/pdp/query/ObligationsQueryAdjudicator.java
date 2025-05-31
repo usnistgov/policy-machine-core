@@ -13,12 +13,13 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.GET_OBLIGATION;
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.checkPatternPrivileges;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.checkObligationRulePrivileges;
 
 public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
 
@@ -29,18 +30,7 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     @Override
     public Collection<Obligation> getObligations() throws PMException {
         Collection<Obligation> obligations = pap.query().obligations().getObligations();
-        obligations.removeIf(obligation -> {
-            try {
-                for (Rule rule : obligation.getRules()) {
-                    checkRule(rule);
-                }
-                return false;
-            } catch (PMException e) {
-                return true;
-            }
-        });
-
-        return obligations;
+        return filterObligations(obligations);
     }
 
     @Override
@@ -62,33 +52,31 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     @Override
     public Obligation getObligation(String name) throws PMException {
         Obligation obligation = pap.query().obligations().getObligation(name);
-        for (Rule rule : obligation.getRules()) {
-            checkRule(rule);
-        }
+        checkObligationRulePrivileges(pap, userCtx, obligation.getRules(), QUERY_OBLIGATIONS, QUERY_OBLIGATIONS);
 
         return obligation;
     }
 
     @Override
     public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
-        pap.privilegeChecker().check(userCtx, userId, AdminAccessRights.REVIEW_POLICY);
+        pap.privilegeChecker().check(userCtx, userId, QUERY_OBLIGATIONS);
 
-        return pap.query().obligations().getObligationsWithAuthor(userId);
+        Collection<Obligation> obligationsWithAuthor = new ArrayList<>(pap.query().obligations().getObligationsWithAuthor(userId));
+        return filterObligations(obligationsWithAuthor);
     }
 
-    private void checkRule(Rule rule) throws PMException {
-        EventPattern eventPattern = rule.getEventPattern();
-
-        // check subject
-        checkPatternPrivileges(pap, userCtx, eventPattern.getSubjectPattern(), GET_OBLIGATION);
-
-        // cannot check operation as it is not a node
-
-        // check args
-        for (Map.Entry<String, List<ArgPatternExpression>> argPattern : eventPattern.getArgPatterns().entrySet()) {
-            for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
-                checkPatternPrivileges(pap, userCtx, argPatternExpression, GET_OBLIGATION);
+    private Collection<Obligation> filterObligations(Collection<Obligation> obligations) {
+        obligations.removeIf(obligation -> {
+            try {
+                checkObligationRulePrivileges(pap, userCtx, obligation.getRules(), QUERY_OBLIGATIONS, QUERY_OBLIGATIONS);
+                return false;
+            } catch (UnauthorizedException e) {
+                return true;
+            } catch (PMException e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
+
+        return obligations;
     }
 }
