@@ -2,7 +2,9 @@ package gov.nist.csd.pm.core.pap.function.op.obligation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
@@ -11,10 +13,11 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.checkPatternPrivileges;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION_WITH_ANY_PATTERN;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ObligationOpTest {
@@ -32,23 +35,24 @@ class ObligationOpTest {
                 
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and "oa2" with ["*a"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 """);
 
-        checkPatternPrivileges(pap, new TestUserContext("u1"), new SubjectPattern(), CREATE_OBLIGATION);
+        Rule testRule = new Rule("", new EventPattern(new SubjectPattern(), new OperationPattern()), null);
+        ObligationOp.checkObligationRulePrivileges(pap, new TestUserContext("u1"), List.of(testRule), CREATE_OBLIGATION, CREATE_OBLIGATION_WITH_ANY_PATTERN);
         assertThrows(UnauthorizedException.class,
-                () -> checkPatternPrivileges(pap, new TestUserContext("u2"), new SubjectPattern(), CREATE_OBLIGATION));
+                () -> ObligationOp.checkObligationRulePrivileges(pap, new TestUserContext("u2"), List.of(testRule), CREATE_OBLIGATION, CREATE_OBLIGATION_WITH_ANY_PATTERN));
 
-        checkPatternPrivileges(pap, new TestUserContext("u1"), new LogicalSubjectPatternExpression(
-                new NodeArgPattern("oa1"),
-                new InArgPattern("oa2"),
-                true
-        ), CREATE_OBLIGATION);
-
+        Rule testRule2 = new Rule("", new EventPattern(new SubjectPattern(new LogicalSubjectPatternExpression(
+            new NodeArgPattern("oa1"),
+            new InArgPattern("oa2"),
+            true
+        )), new OperationPattern()), null);
+        ObligationOp.checkObligationRulePrivileges(pap, new TestUserContext("u1"), List.of(testRule2), CREATE_OBLIGATION, CREATE_OBLIGATION_WITH_ANY_PATTERN);
     }
 
 }

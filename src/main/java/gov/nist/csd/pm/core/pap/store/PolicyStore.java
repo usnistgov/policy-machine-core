@@ -19,23 +19,4 @@ public interface PolicyStore extends Transactional {
 
     void reset() throws PMException;
 
-    default void verifyAdminPolicy() throws PMException {
-        long pcId = AdminPolicyNode.PM_ADMIN_PC.nodeId();
-        String pcName = AdminPolicyNode.PM_ADMIN_PC.nodeName();
-
-        if (!graph().nodeExists(pcId)) {
-            graph().createNode(AdminPolicyNode.PM_ADMIN_PC.nodeId(), pcName, PC);
-        }
-
-        long oaId = AdminPolicyNode.PM_ADMIN_OBJECT.nodeId();
-        String oaName = AdminPolicyNode.PM_ADMIN_OBJECT.nodeName();
-        if (!graph().nodeExists(oaId)) {
-            graph().createNode(oaId, oaName, OA);
-        }
-
-        Collection<Long> descendants = graph().getAdjacentDescendants(oaId);
-        if (!descendants.contains(pcId)) {
-            graph().createAssignment(oaId, pcId);
-        }
-    }
 }

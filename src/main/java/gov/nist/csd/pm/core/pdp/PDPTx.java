@@ -88,21 +88,21 @@ public class PDPTx extends PAP {
 
     @Override
     public void reset() throws PMException {
-        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), RESET);
+        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), RESET);
 
         pap.reset();
     }
 
     @Override
     public String serialize(PolicySerializer serializer) throws PMException {
-        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SERIALIZE_POLICY);
+        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), SERIALIZE_POLICY);
 
         return pap.serialize(serializer);
     }
 
     @Override
     public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
-        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DESERIALIZE_POLICY);
+        privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), DESERIALIZE_POLICY);
 
         pap.deserialize(input, policyDeserializer);
     }

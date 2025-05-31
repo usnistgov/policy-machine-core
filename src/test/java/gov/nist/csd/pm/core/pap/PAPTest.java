@@ -117,10 +117,10 @@ public abstract class PAPTest extends PAPTestInitializer {
         assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_PC.nodeId()));
         Collection<Long> ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.PM_ADMIN_PC.nodeId());
         assertEquals(1, ascendants.size());
-	    assertEquals(ascendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_OBJECT.nodeId()));
+	    assertEquals(ascendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()));
 
-        assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_OBJECT.nodeId()));
-        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.PM_ADMIN_OBJECT.nodeId());
+        assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()));
+        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId());
         assertEquals(1, descendants.size());
 	    assertEquals(descendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_PC.nodeId()));
     }
@@ -133,13 +133,13 @@ public abstract class PAPTest extends PAPTestInitializer {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 associate "ua1" and "ua2" with ["assign"]
                 
                 operation op1(@node string a) {
                     check "assign" on [a]
                 } {
-                    if a == PM_ADMIN_OBJECT {
+                    if a == PM_ADMIN_BASE_OA {
                         op1("ua2")
                     }
                     
@@ -149,9 +149,9 @@ public abstract class PAPTest extends PAPTestInitializer {
         MemoryPAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), pml);
 
-        pap.executePML(new TestUserContext("u1"), "op1(PM_ADMIN_OBJECT)");
+        pap.executePML(new TestUserContext("u1"), "op1(PM_ADMIN_BASE_OA)");
         assertTrue(pap.query().graph().nodeExists("ua2_PC"));
-        assertTrue(pap.query().graph().nodeExists("PM_ADMIN:object_PC"));
+        assertTrue(pap.query().graph().nodeExists("PM_ADMIN:base_PC"));
     }
 
     @Test

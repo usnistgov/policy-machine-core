@@ -42,18 +42,18 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of {PM_ADMIN_OBJECT: false}
+                on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
         Operation<?, ?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
             }
 
             @Override
@@ -137,15 +137,15 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of {PM_ADMIN_OBJECT: false}
+                on union of {PM_ADMIN_BASE_OA: false}
                 
                 operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on [PM_ADMIN_OBJECT]
+                    check "assign" on [PM_ADMIN_BASE_OA]
                 } {
                     create pc "1" + a
                 

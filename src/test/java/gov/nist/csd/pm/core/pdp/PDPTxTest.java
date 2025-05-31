@@ -29,7 +29,7 @@ class PDPTxTest {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 """);
         PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, u2::reset);
@@ -47,7 +47,7 @@ class PDPTxTest {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 """);
         PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.serialize(new JSONSerializer()));
@@ -65,7 +65,7 @@ class PDPTxTest {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["*a"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 """);
 
         String serialize = "create pc \"test\"";
@@ -84,7 +84,7 @@ class PDPTxTest {
         long pc1 = graph.createPolicyClass("pc1");
         long ua1 = graph.createUserAttribute("ua1", List.of(pc1));
         long u1 = graph.createUser("u1", List.of(ua1));
-        graph.associate(ua1, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet(AdminAccessRights.ALL_ACCESS_RIGHTS));
+        graph.associate(ua1, AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet(AdminAccessRights.WC_ADMIN_GRAPH));
 
         PDPTx pdpTx = new PDPTx(new UserContext(u1), pap, List.of());
         long oa1 = pdpTx.modify().graph().createObjectAttribute("oa1", List.of(pc1));
