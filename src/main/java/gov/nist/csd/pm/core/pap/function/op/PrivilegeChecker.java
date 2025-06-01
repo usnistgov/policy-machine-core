@@ -19,23 +19,9 @@ import java.util.List;
 public class PrivilegeChecker {
 
     private final AccessQuerier accessQuerier;
-    private boolean explain;
 
     public PrivilegeChecker(AccessQuerier accessQuerier) {
-        this(accessQuerier, false);
-    }
-    
-    public PrivilegeChecker(AccessQuerier accessQuerier, boolean explain) {
         this.accessQuerier = accessQuerier;
-        this.explain = explain;
-    }
-
-    public void setExplain(boolean explain) {
-        this.explain = explain;
-    }
-
-    public boolean isExplain() {
-        return explain;
     }
 
     public void check(UserContext userCtx, TargetContext targetCtx, Collection<String> rightsToCheck) throws PMException {
@@ -74,16 +60,7 @@ public class PrivilegeChecker {
     private void checkOrThrow(UserContext userCtx, TargetContext targetCtx, AccessRightSet computed,
                               Collection<String> rightsToCheck) throws PMException {
         if (!computed.containsAll(rightsToCheck) || (rightsToCheck.isEmpty() && computed.isEmpty())) {
-            if (explain) {
-                throw new UnauthorizedException(
-                        accessQuerier.explain(userCtx, targetCtx),
-                        userCtx,
-                        targetCtx,
-                        rightsToCheck
-                );
-            } else {
-                throw new UnauthorizedException(null, userCtx, targetCtx, rightsToCheck);
-            }
+            throw new UnauthorizedException(null, userCtx, targetCtx, rightsToCheck);
         }
     }
 }
