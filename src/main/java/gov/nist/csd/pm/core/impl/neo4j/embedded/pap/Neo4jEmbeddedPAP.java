@@ -33,7 +33,8 @@ public class Neo4jEmbeddedPAP extends PAP {
 		super(policyStore, modifier, querier, privilegeChecker);
 	}
 
-	public Neo4jEmbeddedPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) {
+	public Neo4jEmbeddedPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws
+                                                                                                     PMException {
 		super(querier, modifier, policyStore);
 	}
 
