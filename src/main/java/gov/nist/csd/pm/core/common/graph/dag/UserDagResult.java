@@ -9,7 +9,5 @@ import java.util.Map;
 import java.util.Set;
 
 public record UserDagResult(Map<Long, AccessRightSet> borderTargets, Set<Prohibition> prohibitions) {
-    public UserDagResult() {
-        this(new Long2ObjectOpenHashMap<>(), new HashSet<>());
-    }
+
 }
