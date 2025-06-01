@@ -30,8 +30,8 @@ public class TargetEvaluator {
 	 * Perform a depth first search on the object side of the graph.  Start at the target node and recursively visit nodes
 	 * until a policy class is reached.  On each node visited, collect any operation the user has on the target. At the
 	 * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
-	 * each policy class. If the PM_ADMIN_POLICY_CLASSES is a border target, then add the associated access rights to every policy
-	 * class by default.
+	 * each policy class. If the target has one or more PCs as adjacent descendants, first check the users privileges on
+	 * those PCs and add them to the entries of those PCs in the resulting TargetDagResult
 	 */
 	public TargetDagResult evaluate(UserDagResult userContext, TargetContext targetContext) throws PMException {
 		targetContext.checkExists(policyStore.graph());
