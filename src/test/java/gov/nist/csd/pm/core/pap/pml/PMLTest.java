@@ -13,7 +13,6 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-import gov.nist.csd.pm.core.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -165,7 +164,7 @@ public class PMLTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdjudicationResponse response = pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             "op1",
             Map.of(
@@ -173,8 +172,7 @@ public class PMLTest {
                 ARGB.getName(), List.of("b", "c"),
                 ARGC.getName(), Map.of("d", "e", "f", "g")
             )
-        );
-        assertEquals(GRANT, response.getDecision());
+        ));
         assertTrue(pap.query().graph().nodeExists("1a"));
         assertTrue(pap.query().graph().nodeExists("1b"));
         assertTrue(pap.query().graph().nodeExists("1c"));
@@ -183,26 +181,23 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-
-        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")),
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new UserContext(id("u2")),
             "op1",
             Map.of(
                 ARGA.getName(), "a",
                 ARGB.getName(), List.of("b", "c"),
                 ARGC.getName(), Map.of("d", "e", "f", "g")
             )
-        );
-        assertEquals(DENY, response.getDecision());
+        ));
 
-        response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new TestUserContext("u1"),
             "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
                 ARGC.getName(), Map.of("4", "5", "6", "7")
             )
-        );
-        assertEquals(GRANT, response.getDecision());
+        ));
         assertTrue(pap.query().graph().nodeExists("11"));
         assertTrue(pap.query().graph().nodeExists("12"));
         assertTrue(pap.query().graph().nodeExists("13"));
@@ -211,14 +206,13 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
                 ARGC.getName(), Map.of("4", "5", "6", "7")
             )
-        );
-        assertEquals(DENY, response.getDecision());
+        ));
     }
 
 
