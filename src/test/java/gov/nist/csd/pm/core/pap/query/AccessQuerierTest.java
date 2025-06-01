@@ -794,9 +794,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         map.put(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("read"));
         map.put(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("read"));
         map.put(AdminPolicyNode.PM_ADMIN_OBLIGATIONS.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), new AccessRightSet("read"));
         map.put(AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), new AccessRightSet("read"));
         map.put(AdminPolicyNode.PM_ADMIN_ROUTINES.nodeId(), new AccessRightSet("read"));
-        assertEquals(map, u1);
+        assertEquals(map.entrySet(), u1.entrySet());
     }
 
     @Test

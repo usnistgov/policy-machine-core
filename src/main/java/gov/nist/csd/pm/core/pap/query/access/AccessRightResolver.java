@@ -20,7 +20,7 @@ public class AccessRightResolver {
             AccessRightSet pcOps = pc.getValue();
 
             // replace instances of *, *a or *r with the literal access rights
-            resolveWildcardAccessRights(pcOps, resourceOps);
+            pcOps = resolveWildcardAccessRights(pcOps, resourceOps);
 
             resolvedPcMap.put(pc.getKey(), pcOps);
         }
@@ -85,21 +85,36 @@ public class AccessRightResolver {
         return allowed;
     }
 
-    private static void resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
+    private static AccessRightSet resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
         if (accessRightSet.contains(WC_ALL)) {
-            accessRightSet.clear();
-            accessRightSet.addAll(ALL_ACCESS_RIGHTS_SET);
-            accessRightSet.addAll(resourceOps);
-            return;
+            return createAllAccessRightsSet(resourceOps);
         }
 
-        for (Map.Entry<String, Set<String>> entry : WILDCARD_MAP.entrySet()) {
-            String wildcard = entry.getKey();
-            if (accessRightSet.contains(wildcard)) {
-                accessRightSet.remove(wildcard);
-                accessRightSet.addAll(entry.getValue());
+        if (accessRightSet.contains(WC_RESOURCE)) {
+            return new AccessRightSet(resourceOps);
+        }
+
+        return expandWildcards(accessRightSet);
+    }
+
+    private static AccessRightSet createAllAccessRightsSet(AccessRightSet resourceOps) {
+        AccessRightSet result = new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
+        result.addAll(resourceOps);
+        return result;
+    }
+
+    private static AccessRightSet expandWildcards(AccessRightSet accessRightSet) {
+        AccessRightSet result = new AccessRightSet();
+
+        for (String accessRight : accessRightSet) {
+            if (WILDCARD_MAP.containsKey(accessRight)) {
+                result.addAll(WILDCARD_MAP.get(accessRight));
+            } else {
+                result.add(accessRight);
             }
         }
+
+        return result;
     }
 
     private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<Long> reachedTargets) {

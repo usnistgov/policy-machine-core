@@ -64,12 +64,10 @@ public abstract class ProhibitionOp extends Operation<Void, ProhibitionOpArgs> {
     }
 
     protected void checkContainers(PAP pap, UserContext userCtx, Collection<ContainerCondition> containers, String nodeAR, String complementAR) throws PMException {
-        if (containers != null) {
-            for (ContainerCondition contCond : containers) {
-                pap.privilegeChecker().check(userCtx, contCond.getId(), nodeAR);
-                if (contCond.isComplement()) {
-                    pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), complementAR);
-                }
+        for (ContainerCondition contCond : containers) {
+            pap.privilegeChecker().check(userCtx, contCond.getId(), nodeAR);
+            if (contCond.isComplement()) {
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), complementAR);
             }
         }
     }

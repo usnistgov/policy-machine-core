@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.epp;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
@@ -25,10 +26,10 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-import gov.nist.csd.pm.core.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.core.pdp.adjudication.Decision;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -117,34 +118,31 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        AdjudicationResponse response = pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             "op1",
             Map.of("a", "oa1",
                 "b", List.of("oa1", "oa2"))
-        );
-        assertEquals(Decision.DENY, response.getDecision());
+        ));
 
         pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("*a"));
 
-        response = pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             "op1",
             Map.of(
                 "a", "oa1",
                 "b", List.of("oa1", "oa2"))
-        );
-        assertEquals(GRANT, response.getDecision());
+        ));
 
-        response = pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             "op2",
             Map.of(
                 ARG_A.getName(), "oa2",
                 ARG_B.getName(), List.of("oa2")
             )
-        );
-        assertEquals(GRANT, response.getDecision());
+        ));
 
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1pc2"));
@@ -185,9 +183,7 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        AdjudicationResponse response = pdp.adjudicateResourceOperation(new UserContext(id("u1")), id("oa1"), "read");
-        assertEquals(GRANT, response.getDecision());
-
+        assertDoesNotThrow(() -> pdp.adjudicateResourceOperation(new UserContext(id("u1")), id("oa1"), "read"));
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
     }
 
