@@ -118,7 +118,7 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             "op1",
             Map.of("a", "oa1",

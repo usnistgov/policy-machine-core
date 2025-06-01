@@ -46,11 +46,14 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
     }
 
-    public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) {
+    public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws PMException {
         this.querier = querier;
         this.modifier = modifier;
         this.policyStore = policyStore;
         this.privilegeChecker = new PrivilegeChecker(querier.access());
+
+        // verify admin policy
+        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
     }
 
     public PAP(PAP pap) throws PMException {

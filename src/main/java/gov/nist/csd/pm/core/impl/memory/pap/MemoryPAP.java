@@ -37,7 +37,7 @@ public class MemoryPAP extends PAP {
         super(policyStore, modifier, querier, privilegeChecker);
     }
 
-    public MemoryPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) {
+    public MemoryPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws PMException {
         super(querier, modifier, policyStore);
     }
 

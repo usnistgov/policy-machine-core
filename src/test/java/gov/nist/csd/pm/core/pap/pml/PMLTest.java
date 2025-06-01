@@ -181,7 +181,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new UserContext(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(new UserContext(id("u2")),
             "op1",
             Map.of(
                 ARGA.getName(), "a",
@@ -206,7 +206,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
@@ -214,6 +214,4 @@ public class PMLTest {
             )
         ));
     }
-
-
 }
