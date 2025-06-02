@@ -38,16 +38,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
 
         // check user has access to subject
-        if (prohibition.getSubject().isNode()) {
-            pap.privilegeChecker().check(userCtx, prohibition.getSubject().getNodeId(), QUERY_PROHIBITIONS);
-        } else {
-            pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), QUERY_PROCESS_PROHIBITIONS);
-        }
-
-        // check user has access to each container condition
-        for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            pap.privilegeChecker().check(userCtx, containerCondition.getId(), QUERY_PROHIBITIONS);
-        }
+        checkCanQueryProhibition(prohibition);
 
         return prohibition;
     }
@@ -69,17 +60,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     private Collection<Prohibition> filterProhibitions(Collection<Prohibition> prohibitions) {
         prohibitions.removeIf(prohibition -> {
             try {
-                // check user has access to subject prohibitions
-                if (prohibition.getSubject().isNode()) {
-                    pap.privilegeChecker().check(userCtx, prohibition.getSubject().getNodeId(), QUERY_PROHIBITIONS);
-                } else {
-                    pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), QUERY_PROCESS_PROHIBITIONS);
-                }
-
-                // check user has access to each target prohibitions
-                for (ContainerCondition containerCondition : prohibition.getContainers()) {
-                    pap.privilegeChecker().check(userCtx, containerCondition.getId(), QUERY_PROHIBITIONS);
-                }
+                checkCanQueryProhibition(prohibition);
 
                 return false;
             } catch (PMException e) {
@@ -88,5 +69,18 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
         });
 
         return prohibitions;
+    }
+
+    private void checkCanQueryProhibition(Prohibition prohibition) throws PMException {
+        if (prohibition.getSubject().isNode()) {
+            pap.privilegeChecker().check(userCtx, prohibition.getSubject().getNodeId(), QUERY_PROHIBITIONS);
+        } else {
+            pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), QUERY_PROCESS_PROHIBITIONS);
+        }
+
+        // check user has access to each container condition
+        for (ContainerCondition containerCondition : prohibition.getContainers()) {
+            pap.privilegeChecker().check(userCtx, containerCondition.getId(), QUERY_PROHIBITIONS);
+        }
     }
 }
