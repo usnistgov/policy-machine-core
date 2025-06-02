@@ -60,7 +60,7 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
     }
 
     private Map<String, Object> prepareArgExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?, ?> function) throws PMException {
-        List<FormalParameter<?>> formalParams = function.getFormalArgs();
+        List<FormalParameter<?>> formalParams = function.getFormalParameters();
 
         if (actualArgsList.size() != formalParams.size()) {
             throw new PMLExecutionException("expected " + formalParams.size() + " args for function \""

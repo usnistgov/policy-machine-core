@@ -66,7 +66,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
                 addFunction(opName, new PMLOperationSignature(
                     operation.getName(),
                     ANY_TYPE,
-                    operation.getFormalArgs()
+                    operation.getFormalParameters()
                 ));
             }
         }
@@ -81,7 +81,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
                 addFunction(routineName, new PMLOperationSignature(
                     routine.getName(),
                     ANY_TYPE,
-                    routine.getFormalArgs()
+                    routine.getFormalParameters()
                 ));
             }
         }
