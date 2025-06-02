@@ -1,13 +1,8 @@
 package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -15,8 +10,6 @@ import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
 import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.checkObligationRulePrivileges;
