@@ -67,14 +67,8 @@ public abstract class AdminFunction<R, A extends Args> implements Serializable {
         return name;
     }
 
-    public List<FormalParameter<?>> getFormalArgs() {
+    public List<FormalParameter<?>> getFormalParameters() {
         return parameters;
-    }
-
-    public List<String> getFormalArgNames() {
-        return parameters.stream()
-                .map(FormalParameter::getName)
-                .collect(Collectors.toList());
     }
 
     public <T> T prepareArg(FormalParameter<T> formalParameter, Map<FormalParameter<?>, Object> argsMap) {
