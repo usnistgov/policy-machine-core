@@ -20,8 +20,6 @@ import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
 import java.util.*;
 
-import static gov.nist.csd.pm.core.pdp.adjudication.Decision.GRANT;
-
 public class PDP implements EventPublisher, AccessAdjudication {
 
     protected final PAP pap;
