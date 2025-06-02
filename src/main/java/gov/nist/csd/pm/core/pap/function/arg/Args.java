@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 public class Args {
 
 	public static Args of(AdminFunction<?, ?> adminFunction, Map<String, Object> actualArgs) {
-		List<FormalParameter<?>> formalParameters = adminFunction.getFormalArgs();
+		List<FormalParameter<?>> formalParameters = adminFunction.getFormalParameters();
 
 		Args args = new Args();
 
