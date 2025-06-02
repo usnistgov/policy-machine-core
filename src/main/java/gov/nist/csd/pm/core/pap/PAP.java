@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap;
 
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.AdminFunction;
@@ -43,7 +44,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         this.privilegeChecker = privilegeChecker;
 
         // verify admin policy
-        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
+        AdminPolicy.verifyAdminPolicy(policyStore().graph());
     }
 
     public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws PMException {
@@ -53,7 +54,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         this.privilegeChecker = new PrivilegeChecker(querier.access());
 
         // verify admin policy
-        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
+        AdminPolicy.verifyAdminPolicy(policyStore().graph());
     }
 
     public PAP(PAP pap) throws PMException {
@@ -83,7 +84,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
     public void reset() throws PMException {
         policyStore.reset();
-        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
+        AdminPolicy.verifyAdminPolicy(policyStore().graph());
     }
 
     public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
@@ -104,7 +105,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         }
 
         // verify the admin nodes exist in the policy
-        AdminPolicyNode.verifyAdminPolicy(policyStore().graph());
+        AdminPolicy.verifyAdminPolicy(policyStore().graph());
 
         // execute the bootstrapper
         runTx(bootstrapper::bootstrap);
@@ -210,6 +211,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         boolean adminOpsEmpty =  query().operations().getAdminOperationNames().isEmpty();
         boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
 
+        // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
 
         return nodes.isEmpty()
