@@ -104,11 +104,14 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
             throw new BootstrapExistingPolicyException();
         }
 
-        // verify the admin nodes exist in the policy
-        AdminPolicy.verifyAdminPolicy(policyStore().graph());
-
         // execute the bootstrapper
-        runTx(bootstrapper::bootstrap);
+        runTx(tx -> {
+            // verify the admin nodes exist in the policy
+            AdminPolicy.verifyAdminPolicy(tx.policyStore().graph());
+
+            // call bootstrapper
+            bootstrapper.bootstrap(tx);
+        });
     }
 
     @Override
