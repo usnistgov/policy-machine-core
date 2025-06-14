@@ -18,21 +18,21 @@ public class SetNodePropertiesOp extends GraphOp<Void, SetNodePropertiesOpArgs> 
     public SetNodePropertiesOp() {
         super(
                 "set_node_properties",
-                List.of(NODE_ID_PARAM, PROPERTIES_PARAM)
+                List.of(NODE_PARAM, PROPERTIES_PARAM)
         );
     }
 
     @Override
     protected SetNodePropertiesOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
         return new SetNodePropertiesOpArgs(
-            prepareArg(NODE_ID_PARAM, argsMap),
+            prepareArg(NODE_PARAM, argsMap),
             prepareArg(PROPERTIES_PARAM, argsMap)
         );
     }
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, SetNodePropertiesOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, args.get(NODE_ID_PARAM), SET_NODE_PROPERTIES);
+        pap.privilegeChecker().check(userCtx, args.get(NODE_PARAM), SET_NODE_PROPERTIES);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class SetNodePropertiesOp extends GraphOp<Void, SetNodePropertiesOpArgs> 
         private Map<String, String> properties;
         public SetNodePropertiesOpArgs(long nodeId, Map<String, String> properties) {
             super(Map.of(
-                NODE_ID_PARAM, nodeId,
+                NODE_PARAM, nodeId,
                 PROPERTIES_PARAM, properties
             ));
 
