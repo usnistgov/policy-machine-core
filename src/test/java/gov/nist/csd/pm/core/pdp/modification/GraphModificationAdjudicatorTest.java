@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NODE_ID_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NODE_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
@@ -147,7 +147,7 @@ class GraphModificationAdjudicatorTest {
     void setNodeProperties() throws PMException {
         assertDoesNotThrow(() -> ok.setNodeProperties(id("o1"), Map.of("a", "b")));
         assertEquals(
-                new EventContext("u1", null, new SetNodePropertiesOp().getName(), Map.of(NODE_ID_PARAM.getName(), "o1", PROPERTIES_PARAM.getName(), Map.of("a", "b"))),
+                new EventContext("u1", null, new SetNodePropertiesOp().getName(), Map.of(NODE_PARAM.getName(), "o1", PROPERTIES_PARAM.getName(), Map.of("a", "b"))),
                 testEventProcessor.getEventContext()
         );
 	    assertEquals(pap.query().graph().getNodeByName("o1").getProperties(), Map.of("a", "b"));
@@ -161,7 +161,7 @@ class GraphModificationAdjudicatorTest {
         assertEquals(
             new EventContext("u1", null, new DeleteNodeOp().getName(),
                 Map.of(
-                    NODE_ID_PARAM.getName(), "o1",
+                    NODE_PARAM.getName(), "o1",
                     TYPE_PARAM.getName(), NodeType.O,
                     DESCENDANTS_PARAM.getName(), new ArrayList<>(List.of("oa1"))
                 )

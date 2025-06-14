@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 
 public class EventContextUtil {
 
-    public static EventContext buildEventContext(PAP pap, UserContext userCtx, String opName, Args args) throws
-                                                                                                                PMException {
+    public static EventContext buildEventContext(PAP pap, UserContext userCtx, String opName, Args args) throws PMException {
         String userName = pap.query().graph().getNodeById(userCtx.getUser()).getName();
 
         return new EventContext(userName, userCtx.getProcess(), opName, resolveNodeArgNames(pap, args));

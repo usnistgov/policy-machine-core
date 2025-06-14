@@ -6,7 +6,6 @@ import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.IdNodeFormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
     public DeleteNodeOp() {
         super(
                 "delete_node",
-                List.of(NODE_ID_PARAM, TYPE_PARAM, DESCENDANTS_PARAM)
+                List.of(NODE_PARAM, TYPE_PARAM, DESCENDANTS_PARAM)
         );
     }
 
@@ -30,7 +29,7 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
 
         public DeleteNodeOpArgs(long nodeId, NodeType type, List<Long> descendantIds) {
             super(Map.of(
-                NODE_ID_PARAM, nodeId,
+                NODE_PARAM, nodeId,
                 TYPE_PARAM, type,
                 DESCENDANTS_PARAM, descendantIds
             ));
@@ -55,7 +54,7 @@ public class DeleteNodeOp extends GraphOp<Void, DeleteNodeOp.DeleteNodeOpArgs> {
 
     @Override
     protected DeleteNodeOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long nodeId = prepareArg(NODE_ID_PARAM, argsMap);
+        Long nodeId = prepareArg(NODE_PARAM, argsMap);
         NodeType type;
         try {
             type = NodeType.toNodeType(prepareArg(TYPE_PARAM, argsMap));

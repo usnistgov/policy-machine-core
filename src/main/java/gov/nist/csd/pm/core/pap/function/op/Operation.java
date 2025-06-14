@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class Operation<R, A extends Args> extends AdminFunction<R, A> {
 
     public static final FormalParameter<String> NAME_PARAM = new FormalParameter<>("name", STRING_TYPE);
-    public static final IdNodeFormalParameter NODE_ID_PARAM = new IdNodeFormalParameter("nodeId");
+    public static final IdNodeFormalParameter NODE_PARAM = new IdNodeFormalParameter("node");
 
     public Operation(String name, List<FormalParameter<?>> formalParameters) {
         super(name, formalParameters);
