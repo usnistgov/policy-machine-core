@@ -1,0 +1,6 @@
+[submodule "protos/policy-machine-protos"]
+	path = protos/policy-machine-protos
+	url = https://github.com/usnistgov/policy-machine-protos.git
+[submodule "protos"]
+	path = protos
+	url = https://github.com/usnistgov/policy-machine-protos.git
