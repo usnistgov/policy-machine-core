@@ -1,3 +1,4 @@
 [submodule "protos"]
 	path = protos
 	url = https://github.com/usnistgov/policy-machine-protos.git
+	branch = main
