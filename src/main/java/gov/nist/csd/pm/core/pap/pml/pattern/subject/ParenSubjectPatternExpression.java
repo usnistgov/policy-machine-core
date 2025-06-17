@@ -5,22 +5,23 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class ParenSubjectPatternExpression extends SubjectPatternExpression {
 
-    private final Pattern expression;
+    private final SubjectPatternExpression expression;
 
-    public ParenSubjectPatternExpression(Pattern expression) {
+    public ParenSubjectPatternExpression(SubjectPatternExpression expression) {
         this.expression = expression;
     }
 
-    public Pattern getExpression() {
+    public SubjectPatternExpression getExpression() {
         return expression;
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         return expression.matches(value, pap);
     }
 

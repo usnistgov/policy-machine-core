@@ -20,7 +20,7 @@ public class ParenArgPatternExpression extends ArgPatternExpression {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         return expression.matches(value, pap);
     }
 

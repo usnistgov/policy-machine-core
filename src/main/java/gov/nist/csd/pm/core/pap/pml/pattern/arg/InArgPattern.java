@@ -21,7 +21,7 @@ public class InArgPattern extends ArgPatternExpression {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         long valueId = pap.query().graph().getNodeId(value);
         long contId = pap.query().graph().getNodeId(container);
 

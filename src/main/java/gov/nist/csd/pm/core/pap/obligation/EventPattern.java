@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.obligation;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
@@ -55,13 +56,13 @@ public class EventPattern implements Serializable {
     }
 
     public boolean matches(EventContext eventCtx, PAP pap) throws PMException {
-        boolean userMatches = userMatches(eventCtx.getUser(), pap) || processMatches(eventCtx.getProcess(), pap);
-        boolean opMatches = operationMatches(eventCtx.getOpName(), pap);
+        boolean userMatches = userMatches(eventCtx.user(), pap);
+        boolean opMatches = operationMatches(eventCtx.opName(), pap);
         if (operationPattern.isAny()) {
             return userMatches;
         }
 
-        boolean argsMatch = argsMatch(eventCtx.getArgs(), pap);
+        boolean argsMatch = argsMatch(eventCtx.args(), pap);
 
         return userMatches && opMatches && argsMatch;
     }
@@ -87,12 +88,11 @@ public class EventPattern implements Serializable {
                 "argPatterns=" + argPatterns + ']';
     }
 
-    private boolean userMatches(String user, PAP pap) throws PMException {
-        return subjectPattern.matches(user, pap);
-    }
-
-    private boolean processMatches(String process, PAP pap) throws PMException {
-        return subjectPattern.matches(process, pap);
+    private boolean userMatches(EventContextUser user, PAP pap) throws PMException {
+        return
+            subjectPattern.matches(user.getName(), pap)
+            || subjectPattern.matches(user.getProcess(), pap)
+            || subjectPattern.matches(user.getAttrs(), pap);
     }
 
     private boolean operationMatches(String opName, PAP pap) throws PMException {

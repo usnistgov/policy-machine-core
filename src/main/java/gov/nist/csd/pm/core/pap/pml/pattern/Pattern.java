@@ -11,7 +11,21 @@ import java.util.Collection;
 
 public abstract class Pattern implements Serializable, PMLStatementSerializable {
 
-    public abstract boolean matches(String value, PAP pap) throws PMException;
+    /**
+     * Returns true if the given value matches this pattern. If the value is null, then return false.
+     * @param value The value to check against this pattern.
+     * @param pap The PAP object to get policy information relevant to the value and pattern.
+     * @return True if the value matches this pattern.
+     */
+    public final boolean matches(String value, PAP pap) throws PMException {
+        if (value == null) {
+            return false;
+        }
+
+        return matchesInternal(value, pap);
+    }
+
+    public abstract boolean matchesInternal(String value, PAP pap) throws PMException;
     public abstract ReferencedNodes getReferencedNodes();
 
     @Override
@@ -26,6 +40,10 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
     }
 
     public boolean matches(Collection<String> value, PAP pap) throws PMException {
+        if (value == null) {
+            return false;
+        }
+
         for (String opValue : value) {
             if (matches(opValue, pap)) {
                 return true;

@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pdp;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
@@ -89,8 +90,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         Node node = pap.query().graph().getNodeById(policyElementId);
 
         publishEvent(new EventContext(
-            pap.query().graph().getNodeById(user.getUser()).getName(),
-            user.getProcess(),
+            EventContextUser.fromUserContext(user, pap),
             resourceOperation,
             Map.of("target", node.getName())
         ));

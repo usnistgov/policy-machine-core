@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.epp;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -310,8 +311,7 @@ class EPPTest {
         });
 
         EventContext eventCtx = new EventContext(
-            "u1",
-            null,
+            new EventContextUser("u1", null),
             CREATE_OBJECT_ATTRIBUTE,
             Map.of(
                 "name", "oa2",

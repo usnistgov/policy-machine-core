@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
@@ -32,7 +33,7 @@ public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         return isAnd ? left.matches(value, pap) && right.matches(value, pap)
                 : left.matches(value, pap) || right.matches(value, pap);
     }

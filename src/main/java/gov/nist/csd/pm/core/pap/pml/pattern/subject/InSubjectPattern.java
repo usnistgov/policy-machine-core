@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,11 +23,17 @@ public class InSubjectPattern extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         long valueId = pap.query().graph().getNodeId(value);
         long contId = pap.query().graph().getNodeId(container);
 
         return pap.query().graph().isAscendant(valueId, contId);
+    }
+
+    @Override
+    public boolean matches(Collection<String> attrs, PAP pap) throws PMException {
+        // if the specified container is contained in the attrs than the user is IN the container
+        return attrs.contains(container);
     }
 
     @Override
@@ -50,4 +57,5 @@ public class InSubjectPattern extends SubjectPatternExpression {
     public int hashCode() {
         return Objects.hashCode(container);
     }
+
 }

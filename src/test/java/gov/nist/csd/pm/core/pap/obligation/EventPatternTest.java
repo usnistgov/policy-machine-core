@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.obligation;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -8,6 +9,7 @@ import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.ProcessSubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
@@ -38,20 +40,57 @@ class EventPatternTest {
     }
 
     @Test
-    void testOperationMatches() throws PMException {
+    void testUserAttributesMatches() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(),
-                new OperationPattern(),
-                Map.of()
+            new SubjectPattern(new InSubjectPattern("ua1")),
+            new OperationPattern(),
+            Map.of()
         );
 
         PAP pap = testPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                null,
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser(List.of("ua1")),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+        );
+
+        assertTrue(eventPattern.matches(eventContext, pap));
+    }
+
+    @Test
+    void testUserAttributesNotMatches() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new InSubjectPattern("ua1")),
+            new OperationPattern(),
+            Map.of()
+        );
+
+        PAP pap = testPAP();
+
+        EventContext eventContext = new EventContext(
+            new EventContextUser(List.of("ua2")),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+        );
+
+        assertFalse(eventPattern.matches(eventContext, pap));
+    }
+
+    @Test
+    void testOperationMatches() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(),
+            new OperationPattern(),
+            Map.of()
+        );
+
+        PAP pap = testPAP();
+
+        EventContext eventContext = new EventContext(
+            new EventContextUser("u1"),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -60,18 +99,17 @@ class EventPatternTest {
     @Test
     void testOperationDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(),
-                new OperationPattern("op1"),
-                Map.of()
+            new SubjectPattern(),
+            new OperationPattern("op1"),
+            Map.of()
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                null,
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1"),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -80,18 +118,17 @@ class EventPatternTest {
     @Test
     void testUserDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new UsernamePattern("u2")),
-                new OperationPattern(),
-                Map.of()
+            new SubjectPattern(new UsernamePattern("u2")),
+            new OperationPattern(),
+            Map.of()
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1", ""),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -100,22 +137,21 @@ class EventPatternTest {
     @Test
     void testUserAndProcessMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new LogicalSubjectPatternExpression(
-                        new UsernamePattern("u1"),
-                        new ProcessSubjectPattern("p1"),
-                        false
-                )),
-                new OperationPattern(),
-                Map.of()
+            new SubjectPattern(new LogicalSubjectPatternExpression(
+                new UsernamePattern("u1"),
+                new ProcessSubjectPattern("p1"),
+                false
+            )),
+            new OperationPattern(),
+            Map.of()
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "p1",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1", "p1"),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -124,22 +160,21 @@ class EventPatternTest {
     @Test
     void testUserMatchesProcessDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new LogicalSubjectPatternExpression(
-                        new UsernamePattern("u1"),
-                        new ProcessSubjectPattern("p1"),
-                        false
-                )),
-                new OperationPattern(),
-                Map.of()
+            new SubjectPattern(new LogicalSubjectPatternExpression(
+                new UsernamePattern("u1"),
+                new ProcessSubjectPattern("p1"),
+                false
+            )),
+            new OperationPattern(),
+            Map.of()
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "p2",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1", "p2"),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -148,22 +183,21 @@ class EventPatternTest {
     @Test
     void testUserAndProcessDoNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new LogicalSubjectPatternExpression(
-                        new UsernamePattern("u2"),
-                        new ProcessSubjectPattern("p1"),
-                        false
-                )),
-                new OperationPattern(),
-                Map.of()
+            new SubjectPattern(new LogicalSubjectPatternExpression(
+                new UsernamePattern("u2"),
+                new ProcessSubjectPattern("p1"),
+                false
+            )),
+            new OperationPattern(),
+            Map.of()
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "p2",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1", "p2"),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -172,21 +206,20 @@ class EventPatternTest {
     @Test
     void testArgsMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new UsernamePattern("u1")),
-                new OperationPattern("assign"),
-                Map.of(
-                        "ascendant", List.of(new NodeArgPattern("a")),
-                        "descendants", List.of(new AnyArgPattern())
-                )
+            new SubjectPattern(new UsernamePattern("u1")),
+            new OperationPattern("assign"),
+            Map.of(
+                "ascendant", List.of(new NodeArgPattern("a")),
+                "descendants", List.of(new AnyArgPattern())
+            )
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1", ""),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -195,21 +228,20 @@ class EventPatternTest {
     @Test
     void testArgsDoNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new UsernamePattern("u1")),
-                new OperationPattern("assign"),
-                Map.of(
-                        "ascendant", List.of(new NodeArgPattern("b")),
-                        "descendant", List.of(new AnyArgPattern())
-                )
+            new SubjectPattern(new UsernamePattern("u1")),
+            new OperationPattern("assign"),
+            Map.of(
+                "ascendant", List.of(new NodeArgPattern("b")),
+                "descendant", List.of(new AnyArgPattern())
+            )
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            new EventContextUser("u1", ""),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -218,25 +250,24 @@ class EventPatternTest {
     @Test
     void testInvalidNodeArgType() throws PMException {
         EventPattern eventPattern = new EventPattern(
-                new SubjectPattern(new UsernamePattern("u1")),
-                new OperationPattern("assign"),
-                Map.of(
-                        "ascendant", List.of(new AnyArgPattern()),
-                        "descendants", List.of(new AnyArgPattern())
-                )
+            new SubjectPattern(new UsernamePattern("u1")),
+            new OperationPattern("assign"),
+            Map.of(
+                "ascendant", List.of(new AnyArgPattern()),
+                "descendants", List.of(new AnyArgPattern())
+            )
         );
 
         MemoryPAP pap = new TestPAP();
 
         EventContext eventContext = new EventContext(
-                "u1",
-                "",
-                "assign",
-                Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), Map.of("b", ""))
+            new EventContextUser("u1", ""),
+            "assign",
+            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), Map.of("b", ""))
         );
 
         assertThrows(UnexpectedArgTypeException.class,
-                () -> eventPattern.matches(eventContext, pap));
+            () -> eventPattern.matches(eventContext, pap));
     }
 
 }

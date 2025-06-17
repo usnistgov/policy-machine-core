@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pdp.event;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
@@ -16,9 +17,7 @@ import java.util.stream.Collectors;
 public class EventContextUtil {
 
     public static EventContext buildEventContext(PAP pap, UserContext userCtx, String opName, Args args) throws PMException {
-        String userName = pap.query().graph().getNodeById(userCtx.getUser()).getName();
-
-        return new EventContext(userName, userCtx.getProcess(), opName, resolveNodeArgNames(pap, args));
+        return new EventContext(EventContextUser.fromUserContext(userCtx, pap), opName, resolveNodeArgNames(pap, args));
     }
 
     private static Map<String, Object> resolveNodeArgNames(PAP pap, Args actualArgs) {
