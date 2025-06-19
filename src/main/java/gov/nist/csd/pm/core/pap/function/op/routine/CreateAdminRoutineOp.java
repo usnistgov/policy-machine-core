@@ -56,6 +56,6 @@ public class CreateAdminRoutineOp extends Operation<Void, CreateAdminRoutineOp.C
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, CreateAdminRoutineOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), CREATE_ADMIN_ROUTINE);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_ROUTINES.nodeId(), CREATE_ADMIN_ROUTINE);
     }
 }

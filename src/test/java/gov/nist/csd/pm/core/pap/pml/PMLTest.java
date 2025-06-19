@@ -13,7 +13,6 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-import gov.nist.csd.pm.core.pdp.adjudication.AdjudicationResponse;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,6 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
 
-import static gov.nist.csd.pm.core.pdp.adjudication.Decision.DENY;
-import static gov.nist.csd.pm.core.pdp.adjudication.Decision.GRANT;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,18 +39,18 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of {PM_ADMIN_OBJECT: false}
+                on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
         Operation<?, ?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), "assign");
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
             }
 
             @Override
@@ -137,15 +134,15 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create prohibition "pro1"
                 deny user "u2"
                 access rights ["assign"]
-                on union of {PM_ADMIN_OBJECT: false}
+                on union of {PM_ADMIN_BASE_OA: false}
                 
                 operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on [PM_ADMIN_OBJECT]
+                    check "assign" on [PM_ADMIN_BASE_OA]
                 } {
                     create pc "1" + a
                 
@@ -165,7 +162,7 @@ public class PMLTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        AdjudicationResponse response = pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
             new TestUserContext("u1"),
             "op1",
             Map.of(
@@ -173,8 +170,7 @@ public class PMLTest {
                 ARGB.getName(), List.of("b", "c"),
                 ARGC.getName(), Map.of("d", "e", "f", "g")
             )
-        );
-        assertEquals(GRANT, response.getDecision());
+        ));
         assertTrue(pap.query().graph().nodeExists("1a"));
         assertTrue(pap.query().graph().nodeExists("1b"));
         assertTrue(pap.query().graph().nodeExists("1c"));
@@ -183,26 +179,23 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-
-        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(new UserContext(id("u2")),
             "op1",
             Map.of(
                 ARGA.getName(), "a",
                 ARGB.getName(), List.of("b", "c"),
                 ARGC.getName(), Map.of("d", "e", "f", "g")
             )
-        );
-        assertEquals(DENY, response.getDecision());
+        ));
 
-        response = pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new TestUserContext("u1"),
             "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
                 ARGC.getName(), Map.of("4", "5", "6", "7")
             )
-        );
-        assertEquals(GRANT, response.getDecision());
+        ));
         assertTrue(pap.query().graph().nodeExists("11"));
         assertTrue(pap.query().graph().nodeExists("12"));
         assertTrue(pap.query().graph().nodeExists("13"));
@@ -211,15 +204,12 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        response = pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
                 ARGC.getName(), Map.of("4", "5", "6", "7")
             )
-        );
-        assertEquals(DENY, response.getDecision());
+        ));
     }
-
-
 }

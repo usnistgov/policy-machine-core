@@ -43,10 +43,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         Map<Node, AccessRightSet> actual = pap.query().access().computeAdjacentAscendantPrivileges(new UserContext(id("u1")), id("oa1"));
         assertEquals(
-                Map.of(node("oa2"), new AccessRightSet("read", "write"),
-                        node("o1"), new AccessRightSet("read", "write"),
-                        node("o2"), new AccessRightSet("read", "write")),
-                new HashMap<>(actual)
+            Map.of(node("oa2"), new AccessRightSet("read", "write"),
+                node("o1"), new AccessRightSet("read", "write"),
+                node("o2"), new AccessRightSet("read", "write")),
+            new HashMap<>(actual)
         );
     }
 
@@ -69,11 +69,11 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         Map<Node, AccessRightSet> actual = pap.query().access().computeAdjacentDescendantPrivileges(new UserContext(id("u1")), id("o1"));
         assertEquals(
-                Map.of(
-                        node("oa2"), new AccessRightSet("read", "write"),
-                        node("oa3"), new AccessRightSet()
-                ),
-                new HashMap<>(actual)
+            Map.of(
+                node("oa2"), new AccessRightSet("read", "write"),
+                node("oa3"), new AccessRightSet()
+            ),
+            new HashMap<>(actual)
         );
     }
 
@@ -105,28 +105,28 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         Map<Node, AccessRightSet> actual = pap.query().access().computePersonalObjectSystem(new UserContext(id("u1")));
         assertEquals(
-                Map.of(node("oa2"), new AccessRightSet("read", "write"), node("oa3-1"), new AccessRightSet("read", "write")),
-                actual
+            Map.of(node("oa2"), new AccessRightSet("read", "write"), node("oa3-1"), new AccessRightSet("read", "write")),
+            actual
         );
 
         pap.modify().graph().dissociate(id("ua1"), id("oa2"));
 
         actual = pap.query().access().computePersonalObjectSystem(new UserContext(id("u1")));
         assertEquals(
-                Map.of(node("oa2-1"), new AccessRightSet("read", "write"), node("oa3-1"), new AccessRightSet("read", "write")),
-                actual
+            Map.of(node("oa2-1"), new AccessRightSet("read", "write"), node("oa3-1"), new AccessRightSet("read", "write")),
+            actual
         );
 
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("read"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("read"));
 
         actual = pap.query().access().computePersonalObjectSystem(new UserContext(id("u1")));
         assertEquals(
-                Map.of(
-                        node("pc1"), new AccessRightSet("read"),
-                        node("pc2"), new AccessRightSet("read"),
-                        node("PM_ADMIN"), new AccessRightSet("read")
-                ),
-                actual
+            Map.of(
+                node("pc1"), new AccessRightSet("read"),
+                node("pc2"), new AccessRightSet("read"),
+                node("PM_ADMIN"), new AccessRightSet("read")
+            ),
+            actual
         );
 
         pml = """
@@ -158,10 +158,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         actual = pap.query().access().computePersonalObjectSystem(new UserContext(id("u1")));
 
         assertEquals(
-                Map.of(node("oa1"), new AccessRightSet("read"),
-                        node("oa2"), new AccessRightSet("read", "write"),
-                        node("oa4"), new AccessRightSet("read")),
-                actual
+            Map.of(node("oa1"), new AccessRightSet("read"),
+                node("oa2"), new AccessRightSet("read", "write"),
+                node("oa4"), new AccessRightSet("read")),
+            actual
         );
     }
 
@@ -197,37 +197,37 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         Explain expected = new Explain(
-                new AccessRightSet("read"),
-                List.of(
-                        new PolicyClassExplain(
-                                node("pc1"),
-                                new AccessRightSet("read", "write"),
-                                List.of(
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa1"), List.of(
-                                                        new ExplainAssociation(node("ua1"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua1"))))
-                                                )),
-                                                new ExplainNode(node("pc1"), List.of())
-                                        )
-                                )),
-                        new PolicyClassExplain(node("pc2"),
-                                new AccessRightSet("read", "write"),
-                                List.of(
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa3"), List.of()),
-                                                new ExplainNode(node("oa2"), List.of(
-                                                        new ExplainAssociation(node("ua2"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua2"))))
-                                                )),
-                                                new ExplainNode(node("pc2"), List.of())
-                                        )
-                                ))
-                ),
-                new AccessRightSet("write"),
-                List.of(
-                        new Prohibition("p1", new ProhibitionSubject(id("u1")), new AccessRightSet("write"), false, List.of(new ContainerCondition(id("oa1"), false)))
-                )
+            new AccessRightSet("read"),
+            List.of(
+                new PolicyClassExplain(
+                    node("pc1"),
+                    new AccessRightSet("read", "write"),
+                    List.of(
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa1"), List.of(
+                                new ExplainAssociation(node("ua1"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua1"))))
+                            )),
+                            new ExplainNode(node("pc1"), List.of())
+                        )
+                    )),
+                new PolicyClassExplain(node("pc2"),
+                    new AccessRightSet("read", "write"),
+                    List.of(
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa3"), List.of()),
+                            new ExplainNode(node("oa2"), List.of(
+                                new ExplainAssociation(node("ua2"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua2"))))
+                            )),
+                            new ExplainNode(node("pc2"), List.of())
+                        )
+                    ))
+            ),
+            new AccessRightSet("write"),
+            List.of(
+                new Prohibition("p1", new ProhibitionSubject(id("u1")), new AccessRightSet("write"), false, List.of(new ContainerCondition(id("oa1"), false)))
+            )
         );
         assertExplainEquals(expected, actual);
     }
@@ -302,48 +302,48 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         Explain explain = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         Explain expected = new Explain(
-                new AccessRightSet("read"),
-                List.of(
-                        new PolicyClassExplain(
-                                node("pc2"),
-                                new AccessRightSet("read"),
-                                List.of(
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa4"), List.of(
-                                                        new ExplainAssociation(node("ua4"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua4"))))
-                                                )),
-                                                new ExplainNode(node("pc2"), List.of())
-                                        )
-                                )
-                        ),
-                        new PolicyClassExplain(
-                                node("pc1"),
-                                new AccessRightSet("read"),
-                                List.of(
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa3"), List.of(
-                                                        new ExplainAssociation(node("ua3"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua3"))))
-                                                )),
-                                                new ExplainNode(node("oa1"), List.of(
-                                                        new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
-                                                )),
-                                                new ExplainNode(node("pc1"), List.of())
-                                        ),
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa2"), List.of(
-                                                        new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
-                                                )),
-                                                new ExplainNode(node("oa1"), List.of(
-                                                        new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
-                                                )),
-                                                new ExplainNode(node("pc1"), List.of())
-                                        )
-                                )
+            new AccessRightSet("read"),
+            List.of(
+                new PolicyClassExplain(
+                    node("pc2"),
+                    new AccessRightSet("read"),
+                    List.of(
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa4"), List.of(
+                                new ExplainAssociation(node("ua4"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua4"))))
+                            )),
+                            new ExplainNode(node("pc2"), List.of())
                         )
+                    )
+                ),
+                new PolicyClassExplain(
+                    node("pc1"),
+                    new AccessRightSet("read"),
+                    List.of(
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa3"), List.of(
+                                new ExplainAssociation(node("ua3"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua3"))))
+                            )),
+                            new ExplainNode(node("oa1"), List.of(
+                                new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
+                            )),
+                            new ExplainNode(node("pc1"), List.of())
+                        ),
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa2"), List.of(
+                                new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
+                            )),
+                            new ExplainNode(node("oa1"), List.of(
+                                new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
+                            )),
+                            new ExplainNode(node("pc1"), List.of())
+                        )
+                    )
                 )
+            )
         );
         assertExplainEquals(expected, explain);
 
@@ -351,35 +351,35 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         explain = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         expected = new Explain(
-                new AccessRightSet("read"),
-                Set.of(
-                        new PolicyClassExplain(
-                                node("pc1"),
-                                new AccessRightSet("read"),
-                                List.of(
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa3"), List.of(
-                                                        new ExplainAssociation(node("ua3"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua3"))))
-                                                )),
-                                                new ExplainNode(node("oa1"), List.of(
-                                                        new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
-                                                )),
-                                                new ExplainNode(node("pc1"), List.of())
-                                        ),
-                                        List.of(
-                                                new ExplainNode(node("o1"), List.of()),
-                                                new ExplainNode(node("oa2"), List.of(
-                                                        new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
-                                                )),
-                                                new ExplainNode(node("oa1"), List.of(
-                                                        new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
-                                                )),
-                                                new ExplainNode(node("pc1"), List.of())
-                                        )
-                                )
+            new AccessRightSet("read"),
+            Set.of(
+                new PolicyClassExplain(
+                    node("pc1"),
+                    new AccessRightSet("read"),
+                    List.of(
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa3"), List.of(
+                                new ExplainAssociation(node("ua3"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua3"))))
+                            )),
+                            new ExplainNode(node("oa1"), List.of(
+                                new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
+                            )),
+                            new ExplainNode(node("pc1"), List.of())
+                        ),
+                        List.of(
+                            new ExplainNode(node("o1"), List.of()),
+                            new ExplainNode(node("oa2"), List.of(
+                                new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
+                            )),
+                            new ExplainNode(node("oa1"), List.of(
+                                new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"), node("ua1")), new Path(node("u1"), node("ua3"), node("ua1"))))
+                            )),
+                            new ExplainNode(node("pc1"), List.of())
                         )
+                    )
                 )
+            )
         );
         assertExplainEquals(expected, explain);
     }
@@ -401,29 +401,29 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("oa2")));
         assertExplainEquals(
-                new Explain(
+            new Explain(
+                new AccessRightSet("read", "write"),
+                List.of(
+                    new PolicyClassExplain(
+                        node("pc1"),
                         new AccessRightSet("read", "write"),
                         List.of(
-                                new PolicyClassExplain(
-                                        node("pc1"),
-                                        new AccessRightSet("read", "write"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("oa2"), List.of(
-                                                                new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua1"))))
-                                                        )),
-                                                        new ExplainNode(node("oa1"), List.of(
-                                                                new ExplainAssociation(node("ua1"), new AccessRightSet("write"), List.of(new Path(node("u1"), node("ua1"))))
-                                                        )),
-                                                        new ExplainNode(node("pc1"), List.of())
-                                                )
-                                        )
-                                )
-                        ),
-                        new AccessRightSet(),
-                        List.of()
+                            List.of(
+                                new ExplainNode(node("oa2"), List.of(
+                                    new ExplainAssociation(node("ua1"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua1"))))
+                                )),
+                                new ExplainNode(node("oa1"), List.of(
+                                    new ExplainAssociation(node("ua1"), new AccessRightSet("write"), List.of(new Path(node("u1"), node("ua1"))))
+                                )),
+                                new ExplainNode(node("pc1"), List.of())
+                            )
+                        )
+                    )
                 ),
-                actual
+                new AccessRightSet(),
+                List.of()
+            ),
+            actual
         );
     }
 
@@ -445,27 +445,27 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertExplainEquals(
-                new Explain(
+            new Explain(
+                new AccessRightSet(),
+                List.of(
+                    new PolicyClassExplain(
+                        node("pc1"),
                         new AccessRightSet(),
                         List.of(
-                                new PolicyClassExplain(
-                                        node("pc1"),
-                                        new AccessRightSet(),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa1"), List.of(
-                                                                new ExplainAssociation(node("ua1"), new AccessRightSet("write"), List.of())
-                                                        )),
-                                                        new ExplainNode(node("pc1"), List.of())
-                                                )
-                                        )
-                                )
-                        ),
-                        new AccessRightSet(),
-                        List.of()
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa1"), List.of(
+                                    new ExplainAssociation(node("ua1"), new AccessRightSet("write"), List.of())
+                                )),
+                                new ExplainNode(node("pc1"), List.of())
+                            )
+                        )
+                    )
                 ),
-                actual
+                new AccessRightSet(),
+                List.of()
+            ),
+            actual
         );
     }
 
@@ -491,40 +491,40 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertExplainEquals(
-                new Explain(
-                        new AccessRightSet(),
+            new Explain(
+                new AccessRightSet(),
+                List.of(
+                    new PolicyClassExplain(
+                        node("pc1"),
+                        new AccessRightSet("write"),
                         List.of(
-                                new PolicyClassExplain(
-                                        node("pc1"),
-                                        new AccessRightSet("write"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa1"), List.of(
-                                                                new ExplainAssociation(node("ua1"), new AccessRightSet("write"), List.of(new Path(node("u1"), node("ua1"))))
-                                                        )),
-                                                        new ExplainNode(node("pc1"), List.of())
-                                                )
-                                        )
-                                ),
-                                new PolicyClassExplain(
-                                        node("pc2"),
-                                        new AccessRightSet("read"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa2"), List.of(
-                                                                new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
-                                                        )),
-                                                        new ExplainNode(node("pc2"), List.of())
-                                                )
-                                        )
-                                )
-                        ),
-                        new AccessRightSet(),
-                        List.of()
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa1"), List.of(
+                                    new ExplainAssociation(node("ua1"), new AccessRightSet("write"), List.of(new Path(node("u1"), node("ua1"))))
+                                )),
+                                new ExplainNode(node("pc1"), List.of())
+                            )
+                        )
+                    ),
+                    new PolicyClassExplain(
+                        node("pc2"),
+                        new AccessRightSet("read"),
+                        List.of(
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa2"), List.of(
+                                    new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
+                                )),
+                                new ExplainNode(node("pc2"), List.of())
+                            )
+                        )
+                    )
                 ),
-                actual
+                new AccessRightSet(),
+                List.of()
+            ),
+            actual
         );
     }
 
@@ -551,40 +551,40 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertExplainEquals(
-                new Explain(
+            new Explain(
+                new AccessRightSet("read", "write"),
+                List.of(
+                    new PolicyClassExplain(
+                        node("pc1"),
                         new AccessRightSet("read", "write"),
                         List.of(
-                                new PolicyClassExplain(
-                                        node("pc1"),
-                                        new AccessRightSet("read", "write"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa1"), List.of(
-                                                                new ExplainAssociation(node("ua1"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua1"))))
-                                                        )),
-                                                        new ExplainNode(node("pc1"), List.of())
-                                                )
-                                        )
-                                ),
-                                new PolicyClassExplain(
-                                        node("pc2"),
-                                        new AccessRightSet("read", "write"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa2"), List.of(
-                                                                new ExplainAssociation(node("ua2"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua2"))))
-                                                        )),
-                                                        new ExplainNode(node("pc2"), List.of())
-                                                )
-                                        )
-                                )
-                        ),
-                        new AccessRightSet(),
-                        List.of()
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa1"), List.of(
+                                    new ExplainAssociation(node("ua1"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua1"))))
+                                )),
+                                new ExplainNode(node("pc1"), List.of())
+                            )
+                        )
+                    ),
+                    new PolicyClassExplain(
+                        node("pc2"),
+                        new AccessRightSet("read", "write"),
+                        List.of(
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa2"), List.of(
+                                    new ExplainAssociation(node("ua2"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua2"))))
+                                )),
+                                new ExplainNode(node("pc2"), List.of())
+                            )
+                        )
+                    )
                 ),
-                actual
+                new AccessRightSet(),
+                List.of()
+            ),
+            actual
         );
 
         // test all pcs do not have same ars
@@ -609,40 +609,40 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
         assertExplainEquals(
-                new Explain(
+            new Explain(
+                new AccessRightSet("read"),
+                List.of(
+                    new PolicyClassExplain(
+                        node("pc1"),
+                        new AccessRightSet("read", "write"),
+                        List.of(
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa1"), List.of(
+                                    new ExplainAssociation(node("ua1"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua1"))))
+                                )),
+                                new ExplainNode(node("pc1"), List.of())
+                            )
+                        )
+                    ),
+                    new PolicyClassExplain(
+                        node("pc2"),
                         new AccessRightSet("read"),
                         List.of(
-                                new PolicyClassExplain(
-                                        node("pc1"),
-                                        new AccessRightSet("read", "write"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa1"), List.of(
-                                                                new ExplainAssociation(node("ua1"), new AccessRightSet("read", "write"), List.of(new Path(node("u1"), node("ua1"))))
-                                                        )),
-                                                        new ExplainNode(node("pc1"), List.of())
-                                                )
-                                        )
-                                ),
-                                new PolicyClassExplain(
-                                        node("pc2"),
-                                        new AccessRightSet("read"),
-                                        List.of(
-                                                List.of(
-                                                        new ExplainNode(node("o1"), List.of()),
-                                                        new ExplainNode(node("oa2"), List.of(
-                                                                new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
-                                                        )),
-                                                        new ExplainNode(node("pc2"), List.of())
-                                                )
-                                        )
-                                )
-                        ),
-                        new AccessRightSet(),
-                        List.of()
+                            List.of(
+                                new ExplainNode(node("o1"), List.of()),
+                                new ExplainNode(node("oa2"), List.of(
+                                    new ExplainAssociation(node("ua2"), new AccessRightSet("read"), List.of(new Path(node("u1"), node("ua2"))))
+                                )),
+                                new ExplainNode(node("pc2"), List.of())
+                            )
+                        )
+                    )
                 ),
-                actual
+                new AccessRightSet(),
+                List.of()
+            ),
+            actual
         );
 
     }
@@ -671,11 +671,11 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         SubgraphPrivileges actual = pap.query().access().computeSubgraphPrivileges(new UserContext(id("u1")), id("oa1"));
         assertSubgraphPrivilegesEquals(new SubgraphPrivileges(
-                node("oa1"), new AccessRightSet("read", "write"), List.of(
-                new SubgraphPrivileges(node("oa2"), new AccessRightSet("read", "write"), List.of(
-                        new SubgraphPrivileges(node("o1"), new AccessRightSet("read"), List.of()),
-                        new SubgraphPrivileges(node("o2"), new AccessRightSet("read", "write"), List.of())
-                ))
+            node("oa1"), new AccessRightSet("read", "write"), List.of(
+            new SubgraphPrivileges(node("oa2"), new AccessRightSet("read", "write"), List.of(
+                new SubgraphPrivileges(node("o1"), new AccessRightSet("read"), List.of()),
+                new SubgraphPrivileges(node("o2"), new AccessRightSet("read", "write"), List.of())
+            ))
         )
         ), actual);
     }
@@ -715,11 +715,11 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Map<Long, AccessRightSet> u1 = pap.query().access().computeDestinationAttributes(new UserContext(id("u1")));
         assertEquals(
-                Map.of(
-                        id("oa1"), new AccessRightSet("read", "write"),
-                        id("oa2"), new AccessRightSet("read")
-                ),
-                u1
+            Map.of(
+                id("oa1"), new AccessRightSet("read", "write"),
+                id("oa2"), new AccessRightSet("read")
+            ),
+            u1
         );
     }
 
@@ -741,11 +741,11 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Map<Long, AccessRightSet> o1 = pap.query().access().computeACL(new TargetContext(id("o1")));
         assertEquals(
-                Map.of(
-                        id("u1"), new AccessRightSet("read", "write"),
-                        id("u2"), new AccessRightSet("read")
-                ),
-                o1
+            Map.of(
+                id("u1"), new AccessRightSet("read", "write"),
+                id("u2"), new AccessRightSet("read")
+            ),
+            o1
         );
     }
 
@@ -772,29 +772,32 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
         Map<Long, AccessRightSet> u1 = pap.query().access().computeCapabilityList(new UserContext(id("u1")));
         assertEquals(
-                Map.of(
-                        id("o1"), new AccessRightSet("read"),
-                        id("o2"), new AccessRightSet("read"),
-                        id("oa1"), new AccessRightSet("read"),
-                        id("oa2"), new AccessRightSet("read")
-                ),
-                u1
+            Map.of(
+                id("o1"), new AccessRightSet("read"),
+                id("o2"), new AccessRightSet("read"),
+                id("oa1"), new AccessRightSet("read"),
+                id("oa2"), new AccessRightSet("read")
+            ),
+            u1
         );
 
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("read"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("read"));
         u1 = pap.query().access().computeCapabilityList(new UserContext(id("u1")));
-        assertEquals(
-                Map.of(
-                        id("o1"), new AccessRightSet("read"),
-                        id("o2"), new AccessRightSet("read"),
-                        id("oa1"), new AccessRightSet("read"),
-                        id("oa2"), new AccessRightSet("read"),
-                        id("pc1"), new AccessRightSet("read"),
-                        id("PM_ADMIN"), new AccessRightSet("read"),
-                        AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("read")
-                ),
-                u1
-        );
+
+        Map<Long, AccessRightSet> map = new HashMap<>();
+        map.put(id("o1"), new AccessRightSet("read"));
+        map.put(id("o2"), new AccessRightSet("read"));
+        map.put(id("oa1"), new AccessRightSet("read"));
+        map.put(id("oa2"), new AccessRightSet("read"));
+        map.put(id("pc1"), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_PC.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_OBLIGATIONS.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), new AccessRightSet("read"));
+        map.put(AdminPolicyNode.PM_ADMIN_ROUTINES.nodeId(), new AccessRightSet("read"));
+        assertEquals(map.entrySet(), u1.entrySet());
     }
 
     @Test
@@ -858,7 +861,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
@@ -894,7 +897,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
@@ -912,8 +915,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         assertEquals(
-                new AccessRightSet("read", "write"),
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1))
+            new AccessRightSet("read", "write"),
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1))
         );
     }
 
@@ -991,7 +994,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1011,7 +1014,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1031,7 +1034,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua2, oa2, new AccessRightSet("read", "write"));
 
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write"))
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write"))
         );
     }
 
@@ -1067,7 +1070,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua2, oa1, new AccessRightSet("write"));
 
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write"))
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write"))
         );
     }
 
@@ -1088,7 +1091,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.contains("read"));
     }
 
@@ -1109,7 +1112,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1130,7 +1133,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1150,7 +1153,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
     }
 
     // removed graph7 due to adding the descendant IDs to the createNode, need to always connect to the testCtx.policy().graph().
@@ -1242,7 +1245,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
@@ -1260,14 +1263,14 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().associate(ua1, oa3, new AccessRightSet("read", "write", "execute"));
         pap.modify().prohibitions().createProhibition("deny", new ProhibitionSubject(id("ua1")) , new AccessRightSet("read"),
-                true,
-                List.of(new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, false)));
+            true,
+            List.of(new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, false)));
 
         pap.modify().prohibitions().createProhibition("deny2", new ProhibitionSubject(id("u1")),
-                new AccessRightSet("write"),
-                true,
-                Collections.singleton(new ContainerCondition(oa3, false)));
+            new AccessRightSet("write"),
+            true,
+            Collections.singleton(new ContainerCondition(oa3, false)));
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
@@ -1290,12 +1293,12 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
         pap.modify().prohibitions().createProhibition("deny", new ProhibitionSubject(id("ua1")) ,
-                new AccessRightSet("read"),
-                true,
-                List.of(
-                        new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, true)
-                ));
+            new AccessRightSet("read"),
+            true,
+            List.of(
+                new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, true)
+            ));
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).contains("read"));
@@ -1304,13 +1307,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa2, new AccessRightSet("read"));
 
         pap.modify().prohibitions().createProhibition("deny-process", new ProhibitionSubject("1234"),
-                new AccessRightSet("read"),
-                false,
-                Collections.singleton(new ContainerCondition(oa1, false)));
+            new AccessRightSet("read"),
+            false,
+            Collections.singleton(new ContainerCondition(oa1, false)));
 
         assertEquals(
-                new AccessRightSet(),
-                pap.query().access().computePrivileges(new UserContext(u1, "1234"), new TargetContext(o1))
+            new AccessRightSet(),
+            pap.query().access().computePrivileges(new UserContext(u1, "1234"), new TargetContext(o1))
         );
     }
 
@@ -1331,15 +1334,15 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
         pap.modify().prohibitions().createProhibition("deny", new ProhibitionSubject(u1),
-                new AccessRightSet("read", "write"),
-                true,
-                List.of(new ContainerCondition(oa4, true),
-                        new ContainerCondition(oa1, false)));
+            new AccessRightSet("read", "write"),
+            true,
+            List.of(new ContainerCondition(oa4, true),
+                new ContainerCondition(oa1, false)));
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(oa5)).isEmpty());
         assertTrue(
-                pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
@@ -1357,10 +1360,10 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         pap.modify().prohibitions().createProhibition("deny", new ProhibitionSubject(u1),
-                new AccessRightSet("read", "write"),
-                true,
-                List.of(new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, false)));
+            new AccessRightSet("read", "write"),
+            true,
+            List.of(new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, false)));
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).isEmpty());
@@ -1384,7 +1387,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         assertTrue(pap.query().access().computePrivileges(new UserContext(ua1), new TargetContext(oa1))
-                .containsAll(Arrays.asList("read", "write")));
+            .containsAll(Arrays.asList("read", "write")));
     }
 
     @Test
@@ -1407,53 +1410,53 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
 
         pap.modify().prohibitions().createProhibition(
-                "p1",
-                new ProhibitionSubject(id("u1")),
-                new AccessRightSet("write"),
-                true,
-                List.of(
-                        new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, false),
-                        new ContainerCondition(oa3, false)
-                ));
+            "p1",
+            new ProhibitionSubject(id("u1")),
+            new AccessRightSet("write"),
+            true,
+            List.of(
+                new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, false),
+                new ContainerCondition(oa3, false)
+            ));
 
         pap.modify().prohibitions().createProhibition(
-                "p2",
-                new ProhibitionSubject(u2),
-                new AccessRightSet("write"),
-                false,
-                List.of(
-                        new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, false),
-                        new ContainerCondition(oa3, false)
-                ));
+            "p2",
+            new ProhibitionSubject(u2),
+            new AccessRightSet("write"),
+            false,
+            List.of(
+                new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, false),
+                new ContainerCondition(oa3, false)
+            ));
 
         pap.modify().prohibitions().createProhibition(
-                "p3",
-                new ProhibitionSubject(u3),
-                new AccessRightSet("write"),
-                true,
-                List.of(
-                        new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, true)
-                ));
+            "p3",
+            new ProhibitionSubject(u3),
+            new AccessRightSet("write"),
+            true,
+            List.of(
+                new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, true)
+            ));
 
         pap.modify().prohibitions().createProhibition(
-                "p4",
-                new ProhibitionSubject(u4),
-                new AccessRightSet("write"),
-                false,
-                List.of(
-                        new ContainerCondition(oa1, false),
-                        new ContainerCondition(oa2, true)
-                ));
+            "p4",
+            new ProhibitionSubject(u4),
+            new AccessRightSet("write"),
+            false,
+            List.of(
+                new ContainerCondition(oa1, false),
+                new ContainerCondition(oa2, true)
+            ));
 
         pap.modify().prohibitions().createProhibition(
-                "p5",
-                new ProhibitionSubject(u4),
-                new AccessRightSet("write"),
-                false,
-                Collections.singleton(new ContainerCondition(oa2, true)));
+            "p5",
+            new ProhibitionSubject(u4),
+            new AccessRightSet("write"),
+            false,
+            Collections.singleton(new ContainerCondition(oa2, true)));
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
@@ -1485,20 +1488,20 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-        pap.modify().graph().associate(ua1, oa1, allAccessRights());
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(WC_ALL));
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.containsAll(RWE));
 
-        pap.modify().graph().associate(ua1, oa1, allAdminAccessRights());
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(WC_ADMIN));
         list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertTrue(list.containsAll(allAdminAccessRights()));
+        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertFalse(list.containsAll(RWE));
 
-        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(ALL_RESOURCE_ACCESS_RIGHTS));
+        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(WC_RESOURCE));
         list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertFalse(list.containsAll(allAdminAccessRights()));
+        assertFalse(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1532,8 +1535,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
         pap.modify().prohibitions().createProhibition("deny1", new ProhibitionSubject(u1), new AccessRightSet("read"),
-                false,
-                Collections.singleton(new ContainerCondition(oa1, false)));
+            false,
+            Collections.singleton(new ContainerCondition(oa1, false)));
 
 
         AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext(id("u1")), new TargetContext(id("oa1")));
@@ -1550,8 +1553,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read"));
 
         pap.modify().prohibitions().createProhibition("deny1", new ProhibitionSubject(u1), new AccessRightSet("read"),
-                false,
-                Collections.singleton(new ContainerCondition(oa1, true)));
+            false,
+            Collections.singleton(new ContainerCondition(oa1, true)));
 
         AccessRightSet deniedAccessRights = pap.query().access().computeDeniedPrivileges(new UserContext(id("u1")), new TargetContext(id("oa1")));
         assertFalse(deniedAccessRights.contains("read"));
@@ -1582,8 +1585,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         pap.modify().graph().associate(ua1, o1, new AccessRightSet("read"));
 
         pap.modify().prohibitions().createProhibition("deny1", new ProhibitionSubject(u1), new AccessRightSet("read"),
-                false,
-                Collections.singleton(new ContainerCondition(o1, false)));
+            false,
+            Collections.singleton(new ContainerCondition(o1, false)));
 
 
         AccessRightSet accessRightSet = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));

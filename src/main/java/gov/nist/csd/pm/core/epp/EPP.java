@@ -76,12 +76,11 @@ public class EPP implements EventSubscriber {
 
     private Map<String, Object> eventCtxToMap(EventContext eventCtx) {
         Map<String, Object> map = new HashMap<>();
-        map.put("user", eventCtx.getUser());
-        map.put("opName", eventCtx.getOpName());
-        map.put("args", eventCtx.getArgs());
-        if (eventCtx.getProcess() != null) {
-            map.put("process", eventCtx.getUser());
-        }
+        map.put("user", eventCtx.user().getName());
+        map.put("attrs", eventCtx.user().getAttrs());
+        map.put("process", eventCtx.user());
+        map.put("opName", eventCtx.opName());
+        map.put("args", eventCtx.args());
 
         return map;
     }

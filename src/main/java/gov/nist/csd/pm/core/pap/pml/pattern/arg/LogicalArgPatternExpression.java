@@ -32,7 +32,7 @@ public class LogicalArgPatternExpression extends ArgPatternExpression {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         return isAnd ? left.matches(value, pap) && right.matches(value, pap)
                 : left.matches(value, pap) || right.matches(value, pap);
     }

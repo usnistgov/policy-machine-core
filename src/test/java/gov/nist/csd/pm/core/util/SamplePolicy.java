@@ -22,7 +22,7 @@ public class SamplePolicy {
         long testPc = pap.modify().graph().createPolicyClass("test_pc");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", Collections.singleton(testPc));
         long u1 = pap.modify().graph().createUser("u1", Collections.singleton(ua1));
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), new AccessRightSet("*"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
 
         pap.executePML(new TestUserContext("u1"), s);
     }

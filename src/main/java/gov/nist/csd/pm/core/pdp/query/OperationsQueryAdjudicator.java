@@ -13,6 +13,10 @@ import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;
 
+/**
+ * Adjudicate queries on operations. Because operations are not Policy Elements, there are no access checks on
+ * querying them. The access checks are enforced on operation execution.
+ */
 public class OperationsQueryAdjudicator extends Adjudicator implements OperationsQuery {
 
     public OperationsQueryAdjudicator(PAP pap, UserContext userCtx) {
@@ -23,22 +27,16 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
 
     @Override
     public AccessRightSet getResourceOperations() throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
-
         return pap.query().operations().getResourceOperations();
     }
 
     @Override
     public Collection<String> getAdminOperationNames() throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
-
         return pap.query().operations().getAdminOperationNames();
     }
 
     @Override
     public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
-
         return pap.query().operations().getAdminOperation(operationName);
     }
 }

@@ -26,6 +26,10 @@ public class UnauthorizedException extends PMException {
     }
 
     private static String userString(UserContext user) {
-        return String.format("{user: %s%s}", user.getUser(), user.getProcess() != null ? ", process: " + user.getProcess() : "");
+        if (user.isUserDefined()) {
+            return String.format("{user: %s%s}", user.getUser(), user.getProcess() != null ? ", process: " + user.getProcess() : "");
+        } else {
+            return String.format("{attrs: %s%s}", user.getAttributeIds(), user.getProcess() != null ? ", process: " + user.getProcess() : "");
+        }
     }
 }

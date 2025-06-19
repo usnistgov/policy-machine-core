@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class AnyArgPattern extends ArgPatternExpression {
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
         return true;
     }
 

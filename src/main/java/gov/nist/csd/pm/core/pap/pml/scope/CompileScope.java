@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -16,8 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBJECT;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions.builtinFunctions;
@@ -28,8 +27,9 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         Map<String, Variable> constants = new HashMap<>();
 
         // admin policy nodes constants
-        constants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.constantName(), STRING_TYPE, true));
-        constants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.constantName(), STRING_TYPE, true));
+        for (AdminPolicyNode adminPolicyNode : AdminPolicyNode.values()) {
+            constants.put(adminPolicyNode.constantName(), new Variable(adminPolicyNode.constantName(), STRING_TYPE, true));
+        }
         setConstants(constants);
 
         // add builtin operations
@@ -44,8 +44,9 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
     public CompileScope(PAP pap) throws PMException {
         // add constants
         Map<String, Variable> constants = new HashMap<>();
-        constants.put(PM_ADMIN_PC.constantName(), new Variable(PM_ADMIN_PC.nodeName(), STRING_TYPE, true));
-        constants.put(PM_ADMIN_OBJECT.constantName(), new Variable(PM_ADMIN_OBJECT.nodeName(), STRING_TYPE, true));
+        for (AdminPolicyNode adminPolicyNode : AdminPolicyNode.values()) {
+            constants.put(adminPolicyNode.constantName(), new Variable(adminPolicyNode.constantName(), STRING_TYPE, true));
+        }
         setConstants(constants);
 
         // add pml operations and routines stored in PAP
@@ -65,7 +66,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
                 addFunction(opName, new PMLOperationSignature(
                     operation.getName(),
                     ANY_TYPE,
-                    operation.getFormalArgs()
+                    operation.getFormalParameters()
                 ));
             }
         }
@@ -80,7 +81,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
                 addFunction(routineName, new PMLOperationSignature(
                     routine.getName(),
                     ANY_TYPE,
-                    routine.getFormalArgs()
+                    routine.getFormalParameters()
                 ));
             }
         }

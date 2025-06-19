@@ -50,7 +50,7 @@ public class CreateAdminOperationOp extends Operation<Void, CreateAdminOperation
     @Override
     public void canExecute(PAP pap,
                            UserContext userCtx, CreateAdminOperationOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), CREATE_ADMIN_OPERATION);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), CREATE_ADMIN_OPERATION);
     }
 
     @Override

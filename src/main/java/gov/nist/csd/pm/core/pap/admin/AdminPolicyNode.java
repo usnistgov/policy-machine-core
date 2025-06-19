@@ -2,10 +2,13 @@ package gov.nist.csd.pm.core.pap.admin;
 
 public enum AdminPolicyNode {
 
-    // Admin policy class
     PM_ADMIN_PC(-1, "PM_ADMIN"),
-    // Admin policy object attribute
-    PM_ADMIN_OBJECT(-2, "PM_ADMIN:object");
+    PM_ADMIN_BASE_OA(-2, "PM_ADMIN:base"),
+    PM_ADMIN_POLICY_CLASSES(-3, "PM_ADMIN:policy_classes"),
+    PM_ADMIN_OBLIGATIONS(-4, "PM_ADMIN:obligations"),
+    PM_ADMIN_PROHIBITIONS(-5, "PM_ADMIN:prohibitions"),
+    PM_ADMIN_OPERATIONS(-6, "PM_ADMIN:operations"),
+    PM_ADMIN_ROUTINES(-7, "PM_ADMIN:routines");
 
     private final long id;
     private final String name;
@@ -13,19 +16,6 @@ public enum AdminPolicyNode {
     AdminPolicyNode(long id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public static AdminPolicyNode fromNodeName(String ascendant) {
-        switch (ascendant) {
-            case "PM_ADMIN" -> {
-                return PM_ADMIN_PC;
-            }
-            case "PM_ADMIN:object" -> {
-                return PM_ADMIN_OBJECT;
-            }
-        }
-
-        throw new IllegalArgumentException("unknown admin policy node " + ascendant);
     }
 
     public String constantName() {
@@ -38,5 +28,15 @@ public enum AdminPolicyNode {
 
     public long nodeId() {
         return id;
+    }
+
+    public static boolean isAdminPolicyNode(long id) {
+        for (AdminPolicyNode node : values()) {
+            if (node.id == id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

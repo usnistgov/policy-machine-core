@@ -31,48 +31,75 @@ public class UserEvaluator {
 	 *
 	 * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
 	 */
-	public UserDagResult evaluate(UserContext userCtx) throws PMException {
-		userCtx.checkExists(policyStore.graph());
+	public UserDagResult evaluate(UserContext userContext) throws PMException {
+		userContext.checkExists(policyStore.graph());
 
-		final Map<Long, AccessRightSet> borderTargets = new HashMap<>();
-		// initialize with the prohibitions for the provided process
-		final Set<Prohibition> reachedProhibitions = new HashSet<>();
-		if (userCtx.getProcess() != null) {
-			reachedProhibitions.addAll(policyStore.prohibitions().getProhibitionsWithProcess(userCtx.getProcess()));
+		EvaluationState state = initializeEvaluationState(userContext);
+		BreadthFirstGraphWalker bfs = createBreadthFirstWalker(state);
+		executeEvaluation(userContext, bfs);
+
+		return new UserDagResult(state.borderTargets, state.reachedProhibitions);
+	}
+
+	private EvaluationState initializeEvaluationState(UserContext userContext) throws PMException {
+		Map<Long, AccessRightSet> borderTargets = new HashMap<>();
+		Set<Prohibition> reachedProhibitions = initializeProcessProhibitions(userContext);
+		
+		return new EvaluationState(borderTargets, reachedProhibitions);
+	}
+
+	private Set<Prohibition> initializeProcessProhibitions(UserContext userContext) throws PMException {
+		Set<Prohibition> prohibitions = new HashSet<>();
+		if (userContext.getProcess() != null) {
+			prohibitions.addAll(policyStore.prohibitions().getProhibitionsWithProcess(userContext.getProcess()));
 		}
+		return prohibitions;
+	}
 
-		Visitor visitor = node -> {
-			// cache prohibitions reached by the user
-			Collection<Prohibition> subjectProhibitions = policyStore.prohibitions().getProhibitionsWithNode(node);
-			reachedProhibitions.addAll(subjectProhibitions);
-
-			Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(node);
-			collectAssociationsFromBorderTargets(nodeAssociations, borderTargets);
-		};
-
-		// start the bfs
-		BreadthFirstGraphWalker bfs = new GraphStoreBFS(policyStore.graph())
+	private BreadthFirstGraphWalker createBreadthFirstWalker(EvaluationState state) {
+		Visitor nodeVisitor = createNodeVisitor(state);
+		
+		return new GraphStoreBFS(policyStore.graph())
 				.withDirection(Direction.DESCENDANTS)
-				.withVisitor(visitor);
+				.withVisitor(nodeVisitor);
+	}
 
-		if (userCtx.isUserDefined()) {
-			bfs.walk(userCtx.getUser());
+	private Visitor createNodeVisitor(EvaluationState state) {
+		return nodeId -> {
+			collectNodeProhibitions(nodeId, state.reachedProhibitions);
+			collectNodeAssociations(nodeId, state.borderTargets);
+		};
+	}
+
+	private void collectNodeProhibitions(long nodeId, Set<Prohibition> reachedProhibitions) throws PMException {
+		Collection<Prohibition> nodeProhibitions = policyStore.prohibitions().getProhibitionsWithNode(nodeId);
+		reachedProhibitions.addAll(nodeProhibitions);
+	}
+
+	private void collectNodeAssociations(long nodeId, Map<Long, AccessRightSet> borderTargets) throws PMException {
+		Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(nodeId);
+		collectAssociationsIntoBorderTargets(nodeAssociations, borderTargets);
+	}
+
+	private void executeEvaluation(UserContext userContext, BreadthFirstGraphWalker bfs) throws PMException {
+		if (userContext.isUserDefined()) {
+			bfs.walk(userContext.getUser());
 		} else {
-			bfs.walk(userCtx.getAttributeIds());
-		}
-
-		return new UserDagResult(borderTargets, reachedProhibitions);
-	}
-
-	private void collectAssociationsFromBorderTargets(Collection<Association> assocs, Map<Long, AccessRightSet> borderTargets) {
-		for (Association association : assocs) {
-			AccessRightSet ops = association.getAccessRightSet();
-			AccessRightSet exOps = borderTargets.getOrDefault(association.getTarget(), new AccessRightSet());
-			//if the target is not in the map already, put it
-			//else add the found operations to the existing ones.
-			exOps.addAll(ops);
-			borderTargets.put(association.getTarget(), exOps);
+			bfs.walk(userContext.getAttributeIds());
 		}
 	}
 
+	private void collectAssociationsIntoBorderTargets(Collection<Association> associations, 
+													 Map<Long, AccessRightSet> borderTargets) {
+		for (Association association : associations) {
+			long targetId = association.getTarget();
+			AccessRightSet associationRights = association.getAccessRightSet();
+			
+			AccessRightSet existingRights = borderTargets.computeIfAbsent(targetId, k -> new AccessRightSet());
+			existingRights.addAll(associationRights);
+		}
+	}
+
+	private record EvaluationState(Map<Long, AccessRightSet> borderTargets,
+								   Set<Prohibition> reachedProhibitions) { }
 }

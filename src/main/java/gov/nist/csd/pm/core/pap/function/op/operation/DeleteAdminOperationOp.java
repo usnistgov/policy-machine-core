@@ -47,7 +47,7 @@ public class DeleteAdminOperationOp extends Operation<Void, DeleteAdminOperation
     @Override
     public void canExecute(PAP pap,
                            UserContext userCtx, DeleteAdminOperationOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), DELETE_ADMIN_OPERATION);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), DELETE_ADMIN_OPERATION);
     }
 
     @Override

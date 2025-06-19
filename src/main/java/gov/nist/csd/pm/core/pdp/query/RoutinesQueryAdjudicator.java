@@ -11,6 +11,10 @@ import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;
 
+/**
+ * Adjudicate queries on routines. Because routines are not Policy Elements, there are no access checks on
+ * querying them. The access checks are enforced during execution.
+ */
 public class  RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQuery {
 
     public RoutinesQueryAdjudicator(PAP pap, UserContext userCtx) {
@@ -19,15 +23,11 @@ public class  RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQu
 
     @Override
     public Collection<String> getAdminRoutineNames() throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
-
         return pap.query().routines().getAdminRoutineNames();
     }
 
     @Override
     public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), AdminAccessRights.REVIEW_POLICY);
-
         return pap.query().routines().getAdminRoutine(routineName);
     }
 }

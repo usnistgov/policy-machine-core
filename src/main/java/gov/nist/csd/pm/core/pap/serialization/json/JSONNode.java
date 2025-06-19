@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -21,14 +22,20 @@ public class JSONNode {
 
         if (properties != null && !properties.isEmpty()) {
             this.properties = properties;
+        } else {
+            this.properties = new ArrayList<>();
         }
 
         if (assignments != null && !assignments.isEmpty()) {
             this.assignments = assignments;
+        } else {
+            this.assignments = new ArrayList<>();
         }
 
         if (associations != null && !associations.isEmpty()) {
             this.associations = associations;
+        } else {
+            this.associations = new ArrayList<>();
         }
     }
 

@@ -49,7 +49,7 @@ public class SetResourceOperationsOp extends Operation<Void, SetResourceOperatio
     @Override
     public void canExecute(PAP pap,
                            UserContext userCtx, SetResourceOperationsOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OBJECT.nodeId(), SET_RESOURCE_OPERATIONS);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), SET_RESOURCE_OPERATIONS);
     }
 
     @Override

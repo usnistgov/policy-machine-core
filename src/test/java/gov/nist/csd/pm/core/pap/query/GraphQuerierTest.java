@@ -82,7 +82,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             pap.modify().graph().setNodeProperties(oa3, toProperties("key1", "value1", "key2", "value2"));
 
             Collection<Node> nodes = pap.query().graph().search(OA, NO_PROPERTIES);
-            assertEquals(4, nodes.size());
+            assertEquals(9, nodes.size());
 
             nodes = pap.query().graph().search(ANY, toProperties("key1", "value1"));
             assertEquals(2, nodes.size());
@@ -103,7 +103,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
             nodes = pap.query().graph().search(OA, toProperties("key1", "value1", "key2", "no_value"));
             assertEquals(0, nodes.size());
             nodes = pap.query().graph().search(ANY, NO_PROPERTIES);
-            assertEquals(6, nodes.size());
+            assertEquals(11, nodes.size());
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void NodeDoesNotExist() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAdjacentAscendants(-3));
+                    () -> pap.query().graph().getAdjacentAscendants(-99));
         }
 
         @Test
@@ -146,7 +146,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void NodeDoesNotExist() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAdjacentDescendants(-3));
+                    () -> pap.query().graph().getAdjacentDescendants(-99));
         }
 
         @Test
@@ -169,7 +169,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         @Test
         void testNodeDoesNotExistException() {
             assertThrows(NodeDoesNotExistException.class,
-                    () -> pap.query().graph().getAssociationsWithSource(-3));
+                    () -> pap.query().graph().getAssociationsWithSource(-99));
         }
 
         @Test

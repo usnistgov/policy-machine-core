@@ -9,7 +9,6 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import java.util.*;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_RESOURCE_ACCESS_RIGHTS;
 
 public class AccessRightResolver {
 
@@ -21,7 +20,7 @@ public class AccessRightResolver {
             AccessRightSet pcOps = pc.getValue();
 
             // replace instances of *, *a or *r with the literal access rights
-            resolveWildcardAccessRights(pcOps, resourceOps);
+            pcOps = resolveWildcardAccessRights(pcOps, resourceOps);
 
             resolvedPcMap.put(pc.getKey(), pcOps);
         }
@@ -86,23 +85,36 @@ public class AccessRightResolver {
         return allowed;
     }
 
-    private static void resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
-        // if the permission set includes *, remove the * and add all resource operations
-        if (accessRightSet.contains(ALL_ACCESS_RIGHTS)) {
-            accessRightSet.remove(ALL_ACCESS_RIGHTS);
-            accessRightSet.addAll(allAdminAccessRights());
-            accessRightSet.addAll(resourceOps);
-        } else {
-            // if the permissions includes *a or *r add all the admin ops/resource ops as necessary
-            if (accessRightSet.contains(ALL_ADMIN_ACCESS_RIGHTS)) {
-                accessRightSet.remove(ALL_ADMIN_ACCESS_RIGHTS);
-                accessRightSet.addAll(allAdminAccessRights());
-            }
-            if (accessRightSet.contains(ALL_RESOURCE_ACCESS_RIGHTS)) {
-                accessRightSet.remove(ALL_RESOURCE_ACCESS_RIGHTS);
-                accessRightSet.addAll(resourceOps);
+    private static AccessRightSet resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
+        if (accessRightSet.contains(WC_ALL)) {
+            return createAllAccessRightsSet(resourceOps);
+        }
+
+        if (accessRightSet.contains(WC_RESOURCE)) {
+            return new AccessRightSet(resourceOps);
+        }
+
+        return expandWildcards(accessRightSet);
+    }
+
+    private static AccessRightSet createAllAccessRightsSet(AccessRightSet resourceOps) {
+        AccessRightSet result = new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
+        result.addAll(resourceOps);
+        return result;
+    }
+
+    private static AccessRightSet expandWildcards(AccessRightSet accessRightSet) {
+        AccessRightSet result = new AccessRightSet();
+
+        for (String accessRight : accessRightSet) {
+            if (WILDCARD_MAP.containsKey(accessRight)) {
+                result.addAll(WILDCARD_MAP.get(accessRight));
+            } else {
+                result.add(accessRight);
             }
         }
+
+        return result;
     }
 
     private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<Long> reachedTargets) {

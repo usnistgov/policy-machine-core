@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public class SubjectPattern extends Pattern {
@@ -31,7 +32,12 @@ public class SubjectPattern extends Pattern {
     }
 
     @Override
-    public boolean matches(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(String value, PAP pap) throws PMException {
+        return isAny || subjectPatternExpression.matches(value, pap);
+    }
+
+    @Override
+    public boolean matches(Collection<String> value, PAP pap) throws PMException {
         return isAny || subjectPatternExpression.matches(value, pap);
     }
 
