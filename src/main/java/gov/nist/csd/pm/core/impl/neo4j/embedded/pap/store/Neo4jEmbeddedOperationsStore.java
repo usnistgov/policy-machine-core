@@ -17,6 +17,7 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 
 public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
+	private static final String RESOURCE_OPERATIONS_NODE_NAME = "resource_operations";
 	private final TxHandler txHandler;
 
 	public Neo4jEmbeddedOperationsStore(TxHandler txHandler) {
@@ -25,9 +26,16 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	@Override
 	public void setResourceOperations(AccessRightSet resourceOperations) throws PMException {
+		String[] opsArr = resourceOperations.toArray(String[]::new);
+
 		txHandler.runTx(tx -> {
-			Node node = tx.createNode(RESOURCE_OPERATIONS_LABEL);
-			node.setProperty(DATA_PROPERTY, resourceOperations.toArray(String[]::new));
+			Node node = tx.findNode(RESOURCE_OPERATIONS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			if (node == null) {
+				node = tx.createNode(RESOURCE_OPERATIONS_LABEL);
+				node.setProperty(NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			}
+
+			node.setProperty(DATA_PROPERTY, opsArr);
 		});
 	}
 
@@ -59,13 +67,13 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 		AccessRightSet resourceOperations = new AccessRightSet();
 
 		txHandler.runTx(tx -> {
-			ResourceIterator<Node> nodes = tx.findNodes(RESOURCE_OPERATIONS_LABEL);
-			if (!nodes.hasNext()) {
+			Node node = tx.findNode(RESOURCE_OPERATIONS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			if (node == null) {
 				return;
 			}
 
-			Node node = nodes.next();
-			resourceOperations.addAll(Arrays.asList((String[]) node.getProperty(DATA_PROPERTY)));
+			String[] opArr = (String[]) node.getProperty(DATA_PROPERTY);
+			resourceOperations.addAll(Arrays.asList(opArr));
 		});
 
 		return resourceOperations;
