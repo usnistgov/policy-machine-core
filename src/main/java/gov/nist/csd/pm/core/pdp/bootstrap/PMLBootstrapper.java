@@ -10,11 +10,14 @@ import java.util.List;
 
 public class PMLBootstrapper extends PolicyBootstrapper {
 
+    private List<Operation<?, ?>> operations;
+    private List<Routine<?, ?>> routines;
     private final String bootstrapUser;
     private final String pml;
 
     public PMLBootstrapper(List<Operation<?, ?>> operations, List<Routine<?, ?>> routines, String bootstrapUser, String pml) {
-        super(operations, routines);
+        this.operations = operations;
+        this.routines = routines;
         this.bootstrapUser = bootstrapUser;
         this.pml = pml;
     }

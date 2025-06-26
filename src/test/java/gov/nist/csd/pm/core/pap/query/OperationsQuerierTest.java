@@ -66,6 +66,9 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
             AccessRightSet arset = new AccessRightSet("read", "write");
             pap.modify().operations().setResourceOperations(arset);
             assertEquals(arset, pap.query().operations().getResourceOperations());
+            arset = new AccessRightSet("read", "write", "execute");
+            pap.modify().operations().setResourceOperations(arset);
+            assertEquals(arset, pap.query().operations().getResourceOperations());
         }
     }
 

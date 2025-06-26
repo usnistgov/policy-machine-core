@@ -11,13 +11,6 @@ public class JSONBootstrapper extends PolicyBootstrapper{
 
     private String json;
 
-    public JSONBootstrapper(List<Operation<?, ?>> operations,
-                            List<Routine<?, ?>> routines,
-                            String json) {
-        super(operations, routines);
-        this.json = json;
-    }
-
     @Override
     public void bootstrap(PAP pap) throws PMException {
         pap.deserialize(json, new JSONDeserializer());
