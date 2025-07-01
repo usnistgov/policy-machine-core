@@ -8,9 +8,6 @@ public class ContainerCondition implements Serializable {
     private long id;
     private boolean complement;
 
-    public ContainerCondition() {
-    }
-
     public ContainerCondition(long id, boolean complement) {
         this.id = id;
         this.complement = complement;

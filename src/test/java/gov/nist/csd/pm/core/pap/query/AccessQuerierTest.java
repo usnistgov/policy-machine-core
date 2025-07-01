@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.*;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
+import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.junit.jupiter.api.Test;
@@ -860,8 +861,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
         pap.modify().graph().associate(ua1, oa1, new AccessRightSet("read", "write"));
-        assertTrue(
-            pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
+        assertTrue(pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1)).containsAll(Arrays.asList("read", "write")));
     }
 
     @Test

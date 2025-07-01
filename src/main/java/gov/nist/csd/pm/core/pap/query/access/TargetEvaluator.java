@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 
 import java.util.*;
@@ -20,7 +21,7 @@ import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLA
 
 public class TargetEvaluator {
 
-	private final PolicyStore policyStore;
+	protected final PolicyStore policyStore;
 
 	public TargetEvaluator(PolicyStore policyStore) {
 		this.policyStore = policyStore;
@@ -33,119 +34,85 @@ public class TargetEvaluator {
 	 * each policy class. If the target has one or more PCs as adjacent descendants, first check the users privileges on
 	 * those PCs and add them to the entries of those PCs in the resulting TargetDagResult
 	 */
-	public TargetDagResult evaluate(UserDagResult userContext, TargetContext targetContext) throws PMException {
-		targetContext.checkExists(policyStore.graph());
-		prepareTargetContext(targetContext);
+	public TargetDagResult evaluate(UserDagResult userDagResult, TargetContext targetContext) throws PMException {
+		prepareTargetCtx(targetContext);
 
-		EvaluationState state = initializeEvaluationState(userContext, targetContext);
-		DepthFirstGraphWalker dfs = createDepthFirstWalker(state);
-		List<Long> targetNodes = executeEvaluation(targetContext, dfs);
-		
-		return new TargetDagResult(mergeResults(targetNodes, state.visitedNodes), state.reachedTargets);
+		// initialize objects for traversal
+		TraversalState state = initializeEvaluationState(userDagResult, targetContext);
+		DepthFirstGraphWalker dfs = createDepthFirstWalker(userDagResult, state);
+
+		// walk the target graph starting at the first level descs
+		List<Long> targetNodes = new ArrayList<>();
+		if (targetContext.isNode()) {
+			long targetId = targetContext.getTargetId();
+			targetNodes.add(targetId);
+			dfs.walk(targetId);
+		} else {
+			Collection<Long> attributeIds = targetContext.getAttributeIds();
+			targetNodes.addAll(attributeIds);
+			dfs.walk(attributeIds);
+		}
+
+		Map<Long, AccessRightSet> pcMap = computePcMap(targetNodes, state.visitedNodes);
+
+		return new TargetDagResult(pcMap, state.visitedProhibitionTargets);
 	}
 
-	private EvaluationState initializeEvaluationState(UserDagResult userContext, TargetContext targetContext) throws PMException {
-		Set<Long> policyClasses = new LongOpenHashSet(policyStore.graph().getPolicyClasses());
-		Map<Long, AccessRightSet> borderTargets = userContext.borderTargets();
-		Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userContext.prohibitions());
+	private Map<Long, AccessRightSet> computePcMap(List<Long> targetNodes, Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
+		HashMap<Long, AccessRightSet> merged = new HashMap<>();
+
+		for (Long target : targetNodes) {
+			Map<Long, AccessRightSet> pcMap = visitedNodes.getOrDefault(target, new HashMap<>());
+
+			for (Map.Entry<Long, AccessRightSet> entry : pcMap.entrySet()) {
+				Long pc = entry.getKey();
+				AccessRightSet pcArset = entry.getValue();
+
+				if (!merged.containsKey(pc)) {
+					merged.put(pc, pcArset);
+				} else {
+					AccessRightSet mergedArset = merged.get(pc);
+					mergedArset.retainAll(pcArset);
+					merged.put(pc, mergedArset);
+				}
+			}
+		}
+
+		return merged;
+	}
+
+	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
+		Collection<Long> firstLevelDescs = new LongArrayList();
+		if (targetCtx.isNode()) {
+			firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(targetCtx.getTargetId()));
+		} else {
+			firstLevelDescs.addAll(targetCtx.getAttributeIds());
+		}
+
+		Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userDagResult.prohibitions());
 		Map<Long, Map<Long, AccessRightSet>> visitedNodes = new Long2ObjectOpenHashMap<>();
-		Set<Long> reachedTargets = new LongOpenHashSet();
+		Set<Long> visitedProhibitionTargets = new LongOpenHashSet();
 
-		AccessRightSet adminPrivilegesOnPCs = computeAdminPrivilegesOnPCs(userContext, targetContext, policyClasses);
-
-		return new EvaluationState(policyClasses, borderTargets, userProhibitionTargets, 
-			visitedNodes, reachedTargets, adminPrivilegesOnPCs);
+		return new TraversalState(
+			firstLevelDescs,
+			userProhibitionTargets,
+			visitedNodes,
+			visitedProhibitionTargets
+		);
 	}
 
-	private AccessRightSet computeAdminPrivilegesOnPCs(UserDagResult userContext, TargetContext targetContext,
-												  Set<Long> policyClasses) throws PMException {
-		Collection<Long> firstLevelDescendantPCs = new ArrayList<>(targetContext.getAttributeIds());
+	protected AccessRightSet computePrivilegesOnPCs(UserDagResult userDagResult,
+													Collection<Long> firstLevelDescs,
+													Collection<Long> policyClasses) throws PMException {
+		Collection<Long> firstLevelDescendantPCs = new ArrayList<>(firstLevelDescs);
 		firstLevelDescendantPCs.retainAll(policyClasses);
-		
+
 		if (firstLevelDescendantPCs.isEmpty()) {
 			return new AccessRightSet();
 		}
-		
-		return computePrivsOnPCAdminNode(userContext, firstLevelDescendantPCs, policyClasses);
-	}
 
-	private DepthFirstGraphWalker createDepthFirstWalker(EvaluationState state) {
-		Visitor nodeVisitor = createNodeVisitor(state);
-		Propagator privilegePropagator = createPrivilegePropagator(state);
-
-		return new GraphStoreDFS(policyStore.graph())
-			.withDirection(Direction.DESCENDANTS)
-			.withVisitor(nodeVisitor)
-			.withPropagator(privilegePropagator);
-	}
-
-	private Visitor createNodeVisitor(EvaluationState state) {
-		return nodeId -> {
-			markProhibitionTargetIfReached(nodeId, state);
-			Map<Long, AccessRightSet> nodePrivileges = getOrCreateNodePrivileges(nodeId, state.visitedNodes);
-			
-			if (state.policyClasses.contains(nodeId)) {
-				nodePrivileges.put(nodeId, state.adminPrivilegesOnPCs);
-			} else if (state.borderTargets.containsKey(nodeId)) {
-				applyBorderTargetPrivileges(nodeId, nodePrivileges, state.borderTargets);
-			}
-		};
-	}
-
-	private Propagator createPrivilegePropagator(EvaluationState state) {
-		return (descendantId, ancestorId) -> {
-			Map<Long, AccessRightSet> descendantPrivileges = state.visitedNodes.get(descendantId);
-			Map<Long, AccessRightSet> ancestorPrivileges = getOrCreateNodePrivileges(ancestorId, state.visitedNodes);
-
-			propagatePrivileges(descendantPrivileges, ancestorPrivileges);
-			state.visitedNodes.put(ancestorId, ancestorPrivileges);
-		};
-	}
-
-	private void markProhibitionTargetIfReached(long nodeId, EvaluationState state) {
-		if (state.userProhibitionTargets.contains(nodeId)) {
-			state.reachedTargets.add(nodeId);
-		}
-	}
-
-	private Map<Long, AccessRightSet> getOrCreateNodePrivileges(long nodeId, 
-															   Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
-		return visitedNodes.computeIfAbsent(nodeId, k -> new Long2ObjectOpenHashMap<>());
-	}
-
-	private void applyBorderTargetPrivileges(long nodeId, Map<Long, AccessRightSet> nodePrivileges, 
-											Map<Long, AccessRightSet> borderTargets) {
-		AccessRightSet borderOperations = borderTargets.get(nodeId);
-		
-		nodePrivileges.forEach((policyClassId, privileges) -> privileges.addAll(borderOperations));
-	}
-
-	private void propagatePrivileges(Map<Long, AccessRightSet> fromPrivileges, 
-									Map<Long, AccessRightSet> toPrivileges) {
-		fromPrivileges.forEach((policyClassId, privileges) -> {
-			AccessRightSet targetPrivileges = toPrivileges.computeIfAbsent(policyClassId, k -> new AccessRightSet());
-			targetPrivileges.addAll(privileges);
-		});
-	}
-
-	private List<Long> executeEvaluation(TargetContext targetContext, DepthFirstGraphWalker dfs) throws PMException {
-		List<Long> targetNodes = new ArrayList<>();
-		
-		if (targetContext.isNode()) {
-			targetNodes.add(targetContext.getTargetId());
-			dfs.walk(targetContext.getTargetId());
-		} else {
-			targetNodes.addAll(targetContext.getAttributeIds());
-			dfs.walk(targetContext.getAttributeIds());
-		}
-		
-		return targetNodes;
-	}
-
-	private AccessRightSet computePrivsOnPCAdminNode(UserDagResult userDagResult,
-													 Collection<Long> firstLevelDescendants,
-													 Collection<Long> policyClasses) throws PMException {
-		List<Long> policyClassDescendants = new ArrayList<>(firstLevelDescendants);
+		// retain all policy class first level descs
+		List<Long> policyClassDescendants = new ArrayList<>(firstLevelDescs);
 		policyClassDescendants.retainAll(policyClasses);
 
 		// there are no policy class adjacent descendants, so no privs to evaluate for
@@ -163,27 +130,70 @@ public class TargetEvaluator {
 		);
 	}
 
-	private void prepareTargetContext(TargetContext targetContext) throws PMException {
-		Collection<Long> firstLevelDescendants = determineFirstLevelDescendants(targetContext);
-		targetContext.setAttributeIds(firstLevelDescendants);
+	protected DepthFirstGraphWalker createDepthFirstWalker(UserDagResult userDagResult, TraversalState state) throws PMException {
+		Visitor nodeVisitor = createVisitor(userDagResult, state);
+		Propagator privilegePropagator = createPropagator(state);
+
+		return new GraphStoreDFS(policyStore.graph())
+			.withDirection(Direction.DESCENDANTS)
+			.withVisitor(nodeVisitor)
+			.withPropagator(privilegePropagator);
 	}
 
-	private Collection<Long> determineFirstLevelDescendants(TargetContext targetContext) throws PMException {
-		if (targetContext.isNode()) {
-			long targetId = adjustTargetIdForPolicyClass(targetContext.getTargetId());
-			targetContext.setTargetId(targetId);
-			return policyStore.graph().getAdjacentDescendants(targetId);
-		} else {
-			return targetContext.getAttributeIds();
+	protected Visitor createVisitor(UserDagResult userDagResult, TraversalState state) throws PMException {
+		Collection<Long> policyClasses = policyStore.graph().getPolicyClasses();
+		AccessRightSet adminPrivilegesOnPCs = computePrivilegesOnPCs(userDagResult, state.firstLevelDescs, policyClasses);
+
+		return nodeId -> {
+			// track visited prohibition container nodes
+			if (state.userProhibitionTargets.contains(nodeId)) {
+				state.visitedProhibitionTargets.add(nodeId);
+			}
+
+			Map<Long, AccessRightSet> nodePrivileges = state.visitedNodes.computeIfAbsent(nodeId, __ -> new Long2ObjectOpenHashMap<>());
+
+			if (policyClasses.contains(nodeId)) {
+				nodePrivileges.put(nodeId, adminPrivilegesOnPCs);
+			} else if (userDagResult.borderTargets().containsKey(nodeId)) {
+				AccessRightSet borderArset = userDagResult.borderTargets().get(nodeId);
+
+				nodePrivileges.forEach((policyClassId, privileges) -> privileges.addAll(borderArset));
+			}
+		};
+	}
+
+	protected Propagator createPropagator(TraversalState state) {
+		return (descendantId, ascendantId) -> {
+			Map<Long, AccessRightSet> descsPrivs = state.visitedNodes.get(descendantId);
+			Map<Long, AccessRightSet> ascsPrivs = state.visitedNodes.computeIfAbsent(ascendantId, __ -> new Long2ObjectOpenHashMap<>());
+
+			for (long id : descsPrivs.keySet()) {
+				AccessRightSet ops = ascsPrivs.getOrDefault(id, new AccessRightSet());
+				ops.addAll(descsPrivs.getOrDefault(id, new AccessRightSet()));
+				ascsPrivs.put(id, ops);
+			}
+
+			state.visitedNodes.put(ascendantId, ascsPrivs);
+		};
+	}
+
+	protected void prepareTargetCtx(TargetContext targetContext) throws PMException {
+		// ensure the target context node or attributes exist
+		targetContext.checkExists(policyStore.graph());
+
+		// if already list of attributes than nothing to prepare
+		if (!targetContext.isNode()) {
+			return;
 		}
-	}
 
-	private long adjustTargetIdForPolicyClass(long targetId) throws PMException {
+		// if the node is a PC, make the target the PM_ADMIN_PCs node
+		long targetId = targetContext.getTargetId();
 		Node targetNode = policyStore.graph().getNodeById(targetId);
-		return targetNode.getType().equals(PC) ? PM_ADMIN_POLICY_CLASSES.nodeId() : targetId;
+		targetId = targetNode.getType().equals(PC) ? PM_ADMIN_POLICY_CLASSES.nodeId() : targetId;
+		targetContext.setTargetId(targetId);
 	}
 
-	private Set<Long> collectUserProhibitionTargets(Set<Prohibition> prohibitions) {
+	protected Set<Long> collectUserProhibitionTargets(Set<Prohibition> prohibitions) {
 		Set<Long> userProhibitionTargets = new HashSet<>();
 		for (Prohibition prohibition : prohibitions) {
 			for (ContainerCondition containerCondition : prohibition.getContainers()) {
@@ -193,29 +203,8 @@ public class TargetEvaluator {
 		return userProhibitionTargets;
 	}
 
-	private Map<Long, AccessRightSet> mergeResults(Collection<Long> targetNodes, 
-												  Map<Long, Map<Long, AccessRightSet>> visitedNodes) {
-		Long2ObjectOpenHashMap<AccessRightSet> mergedResults = new Long2ObjectOpenHashMap<>();
-
-		targetNodes.forEach(targetId -> 
-			visitedNodes.getOrDefault(targetId, Collections.emptyMap())
-				.forEach((policyClassId, privileges) -> 
-					mergedResults.merge(policyClassId, privileges, this::intersectPrivileges)
-				)
-		);
-
-		return mergedResults;
-	}
-
-	private AccessRightSet intersectPrivileges(AccessRightSet existing, AccessRightSet incoming) {
-		existing.retainAll(incoming);
-		return existing;
-	}
-
-	private record EvaluationState(Set<Long> policyClasses,
-								   Map<Long, AccessRightSet> borderTargets,
-								   Set<Long> userProhibitionTargets,
-								   Map<Long, Map<Long, AccessRightSet>> visitedNodes,
-								   Set<Long> reachedTargets,
-								   AccessRightSet adminPrivilegesOnPCs) { }
+	protected record TraversalState(Collection<Long> firstLevelDescs,
+									Set<Long> userProhibitionTargets,
+									Map<Long, Map<Long, AccessRightSet>> visitedNodes,
+									Set<Long> visitedProhibitionTargets) { }
 }
