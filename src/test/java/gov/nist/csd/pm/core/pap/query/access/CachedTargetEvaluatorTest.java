@@ -103,7 +103,7 @@ class CachedTargetEvaluatorTest {
     }
 
     @Test
-    void testConsistentResultsAcrossCalls() throws PMException {
+    void testConsistentResults() throws PMException {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
         TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
@@ -173,7 +173,7 @@ class CachedTargetEvaluatorTest {
     }
 
     @Test
-    void testEmptyUserDagResultHandling() throws PMException {
+    void testEmptyUserDagResult() throws PMException {
         UserDagResult emptyUserDagResult = new UserDagResult(Map.of(), Set.of());
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
         
@@ -184,7 +184,7 @@ class CachedTargetEvaluatorTest {
     }
 
     @Test
-    void testCacheWithMeaningfulUserDagResultDifferences() throws PMException {
+    void testCacheWithUserDagResultDifferences() throws PMException {
         UserDagResult userWithWriteAccess = new UserDagResult(
             Map.of(
                 id("oa1"), new AccessRightSet("read", "write"),
