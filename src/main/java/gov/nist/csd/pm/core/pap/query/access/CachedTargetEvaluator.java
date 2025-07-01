@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.query.access;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -18,7 +17,7 @@ import java.util.Set;
 public class CachedTargetEvaluator extends TargetEvaluator {
 
     private UserDagResult cachedUserDagResult;
-    private Map<Long, Map<Long, AccessRightSet>> cachedVisitedNodes;
+    private final Map<Long, Map<Long, AccessRightSet>> cachedVisitedNodes;
 
     public CachedTargetEvaluator(PolicyStore policyStore) {
         super(policyStore);

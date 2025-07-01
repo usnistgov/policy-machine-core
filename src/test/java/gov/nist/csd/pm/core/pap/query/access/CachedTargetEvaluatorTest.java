@@ -106,7 +106,6 @@ class CachedTargetEvaluatorTest {
     void testConsistentResultsAcrossCalls() throws PMException {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
-        // Multiple evaluations of the same target should return identical results
         TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         TargetDagResult result3 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
@@ -119,30 +118,21 @@ class CachedTargetEvaluatorTest {
 
     @Test
     void testCacheInvalidatedOnUserDagResultChange() throws PMException {
-        // Let's first understand what the regular evaluator produces
         TargetEvaluator regularEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult regularResult1 = regularEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         TargetDagResult regularResult2 = regularEvaluator.evaluate(alternateUserDagResult, new TargetContext(id("o1")));
         
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
         
-        // First evaluation with original UserDagResult
         TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         
-        // Second evaluation with same UserDagResult should use cache and return same result
         TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         assertEquals(result1.pcMap(), result2.pcMap());
         
-        // Third evaluation with different UserDagResult
         TargetDagResult result3 = cachedEvaluator.evaluate(alternateUserDagResult, new TargetContext(id("o1")));
-        
-        // If both regular results are empty, then both cached results should also be empty
-        // but they should still match their respective regular evaluator results
         assertEquals(regularResult1.pcMap(), result1.pcMap());
         assertEquals(regularResult2.pcMap(), result3.pcMap());
-        
-        // The cache should be working correctly even if results happen to be the same
-        // Fourth evaluation with original UserDagResult should match first result again
+
         TargetDagResult result4 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         assertEquals(result1.pcMap(), result4.pcMap());
     }
@@ -157,10 +147,9 @@ class CachedTargetEvaluatorTest {
             new TargetContext(id("o2")),
             new TargetContext(id("oa1")),
             new TargetContext(id("oa2")),
-            new TargetContext(id("o3"))  // From different PC
+            new TargetContext(id("o3"))
         };
 
-        // Evaluate all contexts with both evaluators
         for (TargetContext context : contexts) {
             TargetDagResult regularResult = regularEvaluator.evaluate(userDagResult, context);
             TargetDagResult cachedResult = cachedEvaluator.evaluate(userDagResult, context);
@@ -188,7 +177,6 @@ class CachedTargetEvaluatorTest {
         UserDagResult emptyUserDagResult = new UserDagResult(Map.of(), Set.of());
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
         
-        // Should handle empty UserDagResult without errors
         TargetDagResult result = cachedEvaluator.evaluate(emptyUserDagResult, new TargetContext(id("o1")));
         
         assertNotNull(result);
@@ -197,7 +185,6 @@ class CachedTargetEvaluatorTest {
 
     @Test
     void testCacheWithMeaningfulUserDagResultDifferences() throws PMException {
-        // Create UserDagResults with more significant differences
         UserDagResult userWithWriteAccess = new UserDagResult(
             Map.of(
                 id("oa1"), new AccessRightSet("read", "write"),
@@ -207,25 +194,22 @@ class CachedTargetEvaluatorTest {
         );
 
         UserDagResult userWithNoAccess = new UserDagResult(
-            Map.of(), // No privileges at all
+            Map.of(),
             Set.of()
         );
 
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
         TargetEvaluator regularEvaluator = new TargetEvaluator(pap.policyStore());
 
-        // Test with o1 (which is in oa1)
         TargetDagResult cachedResultWithAccess = cachedEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
         TargetDagResult regularResultWithAccess = regularEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
         
         TargetDagResult cachedResultNoAccess = cachedEvaluator.evaluate(userWithNoAccess, new TargetContext(id("o1")));
         TargetDagResult regularResultNoAccess = regularEvaluator.evaluate(userWithNoAccess, new TargetContext(id("o1")));
 
-        // Verify cached results match regular evaluator results
         assertEquals(regularResultWithAccess.pcMap(), cachedResultWithAccess.pcMap());
         assertEquals(regularResultNoAccess.pcMap(), cachedResultNoAccess.pcMap());
 
-        // Verify that switching back to original UserDagResult works
         TargetDagResult cachedResultWithAccessAgain = cachedEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
         assertEquals(cachedResultWithAccess.pcMap(), cachedResultWithAccessAgain.pcMap());
     }
