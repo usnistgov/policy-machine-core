@@ -28,7 +28,7 @@ class CreateProhibitionStmtVisitorTest {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
                 create prohibition "test"
-                deny u "u1"
+                deny U "u1"
                 access rights ["read"]
                 on union of {"oa1": true}
                 """);
@@ -57,7 +57,7 @@ class CreateProhibitionStmtVisitorTest {
         testCompilationError(
                 """
                 create prohibition ["test"]
-                deny u "u1"
+                deny U "u1"
                 access rights ["read"]
                 on union of {"oa1": true}
                 """, visitorCtx, 1,
@@ -67,7 +67,7 @@ class CreateProhibitionStmtVisitorTest {
         testCompilationError(
                 """
                 create prohibition "test"
-                deny u ["u1"]
+                deny U ["u1"]
                 access rights ["read"]
                 on union of {"oa1": true}
                 """, visitorCtx, 1,
@@ -77,7 +77,7 @@ class CreateProhibitionStmtVisitorTest {
         testCompilationError(
                 """
                 create prohibition "test"
-                deny u "u1"
+                deny U "u1"
                 access rights "read"
                 on union of {"oa1": true}
                 """, visitorCtx, 1,
@@ -87,7 +87,7 @@ class CreateProhibitionStmtVisitorTest {
         testCompilationError(
                 """
                 create prohibition "test"
-                deny u "u1"
+                deny U "u1"
                 access rights ["read"]
                 on union of "oa1"
                 """, visitorCtx, 1,

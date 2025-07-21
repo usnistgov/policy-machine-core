@@ -150,7 +150,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa4"]
                 
                 create prohibition "p1"
-                deny u "u1"
+                deny U "u1"
                 access rights ["write"]
                 on union of {"oa1": false}
                 """;
@@ -185,12 +185,12 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o1" in ["oa1", "oa3"]
                 
                 create prohibition "p1"
-                deny u "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": false}
                 
                 create prohibition "p2"
-                deny u "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": true}
                 """;
@@ -665,7 +665,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa2"]
                 
                 create prohibition "p1"
-                deny u "u1"
+                deny U "u1"
                 access rights ["write"]
                 on union of {"o1": false}
                 """;
@@ -766,7 +766,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa2"]
                 
                 create prohibition "p1"
-                deny u "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": false}
                 """;
@@ -814,7 +814,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o1" in ["oa1"]
                 
                 create prohibition "p1"
-                deny u "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": false}
                 """;
@@ -1628,7 +1628,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         // create a prohibition for the user on the object
         pml = """
                 create prohibition "p1"
-                deny u "u1"
+                deny U "u1"
                 access rights ["read"]
                 on union of {"o1": false}
                 """;
@@ -1650,7 +1650,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 delete prohibition "p1"
                 
                 create prohibition "p1"
-                deny u "u1"
+                deny U "u1"
                 access rights ["read"]
                 on intersection of {"oa1": false, "oa2": false}
                 """;

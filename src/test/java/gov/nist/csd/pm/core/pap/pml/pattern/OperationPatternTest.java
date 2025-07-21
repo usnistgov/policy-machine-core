@@ -23,8 +23,8 @@ class OperationPatternTest {
     @Test
     void testPML() throws PMException {
         String pml = """
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs any operation
                     do(ctx) { }
@@ -34,8 +34,8 @@ class OperationPatternTest {
         assertEquals(new OperationPattern(), stmt.getOperationPattern());
 
         pml = """
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs "op1"
                     do(ctx) { }

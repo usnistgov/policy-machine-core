@@ -14,13 +14,9 @@ CREATE      : 'create' ;
 DELETE      : 'delete' ;
 
 // obligation keywords
-POLICY_ELEMENT: 'policy element' | PE ;
-PE: 'pe' ;
-CONTAINED: 'contained' ;
 RULE: 'rule' ;
 WHEN: 'when' ;
 PERFORMS: 'performs' ;
-AS: 'as' ;
 ON: 'on' ;
 IN: 'in' ;
 DO: 'do' ;

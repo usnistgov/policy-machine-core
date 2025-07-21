@@ -15,11 +15,13 @@ import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
@@ -58,8 +60,8 @@ class EPPTest {
                 
                 }
                 
-                obligation "obl1" {
-                    rule "op1"
+                create obligation "obl1" {
+                    create rule "op1"
                     when any user
                     performs "op1"
                     on {
@@ -74,7 +76,7 @@ class EPPTest {
                         }
                     }
                 
-                    rule "op2"
+                    create rule "op2"
                     when any user
                     performs "op2"
                     on {
@@ -164,8 +166,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["read"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
-                obligation "obl1" {
-                    rule "op1"
+                create obligation "obl1" {
+                    create rule "op1"
                     when any user
                     performs "read"
                     on {
@@ -198,8 +200,8 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 associate "ua1" and "oa1" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -237,8 +239,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -364,8 +366,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -404,8 +406,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -448,8 +450,8 @@ class EPPTest {
                     create o "o1" in ["oa1"]
                 }
                 
-                obligation "obl1" {
-                    rule "rule1"
+                create obligation "obl1" {
+                    create rule "rule1"
                     when any user
                     performs "create_policy_class"
                     do(ctx) {
@@ -480,5 +482,82 @@ class EPPTest {
         assertFalse(pap.query().graph().nodeExists("test_pc"));
         assertFalse(pap.query().graph().nodeExists("o1"));
         assertFalse(pap.query().graph().nodeExists("u1_pc"));
+    }
+
+    @Test
+    void testEppSendsCorrectEventContextMap() {
+        String pml = """
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create u "u1" in ["ua1"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
+                
+                create obligation "obl1" {
+                    create rule "rule1"
+                    when any user
+                    performs "test1"
+                    do(ctx) {
+                        x := [
+                            ctx.test,
+                            ctx.operation,
+                            ctx.check,
+                            ctx.routine,
+                            ctx.function,
+                            ctx.create,
+                            ctx.delete,
+                            ctx.rule,
+                            ctx.when,
+                            ctx.performs,
+                            ctx.on,
+                            ctx.in,
+                            ctx.do,
+                            ctx.any,
+                            ctx.intersection,
+                            ctx.union,
+                            ctx.process,
+                            ctx.assign,
+                            ctx.deassign,
+                            ctx.from,
+                            ctx.of,
+                            ctx.to,
+                            ctx.associate,
+                            ctx.and,
+                            ctx.with,
+                            ctx.dissociate,
+                            ctx.deny,
+                            ctx.prohibition,
+                            ctx.obligation,
+                            ctx.node,
+                            ctx.user,
+                            ctx.pc,
+                            ctx.oa,
+                            ctx.ua,
+                            ctx.o,
+                            ctx.u,
+                            ctx.break,
+                            ctx.default,
+                            ctx.map,
+                            ctx.else,
+                            ctx.const,
+                            ctx.if,
+                            ctx.range,
+                            ctx.continue,
+                            ctx.foreach,
+                            ctx.return,
+                            ctx.var,
+                            ctx.string,
+                            ctx.bool,
+                            ctx.void,
+                            ctx.array,
+                            ctx.nil,
+                            ctx.true,
+                            ctx.false
+                        ]
+                    }
+                }
+                """;
+
+        PMLCompiler pmlCompiler = new PMLCompiler();
+        assertDoesNotThrow(() -> pmlCompiler.compilePML(pml));
     }
 }

@@ -54,9 +54,9 @@ nonPCNodeType:
     (OA | UA | O | U) ;
 
 createObligationStatement:
-    OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
+    CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
 createRuleStatement:
-    RULE ruleName=expression
+    CREATE RULE ruleName=expression
     WHEN subjectPattern
     PERFORMS operationPattern
     (ON argPattern)?
@@ -242,12 +242,9 @@ idIndex:
     | FUNCTION
     | CREATE
     | DELETE
-    | PE
-    | CONTAINED
     | RULE
     | WHEN
     | PERFORMS
-    | AS
     | ON
     | IN
     | DO
@@ -268,6 +265,7 @@ idIndex:
     | PROHIBITION
     | OBLIGATION
     | NODE
+    | USER
     | PC
     | OA
     | UA

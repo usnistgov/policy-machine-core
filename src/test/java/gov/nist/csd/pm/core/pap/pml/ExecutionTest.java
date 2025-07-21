@@ -428,12 +428,12 @@ public class ExecutionTest {
 
         String input = """
                 create prohibition "p1"
-                deny ua "ua1"
+                deny UA "ua1"
                 access rights ["read"]
                 on union of {"oa1": false}
                 
                 create prohibition "p2"
-                deny ua "ua1"
+                deny UA "ua1"
                 access rights ["read"]
                 on union of {"oa1": false}
                 """;

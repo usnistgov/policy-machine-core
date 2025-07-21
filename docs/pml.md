@@ -343,9 +343,9 @@ Create new obligation. The author of the obligation will be the user that compil
   
 ```  
 createObligationStatement:  
-    'obligation' name=expression '{' createRuleStatement* '}';  
+    'create obligation' name=expression '{' createRuleStatement* '}';  
 createRuleStatement:  
-    'rule' ruleName=expression  
+    'create rule' ruleName=expression  
     'when' subjectPattern  
     'performs' operationPattern  
     ('on' argPattern)?  

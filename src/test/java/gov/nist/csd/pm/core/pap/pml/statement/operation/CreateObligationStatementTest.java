@@ -116,8 +116,8 @@ class CreateObligationStatementTest {
         );
         assertEquals(
                 """
-                        obligation "obl1" {
-                            rule "rule1"
+                        create obligation "obl1" {
+                            create rule "rule1"
                             when any user
                             performs "e1"
                             on {
@@ -127,7 +127,7 @@ class CreateObligationStatementTest {
                                 create PC "pc2"
                             }
                             
-                            rule "rule2"
+                            create rule "rule2"
                             when user "u1"
                             performs "e3"
                             on {
