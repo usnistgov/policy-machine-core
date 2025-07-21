@@ -163,8 +163,8 @@ public abstract class PAPTest extends PAPTestInitializer {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 
-                create obligation "o1" {
-                    create rule "r1"
+                obligation "o1" {
+                    rule "r1"
                     when any user 
                     performs any operation
                     do(ctx) {}

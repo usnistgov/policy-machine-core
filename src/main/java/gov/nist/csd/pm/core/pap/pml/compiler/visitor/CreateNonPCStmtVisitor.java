@@ -29,11 +29,11 @@ public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement>
     }
 
     private NodeType getNodeType(PMLParser.NonPCNodeTypeContext nodeType) {
-        if (nodeType.OBJECT_ATTRIBUTE() != null) {
+        if (nodeType.OA() != null) {
             return OA;
-        } else if (nodeType.USER_ATTRIBUTE() != null) {
+        } else if (nodeType.UA() != null) {
             return NodeType.UA;
-        } else if (nodeType.OBJECT() != null) {
+        } else if (nodeType.O() != null) {
             return NodeType.O;
         } else {
             return NodeType.U;

@@ -114,7 +114,7 @@ public class CreateRuleStatement extends PMLStatement<Rule> {
 
         return String.format(
             """
-            %screate rule %s
+            %srule %s
             %swhen %s
             %sperforms %s
             %s

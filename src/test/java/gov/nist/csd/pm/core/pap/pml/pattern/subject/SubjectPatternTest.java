@@ -34,8 +34,8 @@ class SubjectPatternTest {
         pap.modify().graph().createUser("u2", List.of(ua2));
 
         String pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when any user
                     performs any operation
                     do(ctx) { }
@@ -46,8 +46,8 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1"
                     performs any operation
                     do(ctx) { }
@@ -58,8 +58,8 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1" || "u2"
                     performs any operation
                     do(ctx) { }
@@ -74,8 +74,8 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u1", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1" && in "ua2"
                     performs any operation
                     do(ctx) { }
@@ -91,8 +91,8 @@ class SubjectPatternTest {
         assertFalse(stmt.getSubjectPattern().matches("u2", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user !in "ua1"
                     performs any operation
                     do(ctx) { }
@@ -106,8 +106,8 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u2", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user ("u1" && in "ua2") || "u2"
                     performs any operation
                     do(ctx) { }
@@ -129,8 +129,8 @@ class SubjectPatternTest {
         assertTrue(stmt.getSubjectPattern().matches("u2", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user process "p1"
                     performs any operation
                     do(ctx) { }
