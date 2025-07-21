@@ -27,7 +27,7 @@ class PrivilegeCheckerTest {
                 """
                         set resource operations ["read", "write"]
                         
-                        create PC "pc1"
+                        create policy class "pc1"
                             create ua "ua1" in ["pc1"]
                             create ua "ua2" in ["pc1"]
 
@@ -37,10 +37,10 @@ class PrivilegeCheckerTest {
                             associate "ua1" and "oa1" with ["read", "write"]
                             associate "ua1" and PM_ADMIN_BASE_OA with ["read"]
                       
-                        create U "u1" in ["ua1"]
-                        create U "u2" in ["ua2"]
+                        create user "u1" in ["ua1"]
+                        create user "u2" in ["ua2"]
                         
-                        create O "o1" in ["oa1"]
+                        create object "o1" in ["oa1"]
                         """
         );
     }

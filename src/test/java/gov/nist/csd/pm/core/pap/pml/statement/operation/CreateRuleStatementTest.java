@@ -30,7 +30,7 @@ class CreateRuleStatementTest {
 
         String actual = createRuleStatement.toFormattedString(0);
         assertTrue(actual.equals("""
-                rule "rule1"
+                create rule "rule1"
                 when any user
                 performs any operation
                 on {
@@ -39,7 +39,7 @@ class CreateRuleStatementTest {
                 }
                 do () {
                 }""".trim()) || actual.equals("""
-                rule "rule1"
+                create rule "rule1"
                 when any user
                 performs any operation
                 on {

@@ -186,8 +186,8 @@ class FunctionInvokeExpressionTest {
                 }
                                 
                 operation b(string x, string y) {
-                    create PC c(x)
-                    create PC c(y)
+                    create policy class c(x)
+                    create policy class c(y)
                 }
                                 
                 operation a(string x) {

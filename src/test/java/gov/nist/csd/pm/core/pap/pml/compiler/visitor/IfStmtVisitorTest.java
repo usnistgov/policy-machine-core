@@ -75,7 +75,7 @@ class IfStmtVisitorTest {
                         return
                     }
                     
-                    create PC "pc1"
+                    create policy class "pc1"
                 }
                 
                 f1()

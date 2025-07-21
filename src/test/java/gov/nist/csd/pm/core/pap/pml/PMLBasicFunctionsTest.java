@@ -33,8 +33,8 @@ public class PMLBasicFunctionsTest {
                     create pc name
                 }
                 
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs any operation
                     do(ctx) {
@@ -75,8 +75,8 @@ public class PMLBasicFunctionsTest {
                     }
                 }
                 
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs any operation
                     do(ctx) {
@@ -118,8 +118,8 @@ public class PMLBasicFunctionsTest {
                     create pc "pc2"
                 }
                 
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs "op1"
                     do(ctx) {
@@ -157,8 +157,8 @@ public class PMLBasicFunctionsTest {
                     create pc "pc2"
                 }
                 
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs any operation
                     do(ctx) {

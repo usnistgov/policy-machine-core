@@ -265,7 +265,7 @@ class PDPTest {
         });
         pap.executePML(new TestUserContext("u1"), """
                 routine routine2() map[string]string {
-                    create PC "test2"
+                    create policy class "test2"
                     return {"test2": "test2"}
                 }
                 """);
@@ -363,8 +363,8 @@ class PDPTest {
                     }
                 }
                 
-                obligation "o1" {
-                    rule "r1"
+                create obligation "o1" {
+                    create rule "r1"
                     when any user
                     performs "create_user_attribute"
                     do(ctx) {
@@ -398,8 +398,8 @@ class PDPTest {
                     create pc name
                 }
                 
-                obligation "obl1" {
-                    rule "rule1"
+                create obligation "obl1" {
+                    create rule "rule1"
                     when any user
                     performs "op1"
                     do(ctx) {

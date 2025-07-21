@@ -101,12 +101,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.runTx(tx -> {
                 tx.executePML(new UserContext(id("u1")), """
                     create prohibition "p1"
-                    deny ua "ua1"
+                    deny user attribute "ua1"
                     access rights ["read"]
                     on union of {"US project": false}
                     
                     create prohibition "p2"
-                    deny ua "ua1"
+                    deny user attribute "ua1"
                     access rights ["read"]
                     on union of {"US project": false}
                     """);
@@ -115,12 +115,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
                 tx.executePML(new UserContext(id("u1")), """
                     create prohibition "p3"
-                    deny ua "ua1"
+                    deny user attribute "ua1"
                     access rights ["read"]
                     on union of {"US project": false}
                     
                     create prohibition "p4"
-                    deny ua "ua1"
+                    deny user attribute "ua1"
                     access rights ["read"]
                     on union of {"US project": false}
                     """);
@@ -173,12 +173,12 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.runTx(tx -> {
                 tx.executePML(new UserContext(id("u1")), """
                     create prohibition "p1"
-                    deny ua "ua1"
+                    deny user attribute "ua1"
                     access rights ["read"]
                     on union of {"US project": false}
                     
                     create prohibition "p2"
-                    deny ua "ua1"
+                    deny user attribute "ua1"
                     access rights ["read"]
                     on union of {"US project": false}
                     """);

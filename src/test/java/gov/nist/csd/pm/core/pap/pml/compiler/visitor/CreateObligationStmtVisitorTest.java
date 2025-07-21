@@ -21,7 +21,7 @@ class CreateObligationStmtVisitorTest {
     void testSuccess() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                obligation "test" {}
+                create obligation "test" {}
                 """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
@@ -38,7 +38,7 @@ class CreateObligationStmtVisitorTest {
 
         testCompilationError(
                 """
-                obligation ["test"] {}
+                create obligation ["test"] {}
                 """, visitorCtx, 1,
                 "expected expression type string, got []string"
                 );

@@ -28,18 +28,18 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testSubjectClause() throws PMException {
         String pml = """
-                    obligation "obligation1" {
-                        rule "any user"
+                    create obligation "obligation1" {
+                        create rule "any user"
                         when any user
                         performs "test_event"
                         do(ctx) {}
                         
-                        rule "users"
+                        create rule "users"
                         when user "u1"
                         performs "test_event"
                         do(ctx) {}
                         
-                        rule "users list"
+                        create rule "users list"
                         when user "u1" || "u2"
                         performs "test_event"
                         do(ctx) {}
@@ -84,8 +84,8 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testPerformsClause() throws PMException {
         String pml = """
-                    obligation "obligation1" {
-                        rule "r1"
+                    create obligation "obligation1" {
+                        create rule "r1"
                         when any user
                         performs any operation
                         do(ctx) {}
@@ -110,8 +110,8 @@ class CreateRuleStmtVisitorTest {
         assertEquals(expected, stmt);
 
         String pml2 = """
-            obligation "obligation1" {
-                rule "r1"
+            create obligation "obligation1" {
+                create rule "r1"
                 when any user
                 do(ctx) {}
             }
@@ -127,19 +127,19 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testOnClause() throws PMException {
         String pml = """
-                    obligation "obligation1" {
-                        rule "any arg"
+                    create obligation "obligation1" {
+                        create rule "any arg"
                         when any user
                         performs any operation
                         do(ctx) {}
                         
-                        rule "any arg with on"
+                        create rule "any arg with on"
                         when any user
                         performs any operation
                         on {}
                         do(ctx) {}
                         
-                        rule "an arg"
+                        create rule "an arg"
                         when any user
                         performs "assign"
                         on {
@@ -187,13 +187,13 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testResponse() throws PMException {
         String pml = """
-                    obligation "obligation1" {
-                        rule "r1"
+                    create obligation "obligation1" {
+                        create rule "r1"
                         when any user
                         performs any operation
                         do(ctx) {
-                            create PC "pc1"
-                            create PC "pc2"
+                            create policy class "pc1"
+                            create policy class "pc2"
                         }
                     }
                     """;
@@ -222,8 +222,8 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testFunctionInResponseOk() throws PMException {
         String pml = """
-                    obligation "obligation1" {
-                        rule "e1 and e2"
+                    create obligation "obligation1" {
+                        create rule "e1 and e2"
                         when any user
                         performs any operation
                         do(ctx) {
@@ -237,8 +237,8 @@ class CreateRuleStmtVisitorTest {
     @Test
     void testReturnValueInResponseThrowsException() {
         String pml = """
-                    obligation "obligation1" {
-                        rule "any user"
+                    create obligation "obligation1" {
+                        create rule "any user"
                         when subject => pAny()
                         performs op => pEquals(op, "test_event")
                         do(ctx) {

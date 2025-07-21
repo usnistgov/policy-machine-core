@@ -11,10 +11,8 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 
-import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,7 +21,6 @@ import java.util.Map;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReferenceByDotIndexTest {
@@ -74,7 +71,7 @@ class ReferenceByDotIndexTest {
                     }
                 }
                 
-                create PC a.b.c.d
+                create policy class a.b.c.d
                 """;
         PAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
@@ -85,28 +82,5 @@ class ReferenceByDotIndexTest {
         assertTrue(pap.query().graph().nodeExists("e"));
     }
 
-    @Test
-    void testKeywordIndex() throws PMException {
-        String pml = """
-                operation test(map[string]string m) {
-                    create pc m.oa
-                }
-                
-                test({"oa": "test"})
-                """;
-        PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
-        assertTrue(pap.query().graph().nodeExists("test"));
-
-        String pml2 = """
-                operation test(map[string]string m) {
-                    create pc m.policy class
-                }
-                
-                test({"policy class": "test"})
-                """;
-        PAP pap2 = new TestPAP();
-        assertThrows(PMException.class, () -> pap2.executePML(new TestUserContext("u1"), pml2));
-    }
 
 }

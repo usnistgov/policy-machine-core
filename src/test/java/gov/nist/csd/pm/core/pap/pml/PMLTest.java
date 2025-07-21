@@ -42,7 +42,7 @@ public class PMLTest {
                 associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create prohibition "pro1"
-                deny u "u2"
+                deny user "u2"
                 access rights ["assign"]
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
@@ -137,7 +137,7 @@ public class PMLTest {
                 associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 
                 create prohibition "pro1"
-                deny u "u2"
+                deny user "u2"
                 access rights ["assign"]
                 on union of {PM_ADMIN_BASE_OA: false}
                 

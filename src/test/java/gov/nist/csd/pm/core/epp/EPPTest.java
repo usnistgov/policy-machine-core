@@ -58,8 +58,8 @@ class EPPTest {
                 
                 }
                 
-                obligation "obl1" {
-                    rule "op1"
+                create obligation "obl1" {
+                    create rule "op1"
                     when any user
                     performs "op1"
                     on {
@@ -74,7 +74,7 @@ class EPPTest {
                         }
                     }
                 
-                    rule "op2"
+                    create rule "op2"
                     when any user
                     performs "op2"
                     on {
@@ -164,8 +164,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["read"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
-                obligation "obl1" {
-                    rule "op1"
+                create obligation "obl1" {
+                    create rule "op1"
                     when any user
                     performs "read"
                     on {
@@ -198,15 +198,15 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 associate "ua1" and "oa1" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
                         descendants: "oa1"
                     }
                     do(evtCtx) {
-                        create PC "pc2"
+                        create policy class "pc2"
                     }
                 }
                 """;
@@ -237,8 +237,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -246,14 +246,14 @@ class EPPTest {
                     }
                     do(ctx) {
                         name := ctx.opName
-                        create PC name
+                        create policy class name
 
                         name = ctx.args.name
-                        create PC name + "_test"
+                        create policy class name + "_test"
                         set properties of name + "_test" to {"key": name}
 
                         userCtx := ctx["user"]
-                        create PC ctx["user"] + "_test"
+                        create policy class ctx["user"] + "_test"
                     }
                 }
                 """;
@@ -364,8 +364,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -404,8 +404,8 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
-                obligation "test" {
-                    rule "rule1"
+                create obligation "test" {
+                    create rule "rule1"
                     when any user
                     performs "create_object_attribute"
                     on {
@@ -416,7 +416,7 @@ class EPPTest {
                             return
                         }
                 
-                        create PC "test"
+                        create policy class "test"
                     }
                 }
                 """;
@@ -448,8 +448,8 @@ class EPPTest {
                     create o "o1" in ["oa1"]
                 }
                 
-                obligation "obl1" {
-                    rule "rule1"
+                create obligation "obl1" {
+                    create rule "rule1"
                     when any user
                     performs "create_policy_class"
                     do(ctx) {

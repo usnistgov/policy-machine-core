@@ -45,18 +45,18 @@ operationStatement: (
 
 statementBlock: OPEN_CURLY statement* CLOSE_CURLY ;
 
-createPolicyStatement: CREATE PC name=expression;
+createPolicyStatement: CREATE POLICY_CLASS name=expression;
 
 createNonPCStatement:
     CREATE nonPCNodeType name=expression
     IN in=expression ;
 nonPCNodeType:
-    (OA | UA | O | U) ;
+    (OBJECT_ATTRIBUTE | USER_ATTRIBUTE | OBJECT | USER) ;
 
 createObligationStatement:
-    OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
+    CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
 createRuleStatement:
-    RULE ruleName=expression
+    CREATE RULE ruleName=expression
     WHEN subjectPattern
     PERFORMS operationPattern
     (ON argPattern)?
@@ -112,7 +112,7 @@ responseStatement:
 
 createProhibitionStatement:
     CREATE PROHIBITION name=expression
-    DENY (U | UA | PROCESS) subject=expression
+    DENY (USER | USER_ATTRIBUTE | PROCESS) subject=expression
     ACCESS_RIGHTS accessRights=expression
     ON (INTERSECTION|UNION) OF containers=expression ;
 
@@ -229,66 +229,8 @@ variableReference: ID (index)* ;
 
 index:
     OPEN_BRACKET key=expression CLOSE_BRACKET #BracketIndex
-    | DOT key=idIndex #DotIndex;
+    | DOT key=id #DotIndex;
+id: ID;
 
 functionInvoke: ID functionInvokeArgs ;
 functionInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
-
-idIndex:
-    ID
-    | OPERATION
-    | CHECK
-    | ROUTINE
-    | FUNCTION
-    | CREATE
-    | DELETE
-    | PE
-    | CONTAINED
-    | RULE
-    | WHEN
-    | PERFORMS
-    | AS
-    | ON
-    | IN
-    | DO
-    | ANY
-    | INTERSECTION
-    | UNION
-    | PROCESS
-    | ASSIGN
-    | DEASSIGN
-    | FROM
-    | OF
-    | TO
-    | ASSOCIATE
-    | AND
-    | WITH
-    | DISSOCIATE
-    | DENY
-    | PROHIBITION
-    | OBLIGATION
-    | NODE
-    | PC
-    | OA
-    | UA
-    | O
-    | U
-    | BREAK
-    | DEFAULT
-    | MAP
-    | ELSE
-    | CONST
-    | IF
-    | RANGE
-    | CONTINUE
-    | FOREACH
-    | RETURN
-    | VAR
-    | STRING_TYPE
-    | BOOL_TYPE
-    | VOID_TYPE
-    | ARRAY_TYPE
-    | NIL_LIT
-    | TRUE
-    | FALSE
-    ;

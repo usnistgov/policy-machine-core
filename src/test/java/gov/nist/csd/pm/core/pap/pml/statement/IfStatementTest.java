@@ -23,16 +23,16 @@ class IfStatementTest {
         String pml = """
                 operation func1(string s) {
                     if s == "a" {
-                        create PC s
+                        create policy class s
 
                     } else if s == "b" {
-                        create PC s
+                        create policy class s
                     
                     } else if s == "c" {
-                        create PC s
+                        create policy class s
                     
                     } else {
-                        create PC s
+                        create policy class s
                     
                     }
                 }

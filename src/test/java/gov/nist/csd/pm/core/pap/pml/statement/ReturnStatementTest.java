@@ -20,7 +20,7 @@ class ReturnStatementTest {
                     return "test"
                 }
                 
-                create PC f1()
+                create policy class f1()
                 """;
         PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
