@@ -14,12 +14,9 @@ CREATE      : 'create' ;
 DELETE      : 'delete' ;
 
 // obligation keywords
-POLICY_ELEMENT: 'policy element' | 'pe' ;
-CONTAINED: 'contained';
 RULE: 'rule' ;
 WHEN: 'when' ;
 PERFORMS: 'performs' ;
-AS: 'as' ;
 ON: 'on' ;
 IN: 'in' ;
 DO: 'do' ;
@@ -46,16 +43,14 @@ PROHIBITION: 'prohibition';
 OBLIGATION: 'obligation';
 ACCESS_RIGHTS: 'access rights' ;
 
+PC : PC_FRAG ;
+OA : OA_FRAG ;
+UA : UA_FRAG ;
+U: U_FRAG;
+O: O_FRAG;
+
 NODE: 'node' ;
-POLICY_CLASS: 'policy class' | 'pc' | 'PC' ;
-OBJECT_ATTRIBUTE: 'object attribute' | 'oa' | 'OA' ;
-USER_ATTRIBUTE: 'user attribute' | 'ua' | 'UA' ;
-USER_ATTRIBUTES: 'user attributes' | 'uas' | 'UAs' ;
-OBJECT_ATTRIBUTES: 'object attributes' | 'oas' | 'OAs' ;
-OBJECT: 'object' | 'o' | 'O' ;
-USER: 'user' | 'u' | 'U' ;
-ATTRIBUTE:  'attribute';
-ASSOCIATIONS: 'associations' ;
+USER: 'user' ;
 
 // Keywords
 
@@ -129,6 +124,16 @@ WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
+fragment P   : [pP] ;
+fragment C   : [cC] ;
+fragment PC_FRAG : P C ;
+
+fragment O_FRAG   : [oO] ;
+fragment A   : [aA] ;
+fragment OA_FRAG : O_FRAG A ;
+
+fragment U_FRAG   : [uU] ;
+fragment UA_FRAG : U_FRAG A ;
 
 fragment EscapeSequence
     : '\\' [btnfr"'\\]

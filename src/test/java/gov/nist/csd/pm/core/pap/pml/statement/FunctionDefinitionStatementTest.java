@@ -147,8 +147,8 @@ class FunctionDefinitionStatementTest {
                 func1(a, b)
                 
                 operation func1(string a, string b) {
-                    create policy class a
-                    create policy class b
+                    create PC a
+                    create PC b
                 }
                 """;
         PAP pap = new TestPAP();
@@ -162,7 +162,7 @@ class FunctionDefinitionStatementTest {
     void testInvokeFromDefinition() throws PMException {
         String pml = """
                 operation f1(string a) {
-                    create policy class a
+                    create PC a
                 }
                 
                 operation f2() {
@@ -184,7 +184,7 @@ class FunctionDefinitionStatementTest {
                 x := "x"
                 
                 operation func2() {
-                    create policy class x
+                    create PC x
                 }
                 """;
         PAP pap = new TestPAP();

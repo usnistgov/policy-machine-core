@@ -206,7 +206,7 @@ class EPPTest {
                         descendants: "oa1"
                     }
                     do(evtCtx) {
-                        create policy class "pc2"
+                        create PC "pc2"
                     }
                 }
                 """;
@@ -246,14 +246,14 @@ class EPPTest {
                     }
                     do(ctx) {
                         name := ctx.opName
-                        create policy class name
+                        create PC name
 
                         name = ctx.args.name
-                        create policy class name + "_test"
+                        create PC name + "_test"
                         set properties of name + "_test" to {"key": name}
 
                         userCtx := ctx["user"]
-                        create policy class ctx["user"] + "_test"
+                        create PC ctx["user"] + "_test"
                     }
                 }
                 """;
@@ -416,7 +416,7 @@ class EPPTest {
                             return
                         }
                 
-                        create policy class "test"
+                        create PC "test"
                     }
                 }
                 """;

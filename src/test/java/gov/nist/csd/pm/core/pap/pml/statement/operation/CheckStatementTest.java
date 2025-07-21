@@ -90,7 +90,7 @@ class CheckStatementTest {
                 operation op1() {
                     check "assign" on [testOp()]
                 } {
-                    create policy class "pc2"
+                    create PC "pc2"
                 }
                 
                 create pc "pc1"

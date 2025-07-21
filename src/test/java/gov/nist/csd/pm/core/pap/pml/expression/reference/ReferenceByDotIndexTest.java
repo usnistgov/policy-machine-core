@@ -71,7 +71,7 @@ class ReferenceByDotIndexTest {
                     }
                 }
                 
-                create policy class a.b.c.d
+                create PC a.b.c.d
                 """;
         PAP pap = new TestPAP();
         long pc1 = pap.modify().graph().createPolicyClass("pc1");

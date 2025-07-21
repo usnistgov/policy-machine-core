@@ -22,7 +22,7 @@ class ContinueStatementTest {
                         continue
                     }         
                     
-                    create policy class x         
+                    create PC x         
                 }
                 """;
         PAP pap = new TestPAP();
@@ -43,7 +43,7 @@ class ContinueStatementTest {
                         }   
                     }         
                     
-                    create policy class x         
+                    create PC x         
                 }
                 """;
         PAP pap = new TestPAP();

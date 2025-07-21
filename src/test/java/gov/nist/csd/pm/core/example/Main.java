@@ -74,7 +74,7 @@ public class Main {
 		associate "ua2" and "ua1" with ["associate"]
 
 		create prohibition "deny u1 write on oa1"
-		deny user "u1"
+		deny U "u1"
 		access rights ["write"]
 		on union of ["oa1"]
 

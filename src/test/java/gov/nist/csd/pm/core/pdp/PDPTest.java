@@ -265,7 +265,7 @@ class PDPTest {
         });
         pap.executePML(new TestUserContext("u1"), """
                 routine routine2() map[string]string {
-                    create policy class "test2"
+                    create PC "test2"
                     return {"test2": "test2"}
                 }
                 """);

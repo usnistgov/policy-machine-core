@@ -150,7 +150,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa4"]
                 
                 create prohibition "p1"
-                deny user "u1"
+                deny U "u1"
                 access rights ["write"]
                 on union of {"oa1": false}
                 """;
@@ -185,12 +185,12 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o1" in ["oa1", "oa3"]
                 
                 create prohibition "p1"
-                deny user "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": false}
                 
                 create prohibition "p2"
-                deny user "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": true}
                 """;
@@ -296,8 +296,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create oa "oa4" in ["pc2"]
                 associate "ua4" and "oa4" with ["read"]
                 
-                create user "u1" in ["ua2", "ua3", "ua4"]
-                create object "o1" in ["oa2", "oa3", "oa4"]
+                create U "u1" in ["ua2", "ua3", "ua4"]
+                create O "o1" in ["oa2", "oa3", "oa4"]
                 """;
         pap.executePML(new UserContext(0), pml);
 
@@ -397,7 +397,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     associate "ua1" and "oa1" with ["write"]
                     associate "ua1" and "oa2" with ["read"]
                
-                create user "u1" in ["ua1"]
+                create U "u1" in ["ua1"]
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("oa2")));
@@ -440,8 +440,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
                     associate "ua1" and "oa1" with ["write"]
                
-                create user "u1" in ["ua2"]
-                create object "o1" in ["oa1"]
+                create U "u1" in ["ua2"]
+                create O "o1" in ["oa1"]
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
@@ -486,8 +486,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     
                     associate "ua2" and "oa2" with ["read"]
                
-                create user "u1" in ["ua1", "ua2"]
-                create object "o1" in ["oa1", "oa2"]
+                create U "u1" in ["ua1", "ua2"]
+                create O "o1" in ["oa1", "oa2"]
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
@@ -546,8 +546,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     
                     associate "ua2" and "oa2" with ["read", "write"]
                
-                create user "u1" in ["ua1", "ua2"]
-                create object "o1" in ["oa1", "oa2"]
+                create U "u1" in ["ua1", "ua2"]
+                create O "o1" in ["oa1", "oa2"]
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
         Explain actual = pap.query().access().explain(new UserContext(id("u1")), new TargetContext(id("o1")));
@@ -603,8 +603,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     
                     associate "ua2" and "oa2" with ["read"]
                
-                create user "u1" in ["ua1", "ua2"]
-                create object "o1" in ["oa1", "oa2"]
+                create U "u1" in ["ua1", "ua2"]
+                create O "o1" in ["oa1", "oa2"]
                 """;
         pap.reset();
         pap.executePML(new TestUserContext("u1"), pml);
@@ -665,7 +665,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa2"]
                 
                 create prohibition "p1"
-                deny user "u1"
+                deny U "u1"
                 access rights ["write"]
                 on union of {"o1": false}
                 """;
@@ -766,7 +766,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o2" in ["oa2"]
                 
                 create prohibition "p1"
-                deny user "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": false}
                 """;
@@ -814,7 +814,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create o "o1" in ["oa1"]
                 
                 create prohibition "p1"
-                deny user "u1" 
+                deny U "u1" 
                 access rights ["write"]
                 on union of {"oa1": false}
                 """;
@@ -1628,7 +1628,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         // create a prohibition for the user on the object
         pml = """
                 create prohibition "p1"
-                deny user "u1"
+                deny U "u1"
                 access rights ["read"]
                 on union of {"o1": false}
                 """;
@@ -1650,7 +1650,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 delete prohibition "p1"
                 
                 create prohibition "p1"
-                deny user "u1"
+                deny U "u1"
                 access rights ["read"]
                 on intersection of {"oa1": false, "oa2": false}
                 """;

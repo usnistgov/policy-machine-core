@@ -35,7 +35,7 @@ class OperationDefinitionStatementTest {
                     check "assign" on b
                     check "assign" on ["oa1"]
                 } {
-                    create policy class "test"
+                    create PC "test"
                 }
                 """;
         MemoryPAP pap = new TestPAP();
@@ -74,7 +74,7 @@ class OperationDefinitionStatementTest {
                 create o "o3" in ["oa1"]
                 
                 operation op1(string a, []string b) {
-                    create policy class a
+                    create PC a
                 }
                 """;
         MemoryPAP pap = new TestPAP();

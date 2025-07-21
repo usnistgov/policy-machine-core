@@ -72,7 +72,7 @@ class ReferenceByBracketIndexTest {
                     }
                 }
                 
-                create policy class a["b"]["c"]["d"]
+                create PC a["b"]["c"]["d"]
                 """;
         PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);
@@ -91,7 +91,7 @@ class ReferenceByBracketIndexTest {
                     }
                 }
                 
-                create policy class a[true]["c"]["d"]
+                create PC a[true]["c"]["d"]
                 """;
         PAP pap = new TestPAP();
         PMLCompilationException e = assertThrows(PMLCompilationException.class,
@@ -110,7 +110,7 @@ class ReferenceByBracketIndexTest {
                     }
                 }
                 
-                create policy class a["z"]["c"]["d"]
+                create PC a["z"]["c"]["d"]
                 """;
         PAP pap = new TestPAP();
         assertThrows(NullPointerException.class,
@@ -124,7 +124,7 @@ class ReferenceByBracketIndexTest {
                     ["a"]: "test"
                 }
                 
-                create policy class a[["a"]]
+                create PC a[["a"]]
                 """;
         PAP pap = new TestPAP();
         pap.executePML(new UserContext(0), pml);

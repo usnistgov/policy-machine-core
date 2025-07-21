@@ -192,8 +192,8 @@ class CreateRuleStmtVisitorTest {
                         when any user
                         performs any operation
                         do(ctx) {
-                            create policy class "pc1"
-                            create policy class "pc2"
+                            create PC "pc1"
+                            create PC "pc2"
                         }
                     }
                     """;
