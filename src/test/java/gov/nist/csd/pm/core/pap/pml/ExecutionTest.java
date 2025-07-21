@@ -25,23 +25,23 @@ public class ExecutionTest {
                 """
                 set resource operations ["read", "write"]
                 
-                create policy class "pc1"
+                create PC "pc1"
                 
                 set properties of "pc1" to {"k": "v"}
                 
-                create object attribute "oa1" in ["pc1"]
-                create object attribute "oa2" in ["pc1"]
-                create object attribute "oa3" in ["pc1"]
+                create OA "oa1" in ["pc1"]
+                create OA "oa2" in ["pc1"]
+                create OA "oa3" in ["pc1"]
                 
                 var descendants = ["oa1", "oa2", "oa3"]
-                create object "o1" in descendants
+                create O "o1" in descendants
                 
-                create user attribute "ua1" in ["pc1"]
-                create user attribute "ua2" in ["pc1"]
-                create user attribute "ua3" in ["pc1"]
+                create UA "ua1" in ["pc1"]
+                create UA "ua2" in ["pc1"]
+                create UA "ua3" in ["pc1"]
                 
                 var username = "u1"
-                create user username in ["ua1"]
+                create U username in ["ua1"]
                 assign username to ["ua2", "ua3"]
                 
                 associate "ua1" and "oa1" with ["read", "write"]
@@ -158,7 +158,7 @@ public class ExecutionTest {
                 var x = "test"
                 var y = "test"
                 if x == y {
-                    create policy class "pc1"
+                    create PC "pc1"
                 }
                 """;
         pap.executePML(new TestUserContext("u1"), input);
@@ -169,9 +169,9 @@ public class ExecutionTest {
                 var y = "test"
                 var z = "test1"
                 if x == z {
-                    create policy class "pc1"
+                    create PC "pc1"
                 } else if x == y {
-                    create policy class "pc2"
+                    create PC "pc2"
                 }
                 """;
         pap = new TestPAP();
@@ -185,11 +185,11 @@ public class ExecutionTest {
                 var y = "test1"
                 var z = "test2"
                 if x == z {
-                    create policy class "pc1"
+                    create PC "pc1"
                 } else if x == y {
-                    create policy class "pc2"
+                    create PC "pc2"
                 } else {
-                    create policy class "pc3"
+                    create PC "pc3"
                 }
                 """;
         pap = new TestPAP();
@@ -205,9 +205,9 @@ public class ExecutionTest {
                 var y = "test1"
                 var z = "test2"
                 if x == y {
-                    create policy class "pc1"
+                    create PC "pc1"
                 } else {
-                    create policy class "pc2"
+                    create PC "pc2"
                 }
                 """;
         pap = new TestPAP();
@@ -222,9 +222,9 @@ public class ExecutionTest {
                 var y = "test1"
                 var z = "test2"
                 if x != y {
-                    create policy class "pc1"
+                    create PC "pc1"
                 } else {
-                    create policy class "pc2"
+                    create PC "pc2"
                 }
                 """;
         pap = new TestPAP();
@@ -241,7 +241,7 @@ public class ExecutionTest {
         
         String input = """
                 foreach x in ["pc1", "pc2", "pc3"] {
-                    create policy class x
+                    create PC x
                 }
                 """;
         pap.executePML(new TestUserContext("u1"), input);
@@ -253,7 +253,7 @@ public class ExecutionTest {
         input = """
                 var m = {"k1": "pc1", "k2": "pc2", "k3": "pc3"}
                 foreach x, y in m {
-                    create policy class y
+                    create PC y
                 }
                 """;
         pap = new TestPAP();
@@ -267,7 +267,7 @@ public class ExecutionTest {
         input = """
                 foreach x, y in {"k1": ["pc1", "pc2"], "k2": ["pc3"]} {
                     foreach z in y {
-                        create policy class z
+                        create PC z
                     }
                 }
                 """;
@@ -282,7 +282,7 @@ public class ExecutionTest {
         input = """
                 foreach x, y in {"k1": ["pc1", "pc2"], "k2": ["pc3"]} {
                     foreach z in y {
-                        create policy class z
+                        create PC z
                         break
                     }
                 }
@@ -299,7 +299,7 @@ public class ExecutionTest {
                 foreach x, y in {"k1": ["pc1", "pc2"], "k2": ["pc3"]} {
                     foreach z in y {
                         continue
-                        create policy class z
+                        create PC z
                     }
                 }
                 """;
@@ -320,7 +320,7 @@ public class ExecutionTest {
                         continue
                     }
                     
-                    create policy class x
+                    create PC x
                 }
                 """;
         pap = new TestPAP();
@@ -336,7 +336,7 @@ public class ExecutionTest {
     void testFunction() throws PMException {
         String input = """
                 operation testFunc(any x) {
-                    create policy class x
+                    create PC x
                 }
                 
                 testFunc("pc1")
@@ -364,7 +364,7 @@ public class ExecutionTest {
         String input2 = """
                 x := "hello"
                 operation testFunc() {
-                    create policy class x + " world"
+                    create PC x + " world"
                 }
                 
                 testFunc()
@@ -383,7 +383,7 @@ public class ExecutionTest {
         String input = """
                 var m = {"k1": {"k1-1": {"k1-1-1": "v1"}}}
                 var x = m["k1"]["k1-1"]["k1-1-1"]
-                create policy class x
+                create PC x
                 """;
          PAP pap = new TestPAP();
         
@@ -428,12 +428,12 @@ public class ExecutionTest {
 
         String input = """
                 create prohibition "p1"
-                deny user attribute "ua1"
+                deny ua "ua1"
                 access rights ["read"]
                 on union of {"oa1": false}
                 
                 create prohibition "p2"
-                deny user attribute "ua1"
+                deny ua "ua1"
                 access rights ["read"]
                 on union of {"oa1": false}
                 """;
@@ -453,7 +453,7 @@ public class ExecutionTest {
                     return s
                 }
                 
-                create policy class testFunc("test")
+                create PC testFunc("test")
                 """;
 
          PAP pap = new TestPAP();
@@ -470,7 +470,7 @@ public class ExecutionTest {
                     return s
                 }
                 
-                create policy class testFunc("test")
+                create PC testFunc("test")
                 """;
 
          PAP pap = new TestPAP();

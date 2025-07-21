@@ -13,7 +13,7 @@ pap.executePML(new UserContext(userId), pml);
 
 - Any operations and routines will be stored in the policy store.
 - All [admin policy nodes](/src/main/java/gov/nist/csd/pm/core/pap/admin/AdminPolicyNode.java) will be defined as constants during compilation and execution.  
-  `create object attribute "oa1" in [PM_ADMIN_OBJECT] `
+  `create OA "oa1" in [PM_ADMIN_OBJECT] `
 
 ## Basics  
   
@@ -238,7 +238,7 @@ operation op1(a string, b []string, c map[string]string) string {
 Create a policy class node with the given **name**.  
   
 ```  
-'create policy class' name=expression
+'create PC' name=expression
 ```  
 
 - `name` is a **string** expression.  
@@ -248,7 +248,7 @@ Create a policy class node with the given **name**.
 Create a node of type object attribute, user attribute, object, or user and assign it to a set of existing nodes. Types can also be expressed using their short version: pc, ua, oa, u, o.
   
 ```  
-'create' ('object attribute' | 'user attribute' | 'object' | 'user') name=expression   
+'create' ('OA' | 'UA' | 'O' | 'U') name=expression   
 'in' assignTo=expression   
 ```  
 
@@ -327,7 +327,7 @@ Create a new prohibition.
   
 ```  
 'create prohibition' name=expression   
-'deny' ('user' | 'user attribute' | 'process') subject=expression   
+'deny' ('U' | 'UA' | 'process') subject=expression   
 'access rights' accessRights=expression   
 'on' ('intersection'|'union') 'of' containers=expression ;  
 ```  
@@ -343,9 +343,9 @@ Create new obligation. The author of the obligation will be the user that compil
   
 ```  
 createObligationStatement:  
-    'create obligation' name=expression '{' createRuleStatement* '}';  
+    'obligation' name=expression '{' createRuleStatement* '}';  
 createRuleStatement:  
-    'create rule' ruleName=expression  
+    'rule' ruleName=expression  
     'when' subjectPattern  
     'performs' operationPattern  
     ('on' argPattern)?  
@@ -413,7 +413,7 @@ Delete a node, prohibition, or obligation.
   
 ```  
 'delete'  
-('policy class' | 'object attribute' | 'user attribute' | 'object' | 'user' | 'obligation' | 'prohibition') expression  
+('PC' | 'OA' | 'UA' | 'O' | 'U' | 'obligation' | 'prohibition') expression  
 ```  
 
 - `expression` is a **string** expression.  

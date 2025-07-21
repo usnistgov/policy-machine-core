@@ -29,7 +29,7 @@ class CreateNonPCStmtVisitorTest {
     void testSuccess() {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                create user attribute "ua1" in ["a"]
+                create UA "ua1" in ["a"]
                 """);
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         PMLStatement stmt = new CreateNonPCStmtVisitor(visitorCtx).visit(ctx);
@@ -45,14 +45,14 @@ class CreateNonPCStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(testGlobalScope);
         testCompilationError(
                 """
-                create user attribute ["ua1"] in ["a"]
+                create UA ["ua1"] in ["a"]
                 """, visitorCtx, 1,
                 "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
-                create user attribute "ua1" in "a"
+                create UA "ua1" in "a"
                 """, visitorCtx, 1,
                 "expected expression type []string, got string"
         );

@@ -19,7 +19,7 @@ class CreatePolicyStmtVisitorTest {
     void testSuccess() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                create policy class "test"
+                create PC "test"
                 """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visit(ctx);
@@ -35,7 +35,7 @@ class CreatePolicyStmtVisitorTest {
     void testSuccessWithProperties() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                create policy class "test" 
+                create PC "test" 
                 """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visit(ctx);
@@ -52,7 +52,7 @@ class CreatePolicyStmtVisitorTest {
 
         testCompilationError(
                 """
-                create policy class ["test"]
+                create PC ["test"]
                 """, visitorCtx, 1,
                 "expected expression type string, got []string"
         );

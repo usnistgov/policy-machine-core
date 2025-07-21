@@ -30,8 +30,8 @@ public class ArgPatternTest {
         pap.modify().graph().createObject("o2", List.of(oa2));
 
         String pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1"
                     performs "assign"
                     on {
@@ -53,8 +53,8 @@ public class ArgPatternTest {
         assertTrue(stmt.getArgPattern().get("descendants").getFirst().matches("oa1", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1"
                     performs "assign"
                     on {
@@ -76,8 +76,8 @@ public class ArgPatternTest {
         assertTrue(stmt.getArgPattern().get("descendants").getFirst().matches("oa1", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1"
                     performs "assign"
                     on {
@@ -103,8 +103,8 @@ public class ArgPatternTest {
         assertTrue(stmt.getArgPattern().get("descendants").getFirst().matches("oa2", pap));
 
         pml = """
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1"
                     performs "assign"
                     on {
@@ -148,8 +148,8 @@ public class ArgPatternTest {
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
         assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext(u1), """
                 associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
-                create obligation "ob1" {
-                    create rule "r1"
+                obligation "ob1" {
+                    rule "r1"
                     when user "u1"
                     performs "create_object_attribute"
                     on {

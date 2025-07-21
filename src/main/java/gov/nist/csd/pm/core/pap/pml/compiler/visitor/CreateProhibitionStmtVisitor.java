@@ -26,9 +26,9 @@ public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibiti
         Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.name, STRING_TYPE);
         Expression<String> subject = ExpressionVisitor.compile(visitorCtx, ctx.subject, STRING_TYPE);
         ProhibitionSubjectType type = ProhibitionSubjectType.PROCESS;
-        if (ctx.USER() != null) {
+        if (ctx.U() != null) {
             type = ProhibitionSubjectType.USER;
-        } else if (ctx.USER_ATTRIBUTE() != null) {
+        } else if (ctx.UA() != null) {
             type = ProhibitionSubjectType.USER_ATTRIBUTE;
         }
 

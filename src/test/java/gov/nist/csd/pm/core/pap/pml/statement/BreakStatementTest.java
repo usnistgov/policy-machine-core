@@ -18,7 +18,7 @@ class BreakStatementTest {
     void testSuccess() throws PMException {
         String pml = """
                 foreach x in ["a", "b", "c"] {
-                    create policy class x
+                    create PC x
                     
                     if x == "b" {
                         break
@@ -37,7 +37,7 @@ class BreakStatementTest {
     void testMultipleLevels() throws PMException {
         String pml = """
                 foreach x in ["a", "b", "c"] {
-                    create policy class x
+                    create PC x
                     
                     if x == "b" {
                         if x == "b" {

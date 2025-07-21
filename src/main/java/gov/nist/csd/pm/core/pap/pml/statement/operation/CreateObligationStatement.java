@@ -37,7 +37,7 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
     public ObligationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap);
 
-        // execute the create rule statements and add to obligation
+        // execute the rule statements and add to obligation
         List<Rule> rules = new ArrayList<>();
         for (CreateRuleStatement createRuleStmt : ruleStmts) {
             Rule rule = createRuleStmt.execute(ctx, pap);
@@ -71,7 +71,7 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
         String indent = indent(indentLevel);
         return String.format(
             """
-            %screate obligation %s {
+            %sobligation %s {
             %s%s}""", indent, name, sb, indent);
     }
 

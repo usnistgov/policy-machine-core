@@ -426,8 +426,6 @@ public class GraphModifier extends Modifier implements GraphModification {
             throws PMException {
         long id = idGenerator.generateId(name, type);
 
-
-
         if (name.equals(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeName())) {
             return AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId();
         } else if (policyStore.graph().nodeExists(name)) {
