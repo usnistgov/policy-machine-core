@@ -265,6 +265,7 @@ idIndex:
     | PROHIBITION
     | OBLIGATION
     | NODE
+    | USER
     | PC
     | OA
     | UA
