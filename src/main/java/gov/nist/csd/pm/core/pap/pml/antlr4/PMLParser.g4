@@ -54,9 +54,9 @@ nonPCNodeType:
     (OA | UA | O | U) ;
 
 createObligationStatement:
-    OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
+    CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
 createRuleStatement:
-    RULE ruleName=expression
+    CREATE RULE ruleName=expression
     WHEN subjectPattern
     PERFORMS operationPattern
     (ON argPattern)?

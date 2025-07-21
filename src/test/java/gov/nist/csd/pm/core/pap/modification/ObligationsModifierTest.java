@@ -204,15 +204,15 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> pap.executePML(new UserContext(id("u1")), """
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user
                     performs any operation
                     do(ctx) { }
                 }
                 
-                obligation "ob2" {
-                    rule "r1"
+                create obligation "ob2" {
+                    create rule "r1"
                     when any user
                     performs any operation
                     do(ctx) { }
@@ -220,15 +220,15 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                 """));
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
                 pap.executePML(new UserContext(id("u1")), """
-                    obligation "ob3" {
-                        rule "r1"
+                    create obligation "ob3" {
+                        create rule "r1"
                         when any user
                         performs any operation
                         do(ctx) { }
                     }
                     
-                    obligation "ob4" {
-                        rule "r1"
+                    create obligation "ob4" {
+                        create rule "r1"
                         when any user
                         performs any operation
                         do(ctx) { }
@@ -251,8 +251,8 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             loadSamplePolicyFromPML(pap);
 
             pap.executePML(new UserContext(id("u1")), """
-                    obligation "ob1" {
-                        rule "r1"
+                    create obligation "ob1" {
+                        create rule "r1"
                         when any user
                         performs any operation
                         do(ctx) { }
@@ -269,15 +269,15 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> pap.executePML(new UserContext(id("u1")), """
-                obligation "ob1" {
-                    rule "r1"
+                create obligation "ob1" {
+                    create rule "r1"
                     when any user 
                     performs any operation
                     do(ctx) { }
                 }
                 
-                obligation "ob2" {
-                    rule "r1"
+                create obligation "ob2" {
+                    create rule "r1"
                     when any user 
                     performs any operation
                     do(ctx) { }

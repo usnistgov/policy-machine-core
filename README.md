@@ -101,8 +101,8 @@ public class Main {
 
     // create an obligation that associates ua1 with any OA
     String obligationPML = """
-            obligation "sample_obligation" {
-            	rule "rule1"
+            create obligation "sample_obligation" {
+            	create rule "rule1"
             	when any user
             	performs "create_object_attribute"
             	on {
@@ -137,8 +137,8 @@ public class Main {
     access rights ["write"]
     on union of ["oa1"]
 
-    obligation "sample_obligation" {
-        rule "rule1"
+    create obligation "sample_obligation" {
+        create rule "rule1"
         when any user
         performs "create_object_attribute"
         on {
@@ -204,8 +204,8 @@ Obligations should be defined using PML because obligation responses are defined
 
 ```java
 String pml = """
-        obligation "sample_obligation" {
-            rule "rule1"
+        create obligation "sample_obligation" {
+            create rule "rule1"
             when any user
             performs "create_object_attribute"
             on {

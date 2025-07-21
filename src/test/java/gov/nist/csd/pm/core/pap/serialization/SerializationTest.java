@@ -38,7 +38,7 @@ public class SerializationTest {
         pap.executePML(new TestUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]                
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 """);
         String json = pap.serialize(new JSONSerializer());
 

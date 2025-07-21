@@ -71,8 +71,8 @@ operation createProjectAdmin(string projectName) {
     on union of {projectName: false}
 }
 
-obligation "create us project admin" {
-    rule "us project"
+create obligation "create us project admin" {
+    create rule "us project"
     when any user
     performs "createProject"
     on {
@@ -82,7 +82,7 @@ obligation "create us project admin" {
         createProjectAdmin(ctx.args.projectName)
     }
 
-    rule "eu project"
+    create rule "eu project"
     when any user
     performs "createProject"
     on {

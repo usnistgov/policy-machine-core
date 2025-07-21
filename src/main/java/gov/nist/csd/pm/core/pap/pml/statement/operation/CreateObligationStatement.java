@@ -71,7 +71,7 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
         String indent = indent(indentLevel);
         return String.format(
             """
-            %sobligation %s {
+            %screate obligation %s {
             %s%s}""", indent, name, sb, indent);
     }
 

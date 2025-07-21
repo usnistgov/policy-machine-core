@@ -42,8 +42,8 @@ public class Main {
 
         // create an obligation that associates ua1 with any OA
         String obligationPML = """
-				obligation "sample_obligation" {
-					rule "rule1"
+				create obligation "sample_obligation" {
+					create rule "rule1"
 					when any user
 					performs "create_object_attribute"
 					on {
@@ -78,15 +78,15 @@ public class Main {
 		access rights ["write"]
 		on union of ["oa1"]
 
-		obligation "sample_obligation" {
-		    rule "rule1"
+		create obligation "sample_obligation" {
+		    create rule "rule1"
 		    when any user
 		    performs "create_object_attribute"
 		    on {
-			descendants: "oa1"
+			  descendants: "oa1"
 		    }
 		    do(ctx) {
-			associate "ua1" and ctx.args.name with ["read", "write"]
+			  associate "ua1" and ctx.args.name with ["read", "write"]
 		    }
 		}
 		""";
