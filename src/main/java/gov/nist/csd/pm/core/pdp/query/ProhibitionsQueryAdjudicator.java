@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;
@@ -44,17 +45,35 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     }
 
     @Override
-    public Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException {
-        pap.privilegeChecker().check(this.userCtx, subjectId, QUERY_PROHIBITIONS);
+    public boolean prohibitionExists(String name) throws PMException {
+        boolean exists = pap.query().prohibitions().prohibitionExists(name);
+        if (!exists) {
+            return false;
+        }
 
-        return pap.query().prohibitions().getInheritedProhibitionsFor(subjectId);
+        Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
+
+        try {
+            checkCanQueryProhibition(prohibition);
+        } catch (UnauthorizedException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException {
+        Collection<Prohibition> prohibitions = pap.query().prohibitions()
+            .getInheritedProhibitionsFor(subjectId);
+        return filterProhibitions(prohibitions);
     }
 
     @Override
     public Collection<Prohibition> getProhibitionsWithContainer(long containerId) throws PMException {
-        pap.privilegeChecker().check(this.userCtx, containerId, AdminAccessRights.QUERY_PROHIBITIONS);
-
-        return pap.query().prohibitions().getProhibitionsWithContainer(containerId);
+        Collection<Prohibition> prohibitions = pap.query().prohibitions()
+            .getProhibitionsWithContainer(containerId);
+        return filterProhibitions(prohibitions);
     }
 
     private Collection<Prohibition> filterProhibitions(Collection<Prohibition> prohibitions) {

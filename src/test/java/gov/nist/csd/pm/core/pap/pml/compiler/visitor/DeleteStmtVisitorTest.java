@@ -21,13 +21,13 @@ class DeleteStmtVisitorTest {
     void testDeleteNode() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                delete node "oa1"
+                delete if exists node "oa1"
                 """);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope());
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteNodeStatement(new StringLiteralExpression("oa1")),
+                new DeleteNodeStatement(new StringLiteralExpression("oa1"), true),
                 stmt
         );
     }
@@ -54,7 +54,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteObligationStatement(new StringLiteralExpression("test")),
+                new DeleteObligationStatement(new StringLiteralExpression("test"), false),
                 stmt
         );
     }
@@ -69,7 +69,7 @@ class DeleteStmtVisitorTest {
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new DeleteProhibitionStatement(new StringLiteralExpression("test")),
+                new DeleteProhibitionStatement(new StringLiteralExpression("test"), false),
                 stmt
         );
     }

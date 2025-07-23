@@ -30,9 +30,9 @@ class DeleteStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        DeleteStatement stmt1 = new DeleteNodeStatement(new StringLiteralExpression("oa1"));
-        DeleteStatement stmt2 = new DeleteProhibitionStatement(new StringLiteralExpression("p1"));
-        DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteralExpression("o1"));
+        DeleteStatement stmt1 = new DeleteNodeStatement(new StringLiteralExpression("oa1"), false);
+        DeleteStatement stmt2 = new DeleteProhibitionStatement(new StringLiteralExpression("p1"), false);
+        DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteralExpression("o1"), false);
 
         PAP pap = new TestPAP();
         pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
@@ -63,14 +63,27 @@ class DeleteStatementTest {
     }
 
     @Test
+    void testSuccessIfExists() throws PMException {
+        DeleteStatement stmt1 = new DeleteNodeStatement(new StringLiteralExpression("oa1"), true);
+        DeleteStatement stmt2 = new DeleteProhibitionStatement(new StringLiteralExpression("p1"), true);
+        DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteralExpression("o1"), true);
+
+        PAP pap = new TestPAP();
+        TestUserContext testUserContext = new TestUserContext("u1");
+        assertDoesNotThrow(() -> stmt1.execute(new ExecutionContext(testUserContext, pap), pap));
+        assertDoesNotThrow(() -> stmt2.execute(new ExecutionContext(testUserContext, pap), pap));
+        assertDoesNotThrow(() -> stmt3.execute(new ExecutionContext(testUserContext, pap), pap));
+    }
+
+    @Test
     void testToFormattedString() {
-        DeleteStatement stmt = new DeleteNodeStatement(new StringLiteralExpression("test"));
-        DeleteStatement stmt1 = new DeleteProhibitionStatement(new StringLiteralExpression("test"));
-        DeleteStatement stmt2 = new DeleteObligationStatement( new StringLiteralExpression("test"));
-        DeleteStatement stmt3 = new DeleteNodeStatement(new StringLiteralExpression("test"));
-        DeleteStatement stmt4 = new DeleteNodeStatement(new StringLiteralExpression("test"));
-        DeleteStatement stmt5 = new DeleteNodeStatement(new StringLiteralExpression("test"));
-        DeleteStatement stmt6 = new DeleteNodeStatement(new StringLiteralExpression("test"));
+        DeleteStatement stmt = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
+        DeleteStatement stmt1 = new DeleteProhibitionStatement(new StringLiteralExpression("test"), false);
+        DeleteStatement stmt2 = new DeleteObligationStatement( new StringLiteralExpression("test"), false);
+        DeleteStatement stmt3 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
+        DeleteStatement stmt4 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
+        DeleteStatement stmt5 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
+        DeleteStatement stmt6 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
 
         assertEquals("delete node \"test\"", stmt.toFormattedString(0));
         assertEquals("delete prohibition \"test\"", stmt1.toFormattedString(0));

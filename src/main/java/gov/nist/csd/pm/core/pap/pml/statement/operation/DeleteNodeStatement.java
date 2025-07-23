@@ -4,7 +4,6 @@ import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp.DeleteNodeOpArgs;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -14,14 +13,14 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 public class DeleteNodeStatement extends DeleteStatement<DeleteNodeOpArgs> {
 
-    public DeleteNodeStatement(Expression<String> expression) {
-        super(new DeleteNodeOp(), Type.NODE, expression);
+    public DeleteNodeStatement(Expression<String> expression, boolean ifExists) {
+        super(new DeleteNodeOp(), Type.NODE, expression, ifExists);
     }
 
     @Override
     public DeleteNodeOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         // prepare for execution by replacing the name arg with the ID arg
-        String name = expression.execute(ctx, pap);
+        String name = nameExpression.execute(ctx, pap);
 
         try {
             GraphQuery graph = pap.query().graph();
@@ -35,4 +34,9 @@ public class DeleteNodeStatement extends DeleteStatement<DeleteNodeOpArgs> {
             return new DeleteNodeOpArgs(0L, NodeType.U, new LongArrayList());
         }
     }
-} 
+
+    @Override
+    public boolean exists(PAP pap, String name) throws PMException {
+        return pap.query().graph().nodeExists(name);
+    }
+}

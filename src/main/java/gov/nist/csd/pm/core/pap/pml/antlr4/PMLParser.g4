@@ -143,7 +143,7 @@ setResourceOperationsStatement:
     SET_RESOURCE_OPERATIONS accessRightsArr=expression;
 
 deleteStatement:
-    DELETE deleteType expression ;
+    DELETE (IF_EXISTS)? deleteType expression ;
 deleteType:
     NODE #DeleteNode
     | OBLIGATION #DeleteObligation

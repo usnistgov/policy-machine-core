@@ -157,6 +157,20 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
     }
 
     @Test
+    void testProhibitionExists() throws PMException {
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long subject = pap.modify().graph().createUserAttribute("subject", List.of(pc1));
+        long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
+        pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+
+        pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
+            true, List.of(new ContainerCondition(oa1, true)));
+
+        assertTrue(pap.query().prohibitions().prohibitionExists("label1"));
+        assertFalse(pap.query().prohibitions().prohibitionExists("label2"));
+    }
+
+    @Test
     void testGetInheritedProhibitionsFor() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 

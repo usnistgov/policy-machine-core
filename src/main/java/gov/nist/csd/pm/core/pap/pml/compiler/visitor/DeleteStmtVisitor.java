@@ -20,15 +20,16 @@ public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement<?>> {
 
     @Override
     public DeleteStatement<?> visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
-        Expression nameExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), STRING_TYPE);
+        Expression<String> nameExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), STRING_TYPE);
+        boolean ifExists = ctx.IF_EXISTS() != null;
 
         PMLParser.DeleteTypeContext deleteTypeCtx = ctx.deleteType();
         if (deleteTypeCtx instanceof PMLParser.DeleteNodeContext) {
-           return new DeleteNodeStatement(nameExpr);
+           return new DeleteNodeStatement(nameExpr, ifExists);
         } else if (deleteTypeCtx instanceof PMLParser.DeleteProhibitionContext) {
-            return new DeleteProhibitionStatement(nameExpr);
+            return new DeleteProhibitionStatement(nameExpr, ifExists);
         } else {
-            return new DeleteObligationStatement(nameExpr);
+            return new DeleteObligationStatement(nameExpr, ifExists);
         }
     }
 }
