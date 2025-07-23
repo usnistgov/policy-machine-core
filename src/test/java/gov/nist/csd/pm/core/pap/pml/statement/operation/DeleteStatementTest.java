@@ -83,7 +83,7 @@ class DeleteStatementTest {
         DeleteStatement stmt3 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
         DeleteStatement stmt4 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
         DeleteStatement stmt5 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
-        DeleteStatement stmt6 = new DeleteNodeStatement(new StringLiteralExpression("test"), false);
+        DeleteStatement stmt6 = new DeleteNodeStatement(new StringLiteralExpression("test"), true);
 
         assertEquals("delete node \"test\"", stmt.toFormattedString(0));
         assertEquals("delete prohibition \"test\"", stmt1.toFormattedString(0));
@@ -91,7 +91,7 @@ class DeleteStatementTest {
         assertEquals("delete node \"test\"", stmt3.toFormattedString(0));
         assertEquals("delete node \"test\"", stmt4.toFormattedString(0));
         assertEquals("delete node \"test\"", stmt5.toFormattedString(0));
-        assertEquals("delete node \"test\"", stmt6.toFormattedString(0));
+        assertEquals("delete if exists node \"test\"", stmt6.toFormattedString(0));
         assertEquals(
                 """
                             delete node "test"
