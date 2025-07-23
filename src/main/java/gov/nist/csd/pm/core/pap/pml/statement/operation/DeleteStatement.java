@@ -69,7 +69,7 @@ public abstract class DeleteStatement<A extends Args> extends OperationStatement
             case OBLIGATION -> typeStr = "obligation";
             case NODE -> typeStr = "node";
         }
-        typeStr += ifExists ? "if exists" : "";
+        typeStr = (ifExists ? "if exists " : "") + typeStr;
 
         return indent(indentLevel) + String.format("delete %s %s", typeStr, nameExpression);
     }
