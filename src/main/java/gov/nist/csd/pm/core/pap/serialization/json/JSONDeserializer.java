@@ -137,6 +137,10 @@ public class JSONDeserializer implements PolicyDeserializer {
     private void createAssignments(PAP pap, List<JSONNode> nodes) throws PMException {
         for (JSONNode node : nodes) {
             Collection<Long> assignments = node.getAssignments();
+            if (assignments == null) {
+                continue;
+            }
+
             for (Long assignment : assignments) {
                 pap.policyStore().graph().createAssignment(node.getId(), assignment);
             }

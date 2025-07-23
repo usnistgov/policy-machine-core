@@ -19,24 +19,9 @@ public class JSONNode {
     public JSONNode(long id, String name, List<JSONProperty> properties, Collection<Long> assignments, List<JSONAssociation> associations) {
         this.id = id;
         this.name = name;
-
-        if (properties != null && !properties.isEmpty()) {
-            this.properties = properties;
-        } else {
-            this.properties = new ArrayList<>();
-        }
-
-        if (assignments != null && !assignments.isEmpty()) {
-            this.assignments = assignments;
-        } else {
-            this.assignments = new ArrayList<>();
-        }
-
-        if (associations != null && !associations.isEmpty()) {
-            this.associations = associations;
-        } else {
-            this.associations = new ArrayList<>();
-        }
+        this.properties = properties;
+        this.assignments = assignments;
+        this.associations = associations;
     }
 
     public long getId() {

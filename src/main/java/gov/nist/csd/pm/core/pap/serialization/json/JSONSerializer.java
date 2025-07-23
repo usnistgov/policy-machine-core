@@ -24,8 +24,7 @@ public class JSONSerializer implements PolicySerializer {
 
     @Override
     public String serialize(PolicyQuery policyQuery) throws PMException {
-        return buildJSONPolicy(policyQuery)
-            .toString();
+        return buildJSONPolicy(policyQuery).toString();
     }
 
     public JSONPolicy buildJSONPolicy(PolicyQuery policyQuery) throws PMException {
@@ -51,7 +50,7 @@ public class JSONSerializer implements PolicySerializer {
             }
         }
 
-        return json;
+        return json.isEmpty() ? null : json;
     }
 
     private List<String> buildOperationsJSON(PolicyQuery policyQuery) throws PMException {
@@ -66,7 +65,7 @@ public class JSONSerializer implements PolicySerializer {
             }
         }
 
-        return json;
+        return json.isEmpty() ? null : json;
     }
 
     private List<JSONObligation> buildObligationsJSON(PolicyQuery policyQuery) throws PMException {
@@ -76,7 +75,7 @@ public class JSONSerializer implements PolicySerializer {
             jsonObligations.add(JSONObligation.fromObligation(obligation));
         }
 
-        return jsonObligations;
+        return jsonObligations.isEmpty() ? null : jsonObligations;
     }
 
     private List<JSONProhibition> buildProhibitionsJSON(PolicyQuery policyQuery) throws PMException {
@@ -97,7 +96,7 @@ public class JSONSerializer implements PolicySerializer {
             prohibitions.add(jsonProhibition);
         }
 
-        return prohibitions;
+        return prohibitions.isEmpty() ? null : prohibitions;
     }
 
     private JSONGraph buildGraphJSON(PolicyQuery policyQuery) throws PMException {
@@ -125,7 +124,7 @@ public class JSONSerializer implements PolicySerializer {
             nodes.add(new JSONNode(node.getId(), node.getName(), properties, descendants, null));
         }
 
-        return nodes;
+        return nodes.isEmpty() ? null : nodes;
     }
 
     private List<JSONProperty> mapToJsonProperties(Map<String, String> map) {
@@ -175,7 +174,7 @@ public class JSONSerializer implements PolicySerializer {
             userAttributes.add(jsonNode);
         }
 
-        return userAttributes;
+        return userAttributes.isEmpty() ? null : userAttributes;
     }
 
     private List<JSONNode> buildPolicyClasses(PolicyQuery policyQuery) throws PMException {
@@ -195,6 +194,6 @@ public class JSONSerializer implements PolicySerializer {
             policyClassesList.add(jsonPolicyClass);
         }
 
-        return policyClassesList;
+        return policyClassesList.isEmpty() ? null : policyClassesList;
     }
 }
