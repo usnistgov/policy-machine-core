@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/usnistgov/policy-machine-core/master/src/main/resources/json/pm-id.schema.json",
-    "title": "Policy Machine JSON Schema (ID-based)",
+    "$id": "https://raw.githubusercontent.com/usnistgov/policy-machine-core/master/src/main/resources/json/pm.schema.json",
+    "title": "Policy Machine JSON Schema",
     "type": "object",
     "properties": {
         "resourceOperations": {
@@ -271,7 +271,7 @@
                 "name",
                 "subject",
                 "containers",
-                "operations"
+                "arset"
             ],
             "additionalProperties": false
         }
