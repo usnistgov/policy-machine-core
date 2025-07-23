@@ -10,8 +10,9 @@ CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';
 
-CREATE      : 'create' ;
-DELETE      : 'delete' ;
+CREATE : 'create' ;
+DELETE : 'delete' ;
+IF_EXISTS : 'if exists';
 
 // obligation keywords
 RULE: 'rule' ;

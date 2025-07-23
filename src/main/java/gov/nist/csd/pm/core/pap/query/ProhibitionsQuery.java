@@ -30,14 +30,25 @@ public interface ProhibitionsQuery {
 
     /**
      * Get the prohibition with the given name.
-     * @param name The public abstract of the prohibition to get.
-     * @return The prohibition with the given public abstract.
+     *
+     * @param name The name of the prohibition to get.
+     * @return The prohibition with the given name.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     Prohibition getProhibition(String name) throws PMException;
 
     /**
+     * Returns true if a prohibition with the provided name exists. Otherwise, false.
+     *
+     * @param name The name of the prohibition to check for.
+     * @return True if a prohibition with the provided name exists. Otherwise, false.
+     * @throws PMException If any PM related exceptions occur in the implementing class.
+     */
+    boolean prohibitionExists(String name) throws PMException;
+
+    /**
      * Get the prohibitions the given subject inherits through assignments.
+     *
      * @param subjectId The subject node.
      * @return The prohibitions the given subject inherits.
      * @throws PMException If any PM related exceptions occur in the implementing class.

@@ -56,6 +56,11 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     }
 
     @Override
+    public boolean prohibitionExists(String name) throws PMException {
+        return store.prohibitions().prohibitionExists(name);
+    }
+
+    @Override
     public Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
