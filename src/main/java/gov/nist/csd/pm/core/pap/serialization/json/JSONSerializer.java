@@ -144,7 +144,7 @@ public class JSONSerializer implements PolicySerializer {
     private boolean isUnmodifiedAdminNodeOrTarget(PolicyQuery policyQuery, long node) throws PMException {
         Collection<Long> descendants = policyQuery.graph().getAdjacentDescendants(node);
 
-        return descendants.contains(AdminPolicyNode.PM_ADMIN_PC.nodeId()) && descendants.size() == 1;
+        return AdminPolicyNode.isAdminPolicyNode(node) && descendants.size() == 1;
     }
 
     private List<JSONNode> buildUserAttributes(PolicyQuery policyQuery) throws PMException {
