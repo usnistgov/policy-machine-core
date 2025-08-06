@@ -13,7 +13,14 @@ pap.executePML(new UserContext(userId), pml);
 
 - Any operations and routines will be stored in the policy store.
 - All [admin policy nodes](/src/main/java/gov/nist/csd/pm/core/pap/admin/AdminPolicyNode.java) will be defined as constants during compilation and execution.  
-  `create OA "oa1" in [PM_ADMIN_OBJECT] `
+
+  - PM_ADMIN_PC: The PM_ADMIN policy class node.
+  - PM_ADMIN_BASE_OA: The PM_ADMIN base OA that holds all other OA nodes.
+  - PM_ADMIN_POLICY_CLASSES: Used to determine user access to create and interact with PC nodes.
+  - PM_ADMIN_OBLIGATIONS: Used to determine user access to create and interact with obligations with an "any user" event pattern subject.
+  - PM_ADMIN_PROHIBITIONS: Used to determine user access to process prohibitions and container compelemnt conditions.
+  - PM_ADMIN_OPERATIONS: Used to determine user access to operations.
+  - PM_ADMIN_ROUTINES: Used to determine user access to routines.
 
 ## Basics  
   
