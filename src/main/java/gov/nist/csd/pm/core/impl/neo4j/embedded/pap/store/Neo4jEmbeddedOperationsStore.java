@@ -19,9 +19,11 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	private static final String RESOURCE_OPERATIONS_NODE_NAME = "resource_operations";
 	private final TxHandler txHandler;
+	private ClassLoader classLoader;
 
-	public Neo4jEmbeddedOperationsStore(TxHandler txHandler) {
+	public Neo4jEmbeddedOperationsStore(TxHandler txHandler, ClassLoader classLoader) {
 		this.txHandler = txHandler;
+		this.classLoader = classLoader;
 	}
 
 	@Override
@@ -105,7 +107,7 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 				return;
 			}
 
-			Operation<?, ?> op = (Operation<?, ?>) deserialize(node.getProperty(DATA_PROPERTY).toString());
+			Operation<?, ?> op = (Operation<?, ?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader);
 			operation.set(op);
 		});
 

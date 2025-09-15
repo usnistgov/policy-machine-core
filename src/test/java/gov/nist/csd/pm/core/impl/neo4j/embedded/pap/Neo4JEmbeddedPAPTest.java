@@ -24,13 +24,13 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.Neo4jTestInitializer.
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
 class Neo4jTestInitializer {
-	
+
 	private static GraphDatabaseService graphDb;
-	
+
 	public static GraphDatabaseService getTx(Path tempDir) {
-        if (graphDb == null) {
+		if (graphDb == null) {
 			DatabaseManagementService managementService = new DatabaseManagementServiceBuilder(tempDir).build();
-            graphDb = managementService.database(DEFAULT_DATABASE_NAME);
+			graphDb = managementService.database(DEFAULT_DATABASE_NAME);
 			Neo4jEmbeddedPolicyStore.createIndexes(graphDb);
 		}
 
@@ -38,22 +38,23 @@ class Neo4jTestInitializer {
 			tx.execute("match (n) detach delete n");
 			tx.commit();
 		}
-		
+
 		return graphDb;
 	}
 
 	public static PAP init(Path tempDir) throws PMException {
-		return new Neo4jEmbeddedPAP(new Neo4jEmbeddedPolicyStore(Neo4jTestInitializer.getTx(tempDir)))
-			.withIdGenerator(new TestIdGenerator());
+		return new Neo4jEmbeddedPAP(
+			new Neo4jEmbeddedPolicyStore(Neo4jTestInitializer.getTx(tempDir), Neo4jTestInitializer.class.getClassLoader())
+		).withIdGenerator(new TestIdGenerator());
 	}
 }
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Neo4JEmbeddedPAPTest extends PAPTest {
-	
+
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -65,7 +66,7 @@ class Neo4jEmbeddedAccessQuerierTest extends AccessQuerierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -77,7 +78,7 @@ class Neo4jEmbeddedGraphModifierTest extends GraphModifierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -89,7 +90,7 @@ class Neo4jEmbeddedGraphQuerierTest extends GraphQuerierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -101,7 +102,7 @@ class Neo4jEmbeddedObligationsModifierTest extends ObligationsModifierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -113,7 +114,7 @@ class Neo4jEmbeddedObligationsQuerierTest extends ObligationsQuerierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -125,7 +126,7 @@ class Neo4jEmbeddedObligationsQuerierTest extends ObligationsQuerierTest {
 class Neo4jEmbeddedOperationsModifierTest extends OperationsModifierTest {
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -136,7 +137,7 @@ class Neo4jEmbeddedOperationsModifierTest extends OperationsModifierTest {
 class Neo4jEmbeddedOperationsQueryTest extends OperationsQuerierTest {
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -148,7 +149,7 @@ class Neo4jEmbeddedProhibitionsModifierTest extends ProhibitionsModifierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -160,7 +161,7 @@ class Neo4jEmbeddedProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -171,7 +172,7 @@ class Neo4jEmbeddedProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 class Neo4jEmbeddedRoutinesModifierTest extends RoutinesModifierTest {
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);
@@ -182,7 +183,7 @@ class Neo4jEmbeddedRoutinesModifierTest extends RoutinesModifierTest {
 class Neo4jEmbeddedRoutinesQuerierTest extends RoutinesQuerierTest {
 	@TempDir
 	private Path tempDir;
-	
+
 	@Override
 	public PAP initializePAP() throws PMException {
 		return init(tempDir);

@@ -112,12 +112,18 @@ public class Neo4jUtil {
 		return Hex.encodeHexString(bytes);
 	}
 
-	public static Object deserialize(String hex) throws PMException {
+	public static Object deserialize(String hex, ClassLoader classLoader) throws PMException {
 		try {
 			byte[] bytes = Hex.decodeHex(hex);
 
 			ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-			try (ObjectInputStream objectStream = new ObjectInputStream(byteStream)) {
+			try (ObjectInputStream objectStream = new ObjectInputStream(byteStream) {
+				@Override
+				protected Class<?> resolveClass(ObjectStreamClass desc)
+				throws IOException, ClassNotFoundException {
+					return Class.forName(desc.getName(), false, classLoader);
+				}
+			}) {
 				return objectStream.readObject();
 			}
 		} catch (DecoderException | ClassNotFoundException | IOException e) {
