@@ -588,9 +588,13 @@ class EPPTest {
                     new SubjectPattern(),
                     new OperationPattern("assign")
                 ),
-                new JavaObligationResponse((respPap, user, ctx) -> {
-                    respPap.modify().graph().createPolicyClass("test");
-                })
+                new JavaObligationResponse() {
+
+                    @Override
+                    public void execute(PAP pap, UserContext author, EventContext evtCtx) throws PMException {
+                        pap.modify().graph().createPolicyClass("test");
+                    }
+                }
             )
         ));
 
