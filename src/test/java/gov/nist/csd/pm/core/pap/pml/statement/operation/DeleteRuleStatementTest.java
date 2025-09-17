@@ -3,7 +3,8 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Response;
+import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -36,7 +37,7 @@ class DeleteRuleStatementTest {
         pap.modify().obligations().createObligation(userContext.getUser(), "obl1", List.of(new Rule(
                 "rule1",
                 new EventPattern(new SubjectPattern(), new OperationPattern()),
-                new Response("e", List.of()))
+                new PMLObligationResponse("e", List.of()))
         ));
 
         ExecutionContext execCtx = new ExecutionContext(userContext, pap);

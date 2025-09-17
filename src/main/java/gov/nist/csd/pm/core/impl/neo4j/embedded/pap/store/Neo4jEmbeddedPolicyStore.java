@@ -21,14 +21,16 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 	}
 
 	private TxHandler txHandler;
+	private ClassLoader classLoader;
 
 	/**
 	 * Constructor starts a new transaction
 	 * @param graphDb The graph database service
 	 * @throws PMException If an error occurs initializing the policy store
 	 */
-	public Neo4jEmbeddedPolicyStore(GraphDatabaseService graphDb) throws PMException {
+	public Neo4jEmbeddedPolicyStore(GraphDatabaseService graphDb, ClassLoader classLoader) throws PMException {
 		this.txHandler = new TxHandler(graphDb);
+		this.classLoader = classLoader;
 	}
 
 	public TxHandler getTxHandler() {
@@ -51,17 +53,17 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
 	@Override
 	public ObligationsStore obligations() {
-		return new Neo4jEmbeddedObligationStore(txHandler);
+		return new Neo4jEmbeddedObligationStore(txHandler, classLoader);
 	}
 
 	@Override
 	public OperationsStore operations() {
-		return new Neo4jEmbeddedOperationsStore(txHandler);
+		return new Neo4jEmbeddedOperationsStore(txHandler, classLoader);
 	}
 
 	@Override
 	public RoutinesStore routines() {
-		return new Neo4jEmbeddedRoutinesStore(txHandler);
+		return new Neo4jEmbeddedRoutinesStore(txHandler, classLoader);
 	}
 
 	@Override

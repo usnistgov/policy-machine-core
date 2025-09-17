@@ -16,9 +16,11 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 public class Neo4jEmbeddedRoutinesStore implements RoutinesStore {
 
 	private final TxHandler txHandler;
+	private final ClassLoader classLoader;
 
-	public Neo4jEmbeddedRoutinesStore(TxHandler txHandler) {
+	public Neo4jEmbeddedRoutinesStore(TxHandler txHandler, ClassLoader classLoader) {
 		this.txHandler = txHandler;
+		this.classLoader = classLoader;
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public class Neo4jEmbeddedRoutinesStore implements RoutinesStore {
 				return;
 			}
 
-			routine.set((Routine<?, ?>) deserialize(node.getProperty(DATA_PROPERTY).toString()));
+			routine.set((Routine<?, ?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
 		});
 
 		return routine.get();

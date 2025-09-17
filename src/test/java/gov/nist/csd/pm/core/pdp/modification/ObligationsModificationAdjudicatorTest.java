@@ -2,7 +2,8 @@ package gov.nist.csd.pm.core.pdp.modification;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Response;
+import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -72,14 +73,14 @@ class ObligationsModificationAdjudicatorTest {
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
-                        new Response("e", List.of())
+                        new PMLObligationResponse("e", List.of())
                 )
         )));
         assertThrows(UnauthorizedException.class, () -> fail.createObligation(id("u1"), "name", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
-                        new Response("e", List.of())
+                        new PMLObligationResponse("e", List.of())
                 )
         )));
     }
@@ -90,14 +91,14 @@ class ObligationsModificationAdjudicatorTest {
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
-                        new Response("e", List.of())
+                        new PMLObligationResponse("e", List.of())
                 )
         ));
         ok.createObligation(id("u1"), "test2", List.of(
                 new Rule(
                         "rule1",
                         new EventPattern(new SubjectPattern(), new OperationPattern(), Map.of()),
-                        new Response("e", List.of())
+                        new PMLObligationResponse("e", List.of())
                 )
         ));
         assertDoesNotThrow(() -> ok.deleteObligation("test"));

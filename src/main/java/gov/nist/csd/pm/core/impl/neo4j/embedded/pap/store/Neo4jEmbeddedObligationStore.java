@@ -18,9 +18,11 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 
 	private final TxHandler txHandler;
+	private ClassLoader classLoader;
 
-	public Neo4jEmbeddedObligationStore(TxHandler txHandler) {
+	public Neo4jEmbeddedObligationStore(TxHandler txHandler, ClassLoader classLoader) {
 		this.txHandler = txHandler;
+		this.classLoader = classLoader;
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 				while (nodes.hasNext()) {
 					Node next = nodes.next();
 
-					obligations.add((Obligation) deserialize(next.getProperty(DATA_PROPERTY).toString()));
+					obligations.add((Obligation) deserialize(next.getProperty(DATA_PROPERTY).toString(), classLoader));
 				}
 			}
 		});
@@ -85,7 +87,7 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 				return;
 			}
 
-			obligation.set((Obligation) deserialize(node.getProperty(DATA_PROPERTY).toString()));
+			obligation.set((Obligation) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
 		});
 
 		return obligation.get();

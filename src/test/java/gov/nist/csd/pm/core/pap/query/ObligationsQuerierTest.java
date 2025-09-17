@@ -4,7 +4,7 @@ import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Response;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -33,7 +33,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                                         new SubjectPattern(),
                                         new OperationPattern("test_event")
                                 ),
-                                new Response("evtCtx", List.of(
+                                new PMLObligationResponse("evtCtx", List.of(
                                         new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
@@ -52,7 +52,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                                         new SubjectPattern(),
                                         new OperationPattern("test_event")
                                 ),
-                                new Response("evtCtx", List.of(
+                                new PMLObligationResponse("evtCtx", List.of(
                                         new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
@@ -63,7 +63,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                                         new SubjectPattern(),
                                         new OperationPattern("test_event")
                                 ),
-                                new Response("evtCtx", List.of(
+                                new PMLObligationResponse("evtCtx", List.of(
                                         new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
