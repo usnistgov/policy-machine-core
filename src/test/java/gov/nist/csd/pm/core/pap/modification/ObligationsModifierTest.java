@@ -6,7 +6,8 @@ import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Response;
+import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -41,7 +42,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                         new SubjectPattern(),
                                         new OperationPattern("test_event")
                                 ),
-                                new Response("evtCtx", List.of(
+                                new PMLObligationResponse("evtCtx", List.of(
                                         new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
@@ -60,7 +61,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                         new SubjectPattern(),
                                         new OperationPattern("test_event")
                                 ),
-                                new Response("evtCtx", List.of(
+                                new PMLObligationResponse("evtCtx", List.of(
                                         new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
@@ -71,7 +72,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                         new SubjectPattern(),
                                         new OperationPattern("test_event")
                                 ),
-                                new Response("evtCtx", List.of(
+                                new PMLObligationResponse("evtCtx", List.of(
                                         new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
                                 ))
                         )
@@ -115,7 +116,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                             new SubjectPattern(new InSubjectPattern("ua2")),
                                             new OperationPattern("test_event")
                                     ),
-                                    new Response("evtCtx", List.of())
+                                    new PMLObligationResponse("evtCtx", List.of())
                             ))
                     ));
             assertThrows(NodeDoesNotExistException.class,
@@ -128,7 +129,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                             new SubjectPattern(new InSubjectPattern("ua3")),
                                             new OperationPattern("test_event")
                                     ),
-                                    new Response("evtCtx", List.of())
+                                    new PMLObligationResponse("evtCtx", List.of())
                             ))
                     ));
         }
@@ -150,7 +151,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                             new OperationPattern("test_event"),
                                             Map.of("", List.of(new NodeArgPattern("oa1")))
                                     ),
-                                    new Response("evtCtx", List.of())
+                                    new PMLObligationResponse("evtCtx", List.of())
                             ))
                     ));
             assertThrows(NodeDoesNotExistException.class,
@@ -164,7 +165,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                             new OperationPattern("test_event"),
                                             Map.of("", List.of(new NodeArgPattern("oa1")))
                                     ),
-                                    new Response("evtCtx", List.of())
+                                    new PMLObligationResponse("evtCtx", List.of())
                             ))
                     ));
             assertThrows(NodeDoesNotExistException.class,
@@ -178,7 +179,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                                             new OperationPattern("test_event"),
                                             Map.of("", List.of(new InArgPattern("oa1")))
                                     ),
-                                    new Response("evtCtx", List.of())
+                                    new PMLObligationResponse("evtCtx", List.of())
                             ))
                     ));
         }

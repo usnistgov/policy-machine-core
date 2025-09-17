@@ -9,7 +9,9 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Response;
+import gov.nist.csd.pm.core.pap.obligation.JavaObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -21,7 +23,6 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
@@ -296,7 +297,7 @@ class EPPTest {
                 List.of(new Rule(
                     "rule1",
                     new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
-                    new Response("evtCtx", List.of(
+                    new PMLObligationResponse("evtCtx", List.of(
                         new CreateNonPCStatement(
                             new StringLiteralExpression("o2"),
                             NodeType.O,
@@ -559,5 +560,41 @@ class EPPTest {
 
         PMLCompiler pmlCompiler = new PMLCompiler();
         assertDoesNotThrow(() -> pmlCompiler.compilePML(pml));
+    }
+
+    @Test
+    void testJavaObligationResponseExecutesOnPatternMatch() throws PMException {
+        MemoryPAP pap = new TestPAP();
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
+
+        String pml = """                
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create u "u1" in ["ua1"]
+                create oa "oa1" in ["pc1"]
+                
+                associate "ua1" and "oa1" with ["*a"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
+                """;
+        pap.executePML(new TestUserContext("u1"), pml);
+
+        pap.modify().obligations().createObligation(id("u1"), "obligation", List.of(
+            new Rule(
+                "rule1",
+                new EventPattern(
+                    new SubjectPattern(),
+                    new OperationPattern("assign")
+                ),
+                new JavaObligationResponse((respPap, user, ctx) -> {
+                    respPap.modify().graph().createPolicyClass("test");
+                })
+            )
+        ));
+
+        pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
+        assertFalse(pap.query().graph().nodeExists("test"));
     }
 }

@@ -7,15 +7,15 @@ public class Rule implements Serializable {
 
     private String name;
     private EventPattern eventPattern;
-    private Response response;
+    private ObligationResponse obligationResponse;
 
     public Rule() {
     }
 
-    public Rule(String name, EventPattern eventPattern, Response response) {
+    public Rule(String name, EventPattern eventPattern, ObligationResponse obligationResponse) {
         this.name = name;
         this.eventPattern = eventPattern;
-        this.response = response;
+        this.obligationResponse = obligationResponse;
     }
 
     public String getName() {
@@ -26,8 +26,8 @@ public class Rule implements Serializable {
         return eventPattern;
     }
 
-    public Response getResponse() {
-        return response;
+    public ObligationResponse getResponse() {
+        return obligationResponse;
     }
 
     @Override
@@ -35,11 +35,12 @@ public class Rule implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Rule rule = (Rule) o;
-        return Objects.equals(name, rule.name) && Objects.equals(eventPattern, rule.eventPattern) && Objects.equals(response, rule.response);
+        return Objects.equals(name, rule.name) && Objects.equals(eventPattern, rule.eventPattern) && Objects.equals(
+            obligationResponse, rule.obligationResponse);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, eventPattern, response);
+        return Objects.hash(name, eventPattern, obligationResponse);
     }
 }

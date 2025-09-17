@@ -4,6 +4,8 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
@@ -87,6 +89,10 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
 
         for (Rule rule : rules) {
             EventPattern event = rule.getEventPattern();
+            ObligationResponse response = rule.getResponse();
+            if (!(response instanceof PMLObligationResponse pmlObligationResponse)) {
+                throw new IllegalStateException("cannot convert rule " + rule.getName() + " to PML because it has a JavaObligationResponse");
+            }
 
             CreateRuleStatement createRuleStatement = new CreateRuleStatement(
                 new StringLiteralExpression(rule.getName()),
@@ -94,8 +100,8 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
                 event.getOperationPattern(),
                 event.getArgPatterns(),
                 new CreateRuleStatement.ResponseBlock(
-                    rule.getResponse().getEventCtxVariable(),
-                    rule.getResponse().getStatements()
+                    pmlObligationResponse.getEventCtxVariable(),
+                    pmlObligationResponse.getStatements()
                 )
             );
 

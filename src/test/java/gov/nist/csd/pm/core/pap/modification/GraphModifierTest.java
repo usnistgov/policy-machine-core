@@ -6,7 +6,8 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssociationException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Response;
+import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
@@ -429,7 +430,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                                     new SubjectPattern(new InSubjectPattern("ua1")),
                                     new OperationPattern("event1")
                             ),
-                            new Response("evtCtx", List.of())
+                            new PMLObligationResponse("evtCtx", List.of())
                     ),
                     new Rule(
                             "rule1",
@@ -437,7 +438,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                                     new SubjectPattern(new InSubjectPattern("ua1")),
                                     new OperationPattern("event1")
                             ),
-                            new Response("evtCtx", List.of())
+                            new PMLObligationResponse("evtCtx", List.of())
                     ))
             );
 
