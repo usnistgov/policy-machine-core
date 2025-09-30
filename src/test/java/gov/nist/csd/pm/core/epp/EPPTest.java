@@ -118,14 +118,12 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        EPPResponseExecutionException e = assertThrows(EPPResponseExecutionException.class,
-            () -> pdp.adjudicateAdminOperation(
-                new TestUserContext("u1"),
-                "op1",
-                Map.of("a", "oa1",
-                    "b", List.of("oa1", "oa2"))
-            ));
-        assertTrue(e.getCause() instanceof UnauthorizedException);
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(
+            new TestUserContext("u1"),
+            "op1",
+            Map.of("a", "oa1",
+                "b", List.of("oa1", "oa2"))
+        ));
 
         pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("*a"));
 

@@ -25,26 +25,21 @@ public class EPP implements EventSubscriber {
     }
 
     @Override
-    public void processEvent(EventContext eventCtx) throws EPPResponseExecutionException {
-        try {
-            Collection<Obligation> obligations = pap.query().obligations().getObligations();
-            for (Obligation obligation : obligations) {
-                long author = obligation.getAuthorId();
-                List<Rule> rules = obligation.getRules();
-                for (Rule rule : rules) {
-                    if (!rule.getEventPattern().matches(eventCtx, pap)) {
-                        continue;
-                    }
-
-                    UserContext authorCtx = new UserContext(author);
-                    ObligationResponse obligationResponse = rule.getResponse();
-
-                    executeResponse(authorCtx, obligationResponse, eventCtx);
+    public void processEvent(EventContext eventCtx) throws PMException {
+        Collection<Obligation> obligations = pap.query().obligations().getObligations();
+        for (Obligation obligation : obligations) {
+            long author = obligation.getAuthorId();
+            List<Rule> rules = obligation.getRules();
+            for (Rule rule : rules) {
+                if (!rule.getEventPattern().matches(eventCtx, pap)) {
+                    continue;
                 }
+
+                UserContext authorCtx = new UserContext(author);
+                ObligationResponse obligationResponse = rule.getResponse();
+
+                executeResponse(authorCtx, obligationResponse, eventCtx);
             }
-        } catch (PMException e) {
-            // wrap any exception in an EPP specific exception so the caller knows the exception occurred in the EPP
-            throw new EPPResponseExecutionException(e);
         }
     }
 
