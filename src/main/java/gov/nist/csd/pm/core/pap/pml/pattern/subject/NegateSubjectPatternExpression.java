@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
@@ -9,18 +10,14 @@ import java.util.Objects;
 
 public class NegateSubjectPatternExpression extends SubjectPatternExpression {
 
-    private final Pattern subjectPatternExpression;
+    private final SubjectPatternExpression subjectPatternExpression;
 
-    public NegateSubjectPatternExpression(Pattern subjectPatternExpression) {
+    public NegateSubjectPatternExpression(SubjectPatternExpression subjectPatternExpression) {
         this.subjectPatternExpression = subjectPatternExpression;
     }
 
-    public Pattern getSubjectPatternExpression() {
-        return subjectPatternExpression;
-    }
-
     @Override
-    public boolean matchesInternal(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(EventContextUser value, PAP pap) throws PMException {
         return !subjectPatternExpression.matches(value, pap);
     }
 

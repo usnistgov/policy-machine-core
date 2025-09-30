@@ -8,15 +8,15 @@ import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 import java.util.Objects;
 import java.util.Set;
 
-public class NodeArgPattern extends ArgPatternExpression {
+public class NodeNameArgPatternExpression extends ArgPatternExpression {
 
     private final String node;
 
-    public NodeArgPattern(StringLiteralExpression node) {
+    public NodeNameArgPatternExpression(StringLiteralExpression node) {
         this.node = node.getValue();
     }
 
-    public NodeArgPattern(String node) {
+    public NodeNameArgPatternExpression(String node) {
         this.node = node;
     }
 
@@ -38,7 +38,7 @@ public class NodeArgPattern extends ArgPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NodeArgPattern that)) return false;
+        if (!(o instanceof NodeNameArgPatternExpression that)) return false;
         return Objects.equals(node, that.node);
     }
 

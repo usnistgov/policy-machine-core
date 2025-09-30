@@ -2,9 +2,9 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +22,8 @@ class CreateRuleStatementTest {
                 new SubjectPattern(),
                 new OperationPattern(),
                 Map.of(
-                        "a", List.of(new AnyArgPattern()),
-                        "b", List.of(new InArgPattern("test"), new NodeArgPattern("test"))
+                        "a", List.of(new AnyArgPatternExpression()),
+                        "b", List.of(new InArgPatternExpression("test"), new NodeNameArgPatternExpression("test"))
                 ),
                 new CreateRuleStatement.ResponseBlock("", List.of())
         );

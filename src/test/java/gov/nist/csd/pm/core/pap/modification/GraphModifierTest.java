@@ -6,14 +6,13 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssociationException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -427,7 +426,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                     List.of(new Rule(
                             "rule1",
                             new EventPattern(
-                                    new SubjectPattern(new InSubjectPattern("ua1")),
+                                    new SubjectPattern(new InSubjectPatternExpression("ua1")),
                                     new OperationPattern("event1")
                             ),
                             new PMLObligationResponse("evtCtx", List.of())
@@ -435,7 +434,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                     new Rule(
                             "rule1",
                             new EventPattern(
-                                    new SubjectPattern(new InSubjectPattern("ua1")),
+                                    new SubjectPattern(new InSubjectPatternExpression("ua1")),
                                     new OperationPattern("event1")
                             ),
                             new PMLObligationResponse("evtCtx", List.of())

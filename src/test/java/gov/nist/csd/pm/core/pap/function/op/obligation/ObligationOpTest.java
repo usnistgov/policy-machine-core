@@ -5,10 +5,10 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -35,9 +35,10 @@ class ObligationOpTest {
                 
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and "oa2" with ["*a"]
+                associate "ua1" and "ua2" with ["*a"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
                 
-                create u "u1" in ["ua1"]
+                create u "u1" in ["ua1", "ua2"]
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 """);
@@ -48,8 +49,8 @@ class ObligationOpTest {
                 () -> ObligationOp.checkObligationRulePrivileges(pap, new TestUserContext("u2"), List.of(testRule), CREATE_OBLIGATION, CREATE_OBLIGATION_WITH_ANY_PATTERN));
 
         Rule testRule2 = new Rule("", new EventPattern(new SubjectPattern(new LogicalSubjectPatternExpression(
-            new NodeArgPattern("oa1"),
-            new InArgPattern("oa2"),
+            new UsernamePatternExpression("u1"),
+            new InSubjectPatternExpression("ua1"),
             true
         )), new OperationPattern()), null);
         ObligationOp.checkObligationRulePrivileges(pap, new TestUserContext("u1"), List.of(testRule2), CREATE_OBLIGATION, CREATE_OBLIGATION_WITH_ANY_PATTERN);

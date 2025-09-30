@@ -7,13 +7,13 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.ProcessSubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.ProcessSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.util.TestPAP;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class EventPatternTest {
     @Test
     void testUserAttributesMatches() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new InSubjectPattern("ua1")),
+            new SubjectPattern(new InSubjectPatternExpression("ua1")),
             new OperationPattern(),
             Map.of()
         );
@@ -61,7 +61,7 @@ class EventPatternTest {
     @Test
     void testUserAttributesNotMatches() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new InSubjectPattern("ua1")),
+            new SubjectPattern(new InSubjectPatternExpression("ua1")),
             new OperationPattern(),
             Map.of()
         );
@@ -118,7 +118,7 @@ class EventPatternTest {
     @Test
     void testUserDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePattern("u2")),
+            new SubjectPattern(new UsernamePatternExpression("u2")),
             new OperationPattern(),
             Map.of()
         );
@@ -138,8 +138,8 @@ class EventPatternTest {
     void testUserAndProcessMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePattern("u1"),
-                new ProcessSubjectPattern("p1"),
+                new UsernamePatternExpression("u1"),
+                new ProcessSubjectPatternExpression("p1"),
                 false
             )),
             new OperationPattern(),
@@ -161,8 +161,8 @@ class EventPatternTest {
     void testUserMatchesProcessDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePattern("u1"),
-                new ProcessSubjectPattern("p1"),
+                new UsernamePatternExpression("u1"),
+                new ProcessSubjectPatternExpression("p1"),
                 false
             )),
             new OperationPattern(),
@@ -184,8 +184,8 @@ class EventPatternTest {
     void testUserAndProcessDoNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePattern("u2"),
-                new ProcessSubjectPattern("p1"),
+                new UsernamePatternExpression("u2"),
+                new ProcessSubjectPatternExpression("p1"),
                 false
             )),
             new OperationPattern(),
@@ -206,11 +206,11 @@ class EventPatternTest {
     @Test
     void testArgsMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePattern("u1")),
+            new SubjectPattern(new UsernamePatternExpression("u1")),
             new OperationPattern("assign"),
             Map.of(
-                "ascendant", List.of(new NodeArgPattern("a")),
-                "descendants", List.of(new AnyArgPattern())
+                "ascendant", List.of(new NodeNameArgPatternExpression("a")),
+                "descendants", List.of(new AnyArgPatternExpression())
             )
         );
 
@@ -228,11 +228,11 @@ class EventPatternTest {
     @Test
     void testArgsDoNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePattern("u1")),
+            new SubjectPattern(new UsernamePatternExpression("u1")),
             new OperationPattern("assign"),
             Map.of(
-                "ascendant", List.of(new NodeArgPattern("b")),
-                "descendant", List.of(new AnyArgPattern())
+                "ascendant", List.of(new NodeNameArgPatternExpression("b")),
+                "descendant", List.of(new AnyArgPatternExpression())
             )
         );
 
@@ -250,11 +250,11 @@ class EventPatternTest {
     @Test
     void testInvalidNodeArgType() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePattern("u1")),
+            new SubjectPattern(new UsernamePatternExpression("u1")),
             new OperationPattern("assign"),
             Map.of(
-                "ascendant", List.of(new AnyArgPattern()),
-                "descendants", List.of(new AnyArgPattern())
+                "ascendant", List.of(new AnyArgPatternExpression()),
+                "descendants", List.of(new AnyArgPatternExpression())
             )
         );
 

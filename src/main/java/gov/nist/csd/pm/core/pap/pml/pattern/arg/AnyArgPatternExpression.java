@@ -5,15 +5,12 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
 import java.util.Collection;
+import java.util.List;
 
-public class AnyArgPattern extends ArgPatternExpression {
+public class AnyArgPatternExpression extends ArgPatternExpression {
+
     @Override
     public boolean matchesInternal(String value, PAP pap) throws PMException {
-        return true;
-    }
-
-    @Override
-    public boolean matches(Collection<String> value, PAP pap) throws PMException {
         return true;
     }
 
@@ -34,6 +31,6 @@ public class AnyArgPattern extends ArgPatternExpression {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AnyArgPattern;
+        return obj instanceof AnyArgPatternExpression;
     }
 }

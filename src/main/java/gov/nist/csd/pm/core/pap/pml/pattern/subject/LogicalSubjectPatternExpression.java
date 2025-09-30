@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
@@ -10,21 +11,21 @@ import java.util.Objects;
 
 public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
 
-    private final Pattern left;
-    private final Pattern right;
+    private final SubjectPatternExpression left;
+    private final SubjectPatternExpression right;
     private final boolean isAnd;
 
-    public LogicalSubjectPatternExpression(Pattern left, Pattern right, boolean isAnd) {
+    public LogicalSubjectPatternExpression(SubjectPatternExpression left, SubjectPatternExpression right, boolean isAnd) {
         this.left = left;
         this.right = right;
         this.isAnd = isAnd;
     }
 
-    public Pattern getLeft() {
+    public SubjectPattern getLeft() {
         return left;
     }
 
-    public Pattern getRight() {
+    public SubjectPattern getRight() {
         return right;
     }
 
@@ -33,7 +34,7 @@ public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matchesInternal(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(EventContextUser value, PAP pap) throws PMException {
         return isAnd ? left.matches(value, pap) && right.matches(value, pap)
                 : left.matches(value, pap) || right.matches(value, pap);
     }

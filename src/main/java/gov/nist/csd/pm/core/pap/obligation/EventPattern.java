@@ -56,8 +56,10 @@ public class EventPattern implements Serializable {
     }
 
     public boolean matches(EventContext eventCtx, PAP pap) throws PMException {
-        boolean userMatches = userMatches(eventCtx.user(), pap);
-        boolean opMatches = operationMatches(eventCtx.opName(), pap);
+        boolean userMatches = subjectPattern.matches(eventCtx.user(), pap);
+        boolean opMatches = operationPattern.matches(eventCtx.opName(), pap);
+
+        // if the pattern states any operation, return if the user matched
         if (operationPattern.isAny()) {
             return userMatches;
         }
@@ -88,31 +90,24 @@ public class EventPattern implements Serializable {
                 "argPatterns=" + argPatterns + ']';
     }
 
-    private boolean userMatches(EventContextUser user, PAP pap) throws PMException {
-        return
-            subjectPattern.matches(user.getName(), pap)
-            || subjectPattern.matches(user.getProcess(), pap)
-            || subjectPattern.matches(user.getAttrs(), pap);
-    }
-
-    private boolean operationMatches(String opName, PAP pap) throws PMException {
-        return operationPattern.matches(opName, pap);
-    }
-
     private boolean argsMatch(Map<String, Object> args, PAP pap) throws PMException {
+        // if there are patterns defined that are not in args, return false as not all patterns can be satisfied
         if (!args.keySet().containsAll(argPatterns.keySet())) {
             return false;
         }
 
+        // for each arg, if there is a pattern with the same key, check the value against the pattern
         for (Map.Entry<String, Object> arg : args.entrySet()) {
-            if (!argPatterns.containsKey(arg.getKey())) {
+            String argKey = arg.getKey();
+            Object argValue = arg.getValue();
+
+            // if the pattern does not include this arg, ignore
+            if (!argPatterns.containsKey(argKey)) {
                 continue;
             }
 
-            Object argValue = arg.getValue();
+            // needs to satisfy each expression in pattern list
             List<ArgPatternExpression> expressions = argPatterns.get(arg.getKey());
-
-            // needs to match each expression in pattern list
             for (ArgPatternExpression argPatternExpression : expressions) {
                 switch (argValue) {
                     case null -> {}

@@ -44,8 +44,8 @@ public class ArgPatternTest {
         CreateRuleStatement stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeArgPattern("o1")),
-                        "descendants", List.of(new NodeArgPattern("oa1"))
+                        "ascendant", List.of(new NodeNameArgPatternExpression("o1")),
+                        "descendants", List.of(new NodeNameArgPatternExpression("oa1"))
                 ),
                 stmt.getArgPattern()
         );
@@ -67,8 +67,8 @@ public class ArgPatternTest {
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeArgPattern("o1")),
-                        "descendants", List.of(new NodeArgPattern("oa1"))
+                        "ascendant", List.of(new NodeNameArgPatternExpression("o1")),
+                        "descendants", List.of(new NodeNameArgPatternExpression("oa1"))
                 ),
                 stmt.getArgPattern()
         );
@@ -90,8 +90,8 @@ public class ArgPatternTest {
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeArgPattern("o1"), new NodeArgPattern("o2")),
-                        "descendants", List.of(new NegateArgPatternExpression(new NodeArgPattern("oa1")))
+                        "ascendant", List.of(new NodeNameArgPatternExpression("o1"), new NodeNameArgPatternExpression("o2")),
+                        "descendants", List.of(new NegateArgPatternExpression(new NodeNameArgPatternExpression("oa1")))
                 ),
                 stmt.getArgPattern()
         );
@@ -117,13 +117,13 @@ public class ArgPatternTest {
         stmt = compileTestCreateRuleStatement(pml);
         assertEquals(
                 Map.of(
-                        "ascendant", List.of(new NodeArgPattern("o1"), new AnyArgPattern()),
+                        "ascendant", List.of(new NodeNameArgPatternExpression("o1"), new AnyArgPatternExpression()),
                         "descendants", List.of(
-                                new NegateArgPatternExpression(new NodeArgPattern("oa1")),
+                                new NegateArgPatternExpression(new NodeNameArgPatternExpression("oa1")),
                                 new ParenArgPatternExpression(
                                         new LogicalArgPatternExpression(
-                                                new NodeArgPattern("oa1"),
-                                                new NodeArgPattern("oa2"),
+                                                new NodeNameArgPatternExpression("oa1"),
+                                                new NodeNameArgPatternExpression("oa2"),
                                                 false
                                         )
                                 )

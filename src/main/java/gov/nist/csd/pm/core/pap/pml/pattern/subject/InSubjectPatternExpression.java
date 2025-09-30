@@ -1,5 +1,6 @@
-package gov.nist.csd.pm.core.pap.pml.pattern.arg;
+package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -8,24 +9,31 @@ import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 import java.util.Objects;
 import java.util.Set;
 
-public class InArgPattern extends ArgPatternExpression {
+public class InSubjectPatternExpression extends SubjectPatternExpression {
 
     private final String container;
 
-    public InArgPattern(StringLiteralExpression container) {
+    public InSubjectPatternExpression(StringLiteralExpression container) {
         this.container = container.getValue();
     }
 
-    public InArgPattern(String container) {
+    public InSubjectPatternExpression(String container) {
         this.container = container;
     }
 
     @Override
-    public boolean matchesInternal(String value, PAP pap) throws PMException {
-        long valueId = pap.query().graph().getNodeId(value);
+    public boolean matchesInternal(EventContextUser value, PAP pap) throws PMException {
         long contId = pap.query().graph().getNodeId(container);
 
-        return pap.query().graph().isAscendant(valueId, contId);
+        if (value.isUser()) {
+            long userId = pap.query().graph().getNodeId(value.getName());
+
+            // check user contained in container
+            return pap.query().graph().isAscendant(userId, contId);
+        } else {
+            // check if container in attrs
+            return value.getAttrs().contains(container);
+        }
     }
 
     @Override
@@ -41,7 +49,7 @@ public class InArgPattern extends ArgPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof InArgPattern that)) return false;
+        if (!(o instanceof InSubjectPatternExpression that)) return false;
         return Objects.equals(container, that.container);
     }
 
@@ -49,4 +57,5 @@ public class InArgPattern extends ArgPatternExpression {
     public int hashCode() {
         return Objects.hashCode(container);
     }
+
 }

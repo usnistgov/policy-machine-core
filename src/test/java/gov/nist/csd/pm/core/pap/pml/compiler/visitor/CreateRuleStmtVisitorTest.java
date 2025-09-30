@@ -5,10 +5,10 @@ import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
@@ -63,14 +63,14 @@ class CreateRuleStmtVisitorTest {
                                 ),
                                 new CreateRuleStatement(
                                         new StringLiteralExpression("users"),
-                                        new SubjectPattern(new UsernamePattern("u1")),
+                                        new SubjectPattern(new UsernamePatternExpression("u1")),
                                         new OperationPattern("test_event"),
                                         Map.of(),
                                         new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                                 ),
                                 new CreateRuleStatement(
                                         new StringLiteralExpression("users list"),
-                                        new SubjectPattern(new LogicalSubjectPatternExpression(new UsernamePattern("u1"), new UsernamePattern("u2"), false)),
+                                        new SubjectPattern(new LogicalSubjectPatternExpression(new UsernamePatternExpression("u1"), new UsernamePatternExpression("u2"), false)),
                                         new OperationPattern("test_event"),
                                         Map.of(),
                                         new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
@@ -174,7 +174,7 @@ class CreateRuleStmtVisitorTest {
                                 new SubjectPattern(),
                                 new OperationPattern("assign"),
                                 Map.of(
-                                        "ascendant", List.of(new AnyArgPattern())
+                                        "ascendant", List.of(new AnyArgPatternExpression())
                                 ),
                                 new CreateRuleStatement.ResponseBlock("ctx", new ArrayList<>())
                         )

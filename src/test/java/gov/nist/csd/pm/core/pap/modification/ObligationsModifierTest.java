@@ -6,17 +6,16 @@ import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Nested;
@@ -113,7 +112,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                             List.of(new Rule(
                                     "rule1",
                                     new EventPattern(
-                                            new SubjectPattern(new InSubjectPattern("ua2")),
+                                            new SubjectPattern(new InSubjectPatternExpression("ua2")),
                                             new OperationPattern("test_event")
                                     ),
                                     new PMLObligationResponse("evtCtx", List.of())
@@ -126,7 +125,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                             List.of(new Rule(
                                     "rule1",
                                     new EventPattern(
-                                            new SubjectPattern(new InSubjectPattern("ua3")),
+                                            new SubjectPattern(new InSubjectPatternExpression("ua3")),
                                             new OperationPattern("test_event")
                                     ),
                                     new PMLObligationResponse("evtCtx", List.of())
@@ -147,9 +146,9 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                             List.of(new Rule(
                                     "rule1",
                                     new EventPattern(
-                                            new SubjectPattern(new UsernamePattern("u1")),
+                                            new SubjectPattern(new UsernamePatternExpression("u1")),
                                             new OperationPattern("test_event"),
-                                            Map.of("", List.of(new NodeArgPattern("oa1")))
+                                            Map.of("", List.of(new NodeNameArgPatternExpression("oa1")))
                                     ),
                                     new PMLObligationResponse("evtCtx", List.of())
                             ))
@@ -161,9 +160,9 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                             List.of(new Rule(
                                     "rule1",
                                     new EventPattern(
-                                            new SubjectPattern(new UsernamePattern("u1")),
+                                            new SubjectPattern(new UsernamePatternExpression("u1")),
                                             new OperationPattern("test_event"),
-                                            Map.of("", List.of(new NodeArgPattern("oa1")))
+                                            Map.of("", List.of(new NodeNameArgPatternExpression("oa1")))
                                     ),
                                     new PMLObligationResponse("evtCtx", List.of())
                             ))
@@ -175,9 +174,9 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                             List.of(new Rule(
                                     "rule1",
                                     new EventPattern(
-                                            new SubjectPattern(new UsernamePattern("u1")),
+                                            new SubjectPattern(new UsernamePatternExpression("u1")),
                                             new OperationPattern("test_event"),
-                                            Map.of("", List.of(new InArgPattern("oa1")))
+                                            Map.of("", List.of(new InArgPatternExpression("oa1")))
                                     ),
                                     new PMLObligationResponse("evtCtx", List.of())
                             ))
