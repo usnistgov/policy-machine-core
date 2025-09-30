@@ -45,19 +45,6 @@ public class PDPTx extends PAP {
         this.pdpQuerier = new PolicyQueryAdjudicator(this.pap, this.userCtx);
     }
 
-    public PDPTx(PAP pap,
-                 UserContext userCtx,
-                 PDPEventPublisher eventPublisher,
-                 PolicyModificationAdjudicator pdpModifier,
-                 PolicyQueryAdjudicator pdpQuerier) throws PMException {
-        super(pap);
-        this.pap = pap;
-        this.userCtx = userCtx;
-        this.eventPublisher = eventPublisher;
-        this.pdpModifier = pdpModifier;
-        this.pdpQuerier = pdpQuerier;
-    }
-
     @Override
     public PolicyModificationAdjudicator modify() {
         return pdpModifier;

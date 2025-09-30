@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.impl.memory.pap;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.store.MemoryPolicyStore;
+import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.modification.GraphModifier;
 import gov.nist.csd.pm.core.pap.modification.ObligationsModifier;
@@ -56,20 +57,22 @@ public class MemoryPAP extends PAP {
     }
 
     private static MemoryPAP initMemoryPAP(MemoryPolicyStore memoryPolicyStore) throws PMException {
+        PluginRegistry pluginRegistry = new PluginRegistry();
+
         PolicyModifier policyModifier = new PolicyModifier(
             new GraphModifier(memoryPolicyStore, new RandomIdGenerator()),
             new ProhibitionsModifier(memoryPolicyStore),
             new ObligationsModifier(memoryPolicyStore),
-            new OperationsModifier(memoryPolicyStore),
-            new RoutinesModifier(memoryPolicyStore)
+            new OperationsModifier(memoryPolicyStore, pluginRegistry),
+            new RoutinesModifier(memoryPolicyStore, pluginRegistry)
         );
 
         PolicyQuerier policyQuerier = new PolicyQuerier(
             new GraphQuerier(memoryPolicyStore),
             new ProhibitionsQuerier(memoryPolicyStore),
             new ObligationsQuerier(memoryPolicyStore),
-            new OperationsQuerier(memoryPolicyStore),
-            new RoutinesQuerier(memoryPolicyStore),
+            new OperationsQuerier(memoryPolicyStore, pluginRegistry),
+            new RoutinesQuerier(memoryPolicyStore, pluginRegistry),
             new AccessQuerier(memoryPolicyStore)
         );
 

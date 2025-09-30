@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.AdminFunction;
 import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
@@ -26,6 +27,7 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
+import scala.concurrent.impl.FutureConvertersImpl.P;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
@@ -36,6 +38,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     private final PolicyModifier modifier;
     private final PolicyQuerier querier;
     private final PrivilegeChecker privilegeChecker;
+    private final PluginRegistry pluginRegistry;
 
     public PAP(PolicyStore policyStore, PolicyModifier modifier, PolicyQuerier querier, PrivilegeChecker privilegeChecker) throws PMException {
         this.policyStore = policyStore;
@@ -45,6 +48,8 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
+
+        this.pluginRegistry = new PluginRegistry();
     }
 
     public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws PMException {
@@ -55,6 +60,8 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
+
+        this.pluginRegistry = new PluginRegistry();
     }
 
     public PAP(PAP pap) throws PMException {
@@ -75,6 +82,10 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
     public PrivilegeChecker privilegeChecker() {
         return privilegeChecker;
+    }
+
+    public PluginRegistry plugins() {
+        return pluginRegistry;
     }
 
     public PAP withIdGenerator(IdGenerator idGenerator) {
