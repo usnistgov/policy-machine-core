@@ -30,13 +30,16 @@ public class Neo4jEmbeddedPAP extends PAP {
 	public Neo4jEmbeddedPAP(PolicyStore policyStore,
 							PolicyModifier modifier,
 							PolicyQuerier querier,
-							PrivilegeChecker privilegeChecker) throws PMException {
-		super(policyStore, modifier, querier, privilegeChecker);
+							PrivilegeChecker privilegeChecker,
+							PluginRegistry pluginRegistry) throws PMException {
+		super(policyStore, modifier, querier, privilegeChecker, pluginRegistry);
 	}
 
-	public Neo4jEmbeddedPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws
-                                                                                                     PMException {
-		super(querier, modifier, policyStore);
+	public Neo4jEmbeddedPAP(PolicyQuerier querier,
+							PolicyModifier modifier,
+							PolicyStore policyStore,
+							PluginRegistry pluginRegistry) throws PMException {
+		super(querier, modifier, policyStore, pluginRegistry);
 	}
 
 	public Neo4jEmbeddedPAP(PAP pap) throws PMException {
@@ -69,6 +72,6 @@ public class Neo4jEmbeddedPAP extends PAP {
 
 		PrivilegeChecker privilegeChecker = new PrivilegeChecker(policyQuerier.access());
 
-		return new Neo4jEmbeddedPAP(memoryPolicyStore, policyModifier, policyQuerier, privilegeChecker);
+		return new Neo4jEmbeddedPAP(memoryPolicyStore, policyModifier, policyQuerier, privilegeChecker, pluginRegistry);
 	}
 }

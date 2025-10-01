@@ -40,32 +40,30 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     private final PrivilegeChecker privilegeChecker;
     private final PluginRegistry pluginRegistry;
 
-    public PAP(PolicyStore policyStore, PolicyModifier modifier, PolicyQuerier querier, PrivilegeChecker privilegeChecker) throws PMException {
+    public PAP(PolicyStore policyStore, PolicyModifier modifier, PolicyQuerier querier, PrivilegeChecker privilegeChecker, PluginRegistry pluginRegistry) throws PMException {
         this.policyStore = policyStore;
         this.modifier = modifier;
         this.querier = querier;
         this.privilegeChecker = privilegeChecker;
+        this.pluginRegistry = pluginRegistry;
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
-
-        this.pluginRegistry = new PluginRegistry();
     }
 
-    public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws PMException {
+    public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore, PluginRegistry pluginRegistry) throws PMException {
         this.querier = querier;
         this.modifier = modifier;
         this.policyStore = policyStore;
         this.privilegeChecker = new PrivilegeChecker(querier.access());
+        this.pluginRegistry = pluginRegistry;
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
-
-        this.pluginRegistry = new PluginRegistry();
     }
 
     public PAP(PAP pap) throws PMException {
-        this(pap.policyStore, pap.modifier, pap.querier, pap.privilegeChecker);
+        this(pap.policyStore, pap.modifier, pap.querier, pap.privilegeChecker, pap.pluginRegistry);
     }
 
     public PolicyQuery query() {

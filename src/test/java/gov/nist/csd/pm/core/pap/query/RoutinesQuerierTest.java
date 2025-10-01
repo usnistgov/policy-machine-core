@@ -52,6 +52,20 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
         Collection<String> adminRoutineNames = pap.query().routines().getAdminRoutineNames();
         assertEquals(new HashSet<>(adminRoutineNames), Set.of("r1", "r2", "deleteAllProjects"));
+
+        pap.plugins().registerRoutine(new Routine("r3", List.of()) {
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map argsMap) {
+                return null;
+            }
+        });
+        adminRoutineNames = pap.query().routines().getAdminRoutineNames();
+        assertEquals(new HashSet<>(adminRoutineNames), Set.of("r1", "r2", "r3", "deleteAllProjects"));
     }
 
     @Nested
@@ -65,6 +79,10 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
             Routine<?, ?> actual = pap.query().routines().getAdminRoutine(r1.getName());
             assertEquals(r1, actual);
+
+            pap.plugins().registerRoutine(r2);
+            actual = pap.query().routines().getAdminRoutine(r2.getName());
+            assertEquals(r2, actual);
         }
 
         @Test

@@ -34,12 +34,13 @@ public class MemoryPAP extends PAP {
     public MemoryPAP(PolicyStore policyStore,
                      PolicyModifier modifier,
                      PolicyQuerier querier,
-                     PrivilegeChecker privilegeChecker) throws PMException {
-        super(policyStore, modifier, querier, privilegeChecker);
+                     PrivilegeChecker privilegeChecker,
+                     PluginRegistry pluginRegistry) throws PMException {
+        super(policyStore, modifier, querier, privilegeChecker, pluginRegistry);
     }
 
-    public MemoryPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore) throws PMException {
-        super(querier, modifier, policyStore);
+    public MemoryPAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore, PluginRegistry pluginRegistry) throws PMException {
+        super(querier, modifier, policyStore, pluginRegistry);
     }
 
     public MemoryPAP(PAP pap) throws PMException {
@@ -78,6 +79,6 @@ public class MemoryPAP extends PAP {
 
         PrivilegeChecker privilegeChecker = new PrivilegeChecker(policyQuerier.access());
 
-        return new MemoryPAP(memoryPolicyStore, policyModifier, policyQuerier, privilegeChecker);
+        return new MemoryPAP(memoryPolicyStore, policyModifier, policyQuerier, privilegeChecker, pluginRegistry);
     }
 }
