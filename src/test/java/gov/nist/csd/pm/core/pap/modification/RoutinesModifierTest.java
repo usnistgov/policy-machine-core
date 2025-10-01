@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.core.pap.modification;
 
+import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.exception.RoutineDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.RoutineExistsException;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
@@ -104,6 +107,11 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             assertThrows(RoutineExistsException.class, () -> {
                 pap.modify().routines().createAdminRoutine(routine1);
             });
+
+            pap.modify().operations().deleteAdminOperation(routine1.getName());
+            pap.plugins().registerRoutine(routine1);
+            assertThrows(RoutineExistsException.class,
+                () -> pap.modify().routines().createAdminRoutine(routine1));
         }
 
         @Test
@@ -138,6 +146,11 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             pap.modify().routines().deleteAdminRoutine("routine1");
             pap.modify().routines().deleteAdminRoutine("routine1");
             assertFalse(pap.query().routines().getAdminRoutineNames().contains("routine1"));
+
+            pap.plugins().registerRoutine(routine1);
+            assertTrue(pap.query().routines().getAdminRoutineNames().contains(routine1.getName()));
+            pap.modify().routines().deleteAdminRoutine(routine1.getName());
+            assertThrows(RoutineDoesNotExistException.class, () -> pap.query().routines().getAdminRoutine(routine1.getName()));
         }
 
         @Test

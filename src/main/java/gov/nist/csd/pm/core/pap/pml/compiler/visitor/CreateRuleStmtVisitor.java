@@ -11,12 +11,12 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.LogicalArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.NegateArgPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeArgPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ParenArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.*;
 import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
@@ -105,17 +105,17 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
-            return new InSubjectPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new InSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public SubjectPatternExpression visitUsernameSubject(PMLParser.UsernameSubjectContext ctx) {
-            return new UsernamePattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new UsernamePatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public SubjectPatternExpression visitProcessSubject(PMLParser.ProcessSubjectContext ctx) {
-            return new ProcessSubjectPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new ProcessSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 
@@ -168,17 +168,17 @@ public class CreateRuleStmtVisitor extends PMLBaseVisitor<CreateRuleStatement> {
 
         @Override
         public ArgPatternExpression visitAnyPolicyElement(PMLParser.AnyPolicyElementContext ctx) {
-            return new AnyArgPattern();
+            return new AnyArgPatternExpression();
         }
 
         @Override
         public ArgPatternExpression visitInPolicyElement(PMLParser.InPolicyElementContext ctx) {
-            return new InArgPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new InArgPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
 
         @Override
         public ArgPatternExpression visitPolicyElement(PMLParser.PolicyElementContext ctx) {
-            return new NodeArgPattern(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new NodeNameArgPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
         }
     }
 

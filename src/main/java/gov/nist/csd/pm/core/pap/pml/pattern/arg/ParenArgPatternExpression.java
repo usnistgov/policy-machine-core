@@ -9,13 +9,13 @@ import java.util.Objects;
 
 public class ParenArgPatternExpression extends ArgPatternExpression {
 
-    private final Pattern expression;
+    private final ArgPatternExpression expression;
 
-    public ParenArgPatternExpression(Pattern expression) {
+    public ParenArgPatternExpression(ArgPatternExpression expression) {
         this.expression = expression;
     }
 
-    public Pattern getExpression() {
+    public ArgPatternExpression getExpression() {
         return expression;
     }
 

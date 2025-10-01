@@ -9,13 +9,13 @@ import java.util.Objects;
 
 public class NegateArgPatternExpression extends ArgPatternExpression {
 
-    private final Pattern argPatternExpression;
+    private final ArgPatternExpression argPatternExpression;
 
-    public NegateArgPatternExpression(Pattern argPatternExpression) {
+    public NegateArgPatternExpression(ArgPatternExpression argPatternExpression) {
         this.argPatternExpression = argPatternExpression;
     }
 
-    public Pattern getArgPatternExpression() {
+    public ArgPatternExpression getArgPatternExpression() {
         return argPatternExpression;
     }
 

@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 
+import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
@@ -8,7 +10,7 @@ import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 import java.util.Collection;
 import java.util.Objects;
 
-public class SubjectPattern extends Pattern {
+public class SubjectPattern extends Pattern<EventContextUser> {
 
     private final boolean isAny;
     private final SubjectPatternExpression subjectPatternExpression;
@@ -32,12 +34,7 @@ public class SubjectPattern extends Pattern {
     }
 
     @Override
-    public boolean matchesInternal(String value, PAP pap) throws PMException {
-        return isAny || subjectPatternExpression.matches(value, pap);
-    }
-
-    @Override
-    public boolean matches(Collection<String> value, PAP pap) throws PMException {
+    public boolean matchesInternal(EventContextUser value, PAP pap) throws PMException {
         return isAny || subjectPatternExpression.matches(value, pap);
     }
 

@@ -75,8 +75,11 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             assertThrows(OperationExistsException.class,
                     () -> pap.modify().operations().createAdminOperation(testOp));
 
+            pap.modify().operations().deleteAdminOperation(testOp.getName());
+            pap.plugins().registerOperation(testOp);
+            assertThrows(OperationExistsException.class,
+                () -> pap.modify().operations().createAdminOperation(testOp));
         }
-
     }
 
     @Nested
@@ -87,6 +90,11 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             pap.modify().operations().createAdminOperation(testOp);
             pap.modify().operations().deleteAdminOperation("test");
             assertDoesNotThrow(() -> pap.modify().operations().deleteAdminOperation("assign"));
+
+            pap.plugins().registerOperation(testOp);
+            assertTrue(pap.query().operations().getAdminOperationNames().contains(testOp.getName()));
+            pap.modify().operations().deleteAdminOperation(testOp.getName());
+            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation(testOp.getName()));
         }
 
         @Test

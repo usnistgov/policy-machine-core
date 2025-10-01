@@ -27,11 +27,11 @@ public class EPP implements EventSubscriber {
     @Override
     public void processEvent(EventContext eventCtx) throws PMException {
         Collection<Obligation> obligations = pap.query().obligations().getObligations();
-        for(Obligation obligation : obligations) {
+        for (Obligation obligation : obligations) {
             long author = obligation.getAuthorId();
             List<Rule> rules = obligation.getRules();
-            for(Rule rule : rules) {
-                if(!rule.getEventPattern().matches(eventCtx, pap)) {
+            for (Rule rule : rules) {
+                if (!rule.getEventPattern().matches(eventCtx, pap)) {
                     continue;
                 }
 
@@ -45,7 +45,7 @@ public class EPP implements EventSubscriber {
 
     public void executeResponse(UserContext author, ObligationResponse obligationResponse, EventContext eventCtx) throws PMException {
         pdp.runTx(author, pdpTx -> {
-            obligationResponse.execute(pdpTx, author, eventCtx);
+            pdpTx.executeObligationResponse(eventCtx, obligationResponse);
             return null;
         });
     }

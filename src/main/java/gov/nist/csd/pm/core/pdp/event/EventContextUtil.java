@@ -24,10 +24,11 @@ public class EventContextUtil {
         Map<String, Object> args = new HashMap<>();
 
         actualArgs.foreach((formalArg, value) -> {
-            // if the arg is a node arg than we need to convert the node IDs to names for the EPP
+            // if the arg is a node arg than we need to convert the node IDs to names for the EPP pattern checking
             switch (formalArg) {
                 case IdNodeFormalParameter idNodeFormalArg ->
                     args.put(idNodeFormalArg.getName(), resolveNodeArgName(pap, actualArgs.get(idNodeFormalArg)));
+
                 case ListIdNodeFormalParameter listIdNodeFormalArg -> {
                     List<Long> ids = actualArgs.get(listIdNodeFormalArg);
                     List<String> names = ids.stream()
@@ -35,6 +36,8 @@ public class EventContextUtil {
                         .collect(Collectors.toList());
                     args.put(listIdNodeFormalArg.getName(), names);
                 }
+
+                // if not a node arg, add as is
                 default -> args.put(formalArg.getName(), value);
             }
         });

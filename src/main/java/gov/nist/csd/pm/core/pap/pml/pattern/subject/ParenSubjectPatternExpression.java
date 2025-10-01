@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
@@ -21,7 +22,7 @@ public class ParenSubjectPatternExpression extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matchesInternal(String value, PAP pap) throws PMException {
+    public boolean matchesInternal(EventContextUser value, PAP pap) throws PMException {
         return expression.matches(value, pap);
     }
 

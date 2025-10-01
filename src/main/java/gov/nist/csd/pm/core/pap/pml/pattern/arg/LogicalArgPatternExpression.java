@@ -9,21 +9,21 @@ import java.util.Objects;
 
 public class LogicalArgPatternExpression extends ArgPatternExpression {
 
-    private final Pattern left;
-    private final Pattern right;
+    private final ArgPatternExpression left;
+    private final ArgPatternExpression right;
     private final boolean isAnd;
 
-    public LogicalArgPatternExpression(Pattern left, Pattern right, boolean isAnd) {
+    public LogicalArgPatternExpression(ArgPatternExpression left, ArgPatternExpression right, boolean isAnd) {
         this.left = left;
         this.right = right;
         this.isAnd = isAnd;
     }
 
-    public Pattern getLeft() {
+    public ArgPatternExpression getLeft() {
         return left;
     }
 
-    public Pattern getRight() {
+    public ArgPatternExpression getRight() {
         return right;
     }
 

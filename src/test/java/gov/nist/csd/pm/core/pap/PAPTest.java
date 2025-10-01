@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
@@ -148,7 +149,6 @@ public abstract class PAPTest extends PAPTestInitializer {
                     create pc a + "_PC"
                 }
                 """;
-        MemoryPAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), pml);
 
         pap.executePML(new TestUserContext("u1"), "op1(PM_ADMIN_BASE_OA)");
@@ -173,5 +173,40 @@ public abstract class PAPTest extends PAPTestInitializer {
                 create u "u1" in ["ua1"]
                 """;
         assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext(id("u1")), pml));
+    }
+
+    @Test
+    void testPluginRegistry() {
+        pap.plugins().registerOperation(new Operation<>("op1", List.of()) {
+            @Override
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+
+            }
+
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
+            }
+        });
+
+        pap.plugins().registerRoutine(new Routine<>("routine1", List.of()) {
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
+            }
+        });
+
+        assertTrue(pap.plugins().getOperationNames().contains("op1"));
+        assertTrue(pap.plugins().getRoutineNames().contains("routine1"));
     }
 }

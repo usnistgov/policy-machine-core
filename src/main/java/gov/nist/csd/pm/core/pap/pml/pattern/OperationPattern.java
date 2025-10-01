@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 
 import java.util.Objects;
 
-public class OperationPattern extends Pattern {
+public class OperationPattern extends Pattern<String> {
 
     private final String value;
     private final boolean isAny;

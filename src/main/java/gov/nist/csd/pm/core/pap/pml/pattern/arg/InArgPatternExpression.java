@@ -1,39 +1,31 @@
-package gov.nist.csd.pm.core.pap.pml.pattern.subject;
+package gov.nist.csd.pm.core.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class InSubjectPattern extends SubjectPatternExpression {
+public class InArgPatternExpression extends ArgPatternExpression {
 
     private final String container;
 
-    public InSubjectPattern(StringLiteralExpression container) {
+    public InArgPatternExpression(StringLiteralExpression container) {
         this.container = container.getValue();
     }
 
-
-    public InSubjectPattern(String container) {
+    public InArgPatternExpression(String container) {
         this.container = container;
     }
 
     @Override
-    public boolean matchesInternal(String value, PAP pap) throws PMException {
-        long valueId = pap.query().graph().getNodeId(value);
+    public boolean matchesInternal(String node, PAP pap) throws PMException {
         long contId = pap.query().graph().getNodeId(container);
-
+        long valueId = pap.query().graph().getNodeId(node);
         return pap.query().graph().isAscendant(valueId, contId);
-    }
-
-    @Override
-    public boolean matches(Collection<String> attrs, PAP pap) throws PMException {
-        // if the specified container is contained in the attrs than the user is IN the container
-        return attrs.contains(container);
     }
 
     @Override
@@ -49,7 +41,7 @@ public class InSubjectPattern extends SubjectPatternExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof InSubjectPattern that)) return false;
+        if (!(o instanceof InArgPatternExpression that)) return false;
         return Objects.equals(container, that.container);
     }
 
@@ -57,5 +49,4 @@ public class InSubjectPattern extends SubjectPatternExpression {
     public int hashCode() {
         return Objects.hashCode(container);
     }
-
 }

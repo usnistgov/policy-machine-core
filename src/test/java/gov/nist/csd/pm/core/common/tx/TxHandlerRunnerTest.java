@@ -3,6 +3,8 @@ package gov.nist.csd.pm.core.common.tx;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 

@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.store.GraphStore;
 import java.io.Serializable;
 import java.util.Collection;
 
-public abstract class Pattern implements Serializable, PMLStatementSerializable {
+public abstract class Pattern<T> implements Serializable, PMLStatementSerializable {
 
     /**
      * Returns true if the given value matches this pattern. If the value is null, then return false.
@@ -17,7 +17,7 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
      * @param pap The PAP object to get policy information relevant to the value and pattern.
      * @return True if the value matches this pattern.
      */
-    public final boolean matches(String value, PAP pap) throws PMException {
+    public final boolean matches(T value, PAP pap) throws PMException {
         if (value == null) {
             return false;
         }
@@ -25,7 +25,7 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
         return matchesInternal(value, pap);
     }
 
-    public abstract boolean matchesInternal(String value, PAP pap) throws PMException;
+    public abstract boolean matchesInternal(T value, PAP pap) throws PMException;
     public abstract ReferencedNodes getReferencedNodes();
 
     @Override
@@ -39,13 +39,13 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
         return toFormattedString(0);
     }
 
-    public boolean matches(Collection<String> value, PAP pap) throws PMException {
-        if (value == null) {
+    public final boolean matches(Collection<T> listValue, PAP pap) throws PMException {
+        if (listValue == null) {
             return false;
         }
 
-        for (String opValue : value) {
-            if (matches(opValue, pap)) {
+        for (T value : listValue) {
+            if (matches(value, pap)) {
                 return true;
             }
         }
@@ -61,6 +61,5 @@ public abstract class Pattern implements Serializable, PMLStatementSerializable 
             }
         }
     }
-
 
 }

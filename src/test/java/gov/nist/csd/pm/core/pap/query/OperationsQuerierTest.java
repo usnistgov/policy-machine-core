@@ -81,6 +81,26 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
         Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
+
+        pap.plugins().registerOperation(new Operation("op3", List.of()) {
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map argsMap) {
+                return null;
+            }
+
+            @Override
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+
+            }
+        });
+
+        adminOperationNames = pap.query().operations().getAdminOperationNames();
+        assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2", "op3")));
     }
 
     @Nested
@@ -94,6 +114,10 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
             Operation<?, ?> actual = pap.query().operations().getAdminOperation(op1.getName());
             assertEquals(op1, actual);
+
+            pap.plugins().registerOperation(op2);
+            actual = pap.query().operations().getAdminOperation(op2.getName());
+            assertEquals(op2, actual);
         }
 
         @Test
