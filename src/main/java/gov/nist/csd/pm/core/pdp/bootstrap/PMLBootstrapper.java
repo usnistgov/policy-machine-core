@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PMLBootstrapper extends PolicyBootstrapper {
@@ -22,14 +23,21 @@ public class PMLBootstrapper extends PolicyBootstrapper {
         this.pml = pml;
     }
 
+    public PMLBootstrapper(String bootstrapUser, String pml) {
+        this.operations = new ArrayList<>();
+        this.routines = new ArrayList<>();
+        this.bootstrapUser = bootstrapUser;
+        this.pml = pml;
+    }
+
     @Override
     public void bootstrap(PAP pap) throws PMException {
         for (Operation<?, ?> op : operations) {
-            pap.modify().operations().createAdminOperation(op);
+            pap.plugins().registerOperation(op);
         }
 
         for (Routine<?, ?> r : routines) {
-            pap.modify().routines().createAdminRoutine(r);
+            pap.plugins().registerRoutine(r);
         }
 
         pap.runTx(tx -> {
