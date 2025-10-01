@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
@@ -13,6 +14,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -81,7 +83,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
         assertTrue(pap.query().graph().nodeExists("ua1"));
-	    assertEquals(pap.query().graph().getAssociationsWithSource(id("ua1")).iterator().next(), new Association(id("ua1"), id("oa1"), new AccessRightSet()));
+        assertEquals(pap.query().graph().getAssociationsWithSource(id("ua1")).iterator().next(), new Association(id("ua1"), id("oa1"), new AccessRightSet()));
 
         pap.beginTx();
         pap.modify().graph().deleteNode(id("ua1"));
@@ -120,12 +122,12 @@ public abstract class PAPTest extends PAPTestInitializer {
         assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_PC.nodeId()));
         Collection<Long> ascendants = pap.query().graph().getAdjacentAscendants(AdminPolicyNode.PM_ADMIN_PC.nodeId());
         assertEquals(1, ascendants.size());
-	    assertEquals(ascendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()));
+        assertEquals(ascendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()));
 
         assertTrue(pap.query().graph().nodeExists(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()));
         Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId());
         assertEquals(1, descendants.size());
-	    assertEquals(descendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_PC.nodeId()));
+        assertEquals(descendants.iterator().next(), (AdminPolicyNode.PM_ADMIN_PC.nodeId()));
     }
 
     @Test
@@ -208,5 +210,31 @@ public abstract class PAPTest extends PAPTestInitializer {
 
         assertTrue(pap.plugins().getOperationNames().contains("op1"));
         assertTrue(pap.plugins().getRoutineNames().contains("routine1"));
+    }
+
+    @Test
+    void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
+        pap.plugins().registerOperation(new Operation<>("op1", List.of()) {
+            @Override
+            public Object execute(PAP pap, Args args) throws PMException {
+                return null;
+            }
+
+            @Override
+            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
+                return null;
+            }
+
+            @Override
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+
+            }
+        });
+
+        assertDoesNotThrow(() -> pap.bootstrap(new PMLBootstrapper("u1", """
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            assign "u1" to ["ua1"]
+            """)));
     }
 }

@@ -74,7 +74,10 @@ class PMLBootstrapperTest {
             }
         };
 
-        pdp.bootstrap(new PMLBootstrapper(List.of(op1), List.of(routine1), "u1", input));
+        pap.plugins().registerOperation(op1);
+        pap.plugins().registerRoutine(routine1);
+
+        pdp.bootstrap(new PMLBootstrapper("u1", input));
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("op1"));
@@ -90,7 +93,7 @@ class PMLBootstrapperTest {
         PDP pdp = new PDP(pap);
 
         assertThrows(DisconnectedNodeException.class, () -> pdp.bootstrap(new PMLBootstrapper(
-            List.of(), List.of(), "u1", "create pc \"pc1\""
+            "u1", "create pc \"pc1\""
         )));
     }
 
