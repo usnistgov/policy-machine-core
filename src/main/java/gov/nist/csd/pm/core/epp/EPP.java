@@ -45,7 +45,7 @@ public class EPP implements EventSubscriber {
 
     public void executeResponse(UserContext author, ObligationResponse obligationResponse, EventContext eventCtx) throws PMException {
         pdp.runTx(author, pdpTx -> {
-            obligationResponse.execute(pdpTx, author, eventCtx);
+            pdpTx.executeObligationResponse(eventCtx, obligationResponse);
             return null;
         });
     }
