@@ -167,7 +167,7 @@ class SubjectPatternTest {
                 }
                 """;
         MemoryPAP memoryPAP = new MemoryPAP();
-        memoryPAP.bootstrap(new PMLBootstrapper(List.of(), List.of(), "u2", pml));
+        memoryPAP.bootstrap(new PMLBootstrapper("u2", pml));
 
         PDP pdp = new PDP(memoryPAP);
         EPP epp = new EPP(pdp, memoryPAP);

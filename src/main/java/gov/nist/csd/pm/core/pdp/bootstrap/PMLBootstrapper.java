@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pdp.bootstrap;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 
@@ -11,35 +12,16 @@ import java.util.List;
 
 public class PMLBootstrapper extends PolicyBootstrapper {
 
-    private List<Operation<?, ?>> operations;
-    private List<Routine<?, ?>> routines;
     private final String bootstrapUser;
     private final String pml;
 
-    public PMLBootstrapper(List<Operation<?, ?>> operations, List<Routine<?, ?>> routines, String bootstrapUser, String pml) {
-        this.operations = operations;
-        this.routines = routines;
-        this.bootstrapUser = bootstrapUser;
-        this.pml = pml;
-    }
-
     public PMLBootstrapper(String bootstrapUser, String pml) {
-        this.operations = new ArrayList<>();
-        this.routines = new ArrayList<>();
         this.bootstrapUser = bootstrapUser;
         this.pml = pml;
     }
 
     @Override
     public void bootstrap(PAP pap) throws PMException {
-        for (Operation<?, ?> op : operations) {
-            pap.plugins().registerOperation(op);
-        }
-
-        for (Routine<?, ?> r : routines) {
-            pap.plugins().registerRoutine(r);
-        }
-
         pap.runTx(tx -> {
             // create bootstrap policy and user
             long pc = tx.modify().graph().createPolicyClass("bootstrap");
