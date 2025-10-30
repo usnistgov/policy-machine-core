@@ -54,7 +54,7 @@ public class ForeachStatement extends BasicStatement<StatementResult> {
     private StatementResult executeArrayIterator(ExecutionContext ctx, List<?> iterValue, ListType<?> listType) throws PMException{
         for (Object o : iterValue) {
             Args args = new Args();
-            args.put(new FormalParameter<>(varName, listType.getElementType()), o);
+            args.putUnchecked(new FormalParameter<>(varName, listType.getElementType()), o);
 
             StatementResult value = ctx.executeStatements(statements, args);
 
@@ -73,11 +73,11 @@ public class ForeachStatement extends BasicStatement<StatementResult> {
 
             // add the key value
             Args args = new Args();
-            args.put(new FormalParameter<>(varName, Type.resolveTypeOfObject(key)), key);
+            args.putUnchecked(new FormalParameter<>(varName, Type.resolveTypeOfObject(key)), key);
 
             // add the value value
             if (valueVarName != null) {
-                args.put(new FormalParameter<>(valueVarName, mapType.getValueType()), value);
+                args.putUnchecked(new FormalParameter<>(valueVarName, mapType.getValueType()), value);
             }
 
             StatementResult result = ctx.executeStatements(statements, args);

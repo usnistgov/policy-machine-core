@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 
 public class Args {
 
-	public static Args of(AdminFunction<?, ?> adminFunction, Map<String, Object> actualArgs) {
+	public static Args of(AdminFunction<?> adminFunction, Map<String, Object> actualArgs) {
 		List<FormalParameter<?>> formalParameters = adminFunction.getFormalParameters();
 
 		Args args = new Args();
@@ -47,10 +47,15 @@ public class Args {
 	}
 
 	public <T> T get(FormalParameter<T> formalParameter) {
-		return formalParameter.getType().cast(map.get(formalParameter));
+		return formalParameter.toExpectedType(map.get(formalParameter));
 	}
 
-	public Args put(FormalParameter<?> formalParameter, Object value) {
+	public Args putUnchecked(FormalParameter<?> formalParameter, Object value) {
+		map.put(formalParameter, value);
+		return this;
+	}
+
+	public <T> Args put(FormalParameter<T> formalParameter, T value) {
 		map.put(formalParameter, value);
 		return this;
 	}

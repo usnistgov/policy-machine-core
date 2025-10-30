@@ -1,7 +1,11 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.AUTHOR_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
@@ -25,7 +29,10 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
     @Override
     public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
         CreateObligationOp op = new CreateObligationOp();
-        ObligationOpArgs args = new ObligationOpArgs(authorId, name, new ArrayList<>(rules));
+        Args args = new Args()
+            .put(AUTHOR_PARAM, authorId)
+            .put(NAME_PARAM, name)
+            .put(RULES_PARAM, rules);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
@@ -36,11 +43,10 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
         Obligation obligation = pap.query().obligations().getObligation(name);
 
         DeleteObligationOp op = new DeleteObligationOp();
-        ObligationOpArgs args = new ObligationOpArgs(
-                obligation.getAuthorId(),
-                obligation.getName(),
-                new ArrayList<>(obligation.getRules())
-        );
+        Args args = new Args()
+            .put(AUTHOR_PARAM, obligation.getAuthorId())
+            .put(NAME_PARAM, obligation.getName())
+            .put(RULES_PARAM, obligation.getRules());
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);

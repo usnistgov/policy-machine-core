@@ -24,7 +24,7 @@ public class Neo4jEmbeddedRoutinesStore implements RoutinesStore {
 	}
 
 	@Override
-	public void createAdminRoutine(Routine<?, ?> routine) throws PMException {
+	public void createAdminRoutine(Routine<?> routine) throws PMException {
 		String hex = Neo4jUtil.serialize(routine);
 
 		txHandler.runTx(tx -> {
@@ -63,8 +63,8 @@ public class Neo4jEmbeddedRoutinesStore implements RoutinesStore {
 	}
 
 	@Override
-	public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
-		AtomicReference<Routine<?, ?>> routine = new AtomicReference<>();
+	public Routine<?> getAdminRoutine(String routineName) throws PMException {
+		AtomicReference<Routine<?>> routine = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
 			Node node = tx.findNode(ADMIN_ROUTINE_LABEL, NAME_PROPERTY, routineName);
@@ -72,7 +72,7 @@ public class Neo4jEmbeddedRoutinesStore implements RoutinesStore {
 				return;
 			}
 
-			routine.set((Routine<?, ?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
+			routine.set((Routine<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
 		});
 
 		return routine.get();

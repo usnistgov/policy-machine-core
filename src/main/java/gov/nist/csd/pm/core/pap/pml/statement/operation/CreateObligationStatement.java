@@ -1,7 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.AUTHOR_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
@@ -16,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateObligationStatement extends OperationStatement<ObligationOpArgs> {
+public class CreateObligationStatement extends OperationStatement {
 
     private final Expression<String> name;
     private final List<CreateRuleStatement> ruleStmts;
@@ -36,7 +40,7 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
     }
 
     @Override
-    public ObligationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap);
 
         // execute the create rule statements and add to obligation
@@ -46,7 +50,10 @@ public class CreateObligationStatement extends OperationStatement<ObligationOpAr
             rules.add(rule);
         }
 
-        return new ObligationOpArgs(ctx.author().getUser(), nameStr, new ArrayList<>(rules));
+        return new Args()
+            .put(AUTHOR_PARAM, ctx.author().getUser())
+            .put(NAME_PARAM, nameStr)
+            .put(RULES_PARAM, new ArrayList<>(rules));
     }
 
     @Override

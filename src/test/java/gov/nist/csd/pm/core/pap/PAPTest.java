@@ -3,25 +3,20 @@ package gov.nist.csd.pm.core.pap;
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
-import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -35,7 +30,7 @@ public abstract class PAPTest extends PAPTestInitializer {
     public static final FormalParameter<String> ARG_A = new FormalParameter<>("a", STRING_TYPE);
     public static final FormalParameter<String> ARG_B = new FormalParameter<>("b", STRING_TYPE);
 
-    static Operation<Object, Args> op = new Operation<>("testFunc", List.of()) {
+    static Operation<Object> op = new Operation<>("testFunc", List.of()) {
         @Override
         public void canExecute(PAP pap, UserContext userCtx, Args args) {
 
@@ -47,10 +42,6 @@ public abstract class PAPTest extends PAPTestInitializer {
             return null;
         }
 
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            return null;
-        }
     };
 
     @Test
@@ -190,10 +181,6 @@ public abstract class PAPTest extends PAPTestInitializer {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return null;
-            }
         });
 
         pap.plugins().registerRoutine(new Routine<>("routine1", List.of()) {
@@ -202,10 +189,6 @@ public abstract class PAPTest extends PAPTestInitializer {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return null;
-            }
         });
 
         assertTrue(pap.plugins().getOperationNames().contains("op1"));

@@ -26,7 +26,7 @@ public class RoutinesQuerier extends Querier implements RoutinesQuery {
     }
 
     @Override
-    public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
+    public Routine<?> getAdminRoutine(String routineName) throws PMException {
         if (pluginRegistry.getRoutineNames().contains(routineName)) {
             return pluginRegistry.getRoutine(routineName);
         }

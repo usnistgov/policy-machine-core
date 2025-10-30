@@ -251,17 +251,13 @@ class PDPTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().routines().createAdminRoutine(new Routine<String, Args>("routine1", List.of(a)) {
+        pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of(a)) {
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));
                 return "test1";
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         });
         pap.executePML(new TestUserContext("u1"), """
                 routine routine2() map[string]string {

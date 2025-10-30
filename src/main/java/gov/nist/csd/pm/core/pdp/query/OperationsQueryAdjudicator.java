@@ -36,7 +36,7 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
+    public Operation<?> getAdminOperation(String operationName) throws PMException {
         return pap.query().operations().getAdminOperation(operationName);
     }
 }

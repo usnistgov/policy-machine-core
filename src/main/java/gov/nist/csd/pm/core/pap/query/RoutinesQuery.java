@@ -24,6 +24,6 @@ public interface RoutinesQuery {
      * @return The Routine object.
      * @throws PMException If there is an error in the PM.
      */
-    Routine<?, ?> getAdminRoutine(String routineName) throws PMException;
+    Routine<?> getAdminRoutine(String routineName) throws PMException;
 
 }

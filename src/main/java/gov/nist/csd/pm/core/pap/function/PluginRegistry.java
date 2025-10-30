@@ -7,29 +7,29 @@ import java.util.List;
 
 public class PluginRegistry {
 
-    private final List<Operation<?, ?>> operations;
-    private final List<Routine<?, ?>> routines;
+    private final List<Operation<?>> operations;
+    private final List<Routine<?>> routines;
 
     public PluginRegistry() {
         operations = new ArrayList<>();
         routines = new ArrayList<>();
     }
 
-    public PluginRegistry(List<Operation<?, ?>> operations, List<Routine<?, ?>> routines) {
+    public PluginRegistry(List<Operation<?>> operations, List<Routine<?>> routines) {
         this.operations = operations;
         this.routines = routines;
     }
 
-    public List<Operation<?, ?>> getOperations() {
+    public List<Operation<?>> getOperations() {
         return operations;
     }
 
-    public List<Routine<?, ?>> getRoutines() {
+    public List<Routine<?>> getRoutines() {
         return routines;
     }
 
-    public Operation<?, ?> getOperation(String name) {
-        for (Operation<?, ?> op : operations) {
+    public Operation<?> getOperation(String name) {
+        for (Operation<?> op : operations) {
             if (op.getName().equals(name)) {
                 return op;
             }
@@ -38,8 +38,8 @@ public class PluginRegistry {
         return null;
     }
 
-    public Routine<?, ?> getRoutine(String name) {
-        for (Routine<?, ?> routine : routines) {
+    public Routine<?> getRoutine(String name) {
+        for (Routine<?> routine : routines) {
             if (routine.getName().equals(name)) {
                 return routine;
             }
@@ -48,7 +48,7 @@ public class PluginRegistry {
         return null;
     }
 
-    public void registerOperation(Operation<?, ?> op) {
+    public void registerOperation(Operation<?> op) {
         boolean exists = operations.stream()
             .anyMatch(existing -> existing.getName().equals(op.getName()));
 
@@ -61,7 +61,7 @@ public class PluginRegistry {
         operations.add(op);
     }
 
-    public void registerRoutine(Routine<?, ?> routine) {
+    public void registerRoutine(Routine<?> routine) {
         boolean exists = operations.stream()
             .anyMatch(existing -> existing.getName().equals(routine.getName()));
 

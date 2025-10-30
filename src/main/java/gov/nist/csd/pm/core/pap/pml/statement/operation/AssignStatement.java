@@ -1,9 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp.AssignOpArgs;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -11,7 +14,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AssignStatement extends OperationStatement<AssignOpArgs> {
+public class AssignStatement extends OperationStatement {
 
     private final Expression<String> ascendant;
     private final Expression<List<String>> descendants;
@@ -24,7 +27,7 @@ public class AssignStatement extends OperationStatement<AssignOpArgs> {
     }
 
     @Override
-    public AssignOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String asc = ascendant.execute(ctx, pap);
         List<String> descs = descendants.execute(ctx, pap);
 
@@ -35,7 +38,9 @@ public class AssignStatement extends OperationStatement<AssignOpArgs> {
             descIds.add(pap.query().graph().getNodeByName(desc).getId());
         }
 
-        return new AssignOpArgs(ascId, descIds);
+        return new Args()
+            .put(ASCENDANT_PARAM, ascId)
+            .put(DESCENDANTS_PARAM, descIds);
     }
 
     @Override

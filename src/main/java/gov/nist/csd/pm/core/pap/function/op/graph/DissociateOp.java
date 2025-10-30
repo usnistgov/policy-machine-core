@@ -3,16 +3,14 @@ package gov.nist.csd.pm.core.pap.function.op.graph;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE_FROM;
 
-public class DissociateOp extends GraphOp<Void, DissociateOp.DissociateOpArgs> {
+public class DissociateOp extends GraphOp<Void> {
 
     public DissociateOp() {
         super(
@@ -21,48 +19,21 @@ public class DissociateOp extends GraphOp<Void, DissociateOp.DissociateOpArgs> {
         );
     }
 
-    public static class DissociateOpArgs extends Args {
-        private final long uaId;
-        private final long targetId;
-
-        public DissociateOpArgs(long uaId, long targetId) {
-            super(Map.of(
-                UA_PARAM, uaId,
-                TARGET_PARAM, targetId
-            ));
-
-            this.uaId = uaId;
-            this.targetId = targetId;
-        }
-
-        public long getUaId() {
-            return uaId;
-        }
-
-        public long getTargetId() {
-            return targetId;
-        }
-    }
-
     @Override
-    protected DissociateOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long uaId = prepareArg(UA_PARAM, argsMap);
-        Long targetId = prepareArg(TARGET_PARAM, argsMap);
-        return new DissociateOpArgs(uaId, targetId);
-    }
+    public Void execute(PAP pap, Args args) throws PMException {
+        Long uaId = args.get(UA_PARAM);
+        Long targetId = args.get(TARGET_PARAM);
 
-    @Override
-    public Void execute(PAP pap, DissociateOpArgs args) throws PMException {
-        pap.modify().graph().dissociate(
-                args.getUaId(),
-                args.getTargetId()
-        );
+        pap.modify().graph().dissociate(uaId, targetId);
         return null;
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, DissociateOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, args.getUaId(), DISSOCIATE);
-        pap.privilegeChecker().check(userCtx, args.getTargetId(), DISSOCIATE_FROM);
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        Long uaId = args.get(UA_PARAM);
+        Long targetId = args.get(TARGET_PARAM);
+
+        pap.privilegeChecker().check(userCtx, uaId, DISSOCIATE);
+        pap.privilegeChecker().check(userCtx, targetId, DISSOCIATE_FROM);
     }
 }

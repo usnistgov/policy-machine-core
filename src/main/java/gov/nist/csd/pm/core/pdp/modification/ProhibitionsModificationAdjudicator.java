@@ -1,14 +1,20 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.CONTAINERS_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.INTERSECTION_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.SUBJECT_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
@@ -27,7 +33,12 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
     @Override
     public void createProhibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containerConditions) throws PMException {
         CreateProhibitionOp op = new CreateProhibitionOp();
-        ProhibitionOpArgs args = new ProhibitionOpArgs(name, subject, accessRightSet, intersection, new ArrayList<>(containerConditions));
+        Args args = new Args()
+            .put(NAME_PARAM, name)
+            .put(SUBJECT_PARAM, subject)
+            .put(ARSET_PARAM, new ArrayList<>(accessRightSet))
+            .put(INTERSECTION_PARAM, intersection)
+            .put(CONTAINERS_PARAM, new ArrayList<>(containerConditions));
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
@@ -38,8 +49,13 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
-        ProhibitionOpArgs args = new ProhibitionOpArgs(name, prohibition.getSubject(), prohibition.getAccessRightSet(),
-            prohibition.isIntersection(), new ArrayList<>(prohibition.getContainers()));
+
+        Args args = new Args()
+            .put(NAME_PARAM, name)
+            .put(SUBJECT_PARAM, prohibition.getSubject())
+            .put(ARSET_PARAM, new ArrayList<>(prohibition.getAccessRightSet()))
+            .put(INTERSECTION_PARAM, prohibition.isIntersection())
+            .put(CONTAINERS_PARAM, new ArrayList<>(prohibition.getContainers()));
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);

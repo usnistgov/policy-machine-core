@@ -6,13 +6,11 @@ import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    static Operation<?, ?> testOp = new Operation<>("test", List.of()) {
+    static Operation<?> testOp = new Operation<>("test", List.of()) {
         @Override
         public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -34,10 +32,6 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             return null;
         }
 
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            return new Args(argsMap);
-        }
     };
 
     @Nested

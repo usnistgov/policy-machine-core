@@ -1,10 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp.CreateAdminRoutineOpArgs;
+import static gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp.ROUTINE_PARAM;
+
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 
@@ -13,7 +14,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class RoutineDefinitionStatement extends OperationStatement<CreateAdminRoutineOpArgs> implements FunctionDefinitionStatement {
+public class RoutineDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
     protected PMLStmtsRoutine pmlStmtsRoutine;
 
@@ -29,8 +30,9 @@ public class RoutineDefinitionStatement extends OperationStatement<CreateAdminRo
     }
 
     @Override
-    public CreateAdminRoutineOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return new CreateAdminRoutineOpArgs(pmlStmtsRoutine);
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        return new Args()
+            .put(ROUTINE_PARAM, pmlStmtsRoutine);
     }
 
     @Override

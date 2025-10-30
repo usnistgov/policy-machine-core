@@ -1,18 +1,23 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TARGET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.UA_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp.AssociateOpArgs;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AssociateStatement extends OperationStatement<AssociateOpArgs> {
+public class AssociateStatement extends OperationStatement {
 
     private final Expression<String> ua;
     private final Expression<String> target;
@@ -27,7 +32,7 @@ public class AssociateStatement extends OperationStatement<AssociateOpArgs> {
     }
 
     @Override
-    public AssociateOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String uaName = ua.execute(ctx, pap);
         String targetName = target.execute(ctx, pap);
         AccessRightSet accessRightSet = new AccessRightSet(accessRights.execute(ctx, pap));
@@ -37,7 +42,10 @@ public class AssociateStatement extends OperationStatement<AssociateOpArgs> {
         long uaId = graph.getNodeByName(uaName).getId();
         long targetId = graph.getNodeByName(targetName).getId();
 
-        return new AssociateOpArgs(uaId, targetId, accessRightSet);
+        return new Args()
+            .put(UA_PARAM, uaId)
+            .put(TARGET_PARAM, targetId)
+            .put(ARSET_PARAM, new ArrayList<>(accessRightSet));
     }
 
     @Override

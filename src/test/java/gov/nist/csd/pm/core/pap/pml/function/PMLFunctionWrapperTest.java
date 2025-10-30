@@ -12,7 +12,6 @@ import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class PMLFunctionWrapperTest {
@@ -41,10 +40,6 @@ class PMLFunctionWrapperTest {
                 return args.get(a);
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         });
 
         operations.createAdminOperation(new Operation<>("op2", List.of(a)) {
@@ -56,10 +51,6 @@ class PMLFunctionWrapperTest {
                 return args.get(a);
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         });
 
         operations.createAdminOperation(new Operation<>("op3", List.of(a)) {
@@ -71,10 +62,6 @@ class PMLFunctionWrapperTest {
                 return args.get(a);
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         });
 
         pap.executePML(new UserContext(1), pml);

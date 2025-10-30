@@ -3,18 +3,15 @@ package gov.nist.csd.pm.core.pdp;
 import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
-import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +39,7 @@ class PMLBootstrapperTest {
                 routine1()
                 """;
 
-        Operation<?, ?> op1 = new Operation<>("op1", List.of()) {
+        Operation<?> op1 = new Operation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -55,23 +52,15 @@ class PMLBootstrapperTest {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return null;
-            }
         };
 
-        Routine<?, ?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
             @Override
             public Object execute(PAP pap, Args actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("routine1");
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return null;
-            }
         };
 
         pap.plugins().registerOperation(op1);
