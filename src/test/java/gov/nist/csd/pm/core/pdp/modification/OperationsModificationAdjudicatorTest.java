@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pdp.modification;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -13,7 +12,6 @@ import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +70,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void createAdminOperation() throws PMException {
-        Operation<Void, ?> op1 = new Operation<>("op1", List.of()) {
+        Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -83,10 +81,6 @@ class OperationsModificationAdjudicatorTest {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         };
 
         assertDoesNotThrow(() -> ok.createAdminOperation(op1));
@@ -96,7 +90,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        Operation<Void, Args> op1 = new Operation<>("op1", List.of()) {
+        Operation<Void> op1 = new Operation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -107,10 +101,6 @@ class OperationsModificationAdjudicatorTest {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         };
         ok.createAdminOperation(op1);
 

@@ -10,7 +10,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializable {
@@ -27,11 +26,6 @@ public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializa
 
     public void setStatements(PMLStatementBlock statements) {
         this.statements = statements;
-    }
-
-    @Override
-    protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return new Args(argsMap);
     }
 
     @Override

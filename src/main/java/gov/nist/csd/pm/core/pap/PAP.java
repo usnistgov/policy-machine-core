@@ -10,7 +10,6 @@ import gov.nist.csd.pm.core.pap.function.AdminFunction;
 import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
-import gov.nist.csd.pm.core.pap.function.arg.NoArgs;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
@@ -27,7 +26,6 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 
 import java.util.*;
-import scala.concurrent.impl.FutureConvertersImpl.P;
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
@@ -124,7 +122,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction,
+    public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
                                                       Map<String, Object> args) throws PMException {
         return adminFunction.execute(this, adminFunction.validateAndPrepareArgs(args));
     }
@@ -172,7 +170,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
         ExecutionContext ctx = new ExecutionContext(author, this);
 
-        ctx.executeStatements(compiledPML, new NoArgs());
+        ctx.executeStatements(compiledPML, new Args());
     }
 
     public List<PMLStatement<?>> compilePML(String input) throws PMException {

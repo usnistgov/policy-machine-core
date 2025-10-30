@@ -5,12 +5,10 @@ import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.JavaObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
@@ -94,12 +92,7 @@ class EPPTest {
                 }
                 """);
 
-        Operation<String, Args> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
-
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
+        Operation<String> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
 
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {
@@ -346,10 +339,6 @@ class EPPTest {
                 return new VoidResult();
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return null;
-            }
         };
 
         pap.modify().operations().createAdminOperation(pmlOperation);

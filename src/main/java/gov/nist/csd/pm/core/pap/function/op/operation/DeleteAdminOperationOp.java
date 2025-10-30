@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.function.op.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -13,7 +12,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_ADMIN_OPERATION;
 
-public class DeleteAdminOperationOp extends Operation<Void, DeleteAdminOperationOp.DeleteAdminOperationOpArgs> {
+public class DeleteAdminOperationOp extends Operation<Void> {
 
     public DeleteAdminOperationOp() {
         super(
@@ -22,37 +21,14 @@ public class DeleteAdminOperationOp extends Operation<Void, DeleteAdminOperation
         );
     }
 
-    public static class DeleteAdminOperationOpArgs extends Args {
-        private final String name;
-
-        public DeleteAdminOperationOpArgs(String name) {
-            super(Map.of(
-                NAME_PARAM, name
-            ));
-
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
     @Override
-    protected DeleteAdminOperationOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        String name = prepareArg(NAME_PARAM, argsMap);
-        return new DeleteAdminOperationOpArgs(name);
-    }
-
-    @Override
-    public void canExecute(PAP pap,
-                           UserContext userCtx, DeleteAdminOperationOpArgs args) throws PMException {
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
         pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), DELETE_ADMIN_OPERATION);
     }
 
     @Override
-    public Void execute(PAP pap, DeleteAdminOperationOpArgs args) throws PMException {
-        pap.modify().operations().deleteAdminOperation(args.getName());
+    public Void execute(PAP pap, Args args) throws PMException {
+        pap.modify().operations().deleteAdminOperation(args.get(NAME_PARAM));
         return null;
     }
 }

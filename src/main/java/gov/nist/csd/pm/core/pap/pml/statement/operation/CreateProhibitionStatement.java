@@ -3,6 +3,11 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.CONTAINERS_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.INTERSECTION_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.SUBJECT_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -13,8 +18,8 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ProhibitionOpArgs;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
@@ -29,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class CreateProhibitionStatement extends OperationStatement<ProhibitionOpArgs> {
+public class CreateProhibitionStatement extends OperationStatement {
 
     private final Expression<String> name;
     private final Expression<String> subject;
@@ -50,7 +55,7 @@ public class CreateProhibitionStatement extends OperationStatement<ProhibitionOp
     }
 
     @Override
-    public ProhibitionOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = this.name.execute(ctx, pap);
         String subject = this.subject.execute(ctx, pap);
         AccessRightSet ops = new AccessRightSet(this.accessRights.execute(ctx, pap));
@@ -70,7 +75,12 @@ public class CreateProhibitionStatement extends OperationStatement<ProhibitionOp
             containerConditions.add(new ContainerCondition(containerId, container.getValue()));
         }
 
-        return new ProhibitionOpArgs(name, prohibitionSubject, ops, isIntersection, new ArrayList<>(containerConditions));
+        return new Args()
+            .put(NAME_PARAM, name)
+            .put(SUBJECT_PARAM, prohibitionSubject)
+            .put(ARSET_PARAM, new ArrayList<>(ops))
+            .put(INTERSECTION_PARAM, isIntersection)
+            .put(CONTAINERS_PARAM, new ArrayList<>(containerConditions));
     }
 
     @Override

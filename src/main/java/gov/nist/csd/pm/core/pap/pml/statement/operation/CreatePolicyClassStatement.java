@@ -1,16 +1,17 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreatePolicyClassOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.List;
 import java.util.Objects;
 
-public class CreatePolicyClassStatement extends OperationStatement<CreateNodeOpArgs> {
+public class CreatePolicyClassStatement extends OperationStatement {
 
     private final Expression<String> name;
 
@@ -21,10 +22,11 @@ public class CreatePolicyClassStatement extends OperationStatement<CreateNodeOpA
     }
 
     @Override
-    public CreateNodeOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String pcName = name.execute(ctx, pap);
 
-        return new CreateNodeOpArgs(pcName, List.of());
+        return new Args()
+            .put(NAME_PARAM, pcName);
     }
 
     @Override

@@ -1,17 +1,13 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
-import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.RoutineDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.RoutineExistsException;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.util.SamplePolicy;
-import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +22,7 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
 
 
 
-    static Routine<Void, Args> routine1 = new Routine<>(
+    static Routine<Void> routine1 = new Routine<>(
             "routine1",
             List.of(ARG_A, ARG_B)
     ) {
@@ -35,13 +31,9 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             return null;
         }
 
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            return null;
-        }
     };
 
-    static Routine<Void, Args> routine2 = new Routine<>(
+    static Routine<Void> routine2 = new Routine<>(
             "routine2",
             List.of(ARG_A, ARG_B)
     ) {
@@ -50,13 +42,9 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             return null;
         }
 
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            return null;
-        }
     };
 
-    static Routine<Void, Args> routine3 = new Routine<>(
+    static Routine<Void> routine3 = new Routine<>(
             "routine3",
             List.of(ARG_A, ARG_B)
     ) {
@@ -65,13 +53,9 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             return null;
         }
 
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            return null;
-        }
     };
 
-    static Routine<Void, Args> routine4 = new Routine<>(
+    static Routine<Void> routine4 = new Routine<>(
             "routine4",
             List.of(ARG_A, ARG_B)
     ) {
@@ -80,10 +64,6 @@ public abstract class RoutinesModifierTest extends PAPTestInitializer {
             return null;
         }
 
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-            return null;
-        }
     };
 
     @Nested

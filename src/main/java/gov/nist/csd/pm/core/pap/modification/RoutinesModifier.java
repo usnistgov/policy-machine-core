@@ -16,7 +16,7 @@ public class RoutinesModifier extends Modifier implements RoutinesModification {
     }
 
     @Override
-    public void createAdminRoutine(Routine<?, ?> routine) throws PMException {
+    public void createAdminRoutine(Routine<?> routine) throws PMException {
         String routineName = routine.getName();
 
         if (policyStore.routines().getAdminRoutineNames().contains(routineName)

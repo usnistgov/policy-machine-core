@@ -1,18 +1,20 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceOperationsOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceOperationsOp.SetResourceOperationsOpArgs;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class SetResourceOperationsStatement extends OperationStatement<SetResourceOperationsOpArgs> {
+public class SetResourceOperationsStatement extends OperationStatement {
 
     private final Expression<List<String>> operationsExpr;
 
@@ -22,11 +24,12 @@ public class SetResourceOperationsStatement extends OperationStatement<SetResour
     }
 
     @Override
-    public SetResourceOperationsOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         List<String> opValues = operationsExpr.execute(ctx, pap);
         AccessRightSet accessRightSet = new AccessRightSet(opValues);
 
-        return new SetResourceOperationsOpArgs(accessRightSet);
+        return new Args()
+            .put(ARSET_PARAM, new ArrayList<>(accessRightSet));
     }
 
     @Override

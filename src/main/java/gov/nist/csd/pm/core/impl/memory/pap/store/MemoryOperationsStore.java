@@ -27,7 +27,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void createAdminOperation(Operation<?, ?> operation) throws PMException {
+    public void createAdminOperation(Operation<?> operation) throws PMException {
         policy.operations.put(operation.getName(), operation);
     }
 
@@ -47,7 +47,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
+    public Operation<?> getAdminOperation(String operationName) throws PMException {
         return policy.operations.get(operationName);
     }
 }

@@ -47,7 +47,7 @@ public class PMLTest {
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
-        Operation<?, ?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
+        Operation<?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
@@ -73,10 +73,6 @@ public class PMLTest {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         };
         pap.modify().operations().createAdminOperation(op1);
 
@@ -88,10 +84,6 @@ public class PMLTest {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         });
 
         PDP pdp = new PDP(pap);

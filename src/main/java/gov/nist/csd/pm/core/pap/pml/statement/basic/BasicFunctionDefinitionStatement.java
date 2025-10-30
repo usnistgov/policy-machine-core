@@ -1,7 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.statement.basic;
 
+import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.OPERATION_PARAM;
+
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.CreateAdminOperationOpArgs;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -13,7 +15,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.OperationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class BasicFunctionDefinitionStatement extends OperationStatement<CreateAdminOperationOpArgs> implements FunctionDefinitionStatement {
+public class BasicFunctionDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
     private final PMLStmtsBasicFunction function;
 
@@ -28,8 +30,9 @@ public class BasicFunctionDefinitionStatement extends OperationStatement<CreateA
     }
 
     @Override
-    public CreateAdminOperationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return new CreateAdminOperationOpArgs(function);
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        return new Args()
+            .put(OPERATION_PARAM, function);
     }
 
     @Override

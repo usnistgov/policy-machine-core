@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pdp.modification;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -11,7 +10,6 @@ import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,16 +64,12 @@ class RoutinesModificationAdjudicatorTest {
 
     @Test
     void createAdminRoutine() throws PMException {
-        Routine<?, ?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         };
 
         assertDoesNotThrow(() -> ok.createAdminRoutine(routine1));
@@ -85,16 +79,12 @@ class RoutinesModificationAdjudicatorTest {
 
     @Test
     void deleteAdminRoutine() throws PMException {
-        Routine<? ,?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
             }
 
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-                return new Args(argsMap);
-            }
         };
         ok.createAdminRoutine(routine1);
 

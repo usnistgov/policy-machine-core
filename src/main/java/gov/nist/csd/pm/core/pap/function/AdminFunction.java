@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class AdminFunction<R, A extends Args> implements Serializable {
+public abstract class AdminFunction<R> implements Serializable {
 
     private static final long serialVersionUID = 1L;
     protected final String name;
@@ -25,11 +25,9 @@ public abstract class AdminFunction<R, A extends Args> implements Serializable {
         this.parameters = parameters;
     }
 
-    public abstract R execute(PAP pap, A args) throws PMException;
+    public abstract R execute(PAP pap, Args args) throws PMException;
 
-    protected abstract A prepareArgs(Map<FormalParameter<?>, Object> argsMap);
-
-    public A validateAndPrepareArgs(Map<String, Object> argsMap) {
+    public Args validateAndPrepareArgs(Map<String, Object> argsMap) {
         Set<String> expectedKeys = parameters.stream()
                                              .map(FormalParameter::getName)
                                              .collect(Collectors.toSet());
@@ -60,7 +58,7 @@ public abstract class AdminFunction<R, A extends Args> implements Serializable {
             argsWithFormalParams.put(param, value);
         }
 
-        return prepareArgs(argsWithFormalParams);
+        return new Args(argsWithFormalParams);
     }
 
     public String getName() {
@@ -78,7 +76,7 @@ public abstract class AdminFunction<R, A extends Args> implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AdminFunction<?, ?> that)) return false;
+        if (!(o instanceof AdminFunction<?> that)) return false;
 	    return Objects.equals(name, that.name) && Objects.equals(parameters, that.parameters);
     }
 

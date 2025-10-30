@@ -1,10 +1,13 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.graph.*;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateNodeOp.CreateNodeOpArgs;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -12,7 +15,7 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CreateNonPCStatement extends OperationStatement<CreateNodeOpArgs> {
+public class CreateNonPCStatement extends OperationStatement {
 
     private final NodeType nodeType;
     private final Expression<String> nameExpr;
@@ -26,7 +29,7 @@ public class CreateNonPCStatement extends OperationStatement<CreateNodeOpArgs> {
     }
 
     @Override
-    public CreateNodeOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = nameExpr.execute(ctx, pap);
         List<String> inList = inExpr.execute(ctx, pap);
 
@@ -36,7 +39,9 @@ public class CreateNonPCStatement extends OperationStatement<CreateNodeOpArgs> {
             descIds.add(pap.query().graph().getNodeByName(parentName).getId());
         }
 
-        return new CreateNodeOpArgs(name, descIds);
+        return new Args()
+            .put(NAME_PARAM, name)
+            .put(DESCENDANTS_PARAM, descIds);
     }
 
     @Override

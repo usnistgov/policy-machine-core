@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.NoArgs;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
@@ -48,7 +48,7 @@ public class IfStatement extends BasicStatement<StatementResult> {
         for (ConditionalBlock conditionalBlock : elseIfBlocks) {
             condition = conditionalBlock.condition.execute(ctx, pap);
             if (condition) {
-                return ctx.executeStatements(conditionalBlock.block.getStmts(), new NoArgs());
+                return ctx.executeStatements(conditionalBlock.block.getStmts(), new Args());
             }
         }
 

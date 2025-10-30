@@ -12,8 +12,9 @@ import gov.nist.csd.pm.core.pap.function.op.arg.IdNodeFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.ListIdNodeFormalParameter;
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.units.qual.A;
 
-public abstract class GraphOp<R, A extends Args> extends Operation<R, A> {
+public abstract class GraphOp<R> extends Operation<R> {
 
     public static final FormalParameter<String> TYPE_PARAM = new FormalParameter<>("type", STRING_TYPE);
     public static final FormalParameter<Map<String, String>> PROPERTIES_PARAM = new FormalParameter<>("properties", MapType.of(STRING_TYPE, STRING_TYPE));

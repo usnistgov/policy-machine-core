@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.function.op.graph;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN_FROM;
 
-public class DeassignOp extends GraphOp<Void, DeassignOp.DeassignOpArgs> {
+public class DeassignOp extends GraphOp<Void> {
 
     public DeassignOp() {
         super(
@@ -21,45 +20,21 @@ public class DeassignOp extends GraphOp<Void, DeassignOp.DeassignOpArgs> {
         );
     }
 
-    public static class DeassignOpArgs extends Args {
-        private final long ascendantId;
-        private final List<Long> descendantIds;
+    @Override
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        Long ascId = args.get(ASCENDANT_PARAM);
+        List<Long> descIds = args.get(DESCENDANTS_PARAM);
 
-        public DeassignOpArgs(long ascendantId, List<Long> descendantIds) {
-            super(Map.of(
-                ASCENDANT_PARAM, ascendantId,
-                DESCENDANTS_PARAM, descendantIds
-            ));
-
-            this.ascendantId = ascendantId;
-            this.descendantIds = descendantIds;
-        }
-
-        public long getAscendantId() {
-            return ascendantId;
-        }
-
-        public List<Long> getDescendantIds() {
-            return descendantIds;
-        }
+        pap.privilegeChecker().check(userCtx, ascId, DEASSIGN);
+        pap.privilegeChecker().check(userCtx, descIds, DEASSIGN_FROM);
     }
 
     @Override
-    protected DeassignOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        Long ascId = prepareArg(ASCENDANT_PARAM, argsMap);
-        List<Long> descIds = prepareArg(DESCENDANTS_PARAM, argsMap);
-        return new DeassignOpArgs(ascId, descIds);
-    }
+    public Void execute(PAP pap, Args args) throws PMException {
+        Long ascId = args.get(ASCENDANT_PARAM);
+        List<Long> descIds = args.get(DESCENDANTS_PARAM);
 
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, DeassignOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, args.getAscendantId(), DEASSIGN);
-        pap.privilegeChecker().check(userCtx, args.getDescendantIds(), DEASSIGN_FROM);
-    }
-
-    @Override
-    public Void execute(PAP pap, DeassignOpArgs args) throws PMException {
-        pap.modify().graph().deassign(args.getAscendantId(), args.getDescendantIds());
+        pap.modify().graph().deassign(ascId, descIds);
         return null;
     }
 }

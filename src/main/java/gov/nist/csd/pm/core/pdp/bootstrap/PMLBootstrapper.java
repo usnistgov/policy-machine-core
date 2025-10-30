@@ -11,12 +11,12 @@ import java.util.List;
 
 public class PMLBootstrapper extends PolicyBootstrapper {
 
-    private List<Operation<?, ?>> operations;
-    private List<Routine<?, ?>> routines;
+    private List<Operation<?>> operations;
+    private List<Routine<?>> routines;
     private final String bootstrapUser;
     private final String pml;
 
-    public PMLBootstrapper(List<Operation<?, ?>> operations, List<Routine<?, ?>> routines, String bootstrapUser, String pml) {
+    public PMLBootstrapper(List<Operation<?>> operations, List<Routine<?>> routines, String bootstrapUser, String pml) {
         this.operations = operations;
         this.routines = routines;
         this.bootstrapUser = bootstrapUser;
@@ -32,11 +32,11 @@ public class PMLBootstrapper extends PolicyBootstrapper {
 
     @Override
     public void bootstrap(PAP pap) throws PMException {
-        for (Operation<?, ?> op : operations) {
+        for (Operation<?> op : operations) {
             pap.plugins().registerOperation(op);
         }
 
-        for (Routine<?, ?> r : routines) {
+        for (Routine<?> r : routines) {
             pap.plugins().registerRoutine(r);
         }
 

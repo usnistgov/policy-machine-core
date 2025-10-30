@@ -113,7 +113,7 @@ class ReferenceByBracketIndexTest {
                 create PC a["z"]["c"]["d"]
                 """;
         PAP pap = new TestPAP();
-        assertThrows(NullPointerException.class,
+        assertThrows(IllegalArgumentException.class,
                      () -> pap.executePML(new UserContext(0), pml));
     }
 

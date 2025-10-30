@@ -14,6 +14,7 @@ import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -87,8 +88,7 @@ class GraphModificationAdjudicatorTest {
     void createPolicyClass() throws PMException {
         assertDoesNotThrow(() -> ok.createPolicyClass("test"));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new CreatePolicyClassOp().getName(), Map.of(NAME_PARAM.getName(), "test",
-                    DESCENDANTS_PARAM.getName(), List.of())),
+                new EventContext(new EventContextUser("u1"), new CreatePolicyClassOp().getName(), Map.of(NAME_PARAM.getName(), "test")),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -159,16 +159,16 @@ class GraphModificationAdjudicatorTest {
     @Test
     void deleteNodeOk() throws PMException {
         assertDoesNotThrow(() -> ok.deleteNode(id("o1")));
-        assertEquals(
-            new EventContext(new EventContextUser("u1"), new DeleteNodeOp().getName(),
-                Map.of(
-                    NODE_PARAM.getName(), "o1",
-                    TYPE_PARAM.getName(), NodeType.O,
-                    DESCENDANTS_PARAM.getName(), new ArrayList<>(List.of("oa1"))
-                )
-            ),
-            testEventProcessor.getEventContext()
+
+        EventContext expected = new EventContext(new EventContextUser("u1"), new DeleteNodeOp().getName(),
+            new HashMap<>(Map.of(
+                NODE_PARAM.getName(), "o1",
+                TYPE_PARAM.getName(), NodeType.O.toString(),
+                DESCENDANTS_PARAM.getName(), new ArrayList<>(List.of("oa1"))
+            ))
         );
+        EventContext actual = testEventProcessor.getEventContext();
+        assertEquals(expected, actual);
 
         assertFalse(pap.query().graph().nodeExists("o1"));
     }
@@ -206,7 +206,7 @@ class GraphModificationAdjudicatorTest {
     void associate() throws PMException {
         assertDoesNotThrow(() -> ok.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new AssociateOp().getName(), Map.of(UA_PARAM.getName(), "ua1", TARGET_PARAM.getName(), "ua3", ARSET_PARAM.getName(), new AccessRightSet("assign"))),
+                new EventContext(new EventContextUser("u1"), new AssociateOp().getName(), Map.of(UA_PARAM.getName(), "ua1", TARGET_PARAM.getName(), "ua3", ARSET_PARAM.getName(), List.of("assign"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1"))

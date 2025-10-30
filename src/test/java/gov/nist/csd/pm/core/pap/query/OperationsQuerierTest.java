@@ -3,14 +3,12 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
-import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -23,15 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
-    static Operation<Object, Args> op1 = new Operation<>("op1", List.of()) {
+    static Operation<Object> op1 = new Operation<>("op1", List.of()) {
 
         @Override
         public Object execute(PAP pap, Args args) throws PMException {
-            return null;
-        }
-
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
 
@@ -41,14 +34,9 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         }
     };
 
-    static Operation<Object, Args> op2 = new Operation<>("op2", List.of()) {
+    static Operation<Object> op2 = new Operation<>("op2", List.of()) {
         @Override
         public Object execute(PAP pap, Args args) throws PMException {
-            return null;
-        }
-
-        @Override
-        protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
             return null;
         }
 
@@ -89,11 +77,6 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
             }
 
             @Override
-            protected Args prepareArgs(Map argsMap) {
-                return null;
-            }
-
-            @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
@@ -112,7 +95,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
             pap.modify().operations().createAdminOperation(op1);
 
-            Operation<?, ?> actual = pap.query().operations().getAdminOperation(op1.getName());
+            Operation<?> actual = pap.query().operations().getAdminOperation(op1.getName());
             assertEquals(op1, actual);
 
             pap.plugins().registerOperation(op2);

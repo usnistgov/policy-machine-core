@@ -10,7 +10,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class PMLStmtsOperation extends PMLOperation implements PMLStatementSerializable {
@@ -34,11 +33,6 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
         ExecutionContext ctx = getCtx();
 
         ctx.executeOperationStatements(this.body.getChecks().getStmts(), args);
-    }
-
-    @Override
-    protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return new Args(argsMap);
     }
 
     @Override

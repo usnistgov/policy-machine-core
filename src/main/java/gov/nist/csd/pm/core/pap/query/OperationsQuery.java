@@ -31,6 +31,6 @@ public interface OperationsQuery {
      * @return The Operation object.
      * @throws PMException If there is an error in the PM.
      */
-    Operation<?, ?> getAdminOperation(String operationName) throws PMException;
+    Operation<?> getAdminOperation(String operationName) throws PMException;
 
 }
