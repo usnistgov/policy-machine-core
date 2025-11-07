@@ -122,8 +122,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
-                                                      Map<String, Object> args) throws PMException {
+    public <R> R executeAdminFunction(AdminFunction<R> adminFunction, Map<String, Object> args) throws PMException {
         return adminFunction.execute(this, adminFunction.validateAndPrepareArgs(args));
     }
 
@@ -218,8 +217,15 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         boolean obligationsEmpty = query().obligations().getObligations().isEmpty();
         boolean resOpsEmpty = query().operations().getResourceOperations().isEmpty();
 
-        boolean adminOpsEmpty =  query().operations().getAdminOperationNames().isEmpty();
-        boolean routinesEmpty = query().routines().getAdminRoutineNames().isEmpty();
+        // ignore plugin operations and routines
+        Collection<String> adminOperationNames = query().operations().getAdminOperationNames();
+        adminOperationNames.removeAll(pluginRegistry.getOperationNames());
+
+        Collection<String> adminRoutineNames = query().routines().getAdminRoutineNames();
+        adminRoutineNames.removeAll(pluginRegistry.getRoutineNames());
+
+        boolean adminOpsEmpty =  adminOperationNames.isEmpty();
+        boolean routinesEmpty = adminRoutineNames.isEmpty();
 
         // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
