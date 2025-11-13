@@ -17,6 +17,7 @@ import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -200,11 +201,6 @@ public abstract class PAPTest extends PAPTestInitializer {
         pap.plugins().registerOperation(new Operation<>("op1", List.of()) {
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
-                return null;
-            }
-
-            @Override
-            protected Args prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
                 return null;
             }
 
