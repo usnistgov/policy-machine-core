@@ -9,14 +9,15 @@ import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
+import org.checkerframework.checker.units.qual.A;
 
-public abstract class DeleteStatement<A extends Args> extends OperationStatement<A> {
+public abstract class DeleteStatement extends OperationStatement {
 
     protected Type type;
     protected Expression<String> nameExpression;
     protected boolean ifExists;
 
-    public DeleteStatement(Operation<?, A> op, Type type, Expression<String> nameExpression, boolean ifExists) {
+    public DeleteStatement(Operation<?> op, Type type, Expression<String> nameExpression, boolean ifExists) {
         super(op);
         this.type = type;
         this.nameExpression = nameExpression;
@@ -79,7 +80,7 @@ public abstract class DeleteStatement<A extends Args> extends OperationStatement
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DeleteStatement<?> that)) {
+        if (!(o instanceof DeleteStatement that)) {
             return false;
         }
         return ifExists == that.ifExists && type == that.type && Objects.equals(nameExpression, that.nameExpression);

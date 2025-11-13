@@ -47,7 +47,7 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
     @Override
     public T execute(ExecutionContext ctx, PAP pap) throws PMException {
         ExecutionContext funcInvokeCtx = ctx.copy();
-        AdminFunction<?, ?> function = funcInvokeCtx.scope().getFunction(functionSignature.getName());
+        AdminFunction<?> function = funcInvokeCtx.scope().getFunction(functionSignature.getName());
         Map<String, Object> actualArgValues = prepareArgExpressions(funcInvokeCtx, pap, function);
 
         // set the ctx if PML function
@@ -59,7 +59,7 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
         return (T) pap.executeAdminFunction(function, actualArgValues);
     }
 
-    private Map<String, Object> prepareArgExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?, ?> function) throws PMException {
+    private Map<String, Object> prepareArgExpressions(ExecutionContext ctx, PAP pap, AdminFunction<?> function) throws PMException {
         List<FormalParameter<?>> formalParams = function.getFormalParameters();
 
         if (actualArgsList.size() != formalParams.size()) {

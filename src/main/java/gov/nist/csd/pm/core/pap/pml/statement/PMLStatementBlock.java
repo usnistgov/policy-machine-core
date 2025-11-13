@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.statement;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.NoArgs;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 
@@ -59,6 +59,6 @@ public class PMLStatementBlock extends PMLStatement<StatementResult> {
     }
 
     public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
-        return ctx.executeStatements(stmts, new NoArgs());
+        return ctx.executeStatements(stmts, new Args());
     }
 }

@@ -27,7 +27,7 @@ public class  RoutinesQueryAdjudicator extends Adjudicator implements RoutinesQu
     }
 
     @Override
-    public Routine<?, ?> getAdminRoutine(String routineName) throws PMException {
+    public Routine<?> getAdminRoutine(String routineName) throws PMException {
         return pap.query().routines().getAdminRoutine(routineName);
     }
 }

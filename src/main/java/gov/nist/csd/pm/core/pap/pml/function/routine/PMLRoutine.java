@@ -10,7 +10,7 @@ import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLRoutine extends Routine<Object, Args> implements PMLFunction {
+public abstract class PMLRoutine extends Routine<Object> implements PMLFunction {
 
     private final Type<?> returnType;
     private final List<FormalParameter<?>> pmlFormalParameters;

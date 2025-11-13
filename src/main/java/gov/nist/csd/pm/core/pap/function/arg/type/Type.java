@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public sealed abstract class Type<T> implements Serializable
-    permits AnyType, BooleanType, ListType, LongType, MapType, StringType, VoidType {
+    permits AnyType, BooleanType, ListType, LongType, MapType, StringType, VoidType, RuleType, RoutineType,
+    OperationType, ProhibitionSubjectArgType, ContainerConditionType {
 
     public static StringType STRING_TYPE = new StringType();
     public static LongType LONG_TYPE = new LongType();

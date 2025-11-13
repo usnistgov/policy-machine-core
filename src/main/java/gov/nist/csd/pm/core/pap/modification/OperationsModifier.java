@@ -31,7 +31,7 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     }
 
     @Override
-    public void createAdminOperation(Operation<?, ?> operation) throws PMException {
+    public void createAdminOperation(Operation<?> operation) throws PMException {
         if (AdminOperations.isAdminOperation(operation.getName())
             || policyStore.operations().getAdminOperationNames().contains(operation.getName())
             || pluginRegistry.getOperationNames().contains(operation.getName())) {

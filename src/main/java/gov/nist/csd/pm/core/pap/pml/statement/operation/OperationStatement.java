@@ -7,20 +7,21 @@ import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
+import org.checkerframework.checker.units.qual.A;
 
-public abstract class OperationStatement<A extends Args> extends PMLStatement<VoidResult> {
+public abstract class OperationStatement extends PMLStatement<VoidResult> {
 
-    protected Operation<?, A> op;
+    protected Operation<?> op;
 
-    public OperationStatement(Operation<?, A> op) {
+    public OperationStatement(Operation<?> op) {
         this.op = op;
     }
 
-    public Operation<?, A> getOp() {
+    public Operation<?> getOp() {
         return op;
     }
 
-    public abstract A prepareArgs(ExecutionContext ctx, PAP pap) throws PMException;
+    public abstract Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException;
 
     @Override
     public abstract int hashCode();

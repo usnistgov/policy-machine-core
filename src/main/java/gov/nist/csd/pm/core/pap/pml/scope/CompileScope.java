@@ -59,7 +59,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
-            Operation<?, ?> operation = pap.query().operations().getAdminOperation(opName);
+            Operation<?> operation = pap.query().operations().getAdminOperation(opName);
             if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
                 addFunction(opName, pmlStmtsOperation.getSignature());
             } else {
@@ -74,7 +74,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         // same for routines
         Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
         for (String routineName : routineNames) {
-            Routine<?, ?> routine = pap.query().routines().getAdminRoutine(routineName);
+            Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
             if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
                 addFunction(routineName, pmlStmtsRoutine.getSignature());
             } else {

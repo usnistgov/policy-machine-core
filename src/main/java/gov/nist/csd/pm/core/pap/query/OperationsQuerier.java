@@ -33,7 +33,7 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     @Override
-    public Operation<?, ?> getAdminOperation(String operationName) throws PMException {
+    public Operation<?> getAdminOperation(String operationName) throws PMException {
         if (pluginRegistry.getOperationNames().contains(operationName)) {
             return pluginRegistry.getOperation(operationName);
         }

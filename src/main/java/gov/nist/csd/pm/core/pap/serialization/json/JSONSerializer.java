@@ -44,7 +44,7 @@ public class JSONSerializer implements PolicySerializer {
 
         Collection<String> adminRoutineNames = policyQuery.routines().getAdminRoutineNames();
         for (String adminOperationName : adminRoutineNames) {
-            Routine<?, ?> routine = policyQuery.routines().getAdminRoutine(adminOperationName);
+            Routine<?> routine = policyQuery.routines().getAdminRoutine(adminOperationName);
             if (routine instanceof PMLStatementSerializable pmlStatementSerializable) {
                 json.add(pmlStatementSerializable.toFormattedString(0));
             }
@@ -59,7 +59,7 @@ public class JSONSerializer implements PolicySerializer {
 
         Collection<String> adminOperationNames = policyQuery.operations().getAdminOperationNames();
         for (String adminOperationName : adminOperationNames) {
-            Operation<?, ?> operation = policyQuery.operations().getAdminOperation(adminOperationName);
+            Operation<?> operation = policyQuery.operations().getAdminOperation(adminOperationName);
             if (operation instanceof PMLStatementSerializable pmlStatementSerializable) {
                 json.add(pmlStatementSerializable.toFormattedString(0));
             }

@@ -7,6 +7,6 @@ import java.util.Map;
 
 public interface AdminFunctionExecutor {
 
-    <R, A extends Args> R executeAdminFunction(AdminFunction<R, A> adminFunction, Map<String, Object> args) throws PMException;
+    <R> R executeAdminFunction(AdminFunction<R> adminFunction, Map<String, Object> args) throws PMException;
 
 }

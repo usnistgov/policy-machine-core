@@ -1,8 +1,11 @@
 package gov.nist.csd.pm.core.pap.function.op.prohibition;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.pap.PAP;
 
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
@@ -20,20 +23,20 @@ public class CreateProhibitionOp extends ProhibitionOp {
     }
 
     @Override
-    public Void execute(PAP pap, ProhibitionOpArgs args) throws PMException {
+    public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().prohibitions().createProhibition(
-            args.getName(),
-            args.getSubject(),
-            args.getArset(),
-            args.getIntersection(),
-            args.getContainers()
+            args.get(NAME_PARAM),
+            args.get(SUBJECT_PARAM),
+            new AccessRightSet(args.get(ARSET_PARAM)),
+            args.get(INTERSECTION_PARAM),
+            args.get(CONTAINERS_PARAM)
         );
         return null;
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, ProhibitionOpArgs args) throws PMException {
-        checkSubject(pap, userCtx, args.getSubject(), CREATE_PROHIBITION, CREATE_PROCESS_PROHIBITION);
-        checkContainers(pap, userCtx, args.getContainers(), CREATE_PROHIBITION, CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER);
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        checkSubject(pap, userCtx, args.get(SUBJECT_PARAM), CREATE_PROHIBITION, CREATE_PROCESS_PROHIBITION);
+        checkContainers(pap, userCtx, args.get(CONTAINERS_PARAM), CREATE_PROHIBITION, CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER);
     }
 }

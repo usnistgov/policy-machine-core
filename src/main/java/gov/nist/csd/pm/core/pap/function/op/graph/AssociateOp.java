@@ -4,8 +4,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp.AssociateOpArgs;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.Map;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE_TO;
 
-public class AssociateOp extends GraphOp<Void, AssociateOpArgs> {
+public class AssociateOp extends GraphOp<Void> {
 
     public AssociateOp() {
         super(
@@ -24,56 +22,21 @@ public class AssociateOp extends GraphOp<Void, AssociateOpArgs> {
     }
 
     @Override
-    protected AssociateOpArgs prepareArgs(Map<FormalParameter<?>, Object> argsMap) {
-        return new AssociateOpArgs(
-            prepareArg(UA_PARAM, argsMap),
-            prepareArg(TARGET_PARAM, argsMap),
-            new AccessRightSet(prepareArg(ARSET_PARAM, argsMap))
-        );
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        long uaId = args.get(UA_PARAM);
+        long targetId = args.get(TARGET_PARAM);
+
+        pap.privilegeChecker().check(userCtx, uaId, ASSOCIATE);
+        pap.privilegeChecker().check(userCtx, targetId, ASSOCIATE_TO);
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, AssociateOpArgs args) throws PMException {
-        pap.privilegeChecker().check(userCtx, args.getUa(), ASSOCIATE);
-        pap.privilegeChecker().check(userCtx, args.getTarget(), ASSOCIATE_TO);
-    }
+    public Void execute(PAP pap, Args args) throws PMException {
+        long uaId = args.get(UA_PARAM);
+        long targetId = args.get(TARGET_PARAM);
+        List<String> arset = args.get(ARSET_PARAM);
 
-    @Override
-    public Void execute(PAP pap, AssociateOpArgs args) throws PMException {
-        pap.modify().graph().associate(
-            args.getUa(),
-            args.getTarget(),
-            args.getArset()
-        );
+        pap.modify().graph().associate(uaId, targetId, new AccessRightSet(arset));
         return null;
-    }
-
-    public static class AssociateOpArgs extends Args {
-        private long ua;
-        private long target;
-        private AccessRightSet arset;
-        public AssociateOpArgs(long ua, long target, AccessRightSet arset) {
-            super(Map.of(
-                UA_PARAM, ua,
-                TARGET_PARAM, target,
-                ARSET_PARAM, arset
-            ));
-
-            this.ua = ua;
-            this.target = target;
-            this.arset = arset;
-        }
-
-        public long getUa() {
-            return ua;
-        }
-
-        public long getTarget() {
-            return target;
-        }
-
-        public AccessRightSet getArset() {
-            return arset;
-        }
     }
 }

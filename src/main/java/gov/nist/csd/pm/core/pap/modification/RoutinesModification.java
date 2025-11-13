@@ -13,7 +13,7 @@ public interface RoutinesModification {
      * @param routine The routine to create.
      * @throws PMException If there is an error in the PM.
      */
-    void createAdminRoutine(Routine<?, ?> routine) throws PMException;
+    void createAdminRoutine(Routine<?> routine) throws PMException;
 
     /**
      * Delete the admin routine with the given name.

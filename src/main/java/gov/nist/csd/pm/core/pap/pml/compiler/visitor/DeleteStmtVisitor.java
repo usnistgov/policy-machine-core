@@ -12,14 +12,14 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteStatement;
 
 
 
-public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement<?>> {
+public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
 
     public DeleteStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public DeleteStatement<?> visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
+    public DeleteStatement visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
         Expression<String> nameExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), STRING_TYPE);
         boolean ifExists = ctx.IF_EXISTS() != null;
 

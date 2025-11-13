@@ -110,7 +110,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     public Object adjudicateAdminRoutine(UserContext user,
                                          String routineName,
                                          Map<String, Object> args) throws PMException {
-        Routine<?, ?> routine = pap.query().routines().getAdminRoutine(routineName);
+        Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
 
         return runTx(user, tx -> {
             if (routine instanceof PMLRoutine) {
@@ -133,7 +133,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     private Object executeOperation(UserContext user, PDPTx pdpTx, String op, Map<String, Object> actualArgs) throws PMException {
-        Operation<?, ?> operation = pap.query().operations().getAdminOperation(op);
+        Operation<?> operation = pap.query().operations().getAdminOperation(op);
 
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));

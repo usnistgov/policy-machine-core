@@ -1,7 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.AUTHOR_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES_PARAM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.ObligationOpArgs;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.obligation.UpdateObligationOp;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
@@ -12,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DeleteRuleStatement extends OperationStatement<ObligationOpArgs> {
+public class DeleteRuleStatement extends OperationStatement {
 
     private final Expression<String> ruleExpr;
     private final Expression<String> oblExpr;
@@ -24,7 +28,7 @@ public class DeleteRuleStatement extends OperationStatement<ObligationOpArgs> {
     }
 
     @Override
-    public ObligationOpArgs prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String ruleName = ruleExpr.execute(ctx, pap);
         String oblName = oblExpr.execute(ctx, pap);
 
@@ -41,7 +45,10 @@ public class DeleteRuleStatement extends OperationStatement<ObligationOpArgs> {
         // even though we are updating an obligation, use the same author id as this statement
         // can only be called from within an obligation response which will be executed by the
         // author anyways
-        return new ObligationOpArgs(obligation.getAuthorId(), obligation.getName(), new ArrayList<>(rules));
+        return new Args()
+            .put(AUTHOR_PARAM, obligation.getAuthorId())
+            .put(NAME_PARAM, obligation.getName())
+            .put(RULES_PARAM, new ArrayList<>(rules));
     }
 
     @Override
