@@ -17,21 +17,8 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
 
     @Override
     public ReturnStatement visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
-        ParserRuleContext enclosingCtx = getEnclosingContext(ctx);
-        if (enclosingCtx == null) {
-            throw new PMLCompilationRuntimeException(
-                    ctx,
-                    "return statement not in function definition or obligation response"
-            );
-        }
-
         if (ctx.expression() == null) {
             return new ReturnStatement();
-        } else if (enclosingCtx instanceof PMLParser.ResponseContext) {
-            throw new PMLCompilationRuntimeException(
-                    ctx,
-                    "return statement in response cannot return a value"
-            );
         }
 
         Expression<?> e = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);

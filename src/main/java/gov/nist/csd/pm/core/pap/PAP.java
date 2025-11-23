@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap;
 
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
@@ -17,6 +18,8 @@ import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -162,14 +165,17 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         commit();
     }
 
-    public void executePML(UserContext author, String input) throws PMException {
-        PMLCompiler pmlCompiler = new PMLCompiler();
-
-        List<PMLStatement<?>> compiledPML = pmlCompiler.compilePML(this, input);
+    public Object executePML(UserContext author, String input) throws PMException {
+        List<PMLStatement<?>> compiledPML = compilePML(input);
 
         ExecutionContext ctx = new ExecutionContext(author, this);
+        StatementResult statementResult = ctx.executeStatements(compiledPML, new Args());
 
-        ctx.executeStatements(compiledPML, new Args());
+        if (statementResult instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 
     public List<PMLStatement<?>> compilePML(String input) throws PMException {

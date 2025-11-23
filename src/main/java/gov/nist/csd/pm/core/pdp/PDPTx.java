@@ -198,7 +198,7 @@ public class PDPTx implements AdminFunctionExecutor {
         }
 
         @Override
-        public void executePML(UserContext author, String input) throws PMException {
+        public Object executePML(UserContext author, String input) throws PMException {
             throw new PMException("not supported by PDPTx, use executePML(String input) instead");
         }
 
