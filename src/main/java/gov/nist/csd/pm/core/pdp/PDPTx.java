@@ -49,32 +49,66 @@ public class PDPTx implements AdminFunctionExecutor {
         return this.txExecutor.query();
     }
 
+    @Override
+    public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
+                                      Map<String, Object> argsMap) throws PMException {
+        return this.txExecutor.executeAdminFunction(adminFunction, argsMap);
+    }
+
+    /**
+     * Builds a PML execution context for the given user.
+     * @param userCtx The user context to build the execution context for.
+     * @throws PMException If an exception occurs building the context.
+     */
     public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
         return new PDPExecutionContext(userCtx, this.txExecutor);
     }
 
-    @Override
-    public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
-                                                      Map<String, Object> argsMap) throws PMException {
-        return this.txExecutor.executeAdminFunction(adminFunction, argsMap);
+    /**
+     * Execute a PML string. If the PML returns a value with a "return ..." statement, that value will be returned.
+     * If there is not return in the PML, then this method will return null.
+     * @param input The input PML string.
+     * @return The value returned by the PML, null if there is none.
+     * @throws PMException If an exception occurs compiling or executing the PML.
+     */
+    public Object executePML(String input) throws PMException {
+        return txExecutor.executePML(input);
     }
 
-    public void executePML(String input) throws PMException {
-        txExecutor.executePML(input);
-    }
-
+    /**
+     * Resets the current policy state.
+     * @throws PMException If an exception occurs while resetting the policy.
+     */
     public void reset() throws PMException {
         txExecutor.reset();
     }
 
+    /**
+     * Serialize the current policy state using the provided serializer.
+     * @param serializer The PolicySerialize used to serialize the policy.
+     * @return The String representation of the policy.
+     * @throws PMException If an exception occurs while serializing the policy.
+     */
     public String serialize(PolicySerializer serializer) throws PMException {
         return txExecutor.serialize(serializer);
     }
 
+    /**
+     * Deserialize the provided input string with the provided PolicyDeserializer.
+     * @param input The input string.
+     * @param policyDeserializer The PolicyDeserializer used to deserialize the provided string.
+     * @throws PMException If an exception occurs while deserializing the policy.
+     */
     public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
         txExecutor.deserialize(input, policyDeserializer);
     }
 
+    /**
+     * Execute the given obligation response using the provided event context.
+     * @param eventCtx The EventContext.
+     * @param response The obligation response to execute.
+     * @throws PMException If an exception occurs while executing the obligation response.
+     */
     public void executeObligationResponse(EventContext eventCtx, ObligationResponse response) throws PMException {
         response.execute(txExecutor, txExecutor.userCtx, eventCtx);
     }
@@ -149,12 +183,18 @@ public class PDPTx implements AdminFunctionExecutor {
             pap.deserialize(input, policyDeserializer);
         }
 
-        public void executePML(String input) throws PMException {
+        public Object executePML(String input) throws PMException {
             PMLCompiler pmlCompiler = new PMLCompiler();
             List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pap, input);
 
-            buildExecutionContext(userCtx)
+            StatementResult statementResult = buildExecutionContext(userCtx)
                 .executeStatements(stmts, new Args());
+
+            if (statementResult instanceof ReturnResult returnResult) {
+                return returnResult.getValue();
+            }
+
+            return null;
         }
 
         @Override
