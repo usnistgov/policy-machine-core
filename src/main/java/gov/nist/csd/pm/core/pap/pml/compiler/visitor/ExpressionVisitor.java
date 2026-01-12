@@ -4,7 +4,6 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
 
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
@@ -46,9 +45,11 @@ import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpres
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,12 +58,30 @@ import java.util.Objects;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
+    public static void main(String[] args) throws PMException {
+        String s = "{\"a\":\"a\"}";
+        s = StringEscapeUtils.escapeJson(s);
+
+        try {
+            Expression<String> stringExpression = ExpressionVisitor.fromString(new VisitorContext(new Scope<>()),
+                s, STRING_TYPE);
+            System.out.println(stringExpression);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(s);
+            Expression<String> stringExpression = ExpressionVisitor.fromString(new VisitorContext(new Scope<>()),
+                "\"" + s + "\"", STRING_TYPE);
+            System.out.println(stringExpression);
+        }
+    }
+
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
-                                            ExpressionContext ctx,
-                                            Type<T> expectedType) {
+            ExpressionContext ctx,
+            Type<T> expectedType) {
         ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
         Expression<?> compiledExpression = visitor.visit(ctx);
         Type<?> resultType = compiledExpression.getType();
@@ -70,16 +89,16 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         if (expectedType.equals(ANY_TYPE) || resultType.equals(expectedType)) {
             return (Expression<T>) compiledExpression;
         } else if ((resultType.equals(ANY_TYPE) && !expectedType.equals(ANY_TYPE))
-            || resultType.isCastableTo(expectedType)) {
+                || resultType.isCastableTo(expectedType)) {
             return new ExpressionWrapper<>(compiledExpression, expectedType);
         } else {
-            throw new PMLCompilationRuntimeException(ctx, 
-                new UnexpectedExpressionTypeException(resultType, expectedType).getMessage());
+            throw new PMLCompilationRuntimeException(ctx,
+                    new UnexpectedExpressionTypeException(resultType, expectedType).getMessage());
         }
     }
 
     public static Expression<?> compile(VisitorContext visitorCtx,
-                                        ExpressionContext ctx) {
+            ExpressionContext ctx) {
         Objects.requireNonNull(visitorCtx);
         Objects.requireNonNull(ctx);
 
@@ -111,8 +130,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     }
 
     public static <T> Expression<T> compileFunctionInvoke(VisitorContext visitorCtx,
-                                                          FunctionInvokeContext ctx,
-                                                          Type<T> expectedType) {
+            FunctionInvokeContext ctx,
+            Type<T> expectedType) {
         Objects.requireNonNull(visitorCtx);
         Objects.requireNonNull(ctx);
 
@@ -148,9 +167,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     @Override
     public Expression<?> visitPlusExpression(PlusExpressionContext ctx) {
         return new PlusExpression(
-            ExpressionVisitor.compile(visitorCtx, ctx.left, STRING_TYPE),
-            ExpressionVisitor.compile(visitorCtx, ctx.right, STRING_TYPE)
-        );
+                ExpressionVisitor.compile(visitorCtx, ctx.left, STRING_TYPE),
+                ExpressionVisitor.compile(visitorCtx, ctx.right, STRING_TYPE));
     }
 
     @Override
@@ -165,7 +183,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         }
 
         PMLParser.FunctionInvokeArgsContext funcCallArgsCtx = ctx.functionInvokeArgs();
-        List<ExpressionContext> argExpressions =  new ArrayList<>();
+        List<ExpressionContext> argExpressions = new ArrayList<>();
         PMLParser.ExpressionListContext expressionListContext = funcCallArgsCtx.expressionList();
         if (expressionListContext != null) {
             argExpressions = expressionListContext.expression();
@@ -174,10 +192,9 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         List<FormalParameter<?>> formalArgs = signature.getFormalArgs();
         if (formalArgs.size() != argExpressions.size()) {
             throw new PMLCompilationRuntimeException(
-                ctx,
-                "wrong number of args for function call " + funcName + ": " +
-                    "expected " + formalArgs.size() + ", got " + argExpressions.size()
-            );
+                    ctx,
+                    "wrong number of args for function call " + funcName + ": " +
+                            "expected " + formalArgs.size() + ", got " + argExpressions.size());
         }
 
         List<Expression<?>> args = new ArrayList<>();
@@ -301,12 +318,13 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return new MapLiteralExpression<>(entries, keyType, valueType);
     }
 
-    private Expression<?> createDotIndexExpression(Expression<?> baseExpr, PMLParser.DotIndexContext ctx) throws
-                                                                                                          UnexpectedExpressionTypeException {
+    private Expression<?> createDotIndexExpression(Expression<?> baseExpr, PMLParser.DotIndexContext ctx)
+            throws UnexpectedExpressionTypeException {
         String key = ctx.key.getText();
         MapType<?, ?> mapType = validateMapType(baseExpr.getType(), ctx);
 
-        // check that the key type of this map is string which is the only type supported for dot indexes
+        // check that the key type of this map is string which is the only type
+        // supported for dot indexes
         assertIsCastableTo(mapType.getKeyType(), STRING_TYPE);
 
         Type<?> valueType = mapType.getValueType();
@@ -314,8 +332,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return new DotIndexExpression<>(baseExpr, key, valueType);
     }
 
-    private Expression<?> createBracketIndexExpression(Expression<?> baseExpr, PMLParser.BracketIndexContext ctx) throws
-                                                                                                                  UnexpectedExpressionTypeException {
+    private Expression<?> createBracketIndexExpression(Expression<?> baseExpr, PMLParser.BracketIndexContext ctx)
+            throws UnexpectedExpressionTypeException {
         Expression<?> indexExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
         MapType<?, ?> mapType = validateMapType(baseExpr.getType(), ctx);
 
@@ -334,8 +352,8 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
         if (!(type instanceof MapType<?, ?> mapType)) {
             throw new PMLCompilationRuntimeException(ctx,
-                String.format("Type mismatch: Cannot apply indexing to type %s. Expected Map.",
-                    TypeStringer.toPMLString(type)));
+                    String.format("Type mismatch: Cannot apply indexing to type %s. Expected Map.",
+                            TypeStringer.toPMLString(type)));
         }
 
         return mapType;
@@ -353,39 +371,40 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         throw new UnexpectedExpressionTypeException(type, targetType);
     }
 
-
     private static class ExpressionWrapper<T> extends Expression<T> {
         private final Expression<?> wrapped;
         private final Type<T> expectedType;
-        
+
         ExpressionWrapper(Expression<?> wrapped, Type<T> expectedType) {
             this.wrapped = wrapped;
             this.expectedType = expectedType;
         }
-        
+
         @Override
         public Type<T> getType() {
             return expectedType;
         }
-        
+
         @Override
         public T execute(ExecutionContext ctx, PAP pap) throws PMException {
             Object result = wrapped.execute(ctx, pap);
             return expectedType.cast(result);
         }
-        
+
         @Override
         public String toFormattedString(int indentLevel) {
             return wrapped.toFormattedString(indentLevel);
         }
-        
+
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ExpressionWrapper<?> that)) return false;
+            if (this == o)
+                return true;
+            if (!(o instanceof ExpressionWrapper<?> that))
+                return false;
             return wrapped.equals(that.wrapped) && expectedType.equals(that.expectedType);
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hash(wrapped, expectedType);

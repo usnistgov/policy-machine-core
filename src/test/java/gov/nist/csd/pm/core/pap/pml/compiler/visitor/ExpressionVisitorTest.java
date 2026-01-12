@@ -17,8 +17,8 @@ class ExpressionVisitorTest {
     @Test
     void testCompileWithObjectAsExpectedReturnType() {
         ExpressionContext ctx = TestPMLParser.parseExpression("""
-            "test"
-            """);
+                "test"
+                """);
         Expression<Object> actual = ExpressionVisitor.compile(new VisitorContext(new CompileScope()), ctx, ANY_TYPE);
         assertEquals(STRING_TYPE, actual.getType());
         assertEquals(StringLiteralExpression.class, actual.getClass());
@@ -27,8 +27,8 @@ class ExpressionVisitorTest {
     @Test
     void testCompileWithNoDefinedExpectedType() {
         ExpressionContext ctx = TestPMLParser.parseExpression("""
-            "test"
-            """);
+                "test"
+                """);
         Expression<?> actual = ExpressionVisitor.compile(new VisitorContext(new CompileScope()), ctx);
         assertEquals(STRING_TYPE, actual.getType());
         assertEquals(StringLiteralExpression.class, actual.getClass());
