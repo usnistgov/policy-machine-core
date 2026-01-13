@@ -40,11 +40,11 @@ class FunctionDefinitionStatementTest {
                 new CheckAndStatementsBlock(
                         new PMLStatementBlock(
                                 new CheckStatement(
-                                    new StringLiteralExpression("ar1"),
+                                    ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),
                                     new VariableReferenceExpression<>("a", ListType.of(STRING_TYPE))
                                 ),
                                 new CheckStatement(
-                                    new StringLiteralExpression("ar2"),
+                                    ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar2")), STRING_TYPE),
                                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("node")), STRING_TYPE)
                                 )
                         ),
@@ -112,11 +112,11 @@ class FunctionDefinitionStatementTest {
                 new CheckAndStatementsBlock(
                         new PMLStatementBlock(
                                 new CheckStatement(
-                                    new StringLiteralExpression("ar1"),
+                                    ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),
                                     ArrayLiteralExpression.of(List.of(new VariableReferenceExpression<>("a", STRING_TYPE)), STRING_TYPE)
                                 ),
                                 new CheckStatement(
-                                    new StringLiteralExpression("ar2"),
+                                    ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar2")), STRING_TYPE),
                                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("node")), STRING_TYPE)
                                 )
                         ),

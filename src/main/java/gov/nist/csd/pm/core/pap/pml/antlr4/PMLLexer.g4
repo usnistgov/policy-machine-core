@@ -5,7 +5,6 @@ package gov.nist.csd.pm.core.pap.pml.antlr;
 }
 
 OPERATION: 'operation';
-NODE_PARAM: '@node';
 CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';
@@ -50,11 +49,11 @@ UA : UA_FRAG ;
 U: U_FRAG;
 O: O_FRAG;
 
-NODE: 'node' ;
 USER: 'user' ;
 
 // Keywords
 
+NODE_TYPE              : 'node';
 BREAK                  : 'break';
 DEFAULT                : 'default';
 MAP                    : 'map';

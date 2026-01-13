@@ -46,28 +46,28 @@ class CheckStatementTest {
         ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), false);
 
         ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
     }

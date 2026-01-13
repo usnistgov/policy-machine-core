@@ -19,7 +19,7 @@ public class CheckStatementVisitor extends PMLBaseVisitor<CheckStatement> {
 
     @Override
     public CheckStatement visitCheckStatement(PMLParser.CheckStatementContext ctx) {
-        Expression<String> arExpr = ExpressionVisitor.compile(visitorCtx, ctx.ar, STRING_TYPE);
+        Expression<List<String>> arExpr = ExpressionVisitor.compile(visitorCtx, ctx.ar, ListType.of(STRING_TYPE));
         Expression<List<String>> targetExpr = ExpressionVisitor.compile(visitorCtx, ctx.target, ListType.of(STRING_TYPE));
 
         return new CheckStatement(arExpr, targetExpr);
