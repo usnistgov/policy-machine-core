@@ -9,10 +9,8 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SET_RESOURCE_OPERATIONS;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
 
 public class SetResourceOperationsOp extends Operation<Void> {
 

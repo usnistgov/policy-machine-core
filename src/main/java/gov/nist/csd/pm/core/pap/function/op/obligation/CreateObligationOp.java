@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.function.op.obligation;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class CreateObligationOp extends ObligationOp {
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().obligations().createObligation(
-            args.get(AUTHOR_PARAM),
+            args.get(AUTHOR_PARAM).getId(pap),
             args.get(NAME_PARAM),
             args.get(RULES_PARAM)
         );

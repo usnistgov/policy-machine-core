@@ -41,7 +41,7 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
             Type<?> type = TypeResolver.resolveFromParserCtx(varTypeContext);
 
             if (isNodeop) {
-                formalArgs.add(new NodeFormalParameter<>(name, type));
+                formalArgs.add(new NodeFormalParameter(name));
             } else {
                 formalArgs.add(new FormalParameter<>(name, type));
             }

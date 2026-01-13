@@ -117,7 +117,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
             }
 
-            return tx.executeAdminFunction(routine, args);
+            return tx.executeFunction(routine, args);
         });
     }
 
@@ -140,7 +140,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
 
         // execute operation
-        Object ret = pdpTx.executeAdminFunction(operation, actualArgs);
+        Object ret = pdpTx.executeFunction(operation, actualArgs);
 
         // send to EPP
         publishEvent(EventContextUtil.buildEventContext(

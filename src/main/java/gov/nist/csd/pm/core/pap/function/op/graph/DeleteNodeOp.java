@@ -4,24 +4,33 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
 
-public class DeleteNodeOp extends GraphOp<Void> {
+public class DeleteNodeOp extends Operation<Void> {
+
+    public static final NodeFormalParameter DELETE_NODE_NODE_PARAM =
+        new NodeFormalParameter("node");
+    public static final NodeListFormalParameter DELETE_NODE_DESCENDANTS_PARAM =
+        new NodeListFormalParameter("descendants");
+
 
     public DeleteNodeOp() {
         super(
                 "delete_node",
-                List.of(NODE_PARAM, TYPE_PARAM, DESCENDANTS_PARAM)
+                List.of(DELETE_NODE_NODE_PARAM, TYPE_PARAM, DELETE_NODE_DESCENDANTS_PARAM)
         );
     }
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        long nodeId = args.get(NODE_PARAM);
+        long nodeId = args.get(DELETE_NODE_NODE_PARAM).getId(pap);
         NodeType type = NodeType.toNodeType(args.get(TYPE_PARAM));
         ReqCaps reqCaps = getReqCap(type);
 
@@ -31,7 +40,7 @@ public class DeleteNodeOp extends GraphOp<Void> {
             return;
         }
 
-        List<Long> descs = args.get(DESCENDANTS_PARAM);
+        List<Long> descs = args.getIdList(DELETE_NODE_DESCENDANTS_PARAM, pap);
         for (Long desc : descs) {
             pap.privilegeChecker().check(userCtx, desc, reqCaps.descsReqCap);
         }
@@ -39,7 +48,7 @@ public class DeleteNodeOp extends GraphOp<Void> {
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        pap.modify().graph().deleteNode(args.get(NODE_PARAM));
+        pap.modify().graph().deleteNode(args.get(DELETE_NODE_NODE_PARAM).getId(pap));
         return null;
     }
 

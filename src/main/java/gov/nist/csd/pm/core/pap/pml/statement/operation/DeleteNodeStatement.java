@@ -1,20 +1,20 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NODE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TYPE_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.Operation.TYPE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
+import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
 import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DeleteNodeStatement extends DeleteStatement {
 
@@ -31,18 +31,21 @@ public class DeleteNodeStatement extends DeleteStatement {
             GraphQuery graph = pap.query().graph();
             long nodeId = graph.getNodeId(name);
             NodeType nodeType = graph.getNodeById(nodeId).getType();
-            LongArrayList descendants = new LongArrayList(graph.getAdjacentDescendants(nodeId));
+            List<NodeArg<?>> descendants = graph.getAdjacentDescendants(nodeId)
+                .stream()
+                .map(IdNodeArg::new)
+                .collect(Collectors.toUnmodifiableList());
             
             return new Args()
-                .put(NODE_PARAM, nodeId)
+                .put(DeleteNodeOp.DELETE_NODE_NODE_PARAM, new IdNodeArg(nodeId))
                 .put(TYPE_PARAM, nodeType.toString())
-                .put(DESCENDANTS_PARAM, descendants);
+                .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, descendants);
         } catch (NodeDoesNotExistException e) {
             // if the node does not exist no error needs to occur, as the PAP will not error either
             return new Args()
-                .put(NODE_PARAM, 0L)
+                .put(DeleteNodeOp.DELETE_NODE_NODE_PARAM, new IdNodeArg(0L))
                 .put(TYPE_PARAM, NodeType.U.toString())
-                .put(DESCENDANTS_PARAM, List.of());
+                .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, List.of());
         }
     }
 

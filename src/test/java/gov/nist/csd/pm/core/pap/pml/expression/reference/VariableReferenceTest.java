@@ -16,8 +16,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor.compile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

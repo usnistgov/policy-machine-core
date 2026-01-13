@@ -8,7 +8,6 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreatePolicyClassOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import java.util.List;
 import java.util.Objects;
 
 public class CreatePolicyClassStatement extends OperationStatement {

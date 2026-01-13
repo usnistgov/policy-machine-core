@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +79,7 @@ public class PMLTest {
         pap.modify().routines().createAdminRoutine(new Routine<>("routine1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
-                pap.executeAdminFunction(op1, args.toMap());
+                pap.executeFunction(op1, args.toMap());
 
                 return null;
             }

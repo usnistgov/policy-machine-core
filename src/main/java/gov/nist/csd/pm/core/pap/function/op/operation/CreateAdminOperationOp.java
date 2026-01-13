@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_ADMIN_OPERATION;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
 
 public class CreateAdminOperationOp extends Operation<Void> {
 

@@ -12,7 +12,7 @@ import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BoolLiteralTest {

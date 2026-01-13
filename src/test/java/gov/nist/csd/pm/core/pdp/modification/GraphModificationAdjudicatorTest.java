@@ -8,7 +8,17 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.graph.*;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreatePolicyClassOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DeassignOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -22,14 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NODE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.PROPERTIES_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TARGET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TYPE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.UA_PARAM;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,7 +102,7 @@ class GraphModificationAdjudicatorTest {
     void createUserAttribute() throws PMException {
         assertDoesNotThrow(() -> ok.createUserAttribute("test", ids("ua1")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new CreateUserAttributeOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("ua1"))),
+                new EventContext(new EventContextUser("u1"), new CreateUserAttributeOp().getName(), Map.of(NAME_PARAM.getName(), "test", "descendants", List.of("ua1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -112,7 +114,7 @@ class GraphModificationAdjudicatorTest {
     void createObjectAttribute() throws PMException {
         assertDoesNotThrow(() -> ok.createObjectAttribute("test", ids("oa1")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new CreateObjectAttributeOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("oa1"))),
+                new EventContext(new EventContextUser("u1"), new CreateObjectAttributeOp().getName(), Map.of(NAME_PARAM.getName(), "test", "descendants", List.of("oa1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -124,7 +126,7 @@ class GraphModificationAdjudicatorTest {
     void createObject() throws PMException {
         assertDoesNotThrow(() -> ok.createObject("test", ids("oa1")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new CreateObjectOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("oa1"))),
+                new EventContext(new EventContextUser("u1"), new CreateObjectOp().getName(), Map.of(NAME_PARAM.getName(), "test", "descendants", List.of("oa1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -136,7 +138,7 @@ class GraphModificationAdjudicatorTest {
     void createUser() throws PMException {
         assertDoesNotThrow(() -> ok.createUser("test", ids("ua1")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new CreateUserOp().getName(), Map.of(NAME_PARAM.getName(), "test", DESCENDANTS_PARAM.getName(), List.of("ua1"))),
+                new EventContext(new EventContextUser("u1"), new CreateUserOp().getName(), Map.of(NAME_PARAM.getName(), "test", "descendants", List.of("ua1"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().nodeExists("test"));
@@ -148,7 +150,7 @@ class GraphModificationAdjudicatorTest {
     void setNodeProperties() throws PMException {
         assertDoesNotThrow(() -> ok.setNodeProperties(id("o1"), Map.of("a", "b")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new SetNodePropertiesOp().getName(), Map.of(NODE_PARAM.getName(), "o1", PROPERTIES_PARAM.getName(), Map.of("a", "b"))),
+                new EventContext(new EventContextUser("u1"), new SetNodePropertiesOp().getName(), Map.of("node", "o1", "properties", Map.of("a", "b"))),
                 testEventProcessor.getEventContext()
         );
 	    assertEquals(pap.query().graph().getNodeByName("o1").getProperties(), Map.of("a", "b"));
@@ -162,9 +164,9 @@ class GraphModificationAdjudicatorTest {
 
         EventContext expected = new EventContext(new EventContextUser("u1"), new DeleteNodeOp().getName(),
             new HashMap<>(Map.of(
-                NODE_PARAM.getName(), "o1",
-                TYPE_PARAM.getName(), NodeType.O.toString(),
-                DESCENDANTS_PARAM.getName(), new ArrayList<>(List.of("oa1"))
+                "node", "o1",
+                "type", NodeType.O.toString(),
+                "descendants", new ArrayList<>(List.of("oa1"))
             ))
         );
         EventContext actual = testEventProcessor.getEventContext();
@@ -182,7 +184,7 @@ class GraphModificationAdjudicatorTest {
     void assign() throws PMException {
         assertDoesNotThrow(() -> ok.assign(id("o1"), ids("oa2")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new AssignOp().getName(), Map.of(ASCENDANT_PARAM.getName(), "o1", DESCENDANTS_PARAM.getName(), List.of("oa2"))),
+                new EventContext(new EventContextUser("u1"), new AssignOp().getName(), Map.of("ascendant", "o1", "descendants", List.of("oa2"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().isAscendant(id("o1"), id("oa2")));
@@ -194,7 +196,7 @@ class GraphModificationAdjudicatorTest {
     void deassign() throws PMException {
         assertDoesNotThrow(() -> ok.deassign(id("u1"), ids("ua1")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new DeassignOp().getName(), Map.of(ASCENDANT_PARAM.getName(), "u1", DESCENDANTS_PARAM.getName(), List.of("ua1"))),
+                new EventContext(new EventContextUser("u1"), new DeassignOp().getName(), Map.of("ascendant", "u1", "descendants", List.of("ua1"))),
                 testEventProcessor.getEventContext()
         );
         assertFalse(pap.query().graph().isAscendant(id("u1"), id("ua1")));
@@ -206,7 +208,7 @@ class GraphModificationAdjudicatorTest {
     void associate() throws PMException {
         assertDoesNotThrow(() -> ok.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new AssociateOp().getName(), Map.of(UA_PARAM.getName(), "ua1", TARGET_PARAM.getName(), "ua3", ARSET_PARAM.getName(), List.of("assign"))),
+                new EventContext(new EventContextUser("u1"), new AssociateOp().getName(), Map.of("ua", "ua1", "target", "ua3", "arset", List.of("assign"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1"))
@@ -219,7 +221,7 @@ class GraphModificationAdjudicatorTest {
     void dissociate() throws PMException {
         assertDoesNotThrow(() -> ok.dissociate(id("ua1"), id("ua3")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new DissociateOp().getName(), Map.of(UA_PARAM.getName(), "ua1", TARGET_PARAM.getName(), "ua3")),
+                new EventContext(new EventContextUser("u1"), new DissociateOp().getName(), Map.of("ua", "ua1", "target", "ua3")),
                 testEventProcessor.getEventContext()
         );
         assertFalse(pap.query().graph().getAssociationsWithSource(id("ua1"))

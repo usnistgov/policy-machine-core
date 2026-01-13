@@ -1,12 +1,9 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
 import gov.nist.csd.pm.core.common.event.EventPublisher;
-import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 public class PolicyModificationAdjudicator implements PolicyModification {
 

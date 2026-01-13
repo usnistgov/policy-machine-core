@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.function;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.VOID_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;

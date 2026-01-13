@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.function.arg;
 
+import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import java.io.Serializable;
 import java.util.Objects;
@@ -29,8 +30,6 @@ public class FormalParameter<T> implements Serializable {
 	 * @throws IllegalArgumentException if the conversion is not possible
 	 */
 	public T toExpectedType(Object obj) {
-
-
 		return type.cast(obj);
 	}
 

@@ -1,6 +1,10 @@
 package gov.nist.csd.pm.core.pap.function.arg;
 
-import gov.nist.csd.pm.core.pap.function.AdminFunction;
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +13,8 @@ import java.util.function.BiConsumer;
 
 public class Args {
 
-	public static Args of(AdminFunction<?> adminFunction, Map<String, Object> actualArgs) {
-		List<FormalParameter<?>> formalParameters = adminFunction.getFormalParameters();
+	public static Args of(Function<?> function, Map<String, Object> actualArgs) {
+		List<FormalParameter<?>> formalParameters = function.getFormalParameters();
 
 		Args args = new Args();
 
@@ -50,6 +54,26 @@ public class Args {
 		return formalParameter.toExpectedType(map.get(formalParameter));
 	}
 
+	public List<Long> getIdList(NodeListFormalParameter formalParameter, PAP pap) throws PMException {
+		List<NodeArg<?>> nodeArgList = formalParameter.toExpectedType(map.get(formalParameter));
+		List<Long> ids = new ArrayList<>();
+		for (NodeArg<?> nodeArg : nodeArgList) {
+			ids.add(nodeArg.getId(pap));
+		}
+
+		return ids;
+	}
+
+	public List<String> getNameList(NodeListFormalParameter formalParameter, PAP pap) throws PMException {
+		List<NodeArg<?>> nodeArgList = formalParameter.toExpectedType(map.get(formalParameter));
+		List<String> names = new ArrayList<>();
+		for (NodeArg<?> nodeArg : nodeArgList) {
+			names.add(nodeArg.getName(pap));
+		}
+
+		return names;
+	}
+
 	public Args putUnchecked(FormalParameter<?> formalParameter, Object value) {
 		map.put(formalParameter, value);
 		return this;
@@ -64,6 +88,10 @@ public class Args {
 		for (Entry<FormalParameter<?>, Object> e : map.entrySet()) {
 			consumer.accept(e.getKey(), e.getValue());
 		}
+	}
+
+	public Map<FormalParameter<?>, Object> getMap() {
+		return map;
 	}
 
 	public Map<String, Object> toMap() {

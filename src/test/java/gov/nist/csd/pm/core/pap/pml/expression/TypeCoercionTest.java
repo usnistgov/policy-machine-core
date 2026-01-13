@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.*;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TypeCoercionTest {

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;

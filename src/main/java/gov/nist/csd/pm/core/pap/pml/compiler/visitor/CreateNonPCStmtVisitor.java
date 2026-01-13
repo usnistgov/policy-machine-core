@@ -10,7 +10,7 @@ import java.util.List;
 
 
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 
 public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement> {

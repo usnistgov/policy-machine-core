@@ -11,10 +11,8 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
-import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_ADMIN_ROUTINE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
 
 public class CreateAdminRoutineOp extends Operation<Void> {
 

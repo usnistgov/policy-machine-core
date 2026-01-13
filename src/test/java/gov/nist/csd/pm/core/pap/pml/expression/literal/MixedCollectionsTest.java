@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.*;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**

@@ -21,6 +21,11 @@ public class UnauthorizedException extends PMException {
         this.explain = explain;
     }
 
+    public UnauthorizedException(UserContext user, TargetContext target, Collection<String> missingAccessRights) {
+        super(userString(user) + " does not have access right " + missingAccessRights + " on " + target);
+        this.explain = null;
+    }
+
     public Explain getExplain() {
         return explain;
     }

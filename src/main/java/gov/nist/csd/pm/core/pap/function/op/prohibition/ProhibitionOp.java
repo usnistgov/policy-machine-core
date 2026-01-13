@@ -1,10 +1,6 @@
 package gov.nist.csd.pm.core.pap.function.op.prohibition;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
-
-
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
@@ -23,7 +19,6 @@ import java.util.List;
 public abstract class ProhibitionOp extends Operation<Void> {
 
     public static final FormalParameter<ProhibitionSubject> SUBJECT_PARAM = new FormalParameter<>("subject", new ProhibitionSubjectArgType());
-    public static final FormalParameter<List<String>> ARSET_PARAM = new FormalParameter<>("arset", ListType.of(STRING_TYPE));
     public static final FormalParameter<Boolean> INTERSECTION_PARAM = new FormalParameter<>("intersection", BOOLEAN_TYPE);
     public static final FormalParameter<List<ContainerCondition>> CONTAINERS_PARAM = new FormalParameter<>("containers", new ListType<>(new ContainerConditionType()));
 

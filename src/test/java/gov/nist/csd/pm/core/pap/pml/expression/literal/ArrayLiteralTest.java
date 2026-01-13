@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
 import static org.junit.jupiter.api.Assertions.*;

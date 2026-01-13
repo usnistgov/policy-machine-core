@@ -22,13 +22,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionStatementTest {
 
-    private static final FormalParameter<String> a = new NodeFormalParameter<>("a", STRING_TYPE);
+    private static final NodeFormalParameter a = new NodeFormalParameter("a");
     private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
     @Test

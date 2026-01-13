@@ -29,7 +29,7 @@ public class PMLOperationSignature extends PMLFunctionSignature {
                 pml += ", ";
             }
 
-            pml += ((formalParameter instanceof NodeFormalParameter<?>) ? "@node " : "") +
+            pml += ((formalParameter instanceof NodeFormalParameter) ? "@node " : "") +
                 TypeStringer.toPMLString(formalParameter.getType()) + " " +
                 formalParameter.getName();
         }

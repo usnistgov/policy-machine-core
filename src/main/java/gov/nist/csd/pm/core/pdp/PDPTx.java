@@ -3,9 +3,9 @@ package gov.nist.csd.pm.core.pdp;
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
+import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.AdminFunction;
+import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
@@ -29,11 +29,10 @@ import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 
 import java.util.List;
 import java.util.Map;
-import org.checkerframework.checker.units.qual.A;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
 
-public class PDPTx implements AdminFunctionExecutor {
+public class PDPTx implements FunctionExecutor {
 
     private final TxExecutor txExecutor;
 
@@ -50,9 +49,9 @@ public class PDPTx implements AdminFunctionExecutor {
     }
 
     @Override
-    public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
-                                      Map<String, Object> argsMap) throws PMException {
-        return this.txExecutor.executeAdminFunction(adminFunction, argsMap);
+    public <R> R executeFunction(Function<R> function,
+                                 Map<String, Object> rawArgs) throws PMException {
+        return this.txExecutor.executeFunction(function, rawArgs);
     }
 
     /**
@@ -148,18 +147,18 @@ public class PDPTx implements AdminFunctionExecutor {
         }
 
         @Override
-        public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
-                                                          Map<String, Object> argsMap) throws PMException {
-            Args args = adminFunction.validateAndPrepareArgs(argsMap);
+        public <R> R executeFunction(Function<R> function,
+                                     Map<String, Object> rawArgs) throws PMException {
+            Args args = function.validateAndPrepareArgs(rawArgs);
 
-            if (adminFunction instanceof Routine<R> routine) {
+            if (function instanceof Routine<R> routine) {
                 return routine.execute(this, args);
-            } else if (adminFunction instanceof Operation<R> operation) {
+            } else if (function instanceof Operation<R> operation) {
                 operation.canExecute(pap, userCtx, args);
                 return operation.execute(pap, args);
             }
 
-            return adminFunction.execute(pap, args);
+            return function.execute(pap, args);
         }
 
         @Override
@@ -229,7 +228,7 @@ public class PDPTx implements AdminFunctionExecutor {
 
         public PDPExecutionContext(UserContext author,
                                    TxExecutor pdpTx,
-                                   Scope<Object, AdminFunction<?>> scope) throws PMException {
+                                   Scope<Object, Function<?>> scope) throws PMException {
             super(author, pdpTx.pap, scope);
             this.pdpTx = pdpTx;
         }

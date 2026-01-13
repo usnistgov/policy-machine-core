@@ -4,24 +4,28 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
 import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 
-public class CreateObjectAttributeOp extends CreateNodeOp {
+public class CreateObjectAttributeOp extends Operation<Long> {
+
+    public static final NodeListFormalParameter CREATE_OA_DESCENDANTS_PARAM =
+        new NodeListFormalParameter("descendants", CREATE_OBJECT_ATTRIBUTE);
 
     public CreateObjectAttributeOp() {
         super(
             "create_object_attribute",
-            true,
-            CREATE_OBJECT_ATTRIBUTE
+            List.of(NAME_PARAM, CREATE_OA_DESCENDANTS_PARAM)
         );
     }
 
     @Override
     public Long execute(PAP pap, Args args) throws PMException {
         String name = args.get(NAME_PARAM);
-        List<Long> descIds = args.get(DESCENDANTS_PARAM);
+        List<Long> descIds = args.getIdList(CREATE_OA_DESCENDANTS_PARAM, pap);
 
         return pap.modify().graph().createObjectAttribute(name, descIds);
     }

@@ -3,38 +3,38 @@ package gov.nist.csd.pm.core.pap.function.op.graph;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
 
 import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSIGN;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSIGN_TO;
 
-public class AssignOp extends GraphOp<Void> {
+public class AssignOp extends Operation<Void> {
+
+    public static final NodeFormalParameter ASSIGN_ASCENDANT_PARAM =
+        new NodeFormalParameter("ascendant", ASSIGN);
+
+    public static final NodeListFormalParameter ASSIGN_DESCENDANTS_PARAM =
+        new NodeListFormalParameter("descendants", ASSIGN_TO);
 
     public AssignOp() {
         super(
-                "assign",
-                List.of(ASCENDANT_PARAM, DESCENDANTS_PARAM)
+            "assign",
+            List.of(ASSIGN_ASCENDANT_PARAM, ASSIGN_DESCENDANTS_PARAM)
         );
     }
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        Long ascId = args.get(ASCENDANT_PARAM);
-        List<Long> descIds = args.get(DESCENDANTS_PARAM);
+        NodeArg<?> asc = args.get(ASSIGN_ASCENDANT_PARAM);
+        List<Long> descs = args.getIdList(ASSIGN_DESCENDANTS_PARAM, pap);
 
-        pap.modify().graph().assign(ascId, descIds);
+        pap.modify().graph().assign(asc.getId(pap), descs);
         return null;
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        Long ascId = args.get(ASCENDANT_PARAM);
-        List<Long> descIds = args.get(DESCENDANTS_PARAM);
-
-        pap.privilegeChecker().check(userCtx, ascId, ASSIGN);
-        pap.privilegeChecker().check(userCtx, descIds, ASSIGN_TO);
     }
 }
 

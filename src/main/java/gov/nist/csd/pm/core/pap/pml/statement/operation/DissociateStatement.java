@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TARGET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.UA_PARAM;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
@@ -34,8 +32,8 @@ public class DissociateStatement extends OperationStatement {
         long targetId = graph.getNodeByName(target).getId();
 
         return new Args()
-            .put(UA_PARAM, uaId)
-            .put(TARGET_PARAM, targetId);
+            .put(DissociateOp.DISSOCIATE_UA_PARAM, new IdNodeArg(uaId))
+            .put(DissociateOp.DISSOCIATE_TARGET_PARAM, new IdNodeArg(targetId));
     }
 
     @Override

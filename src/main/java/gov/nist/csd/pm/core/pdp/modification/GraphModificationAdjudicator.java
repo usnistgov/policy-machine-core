@@ -1,14 +1,9 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NODE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.PROPERTIES_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TARGET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TYPE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.UA_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.Operation.PROPERTIES_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.Operation.TYPE_PARAM;
 import static gov.nist.csd.pm.core.pdp.event.EventContextUtil.buildEventContext;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
@@ -19,16 +14,27 @@ import gov.nist.csd.pm.core.common.graph.node.Properties;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.op.graph.*;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreatePolicyClassOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DeassignOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
@@ -56,7 +62,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserAttributeOp op = new CreateUserAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         return executeOp(op, args);
     }
@@ -66,7 +72,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectAttributeOp op = new CreateObjectAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         return executeOp(op, args);
     }
@@ -76,7 +82,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectOp op = new CreateObjectOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectOp.CREATE_O_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         return executeOp(op, args);
     }
@@ -86,7 +92,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserOp op = new CreateUserOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserOp.CREATE_U_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         return executeOp(op, args);
     }
@@ -95,7 +101,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         SetNodePropertiesOp op = new SetNodePropertiesOp();
         Args args = new Args()
-            .put(NODE_PARAM, id)
+            .put(SetNodePropertiesOp.SET_NODE_PROPS_NODE_PARAM, new IdNodeArg(id))
             .put(PROPERTIES_PARAM, new Properties(properties));
 
         executeOp(op, args);
@@ -104,13 +110,13 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void deleteNode(long id) throws PMException {
         Node node = pap.query().graph().getNodeById(id);
-        LongArrayList descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
+        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(id);
 
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = new Args()
-            .put(NODE_PARAM, id)
+            .put(DeleteNodeOp.DELETE_NODE_NODE_PARAM, new IdNodeArg(id))
             .put(TYPE_PARAM, node.getType().toString())
-            .put(DESCENDANTS_PARAM, descendants);
+            .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         // build event context before executing or else the node will not exist when the util
         // tries to convert the id to the name
@@ -123,8 +129,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void assign(long ascId, Collection<Long> descendants) throws PMException {
         AssignOp op = new AssignOp();
         Args args = new Args()
-            .put(ASCENDANT_PARAM, ascId)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(AssignOp.ASSIGN_ASCENDANT_PARAM, new IdNodeArg(ascId))
+            .put(AssignOp.ASSIGN_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         executeOp(op, args);
     }
@@ -133,8 +139,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         DeassignOp op = new DeassignOp();
         Args args = new Args()
-            .put(ASCENDANT_PARAM, ascendant)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(DeassignOp.DEASSIGN_ASCENDANT_PARAM, new IdNodeArg(ascendant))
+            .put(DeassignOp.DEASSIGN_DESCENDANTS_PARAM, descendants.stream().map(IdNodeArg::new).collect(Collectors.toList()));
 
         executeOp(op, args);
     }
@@ -143,8 +149,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         AssociateOp op = new AssociateOp();
         Args args = new Args()
-            .put(UA_PARAM, ua)
-            .put(TARGET_PARAM, target)
+            .put(AssociateOp.ASSOCIATE_UA_PARAM, new IdNodeArg(ua))
+            .put(AssociateOp.ASSOCIATE_TARGET_PARAM, new IdNodeArg(target))
             .put(ARSET_PARAM, new ArrayList<>(accessRights));
 
         executeOp(op, args);
@@ -154,8 +160,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void dissociate(long ua, long target) throws PMException {
         DissociateOp op = new DissociateOp();
         Args args = new Args()
-            .put(UA_PARAM, ua)
-            .put(TARGET_PARAM, target);
+            .put(DissociateOp.DISSOCIATE_UA_PARAM, new IdNodeArg(ua))
+            .put(DissociateOp.DISSOCIATE_TARGET_PARAM, new IdNodeArg(target));
 
         executeOp(op, args);
     }

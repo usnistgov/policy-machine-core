@@ -24,7 +24,7 @@ public class UpdateObligationOp extends ObligationOp {
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        long author = args.get(AUTHOR_PARAM);
+        long author = args.get(AUTHOR_PARAM).getId(pap);
         String name = args.get(NAME_PARAM);
         List<Rule> rules = args.get(RULES_PARAM);
 

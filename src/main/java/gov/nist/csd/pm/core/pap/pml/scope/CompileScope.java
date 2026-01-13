@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions.builtinFunctions;
 
 public class CompileScope extends Scope<Variable, PMLFunctionSignature> {

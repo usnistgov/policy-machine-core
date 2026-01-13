@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EventPatternTest {
@@ -52,7 +50,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser(List.of("ua1")),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -71,7 +69,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser(List.of("ua2")),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -90,7 +88,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1"),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -109,7 +107,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1"),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -128,7 +126,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", ""),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -151,7 +149,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", "p1"),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -174,7 +172,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", "p2"),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -197,7 +195,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", "p2"),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -219,7 +217,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", ""),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertTrue(eventPattern.matches(eventContext, pap));
@@ -241,7 +239,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", ""),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), List.of("b"))
+            Map.of("ascendant", "a", "descendants", List.of("b"))
         );
 
         assertFalse(eventPattern.matches(eventContext, pap));
@@ -263,7 +261,7 @@ class EventPatternTest {
         EventContext eventContext = new EventContext(
             new EventContextUser("u1", ""),
             "assign",
-            Map.of(ASCENDANT_PARAM.getName(), "a", DESCENDANTS_PARAM.getName(), Map.of("b", ""))
+            Map.of("ascendant", "a", "descendants", Map.of("b", ""))
         );
 
         assertThrows(UnexpectedArgTypeException.class,

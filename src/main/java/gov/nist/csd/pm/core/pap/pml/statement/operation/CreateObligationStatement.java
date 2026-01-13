@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
@@ -51,7 +52,7 @@ public class CreateObligationStatement extends OperationStatement {
         }
 
         return new Args()
-            .put(AUTHOR_PARAM, ctx.author().getUser())
+            .put(AUTHOR_PARAM, new IdNodeArg(ctx.author().getUser()))
             .put(NAME_PARAM, nameStr)
             .put(RULES_PARAM, new ArrayList<>(rules));
     }

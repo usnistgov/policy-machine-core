@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.function.op.obligation.UpdateObligationOp;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
@@ -46,7 +47,7 @@ public class DeleteRuleStatement extends OperationStatement {
         // can only be called from within an obligation response which will be executed by the
         // author anyways
         return new Args()
-            .put(AUTHOR_PARAM, obligation.getAuthorId())
+            .put(AUTHOR_PARAM, new IdNodeArg(obligation.getAuthorId()))
             .put(NAME_PARAM, obligation.getName())
             .put(RULES_PARAM, new ArrayList<>(rules));
     }

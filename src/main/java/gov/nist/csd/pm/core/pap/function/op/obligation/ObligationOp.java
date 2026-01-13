@@ -1,18 +1,14 @@
 package gov.nist.csd.pm.core.pap.function.op.obligation;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
-
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.RuleType;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.op.arg.IdNodeFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
@@ -25,7 +21,7 @@ import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBLIGATION
 
 public abstract class ObligationOp extends Operation<Void> {
 
-    public static final IdNodeFormalParameter AUTHOR_PARAM = new IdNodeFormalParameter("author");
+    public static final NodeFormalParameter AUTHOR_PARAM = new NodeFormalParameter("author");
     public static final FormalParameter<List<Rule>> RULES_PARAM = new FormalParameter<>("rules", ListType.of(new RuleType()));
 
     public ObligationOp(String opName, List<FormalParameter<?>> formalParameters) {

@@ -8,7 +8,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
 
 import java.util.HashMap;
 import java.util.Map;

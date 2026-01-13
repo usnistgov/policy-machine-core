@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;

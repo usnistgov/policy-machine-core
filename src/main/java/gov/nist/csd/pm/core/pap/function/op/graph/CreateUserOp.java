@@ -5,23 +5,28 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
 import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_USER;
 
-public class CreateUserOp extends CreateNodeOp {
+public class CreateUserOp extends Operation<Long> {
+
+    public static final NodeListFormalParameter CREATE_U_DESCENDANTS_PARAM =
+        new NodeListFormalParameter("descendants", CREATE_USER);
+
     public CreateUserOp() {
         super(
             "create_user",
-            true,
-            CREATE_USER
+            List.of(NAME_PARAM, CREATE_U_DESCENDANTS_PARAM)
         );
     }
 
     @Override
     public Long execute(PAP pap, Args args) throws PMException {
         String name = args.get(NAME_PARAM);
-        List<Long> descIds = args.get(DESCENDANTS_PARAM);
+        List<Long> descIds = args.getIdList(CREATE_U_DESCENDANTS_PARAM, pap);
 
         return pap.modify().graph().createUser(name, descIds);
     }

@@ -1,5 +1,12 @@
 package gov.nist.csd.pm.core.pap.function.arg.type;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.LONG_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.NODE_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+
+import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -9,17 +16,12 @@ public sealed abstract class Type<T> implements Serializable
     permits AnyType, BooleanType, ListType, LongType, MapType, StringType, VoidType, RuleType, RoutineType,
     OperationType, ProhibitionSubjectArgType, ContainerConditionType, NodeType {
 
-    public static StringType STRING_TYPE = new StringType();
-    public static LongType LONG_TYPE = new LongType();
-    public static BooleanType BOOLEAN_TYPE = new BooleanType();
-    public static AnyType ANY_TYPE = new AnyType();
-    public static VoidType VOID_TYPE = new VoidType();
-
     public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {
             case String s -> STRING_TYPE;
             case Boolean b -> BOOLEAN_TYPE;
             case Long l -> LONG_TYPE;
+            case NodeArg<?> l -> NODE_TYPE;
             case List<?> list -> resolveListType(list);
             case Map<?, ?> map -> resolveMapType(map);
             case null, default -> ANY_TYPE;
@@ -101,7 +103,7 @@ public sealed abstract class Type<T> implements Serializable
     public boolean isCastableTo(Type<?> targetType) {
         if (this.equals(ANY_TYPE)) {
             return true;
-        } else if (targetType.equals(Type.ANY_TYPE) || this.equals(targetType)) {
+        } else if (targetType.equals(ANY_TYPE) || this.equals(targetType)) {
             return true;
         } else if ((this instanceof ListType<?> sourceList) && (targetType instanceof ListType<?> targetList)) {
             return sourceList.getElementType().isCastableTo(targetList.getElementType());

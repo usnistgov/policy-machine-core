@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.core.pap.admin;
 
 import gov.nist.csd.pm.core.common.exception.AdminOperationDoesNotExistException;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.op.graph.*;
 import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.function.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
@@ -13,6 +11,18 @@ import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.core.pap.function.op.routine.DeleteAdminRoutineOp;
 
+import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreatePolicyClassOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DeassignOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
+import gov.nist.csd.pm.core.pap.function.op.graph.SetNodePropertiesOp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

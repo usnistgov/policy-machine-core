@@ -2,13 +2,12 @@ package gov.nist.csd.pm.core.pap;
 
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.AdminFunction;
-import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
+import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
@@ -33,7 +32,7 @@ import java.util.*;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
 
-public abstract class PAP implements AdminFunctionExecutor, Transactional {
+public abstract class PAP implements FunctionExecutor, Transactional {
 
     private final PolicyStore policyStore;
     private final PolicyModifier modifier;
@@ -125,8 +124,9 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <R> R executeAdminFunction(AdminFunction<R> adminFunction, Map<String, Object> args) throws PMException {
-        return adminFunction.execute(this, adminFunction.validateAndPrepareArgs(args));
+    public <R> R executeFunction(Function<R> function, Map<String, Object> rawArgs) throws PMException {
+        Args args = function.validateAndPrepareArgs(rawArgs);
+        return function.execute(this, args);
     }
 
     /**

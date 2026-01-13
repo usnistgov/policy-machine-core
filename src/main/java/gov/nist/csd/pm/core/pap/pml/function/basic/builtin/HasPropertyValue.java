@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.function.basic.builtin.Env.KEY_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;

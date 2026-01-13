@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.op.obligation.DeleteObligationOp;
@@ -26,7 +27,7 @@ public class DeleteObligationStatement extends DeleteStatement {
         Obligation obligation = pap.query().obligations().getObligation(name);
 
         return new Args()
-            .put(AUTHOR_PARAM, obligation.getAuthorId())
+            .put(AUTHOR_PARAM, new IdNodeArg(obligation.getAuthorId()))
             .put(NAME_PARAM, obligation.getName())
             .put(RULES_PARAM, new ArrayList<>(obligation.getRules()));
     }

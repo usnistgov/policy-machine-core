@@ -3,37 +3,32 @@ package gov.nist.csd.pm.core.pap.function.op.graph;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 
 import java.util.List;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE_TO;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE_FROM;
 
-public class DissociateOp extends GraphOp<Void> {
+public class DissociateOp extends Operation<Void> {
+
+    public static final NodeFormalParameter DISSOCIATE_UA_PARAM = new NodeFormalParameter("ua", DISSOCIATE);
+    public static final NodeFormalParameter DISSOCIATE_TARGET_PARAM = new NodeFormalParameter("target", ASSOCIATE_TO);
 
     public DissociateOp() {
         super(
                 "dissociate",
-                List.of(UA_PARAM, TARGET_PARAM)
+                List.of(DISSOCIATE_UA_PARAM, DISSOCIATE_TARGET_PARAM)
         );
     }
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        Long uaId = args.get(UA_PARAM);
-        Long targetId = args.get(TARGET_PARAM);
+        long uaId = args.get(DISSOCIATE_UA_PARAM).getId(pap);
+        long targetId = args.get(DISSOCIATE_TARGET_PARAM).getId(pap);
 
         pap.modify().graph().dissociate(uaId, targetId);
         return null;
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        Long uaId = args.get(UA_PARAM);
-        Long targetId = args.get(TARGET_PARAM);
-
-        pap.privilegeChecker().check(userCtx, uaId, DISSOCIATE);
-        pap.privilegeChecker().check(userCtx, targetId, DISSOCIATE_FROM);
     }
 }
