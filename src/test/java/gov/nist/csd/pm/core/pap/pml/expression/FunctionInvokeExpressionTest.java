@@ -1,5 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -18,22 +27,14 @@ import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class FunctionInvokeExpressionTest {
 

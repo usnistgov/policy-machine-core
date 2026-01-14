@@ -4,7 +4,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
-
 import java.util.ArrayList;
 import java.util.Collection;
 

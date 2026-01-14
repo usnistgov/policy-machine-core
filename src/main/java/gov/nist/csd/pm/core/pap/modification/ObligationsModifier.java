@@ -7,9 +7,11 @@ import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
-
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class ObligationsModifier extends Modifier implements ObligationsModification {
 

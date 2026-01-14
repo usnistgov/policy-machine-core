@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import org.antlr.v4.runtime.ParserRuleContext;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CompilerTestUtil {
 

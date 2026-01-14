@@ -6,7 +6,6 @@ import gov.nist.csd.pm.core.pap.query.AccessQuerier;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

@@ -1,18 +1,16 @@
 package gov.nist.csd.pm.core.pap.serialization;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONGraph;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONPolicy;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.api.Test;
 
 public class JSONSerializationTest {
 

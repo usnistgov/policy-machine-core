@@ -1,17 +1,16 @@
 package gov.nist.csd.pm.core.impl.memory.pap.dag;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class DepthFirstGraphWalkerTest {
 

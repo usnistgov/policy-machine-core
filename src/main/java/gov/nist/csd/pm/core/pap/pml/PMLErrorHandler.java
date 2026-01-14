@@ -2,12 +2,11 @@ package gov.nist.csd.pm.core.pap.pml;
 
 import gov.nist.csd.pm.core.pap.pml.compiler.Position;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
+import java.util.ArrayList;
+import java.util.List;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PMLErrorHandler extends BaseErrorListener {
 

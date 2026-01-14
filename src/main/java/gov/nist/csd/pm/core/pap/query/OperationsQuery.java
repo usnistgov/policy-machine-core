@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-
 import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import java.util.Collection;
 

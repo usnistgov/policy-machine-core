@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pap.function;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-
 import java.util.Map;
 
 public interface FunctionExecutor {

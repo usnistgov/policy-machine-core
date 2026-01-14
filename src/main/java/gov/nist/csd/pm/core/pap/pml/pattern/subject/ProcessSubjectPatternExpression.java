@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
-
 import java.util.Objects;
 
 public class ProcessSubjectPatternExpression extends SubjectPatternExpression {

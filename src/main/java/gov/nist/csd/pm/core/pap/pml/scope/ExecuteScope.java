@@ -1,13 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

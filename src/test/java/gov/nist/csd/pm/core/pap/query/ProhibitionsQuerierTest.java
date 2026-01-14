@@ -1,5 +1,11 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -8,15 +14,12 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.util.SamplePolicy;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
 

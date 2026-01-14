@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.common.graph.relationship;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;

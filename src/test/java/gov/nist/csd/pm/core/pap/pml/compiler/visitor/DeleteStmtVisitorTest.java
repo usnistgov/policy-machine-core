@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
@@ -11,9 +14,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteNodeStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteObligationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteProhibitionStatement;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DeleteStmtVisitorTest {
 

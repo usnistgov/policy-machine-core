@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.type;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.LONG_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 

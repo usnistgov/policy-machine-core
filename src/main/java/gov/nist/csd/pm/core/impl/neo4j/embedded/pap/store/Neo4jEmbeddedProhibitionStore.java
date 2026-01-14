@@ -1,5 +1,19 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ARSET_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.COMPLEMENT_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ID_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.INTERSECTION_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NODE_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROCESS_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_CONTAINER_REL_TYPE;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_SUBJECT_REL_TYPE;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.UA_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.U_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.getProhibitionFromNode;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
@@ -7,16 +21,18 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.store.ProhibitionsStore;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.neo4j.graphdb.*;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.Transaction;
 
 public class Neo4jEmbeddedProhibitionStore implements ProhibitionsStore {
 

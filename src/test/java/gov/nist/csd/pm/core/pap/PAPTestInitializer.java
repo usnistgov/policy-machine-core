@@ -1,15 +1,14 @@
 package gov.nist.csd.pm.core.pap;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import org.junit.jupiter.api.BeforeEach;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.LongStream;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class PAPTestInitializer {
 

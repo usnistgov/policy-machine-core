@@ -1,12 +1,15 @@
 package gov.nist.csd.pm.core.common.graph.relationship;
 
-import gov.nist.csd.pm.core.common.graph.node.NodeType;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.O;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
 
+import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
 
 /**
  * This object represents an Association in a NGAC graph. An association is a relationship between two nodes,

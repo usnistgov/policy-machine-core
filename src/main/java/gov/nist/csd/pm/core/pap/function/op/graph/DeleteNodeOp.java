@@ -1,18 +1,24 @@
 package gov.nist.csd.pm.core.pap.function.op.graph;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT_ATTRIBUTE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT_ATTRIBUTE_FROM;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT_FROM;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_POLICY_CLASS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER_ATTRIBUTE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER_ATTRIBUTE_FROM;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER_FROM;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
 
 public class DeleteNodeOp extends AdminOperation<Void> {
 

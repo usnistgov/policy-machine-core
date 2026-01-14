@@ -1,23 +1,22 @@
 package gov.nist.csd.pm.core.pap.pml;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class FunctionTest {
 

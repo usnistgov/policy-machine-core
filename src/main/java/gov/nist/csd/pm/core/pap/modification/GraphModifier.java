@@ -1,22 +1,39 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import gov.nist.csd.pm.core.common.exception.*;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.O;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
+
+import gov.nist.csd.pm.core.common.exception.AssignmentCausesLoopException;
+import gov.nist.csd.pm.core.common.exception.CannotDeleteAdminPolicyConfigException;
+import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
+import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.NodeHasAscendantsException;
+import gov.nist.csd.pm.core.common.exception.NodeIdExistsException;
+import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
+import gov.nist.csd.pm.core.common.exception.NodeReferencedInObligationException;
+import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Assignment;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
+import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
-
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.Collection;
@@ -24,10 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
 
 public class GraphModifier extends Modifier implements GraphModification {
 

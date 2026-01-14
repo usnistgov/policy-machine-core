@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

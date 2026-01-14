@@ -1,5 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -7,11 +12,6 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CreatePolicyClassStatementTest {
 

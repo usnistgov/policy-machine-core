@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.common.graph.relationship;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-
 import java.util.Arrays;
 import java.util.Collection;
 

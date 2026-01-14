@@ -5,11 +5,10 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ListTokenSource;
-
 import java.util.List;
 import java.util.Objects;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ListTokenSource;
 
 public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLFunctionSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
 

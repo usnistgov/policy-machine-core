@@ -1,24 +1,23 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collection;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 

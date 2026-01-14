@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -13,14 +17,8 @@ import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpres
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 class ExpressionTest {
 

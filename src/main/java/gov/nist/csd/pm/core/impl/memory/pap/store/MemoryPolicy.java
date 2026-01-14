@@ -2,18 +2,20 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MemoryPolicy {
 

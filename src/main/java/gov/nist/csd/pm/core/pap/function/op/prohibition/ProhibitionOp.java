@@ -1,19 +1,18 @@
 package gov.nist.csd.pm.core.pap.function.op.prohibition;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ContainerConditionType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ProhibitionSubjectArgType;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-
 import java.util.Collection;
 import java.util.List;
 

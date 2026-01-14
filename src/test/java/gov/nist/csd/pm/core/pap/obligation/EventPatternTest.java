@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.core.pap.obligation;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -16,12 +20,9 @@ import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.util.TestPAP;
 import it.unimi.dsi.fastutil.longs.LongList;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class EventPatternTest {
 

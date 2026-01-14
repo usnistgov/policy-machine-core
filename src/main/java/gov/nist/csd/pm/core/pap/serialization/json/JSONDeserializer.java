@@ -1,5 +1,11 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.O;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -9,11 +15,12 @@ import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
-
 import gov.nist.csd.pm.core.pap.serialization.json.JSONProhibition.JSONSubject;
-import java.util.*;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JSONDeserializer implements PolicyDeserializer {
 

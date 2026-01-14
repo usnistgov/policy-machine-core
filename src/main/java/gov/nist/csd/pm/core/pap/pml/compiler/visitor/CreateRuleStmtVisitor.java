@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
-
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
@@ -18,11 +17,17 @@ import gov.nist.csd.pm.core.pap.pml.pattern.arg.LogicalArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.NegateArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ParenArgPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.*;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.LogicalSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.NegateSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.ParenSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.ProcessSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateRuleStatement;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

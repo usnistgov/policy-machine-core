@@ -7,10 +7,8 @@ import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class OperationsQuerier extends Querier implements OperationsQuery {

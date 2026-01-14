@@ -1,18 +1,21 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class UserEvaluator {
 

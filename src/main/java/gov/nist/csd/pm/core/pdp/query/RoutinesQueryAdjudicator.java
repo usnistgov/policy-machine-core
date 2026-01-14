@@ -1,14 +1,11 @@
 package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.query.RoutinesQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-
 import java.util.Collection;
 
 /**

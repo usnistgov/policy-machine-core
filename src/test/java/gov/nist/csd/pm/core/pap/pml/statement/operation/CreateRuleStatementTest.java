@@ -1,17 +1,16 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.AnyArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class CreateRuleStatementTest {
 

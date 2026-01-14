@@ -1,12 +1,15 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -14,15 +17,10 @@ import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ObligationsModificationAdjudicatorTest {
 

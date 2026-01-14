@@ -1,16 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.statement;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class VariableAssignmentStatementTest {
 

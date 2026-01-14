@@ -4,7 +4,6 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import java.util.List;
 
 public class NodeNameListFormalParameter extends NodeFormalParameter<List<String>>{

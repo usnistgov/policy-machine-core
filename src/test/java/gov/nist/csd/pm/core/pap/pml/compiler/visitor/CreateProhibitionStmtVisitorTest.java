@@ -1,5 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -11,15 +17,8 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateProhibitionStatement;
-
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CreateProhibitionStmtVisitorTest {
 

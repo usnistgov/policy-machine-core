@@ -3,8 +3,6 @@ package gov.nist.csd.pm.core.pap.serialization.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import java.util.List;
 
 public class JSONPolicy {

@@ -1,5 +1,14 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -25,16 +34,10 @@ import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class GraphModificationAdjudicatorTest {
 

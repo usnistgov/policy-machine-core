@@ -1,16 +1,15 @@
 package gov.nist.csd.pm.core.pap.function.op;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 class PrivilegeCheckerTest {
 

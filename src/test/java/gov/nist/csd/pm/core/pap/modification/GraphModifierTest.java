@@ -1,30 +1,42 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import gov.nist.csd.pm.core.common.exception.*;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.csd.pm.core.common.exception.AssignmentCausesLoopException;
+import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
+import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.NodeHasAscendantsException;
+import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
+import gov.nist.csd.pm.core.common.exception.NodeReferencedInObligationException;
+import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssociationException;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
+import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class GraphModifierTest extends PAPTestInitializer {
 

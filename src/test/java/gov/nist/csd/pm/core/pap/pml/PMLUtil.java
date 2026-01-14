@@ -2,9 +2,7 @@ package gov.nist.csd.pm.core.pap.pml;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
-
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;

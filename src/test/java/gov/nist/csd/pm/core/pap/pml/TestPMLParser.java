@@ -2,8 +2,6 @@ package gov.nist.csd.pm.core.pap.pml;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PmlContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StatementContext;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;

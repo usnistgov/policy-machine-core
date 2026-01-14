@@ -1,17 +1,14 @@
 package gov.nist.csd.pm.core.pap.function.op.operation;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_ADMIN_OPERATION;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-
 import java.util.List;
-import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_ADMIN_OPERATION;
 
 public class DeleteAdminOperationOp extends AdminOperation<Void> {
 

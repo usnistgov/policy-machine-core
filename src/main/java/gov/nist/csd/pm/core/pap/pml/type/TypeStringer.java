@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.type;
 
 import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.BooleanType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.LongType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.function.arg.type.StringType;
+import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 
 public class TypeStringer {

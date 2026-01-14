@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -11,10 +15,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CreateNonPCStmtVisitorTest {
 

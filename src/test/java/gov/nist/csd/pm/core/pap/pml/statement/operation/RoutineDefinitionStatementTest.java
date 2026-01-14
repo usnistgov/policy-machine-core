@@ -1,14 +1,13 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RoutineDefinitionStatementTest {
 

@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.function;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;

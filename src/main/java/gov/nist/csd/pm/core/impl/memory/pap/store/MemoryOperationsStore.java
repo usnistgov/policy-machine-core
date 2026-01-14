@@ -5,10 +5,8 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
-
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 

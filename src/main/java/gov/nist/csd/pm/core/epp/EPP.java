@@ -4,13 +4,12 @@ package gov.nist.csd.pm.core.epp;
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
-
 import java.util.Collection;
 import java.util.List;
 

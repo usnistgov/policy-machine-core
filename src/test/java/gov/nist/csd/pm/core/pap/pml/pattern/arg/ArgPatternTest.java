@@ -1,18 +1,20 @@
 package gov.nist.csd.pm.core.pap.pml.pattern.arg;
 
+import static gov.nist.csd.pm.core.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateRuleStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class ArgPatternTest {
 

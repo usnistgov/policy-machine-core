@@ -1,30 +1,28 @@
 package gov.nist.csd.pm.core.pap.pml.expression.reference;
 
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class ReferenceByBracketIndexTest {
 

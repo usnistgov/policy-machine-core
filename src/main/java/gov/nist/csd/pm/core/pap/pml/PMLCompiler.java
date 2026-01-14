@@ -9,15 +9,13 @@ import gov.nist.csd.pm.core.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
-
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
+import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-
-import java.util.List;
 
 public class PMLCompiler {
 

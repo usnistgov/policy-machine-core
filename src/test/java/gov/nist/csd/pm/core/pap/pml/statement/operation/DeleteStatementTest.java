@@ -1,15 +1,22 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
@@ -17,14 +24,9 @@ import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.List;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class DeleteStatementTest {
 

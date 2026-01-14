@@ -1,15 +1,17 @@
 package gov.nist.csd.pm.core.pap.obligation;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class EventPattern implements Serializable {
 

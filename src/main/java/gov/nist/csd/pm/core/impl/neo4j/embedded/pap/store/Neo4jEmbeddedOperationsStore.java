@@ -1,21 +1,24 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ADMIN_OPERATION_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_ARS_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_OPERATION_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deserialize;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
 
 public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 

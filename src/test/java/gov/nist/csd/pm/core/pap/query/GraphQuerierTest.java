@@ -1,5 +1,15 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -9,18 +19,12 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class GraphQuerierTest extends PAPTestInitializer {
 

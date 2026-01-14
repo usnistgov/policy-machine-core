@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.tx.Transactional;
-
 import java.util.Objects;
 
 public class MemoryTx implements Transactional {

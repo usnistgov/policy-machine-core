@@ -1,20 +1,21 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.core.pap.pml.scope.*;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
-
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
+import gov.nist.csd.pm.core.pap.pml.scope.UnknownVariableInScopeException;
+import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 class VarStmtVisitorTest {
 

@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
-
 import java.util.Collection;
 
 /**

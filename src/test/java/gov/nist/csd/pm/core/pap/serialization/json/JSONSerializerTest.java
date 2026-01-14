@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.google.gson.Gson;

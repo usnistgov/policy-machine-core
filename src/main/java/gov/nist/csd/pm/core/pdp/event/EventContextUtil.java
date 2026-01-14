@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 public class EventContextUtil {

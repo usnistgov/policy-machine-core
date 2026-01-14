@@ -13,8 +13,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ShortDeclarationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableDeclarationStatement;
-
-
 import java.util.ArrayList;
 import java.util.List;
 

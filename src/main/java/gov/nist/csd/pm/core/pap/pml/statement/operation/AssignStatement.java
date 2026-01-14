@@ -6,11 +6,9 @@ import static gov.nist.csd.pm.core.pap.function.op.graph.AssignOp.ASSIGN_DESCEND
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
 import java.util.List;
 
 public class MemoryPolicyStore implements PolicyStore {

@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pap.id;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-
 import java.security.SecureRandom;
 
 public class RandomIdGenerator implements IdGenerator {

@@ -1,15 +1,18 @@
 package gov.nist.csd.pm.core.pap;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
+import gov.nist.csd.pm.core.pap.function.PluginRegistry;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
@@ -26,11 +29,10 @@ import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public abstract class PAP implements FunctionExecutor, Transactional {
 

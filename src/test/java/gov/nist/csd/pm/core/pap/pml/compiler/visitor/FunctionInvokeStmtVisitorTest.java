@@ -1,5 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
@@ -12,15 +17,8 @@ import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
-
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class FunctionInvokeStmtVisitorTest {
 

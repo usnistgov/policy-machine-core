@@ -1,23 +1,21 @@
 package gov.nist.csd.pm.core.pap.pml.expression.literal;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
-import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 class MapLiteralTest {
 

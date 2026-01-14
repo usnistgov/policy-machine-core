@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.statement;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
@@ -9,12 +12,8 @@ import gov.nist.csd.pm.core.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class IfStatementTest {
 

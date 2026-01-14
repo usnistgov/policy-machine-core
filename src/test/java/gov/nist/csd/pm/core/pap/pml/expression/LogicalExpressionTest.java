@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -9,13 +12,9 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LogicalExpressionTest {
 

@@ -1,8 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.compiler;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import java.util.Objects;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class Position {
 

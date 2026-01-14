@@ -10,9 +10,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-
 import gov.nist.csd.pm.core.pap.function.op.Operation;
-
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
@@ -20,7 +18,6 @@ import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

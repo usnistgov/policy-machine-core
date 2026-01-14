@@ -8,8 +8,6 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
-
-
 import java.util.List;
 
 public class GetNodeType extends PMLBasicFunction {

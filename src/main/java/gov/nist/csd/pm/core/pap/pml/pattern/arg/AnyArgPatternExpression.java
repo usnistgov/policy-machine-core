@@ -4,9 +4,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
 
-import java.util.Collection;
-import java.util.List;
-
 public class AnyArgPatternExpression extends ArgPatternExpression {
 
     @Override

@@ -1,5 +1,13 @@
 package gov.nist.csd.pm.core.pap.pml;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
@@ -7,13 +15,8 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collection;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class ExecutionTest {
 

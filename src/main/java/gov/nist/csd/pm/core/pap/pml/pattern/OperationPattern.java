@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.pml.pattern;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-
 import java.util.Objects;
 
 public class OperationPattern extends Pattern<String> {

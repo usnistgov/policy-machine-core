@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;

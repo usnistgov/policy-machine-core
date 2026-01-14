@@ -1,5 +1,13 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -10,16 +18,23 @@ import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.explain.*;
+import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
+import gov.nist.csd.pm.core.pap.query.model.explain.ExplainAssociation;
+import gov.nist.csd.pm.core.pap.query.model.explain.ExplainNode;
+import gov.nist.csd.pm.core.pap.query.model.explain.Path;
+import gov.nist.csd.pm.core.pap.query.model.explain.PolicyClassExplain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import it.unimi.dsi.fastutil.longs.LongList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class AccessQuerierTest extends PAPTestInitializer {
 

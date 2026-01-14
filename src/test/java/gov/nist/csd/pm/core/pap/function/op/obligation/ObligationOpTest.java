@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.core.pap.function.op.obligation;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION_WITH_ANY_PATTERN;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
@@ -15,10 +19,6 @@ import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION_WITH_ANY_PATTERN;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ObligationOpTest {
 

@@ -1,13 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.expression.reference;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.common.exception.PMException;
-
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
 
 public class BracketIndexExpression<T> extends Expression<T> {
     private final Expression<?> baseExpr;

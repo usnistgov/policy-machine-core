@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.pap.pml.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
@@ -13,7 +13,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;

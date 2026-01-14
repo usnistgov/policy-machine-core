@@ -3,9 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
-
 import java.util.Objects;
 
 public class NegateSubjectPatternExpression extends SubjectPatternExpression {

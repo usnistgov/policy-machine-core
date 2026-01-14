@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-
 import java.util.Objects;
 
 public class DissociateStatement extends OperationStatement {

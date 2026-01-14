@@ -1,11 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.statement;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
@@ -14,17 +17,14 @@ import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpres
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.*;
-
+import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.CheckStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class FunctionDefinitionStatementTest {
 

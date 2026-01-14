@@ -1,19 +1,21 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OBLIGATION_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deserialize;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
 
 public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 

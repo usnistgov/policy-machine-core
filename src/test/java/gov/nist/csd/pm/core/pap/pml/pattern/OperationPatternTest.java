@@ -1,12 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.pattern;
 
+import static gov.nist.csd.pm.core.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateRuleStatement;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
-import static org.junit.jupiter.api.Assertions.*;
 
 class OperationPatternTest {
 

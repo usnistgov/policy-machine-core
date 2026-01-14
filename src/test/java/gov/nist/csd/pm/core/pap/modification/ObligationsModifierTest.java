@@ -1,14 +1,19 @@
 package gov.nist.csd.pm.core.pap.modification;
 
+import static gov.nist.csd.pm.core.util.SamplePolicy.loadSamplePolicyFromPML;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.arg.InArgPatternExpression;
@@ -18,15 +23,11 @@ import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.util.SamplePolicy.loadSamplePolicyFromPML;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class ObligationsModifierTest extends PAPTestInitializer {
 

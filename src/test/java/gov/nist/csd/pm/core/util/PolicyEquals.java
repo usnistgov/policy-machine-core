@@ -1,19 +1,18 @@
 package gov.nist.csd.pm.core.util;
 
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-
 import java.util.Collection;
 import java.util.HashSet;
-
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PolicyEquals {
 

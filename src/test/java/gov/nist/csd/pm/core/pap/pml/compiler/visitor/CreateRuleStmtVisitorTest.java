@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
@@ -13,13 +17,10 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateRuleStatement;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class CreateRuleStmtVisitorTest {
 

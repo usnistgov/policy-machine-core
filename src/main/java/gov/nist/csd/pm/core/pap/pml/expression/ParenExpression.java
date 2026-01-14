@@ -4,7 +4,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-
 import java.util.Objects;
 
 public class ParenExpression<T> extends Expression<T> {

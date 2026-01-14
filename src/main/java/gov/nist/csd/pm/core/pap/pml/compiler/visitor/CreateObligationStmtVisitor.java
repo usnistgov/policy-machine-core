@@ -7,8 +7,6 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateRuleStatement;
-
-
 import java.util.ArrayList;
 import java.util.List;
 

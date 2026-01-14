@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-
 import java.util.List;
 
 /**

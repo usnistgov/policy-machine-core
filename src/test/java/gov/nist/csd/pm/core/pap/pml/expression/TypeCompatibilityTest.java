@@ -1,24 +1,38 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.type.*;
-import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
+import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.function.arg.type.Type;
+import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.*;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class TypeCompatibilityTest {
 

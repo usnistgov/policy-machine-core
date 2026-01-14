@@ -5,11 +5,11 @@ import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.AUTHO
 import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.obligation.UpdateObligationOp;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.ArrayList;

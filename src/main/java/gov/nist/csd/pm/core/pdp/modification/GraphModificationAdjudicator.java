@@ -28,7 +28,6 @@ import gov.nist.csd.pm.core.pap.function.op.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;

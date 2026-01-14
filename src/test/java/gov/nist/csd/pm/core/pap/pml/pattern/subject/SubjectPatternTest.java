@@ -1,5 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.pattern.subject;
 
+import static gov.nist.csd.pm.core.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -9,13 +14,9 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateRuleStatement;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.pml.pattern.PatternTestUtil.compileTestCreateRuleStatement;
-import static org.junit.jupiter.api.Assertions.*;
 
 class SubjectPatternTest {
 

@@ -1,15 +1,13 @@
 package gov.nist.csd.pm.core.pap.function.op.graph;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
 
 public class CreateObjectOp extends AdminOperation<Long> {
     public static final NodeIdListFormalParameter CREATE_O_DESCENDANTS_PARAM =

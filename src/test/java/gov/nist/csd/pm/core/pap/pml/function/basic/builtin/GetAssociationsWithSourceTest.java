@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 import static gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction.NODE_NAME_PARAM;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;

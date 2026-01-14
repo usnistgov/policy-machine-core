@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;

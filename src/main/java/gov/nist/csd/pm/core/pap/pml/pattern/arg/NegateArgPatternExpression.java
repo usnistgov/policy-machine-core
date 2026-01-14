@@ -2,9 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.pattern.arg;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.ReferencedNodes;
-
 import java.util.Objects;
 
 public class NegateArgPatternExpression extends ArgPatternExpression {

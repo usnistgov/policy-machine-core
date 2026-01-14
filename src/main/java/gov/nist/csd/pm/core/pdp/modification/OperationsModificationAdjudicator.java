@@ -6,11 +6,15 @@ import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperatio
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
-import gov.nist.csd.pm.core.pap.function.op.operation.*;
-import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.DeleteResourceOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;

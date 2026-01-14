@@ -1,14 +1,21 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WILDCARD_MAP;
+
 import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AccessRightResolver {
 

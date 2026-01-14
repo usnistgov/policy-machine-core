@@ -1,8 +1,6 @@
 package gov.nist.csd.pm.core.pap.obligation;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

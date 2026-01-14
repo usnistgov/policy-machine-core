@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.function.arg;
 
-import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import java.io.Serializable;
 import java.util.Objects;

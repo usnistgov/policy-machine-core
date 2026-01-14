@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.store.ProhibitionsStore;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;

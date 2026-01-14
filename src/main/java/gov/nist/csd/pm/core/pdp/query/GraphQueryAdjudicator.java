@@ -1,5 +1,10 @@
 package gov.nist.csd.pm.core.pdp.query;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_ASSIGNMENTS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_ASSOCIATIONS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_POLICY_CLASSES;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_SUBGRAPH;
+
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.PMRuntimeException;
@@ -10,18 +15,12 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
-import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-
+import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_ASSIGNMENTS;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_ASSOCIATIONS;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_POLICY_CLASSES;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_SUBGRAPH;
 
 public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
