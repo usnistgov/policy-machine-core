@@ -37,11 +37,11 @@ class SetResourceAccessRightsStatementTest {
         );
 
         assertEquals(
-                "set resource operations [\"a\", \"b\", \"c\", \"d\"]",
+                "set resource access rights [\"a\", \"b\", \"c\", \"d\"]",
                 stmt.toFormattedString(0)
         );
         assertEquals(
-                "    set resource operations [\"a\", \"b\", \"c\", \"d\"]",
+                "    set resource access rights [\"a\", \"b\", \"c\", \"d\"]",
                 stmt.toFormattedString(1)
         );
     }

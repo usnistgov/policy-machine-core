@@ -3,7 +3,9 @@ package gov.nist.csd.pm.core.pap.function.arg;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
+
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,21 +56,21 @@ public class Args {
 		return formalParameter.toExpectedType(map.get(formalParameter));
 	}
 
-	public List<Long> getIdList(NodeListFormalParameter formalParameter, PAP pap) throws PMException {
-		List<NodeArg<?>> nodeArgList = formalParameter.toExpectedType(map.get(formalParameter));
+	public List<Long> getIdList(NodeNameListFormalParameter formalParameter, PAP pap) throws PMException {
+		List<String> names = formalParameter.toExpectedType(map.get(formalParameter));
 		List<Long> ids = new ArrayList<>();
-		for (NodeArg<?> nodeArg : nodeArgList) {
-			ids.add(nodeArg.getId(pap));
+		for (String name : names) {
+			ids.add(pap.query().graph().getNodeId(name));
 		}
 
 		return ids;
 	}
 
-	public List<String> getNameList(NodeListFormalParameter formalParameter, PAP pap) throws PMException {
-		List<NodeArg<?>> nodeArgList = formalParameter.toExpectedType(map.get(formalParameter));
+	public List<String> getNameList(NodeIdListFormalParameter formalParameter, PAP pap) throws PMException {
+		List<Long> ids = formalParameter.toExpectedType(map.get(formalParameter));
 		List<String> names = new ArrayList<>();
-		for (NodeArg<?> nodeArg : nodeArgList) {
-			names.add(nodeArg.getName(pap));
+		for (long id : ids) {
+			names.add(pap.query().graph().getNodeById(id).getName());
 		}
 
 		return names;

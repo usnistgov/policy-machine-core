@@ -146,7 +146,7 @@ setResourceAccessRightsStatement:
 deleteStatement:
     DELETE (IF_EXISTS)? deleteType expression ;
 deleteType:
-    NODE_TYPE #DeleteNode
+    NODE #DeleteNode
     | ADMIN_OP #DeleteAdminOp
     | RESOURCE_OP #DeleteResourceOp
     | OBLIGATION #DeleteObligation
@@ -173,7 +173,9 @@ routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=v
 basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
-operationFormalParam: variableType ID reqCap=stringArrayLit?;
+operationFormalParam: nodeArgAnnotation? variableType ID reqCap=stringArrayLit?;
+
+nodeArgAnnotation: NODE_ARG (OPEN_PAREN (stringLit (COMMA stringLit)*)? CLOSE_PAREN)? ;
 
 adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
 adminOpStatement:
@@ -209,7 +211,7 @@ elseStatement:
 variableType:
     STRING_TYPE #StringType
     | BOOL_TYPE #BooleanType
-    | NODE_TYPE #NodeType
+    | INT64_TYPE #Int64Type
     | arrayType #ArrayVarType
     | mapType #MapVarType
     | ANY #AnyType ;
@@ -278,8 +280,8 @@ idIndex:
     | DENY
     | PROHIBITION
     | OBLIGATION
-    | NODE_TYPE
     | USER
+    | NODE
     | PC
     | OA
     | UA

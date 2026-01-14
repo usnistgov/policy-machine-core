@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionDefinitionStatementTest {
 
-    private static final NodeFormalParameter a = new NodeFormalParameter("a");
+    private static final NodeNameFormalParameter a = new NodeNameFormalParameter("a");
     private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
     @Test
@@ -39,7 +40,7 @@ class FunctionDefinitionStatementTest {
             new PMLStatementBlock(
                 new CheckStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),
-                    new VariableReferenceExpression<>("a", ListType.of(STRING_TYPE))
+                    ArrayLiteralExpression.of(List.of(new VariableReferenceExpression<>("a", STRING_TYPE)), STRING_TYPE)
                 ),
                 new CheckStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar2")), STRING_TYPE),
@@ -50,19 +51,17 @@ class FunctionDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             operation op1(node string a, string b) string {
-                                 check "ar1" on a
-                                 check "ar2" on ["node"]
-                             } {
+                             adminop op1(@node string a, string b) string {
+                                 check ["ar1"] on [a]
+                                 check ["ar2"] on ["node"]
                                  return "test"
                              }""",
             stmt.toFormattedString(0));
 
         assertEquals("""
-                                 operation op1(node string a, string b) string {
-                                     check "ar1" on a
-                                     check "ar2" on ["node"]
-                                 } {
+                                 adminop op1(@node string a, string b) string {
+                                     check ["ar1"] on [a]
+                                     check ["ar2"] on ["node"]
                                      return "test"
                                  }
                              """,
@@ -117,10 +116,9 @@ class FunctionDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             operation func1(node string a, string b) {
-                                 check "ar1" on [a]
-                                 check "ar2" on ["node"]
-                             } {
+                             adminop func1(@node string a, string b) {
+                                 check ["ar1"] on [a]
+                                 check ["ar2"] on ["node"]
                                  return
                              }""",
             stmt.toFormattedString(0));
@@ -134,7 +132,7 @@ class FunctionDefinitionStatementTest {
                 var b = "test2"
                 func1(a, b)
                 
-                operation func1(string a, string b) {
+                adminop func1(string a, string b) {
                     create PC a
                     create PC b
                 }
@@ -149,11 +147,11 @@ class FunctionDefinitionStatementTest {
     @Test
     void testInvokeFromDefinition() throws PMException {
         String pml = """
-                operation f1(string a) {
+                adminop f1(string a) {
                     create PC a
                 }
                 
-                operation f2() {
+                adminop f2() {
                     a := "test"
                     f1(a)
                 }
@@ -171,7 +169,7 @@ class FunctionDefinitionStatementTest {
         String pml = """
                 x := "x"
                 
-                operation func2() {
+                adminop func2() {
                     create PC x
                 }
                 """;

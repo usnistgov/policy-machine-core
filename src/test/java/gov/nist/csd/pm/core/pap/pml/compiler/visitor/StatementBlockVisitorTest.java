@@ -29,7 +29,7 @@ class StatementBlockVisitorTest {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
                 """
                 {
-                    operation f1() {}
+                    adminop f1() {}
                 }
                 """
         );

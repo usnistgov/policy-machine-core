@@ -158,7 +158,7 @@ class PDPTest {
     void testAdjudicateResourceOperation() throws PMException {
         PAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -195,9 +195,8 @@ class PDPTest {
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 
-                operation op1() string {
-                    check "assign_to" on ["oa2"]
-                } {
+                adminop op1() string {
+                    check ["assign_to"] on ["oa2"]
                     create pc "test"
                     return "test"
                 }
@@ -225,7 +224,7 @@ class PDPTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
 
                 """);
         PDP pdp = new PDP(pap);
@@ -352,7 +351,7 @@ class PDPTest {
                 
                 create u "u1" in ["ua1"]
                 
-                operation op1() {
+                adminop op1() {
                     create pc "pc2"
                     foreach x in ["ua2", "ua3"] {
                         create ua x in ["pc2"]
@@ -390,7 +389,7 @@ class PDPTest {
                 
                 create u "u1" in ["ua1"]
                 
-                operation op1(string name) {
+                adminop op1(string name) {
                     create pc name
                 }
                 

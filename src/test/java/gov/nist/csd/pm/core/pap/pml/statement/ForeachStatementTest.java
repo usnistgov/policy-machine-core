@@ -145,7 +145,7 @@ class ForeachStatementTest {
         String pml = """
                 f1()
                 
-                operation f1() {
+                adminop f1() {
                     foreach x in ["1", "2", "3"] {
                         if x == "2" {
                             return
@@ -164,7 +164,7 @@ class ForeachStatementTest {
         pml = """
                 f1()
                 
-                operation f1() {
+                adminop f1() {
                     foreach x, y in {"1": "1", "2": "2"} {
                         if x == "2" {
                             return

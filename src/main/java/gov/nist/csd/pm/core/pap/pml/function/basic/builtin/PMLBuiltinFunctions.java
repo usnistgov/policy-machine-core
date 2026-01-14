@@ -26,7 +26,7 @@ public class PMLBuiltinFunctions {
     private static final Append append = new Append();
     private static final AppendAll appendAll = new AppendAll();
     private static final Name name = new Name();
-    private static final Node node = new Node();
+    private static final Id node = new Id();
 
     private static final Map<String, PMLBasicFunction> BUILTIN_FUNCTIONS = new HashMap<>();
 

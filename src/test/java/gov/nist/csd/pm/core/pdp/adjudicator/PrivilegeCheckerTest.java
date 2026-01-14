@@ -25,7 +25,7 @@ class PrivilegeCheckerTest {
         pap.executePML(
                 new TestUserContext("u1"),
                 """
-                        set resource operations ["read", "write"]
+                        set resource access rights ["read", "write"]
                         
                         create PC "pc1"
                             create ua "ua1" in ["pc1"]

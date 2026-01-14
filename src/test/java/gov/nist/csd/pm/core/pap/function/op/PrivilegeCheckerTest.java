@@ -17,7 +17,7 @@ class PrivilegeCheckerTest {
 	@Test
 	void testEmptyToCheck() throws PMException {
 		String pml = """
-				set resource operations ["read"]
+				set resource access rights ["read"]
 				
 				create pc "pc1"
 				create ua "ua1" in ["pc1"]

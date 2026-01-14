@@ -30,7 +30,7 @@ class CachedTargetEvaluatorTest {
     @BeforeEach
     void setUp() throws PMException {
         String pml = """
-            set resource operations ["read", "write"]
+            set resource access rights ["read", "write"]
             
             create pc "pc1"
             create pc "pc2"

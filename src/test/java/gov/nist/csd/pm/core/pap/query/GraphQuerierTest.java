@@ -241,7 +241,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     void testGetAttributeDescendants() throws PMException {
         String pml =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
@@ -267,7 +267,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testGetPolicyClassDescendants() throws PMException {
         String pml = """
-                      set resource operations ["read", "write"]
+                      set resource access rights ["read", "write"]
                       create pc "pc1"
                       create oa "oa1" in ["pc1"]
                       create oa "oa2" in ["oa1"]
@@ -293,7 +293,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testIsAscendant() throws PMException {
         String pml = """
-                      set resource operations ["read", "write"]
+                      set resource access rights ["read", "write"]
                       create pc "pc1"
                       create oa "oa1" in ["pc1"]
                       create oa "oa2" in ["oa1"]
@@ -322,7 +322,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testIsDescendant() throws PMException {
         String pml = """
-                      set resource operations ["read", "write"]
+                      set resource access rights ["read", "write"]
                       create pc "pc1"
                       create oa "oa1" in ["pc1"]
                       create oa "oa2" in ["oa1"]
@@ -352,7 +352,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     void testGetAscendantSubgraph() throws PMException {
         String pml =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
@@ -392,7 +392,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     void testGetDescendantSubgraph() throws PMException {
         String pml =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]

@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.CheckStatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionDefinitionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionSignatureVisitor;
@@ -91,17 +92,26 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
     @Override
     public PMLStatement<?> visitAdminOpDefinitionStatement(PMLParser.AdminOpDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitAdminOpDefinitionStatement(ctx);
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true))
+            .visitAdminOpDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement<?> visitResourceOpDefinitionStatement(ResourceOpDefinitionStatementContext ctx) {
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true))
+            .visitResourceOpDefinitionStatement(ctx);
     }
 
     @Override
     public PMLStatement<?> visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitRoutineDefinitionStatement(ctx);
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true))
+            .visitRoutineDefinitionStatement(ctx);
     }
 
     @Override
     public PMLStatement<?> visitBasicFunctionDefinitionStatement(BasicFunctionDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitBasicFunctionDefinitionStatement(ctx);
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true))
+            .visitBasicFunctionDefinitionStatement(ctx);
     }
 
     @Override

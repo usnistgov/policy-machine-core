@@ -80,7 +80,10 @@ public class TestPMLParser {
             return (T) parser.arrayLit();
         } else if (ruleClass == PMLParser.MapLiteralContext.class) {
             return (T) parser.mapLit();
+        } else if (ruleClass == PMLParser.OperationFormalParamListContext.class) {
+            return (T) parser.operationFormalParamList();
         } else {
+
             throw new IllegalArgumentException("Unsupported parser rule class: " + ruleClass.getName());
         }
     }

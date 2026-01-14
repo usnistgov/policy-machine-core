@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.function.operation;
 
+import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
@@ -7,6 +8,7 @@ import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PMLOperationSignature extends PMLFunctionSignature {
 
@@ -34,9 +36,18 @@ public class PMLOperationSignature extends PMLFunctionSignature {
                 pml += ", ";
             }
 
-            pml += ((formalParameter instanceof NodeFormalParameter) ? "node " : "") +
-                TypeStringer.toPMLString(formalParameter.getType()) + " " +
-                formalParameter.getName();
+            String paramStr = "%s%s %s";
+            String annotationStr = "";
+            if (formalParameter instanceof NodeFormalParameter<?> nodeFormalParameter) {
+                AccessRightSet reqCaps = nodeFormalParameter.getReqCap().getReqCaps();
+
+                annotationStr = "@node" +
+                    (!reqCaps.isEmpty() ?
+                        "(" + reqCaps.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(", ")) + ") "
+                        : " ");
+            }
+
+            pml += String.format(paramStr, annotationStr, TypeStringer.toPMLString(formalParameter.getType()), formalParameter.getName());
         }
         return pml;
     }

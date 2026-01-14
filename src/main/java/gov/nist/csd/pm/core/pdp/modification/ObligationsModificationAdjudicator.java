@@ -6,7 +6,6 @@ import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
@@ -30,7 +29,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
     public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
         CreateObligationOp op = new CreateObligationOp();
         Args args = new Args()
-            .put(AUTHOR_PARAM, new IdNodeArg(authorId))
+            .put(AUTHOR_PARAM, authorId)
             .put(NAME_PARAM, name)
             .put(RULES_PARAM, rules);
 
@@ -44,7 +43,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
 
         DeleteObligationOp op = new DeleteObligationOp();
         Args args = new Args()
-            .put(AUTHOR_PARAM, new IdNodeArg(obligation.getAuthorId()))
+            .put(AUTHOR_PARAM, obligation.getAuthorId())
             .put(NAME_PARAM, obligation.getName())
             .put(RULES_PARAM, obligation.getRules());
 

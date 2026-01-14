@@ -23,7 +23,7 @@ public class ExecutionTest {
 
         String input =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create PC "pc1"
                 
@@ -335,7 +335,7 @@ public class ExecutionTest {
     @Test
     void testFunction() throws PMException {
         String input = """
-                operation testFunc(any x) {
+                adminop testFunc(any x) {
                     create PC x
                 }
                 
@@ -348,7 +348,7 @@ public class ExecutionTest {
         assertTrue(pap.query().graph().nodeExists("pc1"));
 
         String input1 = """
-                operation testFunc(any x) {
+                adminop testFunc(any x) {
                     create ua "ua1" in x
                 }
                 
@@ -363,7 +363,7 @@ public class ExecutionTest {
         PAP pap2 = new TestPAP();
         String input2 = """
                 x := "hello"
-                operation testFunc() {
+                adminop testFunc() {
                     create PC x + " world"
                 }
                 
@@ -394,7 +394,7 @@ public class ExecutionTest {
     @Test
     void testArrayWithLiteral() throws PMException {
         String input = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 """;
          PAP pap = new TestPAP();
         
@@ -449,7 +449,7 @@ public class ExecutionTest {
     @Test
     void testReturnValue() throws PMException {
         String pml = """
-                operation testFunc(string s) string {
+                adminop testFunc(string s) string {
                     return s
                 }
                 
@@ -465,7 +465,7 @@ public class ExecutionTest {
     @Test
     void testOverwriteFunctionArg() throws PMException {
         String pml = """
-                operation testFunc(string s) string {
+                adminop testFunc(string s) string {
                     s = "test2"
                     return s
                 }

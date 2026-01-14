@@ -70,7 +70,7 @@ class IfStmtVisitorTest {
     @Test
     void testReturnVoidInIf() throws PMException {
         String pml = """
-                operation f1() {
+                adminop f1() {
                     if true {
                         return
                     }

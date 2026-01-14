@@ -2,12 +2,17 @@ package gov.nist.csd.pm.core.pap.pml.function.operation;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +37,16 @@ public class PMLResourceOperation extends ResourceOperation implements PMLFuncti
         this.pmlFormalParameters = new ArrayList<>();
         this.signature = new PMLOperationSignature(name, VOID_TYPE, new ArrayList<>(), false);
         this.checks = new PMLStatementBlock();
+    }
+
+    @Override
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        // perform default canExeute to check FormalParamter ReqCaps
+        super.canExecute(pap, userCtx, args);
+
+        // execute any check statements
+        ExecutionContext ctx = getCtx();
+        ctx.executeOperationStatements(checks.getStmts(), args);
     }
 
     public List<FormalParameter<?>> getPmlFormalArgs() {

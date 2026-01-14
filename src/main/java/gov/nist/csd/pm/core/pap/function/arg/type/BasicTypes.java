@@ -7,6 +7,5 @@ public class BasicTypes {
     public static BooleanType BOOLEAN_TYPE = new BooleanType();
     public static AnyType ANY_TYPE = new AnyType();
     public static VoidType VOID_TYPE = new VoidType();
-    public static NodeType NODE_TYPE = new NodeType();
 
 }

@@ -4,6 +4,7 @@ package gov.nist.csd.pm.core.pap.pml.function.operation;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,7 +21,7 @@ class PMLAdminOperationSignatureTest {
                 "op1",
                 ListType.of(STRING_TYPE),
                 List.of(
-                    new NodeFormalParameter("a"),
+                    new NodeNameFormalParameter("a"),
                     new FormalParameter<>("b", STRING_TYPE),
                     new FormalParameter<>("c", STRING_TYPE)
                 ),
@@ -29,7 +30,7 @@ class PMLAdminOperationSignatureTest {
 
         String actual = signature.toFormattedString(0);
         assertEquals(
-                "adminop op1(node string a, string b, string c) []string ",
+                "adminop op1(@node string a, string b, string c) []string ",
                 actual
         );
     }

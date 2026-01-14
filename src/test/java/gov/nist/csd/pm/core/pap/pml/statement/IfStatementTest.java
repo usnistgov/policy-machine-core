@@ -21,7 +21,7 @@ class IfStatementTest {
     @Test
     void testSuccess() throws PMException {
         String pml = """
-                operation func1(string s) {
+                adminop func1(string s) {
                     if s == "a" {
                         create PC s
 

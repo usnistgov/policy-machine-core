@@ -1,35 +1,32 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.function;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.LONG_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
-import gov.nist.csd.pm.core.pap.function.arg.type.NodeType;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
+
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FormalParamContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NodeArgAnnotationContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationFormalParamContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationFormalParamListContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringArrayLitContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringLitContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.VariableTypeContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.type.TypeResolver;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParameter<?>>> {
 
@@ -39,74 +36,81 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
 
     @Override
     public List<FormalParameter<?>> visitOperationFormalParamList(OperationFormalParamListContext ctx) {
-        return parseParamList(
-            ctx.operationFormalParam(),
-            OperationFormalParamContext::ID,
-            OperationFormalParamContext::variableType,
-            true,
-            c -> parseStringArrayLit(c.reqCap)
-        );
-    }
-
-    @Override
-    public List<FormalParameter<?>> visitFormalParamList(PMLParser.FormalParamListContext ctx) {
-        return parseParamList(
-            ctx.formalParam(),
-            FormalParamContext::ID,
-            FormalParamContext::variableType,
-            false,
-            c -> new ArrayList<>()
-        );
-    }
-
-    private <T extends ParserRuleContext> List<FormalParameter<?>> parseParamList(
-        List<T> paramCtxs,
-        Function<T, TerminalNode> ifFunc,
-        Function<T, VariableTypeContext> typeFunc,
-        boolean isOperation,
-        Function<T, List<String>> reqCapsFunc
-    ) {
         List<FormalParameter<?>> params = new ArrayList<>();
         Set<String> paramNames = new HashSet<>();
 
-        for (T paramCtx : paramCtxs) {
-            String name = ifFunc.apply(paramCtx).getText();
+        for (OperationFormalParamContext operationFormalParamContext : ctx.operationFormalParam()) {
+            String name = operationFormalParamContext.ID().getText();
+            validateParamName(paramNames, name, operationFormalParamContext);
 
-            if (!paramNames.add(name)) {
-                throw new PMLCompilationRuntimeException(
-                    paramCtx,
-                    String.format("formal arg '%s' already defined in signature", name)
-                );
-            }
+            Type<?> type = TypeResolver.resolveFromParserCtx(operationFormalParamContext.variableType());
 
-            Type<?> type = TypeResolver.resolveFromParserCtx(typeFunc.apply(paramCtx));
+            boolean isNodeOp = operationFormalParamContext.nodeArgAnnotation() != null;
+            if (isNodeOp) {
+                RequiredCapabilities requiredCapabilities = parseReqCaps(operationFormalParamContext.nodeArgAnnotation());
 
-            if (isOperation) {
-                RequiredCapabilities reqCap = new RequiredCapabilities(reqCapsFunc.apply(paramCtx));
-
-                if (type instanceof NodeType) {
-                    params.add(new NodeFormalParameter(name, reqCap));
-                    continue;
-                } else if (type instanceof ListType<?> listType && listType.getElementType() instanceof NodeType) {
-                    params.add(new NodeListFormalParameter(name, reqCap));
-                    continue;
+                // node params can be one of 4 types: int64, int64[], string, string[]
+                if (type.equals(LONG_TYPE)) {
+                    params.add(new NodeIdFormalParameter(name, requiredCapabilities));
+                } else if (type.equals(ListType.of(LONG_TYPE))) {
+                    params.add(new NodeIdListFormalParameter(name, requiredCapabilities));
+                } else if (type.equals(STRING_TYPE)) {
+                    params.add(new NodeNameFormalParameter(name, requiredCapabilities));
+                } else if (type.equals(ListType.of(STRING_TYPE))) {
+                    params.add(new NodeNameListFormalParameter(name, requiredCapabilities));
+                } else {
+                    throw new PMLCompilationRuntimeException(operationFormalParamContext, "@node annotation cannot be applied to type " + type);
                 }
+            } else {
+                params.add(new FormalParameter<>(name, type));
             }
 
-            params.add(new FormalParameter<>(name, type));
+            paramNames.add(name);
         }
 
         return params;
     }
 
-    private List<String> parseStringArrayLit(StringArrayLitContext ctx) {
-        if (ctx == null) {
+    private RequiredCapabilities parseReqCaps(NodeArgAnnotationContext nodeArgAnnotationContext) {
+        return new RequiredCapabilities(parseStringArrayLit(nodeArgAnnotationContext.stringLit()));
+    }
+
+    @Override
+    public List<FormalParameter<?>> visitFormalParamList(PMLParser.FormalParamListContext ctx) {
+        List<FormalParameter<?>> params = new ArrayList<>();
+        Set<String> paramNames = new HashSet<>();
+        for (int i = 0; i < ctx.formalParam().size(); i++) {
+            PMLParser.FormalParamContext formalArgCtx = ctx.formalParam().get(i);
+            String name = formalArgCtx.ID().getText();
+            validateParamName(paramNames, name, formalArgCtx);
+
+            // get arg type
+            PMLParser.VariableTypeContext varTypeContext = formalArgCtx.variableType();
+            Type<?> type = TypeResolver.resolveFromParserCtx(varTypeContext);
+
+            params.add(new FormalParameter<>(name, type));
+            paramNames.add(name);
+        }
+
+        return params;
+    }
+
+    private void validateParamName(Set<String> paramNames, String name, ParserRuleContext ctx) {
+        if (paramNames.contains(name) || visitorCtx.scope().getConstants().containsKey(name)) {
+            throw new PMLCompilationRuntimeException(
+                ctx,
+                String.format("formal arg '%s' already defined in signature or as a constant", name)
+            );
+        }
+    }
+
+    private List<String> parseStringArrayLit(List<StringLitContext> ctxs) {
+        if (ctxs == null) {
             return new ArrayList<>();
         }
 
-        List<StringLitContext> stringLits = ctx.stringLit();
         List<String> strings = new ArrayList<>();
-        for (StringLitContext stringLitContext : stringLits) {
+        for (StringLitContext stringLitContext : ctxs) {
             strings.add(ExpressionVisitor.removeQuotes(stringLitContext.getText()));
         }
 

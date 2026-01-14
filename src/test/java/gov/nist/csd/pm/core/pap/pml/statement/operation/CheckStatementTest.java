@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.ArrayList;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -55,6 +56,12 @@ class CheckStatementTest {
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), false);
 
+        // check empty checks for any
+        testCheck(ctx, pap, new CheckStatement(
+            ArrayLiteralExpression.of(new ArrayList<>(), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
+        ), false);
+
         ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
@@ -70,6 +77,11 @@ class CheckStatementTest {
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
+
+        testCheck(ctx, pap, new CheckStatement(
+            ArrayLiteralExpression.of(new ArrayList<>(), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
+        ), true);
     }
 
     private void testCheck(ExecutionContext ctx, PAP pap, CheckStatement checkStatement, boolean err) {
@@ -83,13 +95,12 @@ class CheckStatementTest {
     @Test
     void testOperationInCheck() throws PMException {
         String pml = """
-                operation testOp() string {
+                adminop testOp() string {
                     return PM_ADMIN_BASE_OA
                 }
                 
-                operation op1() {
-                    check "assign" on [testOp()]
-                } {
+                adminop op1() {
+                    check ["assign"] on [testOp()]
                     create PC "pc2"
                 }
                 

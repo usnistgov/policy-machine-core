@@ -1,20 +1,19 @@
 package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.NODE_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
 
 public class Name extends PMLBasicFunction {
 
-    public static final FormalParameter<NodeArg<?>> NODE_PARAM =
-        new FormalParameter<>("node", NODE_TYPE);
+    public static final NodeIdFormalParameter NODE_PARAM =
+        new NodeIdFormalParameter("id");
 
     public Name() {
         super(
@@ -26,7 +25,7 @@ public class Name extends PMLBasicFunction {
 
     @Override
     public String execute(PAP pap, Args args) throws PMException {
-        NodeArg<?> nodeArg = args.get(NODE_PARAM);
-        return nodeArg.getName(pap);
+        long id = args.get(NODE_PARAM);
+        return pap.query().graph().getNodeById(id).getName();
     }
 }

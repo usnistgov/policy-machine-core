@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class UnauthorizedException extends PMException {
@@ -12,17 +13,17 @@ public class UnauthorizedException extends PMException {
     private final Explain explain;
 
     public UnauthorizedException(Explain explain, UserContext user, String target, Collection<String> missingAccessRights) {
-        super(userString(user) + " does not have access right " + missingAccessRights + " on " + target);
+        super(userString(user) + " does not have access right " + new ArrayList<>(missingAccessRights) + " on " + target);
         this.explain = explain;
     }
 
     public UnauthorizedException(Explain explain, UserContext user, TargetContext target, Collection<String> missingAccessRights) {
-        super(userString(user) + " does not have access right " + missingAccessRights + " on " + target);
+        super(userString(user) + " does not have access right " + new ArrayList<>(missingAccessRights) + " on " + target);
         this.explain = explain;
     }
 
     public UnauthorizedException(UserContext user, TargetContext target, Collection<String> missingAccessRights) {
-        super(userString(user) + " does not have access right " + missingAccessRights + " on " + target);
+        super(userString(user) + " does not have access right " + new ArrayList<>(missingAccessRights) + " on " + target);
         this.explain = null;
     }
 

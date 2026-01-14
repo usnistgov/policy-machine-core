@@ -34,7 +34,7 @@ public class SetResourceAccessRightsStatement extends OperationStatement {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + "set resource operations " + arsExpr;
+        return indent(indentLevel) + "set resource access rights " + arsExpr;
     }
 
     @Override

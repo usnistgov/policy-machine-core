@@ -3,10 +3,8 @@ package gov.nist.csd.pm.core.pap.function.arg.type;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.LONG_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.NODE_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -14,14 +12,13 @@ import java.util.Map;
 
 public sealed abstract class Type<T> implements Serializable
     permits AnyType, BooleanType, ListType, LongType, MapType, StringType, VoidType, RuleType, RoutineType,
-    AdminOperationType, ProhibitionSubjectArgType, ContainerConditionType, NodeType, ResourceOperationType {
+    AdminOperationType, ProhibitionSubjectArgType, ContainerConditionType, ResourceOperationType {
 
     public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {
             case String s -> STRING_TYPE;
             case Boolean b -> BOOLEAN_TYPE;
             case Long l -> LONG_TYPE;
-            case NodeArg<?> l -> NODE_TYPE;
             case List<?> list -> resolveListType(list);
             case Map<?, ?> map -> resolveMapType(map);
             case null, default -> ANY_TYPE;
@@ -47,12 +44,12 @@ public sealed abstract class Type<T> implements Serializable
             }
 
             Type<?> elementType = resolveTypeOfObject(element);
-            if (!elementType.getClass().equals(firsType.getClass())) {
+            if (!elementType.equals(firsType)) {
                 return ANY_TYPE;
             }
         }
 
-        return firsType;
+        return ListType.of(firsType);
     }
 
     private static MapType<?, ?> resolveMapType(Map<?, ?> map) {
@@ -63,7 +60,7 @@ public sealed abstract class Type<T> implements Serializable
         Type<?> keyType = getMapElementType(map.keySet());
         Type<?> valueType = getMapElementType(map.values());
 
-        return new MapType<>(keyType, valueType);
+        return MapType.of(keyType, valueType);
     }
 
     private static Type<?> getMapElementType(Collection<?> values) {

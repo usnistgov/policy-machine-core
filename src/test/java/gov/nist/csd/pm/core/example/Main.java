@@ -62,7 +62,7 @@ public class Main {
 		Alternatively, create the above policy using PML:
 
 		String pml = """
-		set resource operations ["read", "write"]
+		set resource access rights ["read", "write"]
 
 		create pc "pc1"
 		create oa "oa1" in ["pc1"]

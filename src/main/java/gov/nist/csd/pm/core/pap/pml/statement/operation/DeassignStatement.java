@@ -6,8 +6,7 @@ import static gov.nist.csd.pm.core.pap.function.op.graph.DeassignOp.DEASSIGN_DES
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+
 import gov.nist.csd.pm.core.pap.function.op.graph.DeassignOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
@@ -33,13 +32,13 @@ public class DeassignStatement extends OperationStatement {
         List<String> descs = deassignFrom.execute(ctx, pap);
 
         long ascId = pap.query().graph().getNodeId(asc);
-        List<NodeArg<?>> descIds = new ArrayList<>();
+        List<Long> descIds = new ArrayList<>();
         for (String desc : descs) {
-            descIds.add(new IdNodeArg(pap.query().graph().getNodeId(desc)));
+            descIds.add(pap.query().graph().getNodeId(desc));
         }
 
         return new Args()
-            .put(DEASSIGN_ASCENDANT_PARAM, new IdNodeArg(ascId))
+            .put(DEASSIGN_ASCENDANT_PARAM, ascId)
             .put(DEASSIGN_DESCENDANTS_PARAM, descIds);
     }
 

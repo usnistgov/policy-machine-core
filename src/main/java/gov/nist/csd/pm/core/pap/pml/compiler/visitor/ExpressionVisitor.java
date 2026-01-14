@@ -2,13 +2,10 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.NODE_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.NameNodeArg;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
 import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
 import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
@@ -34,7 +31,6 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.core.pap.pml.expression.NodeArgExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.ParenExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -63,13 +59,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
-
-    public static Expression<String> compileStringExpression(VisitorContext visitorCtx, ExpressionContext ctx) {
-        ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
-        Expression<?> compiledExpression = visitor.visit(ctx);
-
-        return new ExpressionWrapper<>(compiledExpression, STRING_TYPE);
-    }
 
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
                                             ExpressionContext ctx,
@@ -194,13 +183,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             PMLParser.ExpressionContext exprCtx = argExpressions.get(i);
             FormalParameter<?> formalArg = formalArgs.get(i);
 
-            Expression<?> expr;
-            if (formalArg.getType().equals(NODE_TYPE)) {
-                Expression<String> stringExpression = ExpressionVisitor.compileStringExpression(visitorCtx, exprCtx);
-                expr = new NodeArgExpression(stringExpression);
-            } else {
-                expr = ExpressionVisitor.compile(visitorCtx, exprCtx, formalArg.getType());
-            }
+            Expression<?> expr = ExpressionVisitor.compile(visitorCtx, exprCtx, formalArg.getType());
             args.add(expr);
         }
 

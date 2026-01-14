@@ -25,7 +25,7 @@ class PMLBootstrapperTest {
         PDP pdp = new PDP(pap);
 
         String input = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]

@@ -8,7 +8,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
@@ -45,8 +44,8 @@ public class AssociateStatement extends OperationStatement {
         long targetId = graph.getNodeByName(targetName).getId();
 
         return new Args()
-            .put(ASSOCIATE_UA_PARAM, new IdNodeArg(uaId))
-            .put(ASSOCIATE_TARGET_PARAM, new IdNodeArg(targetId))
+            .put(ASSOCIATE_UA_PARAM, uaId)
+            .put(ASSOCIATE_TARGET_PARAM, targetId)
             .put(ARSET_PARAM, new ArrayList<>(accessRightSet));
     }
 

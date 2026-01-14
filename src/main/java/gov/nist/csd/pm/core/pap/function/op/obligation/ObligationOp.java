@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.RuleType;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
@@ -22,7 +23,7 @@ import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBLIGATION
 
 public abstract class ObligationOp extends AdminOperation<Void> {
 
-    public static final NodeFormalParameter AUTHOR_PARAM = new NodeFormalParameter("author");
+    public static final NodeIdFormalParameter AUTHOR_PARAM = new NodeIdFormalParameter("author");
     public static final FormalParameter<List<Rule>> RULES_PARAM = new FormalParameter<>("rules", ListType.of(new RuleType()));
 
     public ObligationOp(String opName, List<FormalParameter<?>> formalParameters) {

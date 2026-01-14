@@ -8,17 +8,19 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
+
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public abstract sealed class Operation<R> extends Function<R> permits AdminOperation, ResourceOperation{
 
@@ -39,65 +41,32 @@ public abstract sealed class Operation<R> extends Function<R> permits AdminOpera
      * @throws PMException If there is an error checking access.
      */
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        // check privileges for node args
-        Map<NodeFormalParameter, NodeArg<?>> nodeArgs = getNodeArgs(args.getMap());
-        for (Map.Entry<NodeFormalParameter, NodeArg<?>> entry : nodeArgs.entrySet()) {
-            NodeFormalParameter nodeFormalParameter = entry.getKey();
-            NodeArg<?> value = entry.getValue();
-
-            checkPrivileges(pap, userCtx, nodeFormalParameter, value);
-        }
-
-        // check privileges for node list args
-        Map<NodeListFormalParameter, List<NodeArg<?>>> nodeListArgs = getNodeListArgs(args.getMap());
-        for (Map.Entry<NodeListFormalParameter, List<NodeArg<?>>> entry : nodeListArgs.entrySet()) {
-            NodeListFormalParameter nodeListFormalParameter = entry.getKey();
-            List<NodeArg<?>> values = entry.getValue();
-
-            checkPrivileges(pap, userCtx, nodeListFormalParameter, values);
+        List<FormalParameter<?>> formalParameters = getFormalParameters();
+        for (FormalParameter<?> formalParameter : formalParameters) {
+            switch (formalParameter) {
+                case NodeIdFormalParameter nodeIdFormalParameter ->
+                    check(pap, userCtx, nodeIdFormalParameter, args.get(nodeIdFormalParameter));
+                case NodeIdListFormalParameter nodeIdListFormalParameter -> {
+                    for (long id : args.get(nodeIdListFormalParameter)) {
+                        check(pap, userCtx, nodeIdListFormalParameter, id);
+                    }
+                }
+                case NodeNameFormalParameter nodeNameFormalParameter ->
+                    check(pap, userCtx, nodeNameFormalParameter, pap.query().graph().getNodeId(args.get(nodeNameFormalParameter)));
+                case NodeNameListFormalParameter nodeNameListFormalParameter -> {
+                    for (String name : args.get(nodeNameListFormalParameter)) {
+                        check(pap, userCtx, nodeNameListFormalParameter, pap.query().graph().getNodeId(name));
+                    }
+                }
+                case null, default -> {}
+            }
         }
     }
 
-    private void checkPrivileges(PAP pap, UserContext userCtx, NodeFormalParameter nodeFormalParameter, NodeArg<?> nodeArg) throws PMException {
-        TargetContext targetCtx = new TargetContext(nodeArg.getId(pap));
+    private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws
+                                                                                                          PMException {
+        TargetContext targetCtx = new TargetContext(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
         nodeFormalParameter.getReqCap().check(userCtx, targetCtx, privs);
     }
-
-    private void checkPrivileges(PAP pap, UserContext userCtx, NodeListFormalParameter nodeListFormalParameter, List<NodeArg<?>> nodeArgs) throws PMException {
-        for (NodeArg<?> nodeArg : nodeArgs) {
-            TargetContext targetCtx = new TargetContext(nodeArg.getId(pap));
-            AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-            nodeListFormalParameter.getReqCap().check(userCtx, targetCtx, privs);
-        }
-    }
-
-    private Map<NodeFormalParameter, NodeArg<?>> getNodeArgs(Map<FormalParameter<?>, Object> map) {
-        Map<NodeFormalParameter, NodeArg<?>> nodeArgs = new HashMap<>();
-        for (Entry<FormalParameter<?>, Object> entry : map.entrySet()) {
-            FormalParameter<?> formalParameter = entry.getKey();
-            Object value = entry.getValue();
-
-            if (formalParameter instanceof NodeFormalParameter nodeFormalParameter) {
-                nodeArgs.put(nodeFormalParameter, (NodeArg<?>)value);
-            }
-        }
-
-        return nodeArgs;
-    }
-
-    private Map<NodeListFormalParameter, List<NodeArg<?>>> getNodeListArgs(Map<FormalParameter<?>, Object> map) {
-        Map<NodeListFormalParameter, List<NodeArg<?>>> nodeArgs = new HashMap<>();
-        for (Entry<FormalParameter<?>, Object> entry : map.entrySet()) {
-            FormalParameter<?> formalParameter = entry.getKey();
-            Object value = entry.getValue();
-
-            if (formalParameter instanceof NodeListFormalParameter nodeListFormalParameter) {
-                nodeArgs.put(nodeListFormalParameter, (List<NodeArg<?>>) value);
-            }
-        }
-
-        return nodeArgs;
-    }
-
 }

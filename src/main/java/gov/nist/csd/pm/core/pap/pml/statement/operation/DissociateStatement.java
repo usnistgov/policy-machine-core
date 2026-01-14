@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
 import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
@@ -32,8 +31,8 @@ public class DissociateStatement extends OperationStatement {
         long targetId = graph.getNodeByName(target).getId();
 
         return new Args()
-            .put(DissociateOp.DISSOCIATE_UA_PARAM, new IdNodeArg(uaId))
-            .put(DissociateOp.DISSOCIATE_TARGET_PARAM, new IdNodeArg(targetId));
+            .put(DissociateOp.DISSOCIATE_UA_PARAM, uaId)
+            .put(DissociateOp.DISSOCIATE_TARGET_PARAM, targetId);
     }
 
     @Override

@@ -28,7 +28,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testComputeAdjacentAscendantPrivileges() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -53,7 +53,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testComputeAdjacentDescendantPrivileges() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -80,7 +80,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testBuildPOS() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
@@ -130,7 +130,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         );
 
         pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -168,7 +168,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testExplain() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -274,7 +274,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testExplain2() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create pc "pc1"
                 
@@ -387,7 +387,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testExplainOnObjAttrWithAssociation() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
@@ -430,7 +430,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testExplainNoPaths() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                     create UA "ua1" in ["pc1"]
                     create UA "ua2" in ["pc1"]
@@ -472,7 +472,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testExplainPathsButNoPrivileges() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
@@ -532,7 +532,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     void testExplainMultiplePolicyClasses() throws PMException {
         // test all pcs have same access rights
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
@@ -589,7 +589,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         // test all pcs do not have same ars
         pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
@@ -650,7 +650,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testComputeSubgraphPrivileges() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -700,7 +700,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testFindBorderAttributes() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -726,7 +726,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testBuildACL() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -752,7 +752,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testBuildCapabilityList() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -803,7 +803,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testComputeDeniedPrivileges() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -1595,7 +1595,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     @Test
     void testAttributesInUserAndTargetContexts() throws PMException {
         String pml = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create pc "pc1"
                 create pc "pc2"

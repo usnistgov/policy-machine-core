@@ -35,7 +35,7 @@ public class PMLFunctionTest {
     @Test
     void testFunctionsCannotCallOperationsOrRoutines() throws PMException {
         String pml = """
-            operation op1(string s) {
+            adminop op1(string s) {
                 create pc s
             }
             

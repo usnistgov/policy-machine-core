@@ -134,9 +134,8 @@ public class PMLTest {
                 access rights ["assign"]
                 on union of {PM_ADMIN_BASE_OA: false}
                 
-                operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on [PM_ADMIN_BASE_OA]
-                } {
+                adminop op1(string a, []string b, map[string]string c) {
+                    check ["assign"] on [PM_ADMIN_BASE_OA]
                     create pc "1" + a
                 
                     foreach x in b {

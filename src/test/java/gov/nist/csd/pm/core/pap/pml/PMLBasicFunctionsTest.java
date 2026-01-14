@@ -27,9 +27,8 @@ public class PMLBasicFunctionsTest {
                 associate "ua1" and "oa1" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 
-                operation op1(string name) {
-                    check "assign" on ["oa1"]
-                } {
+                adminop op1(string name) {
+                    check ["assign"] on ["oa1"]
                     create pc name
                 }
                 
@@ -106,7 +105,7 @@ public class PMLBasicFunctionsTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                operation op2() {
+                adminop op2() {
                     routine1()
                 }
                 
@@ -114,7 +113,7 @@ public class PMLBasicFunctionsTest {
                     op1()
                 }
                 
-                operation op1() {
+                adminop op1() {
                     create pc "pc2"
                 }
                 
@@ -153,7 +152,7 @@ public class PMLBasicFunctionsTest {
                     op1()
                 }
                 
-                operation op1() {
+                adminop op1() {
                     create pc "pc2"
                 }
                 
@@ -193,7 +192,7 @@ public class PMLBasicFunctionsTest {
 	@Test
 	void testFunctionOnlyAllowsFunctionInvokesOnly() throws PMException {
 		String pml = """
-		operation op1() {}
+		adminop op1() {}
 		
 		function fail() {
 			op1()
@@ -227,7 +226,7 @@ public class PMLBasicFunctionsTest {
 	@Test
 	void testRecursiveCall() throws PMException {
 		String pml = """
-		operation op1(string x) {
+		adminop op1(string x) {
 			create pc x
 			
 			if x == "end" {

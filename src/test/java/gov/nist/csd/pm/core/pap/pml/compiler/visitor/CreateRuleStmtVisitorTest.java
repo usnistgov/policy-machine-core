@@ -227,7 +227,7 @@ class CreateRuleStmtVisitorTest {
                         when any user
                         performs any operation
                         do(ctx) {
-                            operation f1() {}
+                            adminop f1() {}
                         }
                     }
                     """;

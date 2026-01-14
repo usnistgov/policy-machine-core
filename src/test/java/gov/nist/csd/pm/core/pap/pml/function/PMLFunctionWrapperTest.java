@@ -20,7 +20,7 @@ class PMLFunctionWrapperTest {
     @Test
     void testMultipleLayersOfWrappedFunctions() throws PMException {
         String pml = """
-            operation op4() string {
+            adminop op4() string {
                return "op4"
             }
             

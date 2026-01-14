@@ -55,7 +55,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                operation op1(node string a, node []string b) {
+                adminop op1(@node string a, @node []string b) {
                 
                 }
                 
@@ -84,10 +84,7 @@ class EPPTest {
                     }
                     do(ctx) {
                         create pc ctx.args.a + "pc3"
-                
-                        foreach x in ctx.args.b {
-                            create pc x + "pc4"
-                        }
+                        create pc ctx.args.b + "pc4"                
                     }
                 }
                 """);
@@ -133,7 +130,7 @@ class EPPTest {
             "op2",
             Map.of(
                 ARG_A.getName(), "oa2",
-                ARG_B.getName(), List.of("oa2")
+                ARG_B.getName(), "oa2"
             )
         ));
 
@@ -152,7 +149,7 @@ class EPPTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                set resource operations ["read"]
+                set resource access rights ["read"]
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
@@ -430,9 +427,9 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
-                operation op1() {
-                    check "assign" on ["oa1"]
-                } {
+                adminop op1() {
+                    check ["assign"] on ["oa1"]
+
                     create pc "test_pc"
                 }
                 

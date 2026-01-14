@@ -7,14 +7,13 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+
 import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DeleteNodeStatement extends DeleteStatement {
 
@@ -31,19 +30,16 @@ public class DeleteNodeStatement extends DeleteStatement {
             GraphQuery graph = pap.query().graph();
             long nodeId = graph.getNodeId(name);
             NodeType nodeType = graph.getNodeById(nodeId).getType();
-            List<NodeArg<?>> descendants = graph.getAdjacentDescendants(nodeId)
-                .stream()
-                .map(IdNodeArg::new)
-                .collect(Collectors.toUnmodifiableList());
+            List<Long> descendants = new ArrayList<>(graph.getAdjacentDescendants(nodeId));
             
             return new Args()
-                .put(DeleteNodeOp.DELETE_NODE_NODE_PARAM, new IdNodeArg(nodeId))
+                .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, nodeId)
                 .put(TYPE_PARAM, nodeType.toString())
                 .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, descendants);
         } catch (NodeDoesNotExistException e) {
             // if the node does not exist no error needs to occur, as the PAP will not error either
             return new Args()
-                .put(DeleteNodeOp.DELETE_NODE_NODE_PARAM, new IdNodeArg(0L))
+                .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, 0L)
                 .put(TYPE_PARAM, NodeType.U.toString())
                 .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, List.of());
         }

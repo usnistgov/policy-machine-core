@@ -13,19 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class RoutineDefinitionStatementTest {
 
     @Test
-    void testOperationSignatureDoesNotThrowExceptionButIsIgnored() throws PMException {
-        String pml = """
-                routine routine1(node string a) {
-                    check "assign" on [a]
-                } {
-                
-                }
-                """;
-        MemoryPAP pap = new TestPAP();
-        assertDoesNotThrow(() -> pap.executePML(new TestUserContext("u1"), pml));
-    }
-
-    @Test
     void testSuccess() throws PMException {
         String pml = """
                 routine routine1(string a) {

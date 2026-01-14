@@ -30,11 +30,11 @@ class AdminOpDefinitionStatementTest {
                 create o "o2" in ["oa1"]
                 create o "o3" in ["oa1"]
                 
-                operation op1(string a, []string b) {
-                    check "assign" on [a]
-                    check "assign" on b
-                    check "assign" on ["oa1"]
-                } {
+                adminop op1(string a, []string b) {
+                    check ["assign"] on [a]
+                    check ["assign"] on b
+                    check ["assign"] on ["oa1"]
+
                     create PC "test"
                 }
                 """;
@@ -73,7 +73,7 @@ class AdminOpDefinitionStatementTest {
                 create o "o2" in ["oa1"]
                 create o "o3" in ["oa1"]
                 
-                operation op1(string a, []string b) {
+                adminop op1(string a, []string b) {
                     create PC a
                 }
                 """;

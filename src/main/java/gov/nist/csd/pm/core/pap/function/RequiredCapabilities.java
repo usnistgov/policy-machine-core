@@ -4,12 +4,13 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * RequiredCapabilities represents the access rights needed on an argument of an operation.
  */
-public class RequiredCapabilities {
+public class RequiredCapabilities implements Serializable {
 
     private AccessRightSet reqCaps;
 

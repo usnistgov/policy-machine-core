@@ -6,9 +6,12 @@ package gov.nist.csd.pm.core.pap.pml.antlr;
 
 ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
+NODE_ARG: '@node';
+NODE: 'node';
 CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';
+OPERATION: 'operation';
 
 CREATE : 'create' ;
 DELETE : 'delete' ;
@@ -54,7 +57,6 @@ USER: 'user' ;
 
 // Keywords
 
-NODE_TYPE              : 'node';
 BREAK                  : 'break';
 DEFAULT                : 'default';
 MAP                    : 'map';
@@ -70,6 +72,7 @@ STRING_TYPE            : 'string' ;
 BOOL_TYPE              : 'bool' ;
 VOID_TYPE              : 'void' ;
 ARRAY_TYPE             : 'array' ;
+INT64_TYPE             : 'int64' ;
 
 NIL_LIT                : 'nil';
 

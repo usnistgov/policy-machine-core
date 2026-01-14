@@ -176,16 +176,16 @@ class FunctionInvokeExpressionTest {
         String pml = """
                 a("123")
                 
-                operation c(string x) string {
+                adminop c(string x) string {
                     return "c" + x
                 }
                                 
-                operation b(string x, string y) {
+                adminop b(string x, string y) {
                     create PC c(x)
                     create PC c(y)
                 }
                                 
-                operation a(string x) {
+                adminop a(string x) {
                     x = "x"
                     y := "y"
                                 
@@ -204,7 +204,7 @@ class FunctionInvokeExpressionTest {
                 x := "test"
                 a(x)
                 create pc x
-                operation a(string x) {
+                adminop a(string x) {
                     x = "x"
                 }
                 """;
@@ -217,7 +217,7 @@ class FunctionInvokeExpressionTest {
     @Test
     void testReturnInIf() throws PMException {
         String pml = """            
-                operation a() {
+                adminop a() {
                     if true {
                         return
                     }
@@ -235,12 +235,12 @@ class FunctionInvokeExpressionTest {
     @Test
     void testScopeIsNotCopiedToFunctionInvokeExpression() throws PMException {
         String pml = """
-                operation op1() {
+                adminop op1() {
                     x := ""
                     op2()
                 }
                 
-                operation op2() {
+                adminop op2() {
                     x := ""
                 }
                 

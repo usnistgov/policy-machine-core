@@ -5,16 +5,15 @@ import gov.nist.csd.pm.core.pap.PAP;
 
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 
 public class CreateObjectAttributeOp extends AdminOperation<Long> {
 
-    public static final NodeListFormalParameter CREATE_OA_DESCENDANTS_PARAM =
-        new NodeListFormalParameter("descendants", CREATE_OBJECT_ATTRIBUTE);
+    public static final NodeIdListFormalParameter CREATE_OA_DESCENDANTS_PARAM =
+        new NodeIdListFormalParameter("descendants", CREATE_OBJECT_ATTRIBUTE);
 
     public CreateObjectAttributeOp() {
         super(
@@ -26,7 +25,7 @@ public class CreateObjectAttributeOp extends AdminOperation<Long> {
     @Override
     public Long execute(PAP pap, Args args) throws PMException {
         String name = args.get(NAME_PARAM);
-        List<Long> descIds = args.getIdList(CREATE_OA_DESCENDANTS_PARAM, pap);
+        List<Long> descIds = args.get(CREATE_OA_DESCENDANTS_PARAM);
 
         return pap.modify().graph().createObjectAttribute(name, descIds);
     }

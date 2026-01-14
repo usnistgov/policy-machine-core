@@ -96,8 +96,6 @@ public class JSONDeserializer implements PolicyDeserializer {
             pml += routine + "\n";
         }
 
-        System.out.println(pml);
-
         // author doesnt matter when executing create routine statements
         pap.executePML(new UserContext(0), pml);
     }

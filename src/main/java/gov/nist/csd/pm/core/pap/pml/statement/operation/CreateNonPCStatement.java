@@ -10,10 +10,10 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+
 import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
+
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
@@ -43,9 +43,9 @@ public class CreateNonPCStatement extends OperationStatement {
         String name = nameExpr.execute(ctx, pap);
         List<String> inList = inExpr.execute(ctx, pap);
 
-        List<NodeArg<?>> descIds = new ArrayList<>();
+        List<Long> descIds = new ArrayList<>();
         for (String parentName : inList) {
-            descIds.add(new IdNodeArg(pap.query().graph().getNodeByName(parentName).getId()));
+            descIds.add(pap.query().graph().getNodeByName(parentName).getId());
         }
 
         return new Args()
@@ -81,7 +81,7 @@ public class CreateNonPCStatement extends OperationStatement {
         };
     }
 
-    private static NodeListFormalParameter getDescendantsFormalParam(NodeType type) {
+    private static NodeIdListFormalParameter getDescendantsFormalParam(NodeType type) {
         return switch (type) {
             case OA -> CREATE_OA_DESCENDANTS_PARAM;
             case O -> CREATE_O_DESCENDANTS_PARAM;

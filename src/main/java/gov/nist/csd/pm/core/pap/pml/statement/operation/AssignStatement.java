@@ -6,12 +6,10 @@ import static gov.nist.csd.pm.core.pap.function.op.graph.AssignOp.ASSIGN_DESCEND
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.IdNodeArg;
-import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +34,13 @@ public class AssignStatement extends OperationStatement {
 
         // convert to ids
         long ascId = pap.query().graph().getNodeByName(asc).getId();
-        List<NodeArg<?>> descIds = new ArrayList<>();
+        List<Long> descIds = new ArrayList<>();
         for (String desc : descs) {
-            descIds.add(new IdNodeArg(pap.query().graph().getNodeByName(desc).getId()));
+            descIds.add(pap.query().graph().getNodeByName(desc).getId());
         }
 
         return new Args()
-            .put(ASSIGN_ASCENDANT_PARAM, new IdNodeArg(ascId))
+            .put(ASSIGN_ASCENDANT_PARAM, ascId)
             .put(ASSIGN_DESCENDANTS_PARAM, descIds);
     }
 
