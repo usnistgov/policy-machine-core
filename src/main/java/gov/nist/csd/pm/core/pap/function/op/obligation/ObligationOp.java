@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.RuleType;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBLIGATIONS;
 
-public abstract class ObligationOp extends Operation<Void> {
+public abstract class ObligationOp extends AdminOperation<Void> {
 
     public static final NodeFormalParameter AUTHOR_PARAM = new NodeFormalParameter("author");
     public static final FormalParameter<List<Rule>> RULES_PARAM = new FormalParameter<>("rules", ListType.of(new RuleType()));

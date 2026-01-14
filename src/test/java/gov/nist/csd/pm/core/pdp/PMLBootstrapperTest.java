@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pdp;
 import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -39,7 +40,7 @@ class PMLBootstrapperTest {
                 routine1()
                 """;
 
-        Operation<?> op1 = new Operation<>("op1", List.of()) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 

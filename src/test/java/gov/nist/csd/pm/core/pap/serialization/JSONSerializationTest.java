@@ -19,19 +19,20 @@ public class JSONSerializationTest {
     @Test
     void testJSONSerializationDoesNotThrowNPE() throws PMException, IOException {
         List<JSONPolicy> policies = List.of(
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(null, new JSONGraph(), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), null, List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(), null, List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), null, List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), null, List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), List.of(), null),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), List.of(), List.of(), List.of()), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(null, List.of(), List.of(), List.of(), List.of()), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), null, List.of(), List.of(), List.of()), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), null, List.of(), List.of()), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), List.of(), null, List.of()), List.of(), List.of(), List.of(), List.of()),
-                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), List.of(), List.of(), null), List.of(), List.of(), List.of(), List.of())
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(null, new JSONGraph(), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), null, List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(), null, List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), null, List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), null, List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), List.of(), null, List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(), List.of(), List.of(), List.of(), List.of(), null),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), List.of(), List.of(), List.of()), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(null, List.of(), List.of(), List.of(), List.of()), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), null, List.of(), List.of(), List.of()), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), null, List.of(), List.of()), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), List.of(), null, List.of()), List.of(), List.of(), List.of(), List.of(), List.of()),
+                new JSONPolicy(new AccessRightSet(), new JSONGraph(List.of(), List.of(), List.of(), List.of(), null), List.of(), List.of(), List.of(), List.of(), List.of())
         );
 
         for (JSONPolicy policy : policies) {

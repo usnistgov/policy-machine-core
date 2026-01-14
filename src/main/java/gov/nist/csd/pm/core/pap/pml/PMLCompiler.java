@@ -21,6 +21,18 @@ import java.util.List;
 
 public class PMLCompiler {
 
+    public static void main(String[] args) throws PMException {
+        String pml = """
+            adminop test(map[node] a) {
+                
+            }
+            
+            test("a")
+            """;
+        List<PMLStatement<?>> pmlStatements = new PMLCompiler().compilePML(pml);
+        System.out.println(pmlStatements);
+    }
+
     public PMLCompiler() {
     }
 

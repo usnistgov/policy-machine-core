@@ -12,7 +12,7 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PMLOperationSignatureTest {
+class PMLAdminOperationSignatureTest {
 
     @Test
     void testToFormattedString() {
@@ -23,12 +23,13 @@ class PMLOperationSignatureTest {
                     new NodeFormalParameter("a"),
                     new FormalParameter<>("b", STRING_TYPE),
                     new FormalParameter<>("c", STRING_TYPE)
-                )
+                ),
+            true
         );
 
         String actual = signature.toFormattedString(0);
         assertEquals(
-                "operation op1(@node string a, string b, string c) []string ",
+                "adminop op1(node string a, string b, string c) []string ",
                 actual
         );
     }

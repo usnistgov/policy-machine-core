@@ -1,11 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.function;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
+
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicFunctionSignatureContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationSignatureContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.RoutineSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
@@ -38,17 +41,39 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     }
 
     @Override
-    public PMLOperationSignature visitOperationSignature(OperationSignatureContext ctx) {
+    public PMLOperationSignature visitAdminOpSignature(AdminOpSignatureContext ctx) {
         String funcName = ctx.ID().getText();
         Type<?> returnType = parseReturnType(ctx.returnType);
-        List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx).visitFormalParamList(ctx.formalParamList());
+        List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
+            .visitOperationFormalParamList(ctx.operationFormalParamList());
 
         writeArgsToScope(visitorCtx, args);
 
         PMLOperationSignature pmlOperationSignature = new PMLOperationSignature(
             funcName,
             returnType,
-            args
+            args,
+            true
+        );
+
+        addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);
+
+        return pmlOperationSignature;
+    }
+
+    @Override
+    public PMLOperationSignature visitResourceOpSignature(ResourceOpSignatureContext ctx) {
+        String funcName = ctx.ID().getText();
+        List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
+            .visitOperationFormalParamList(ctx.operationFormalParamList());
+
+        writeArgsToScope(visitorCtx, args);
+
+        PMLOperationSignature pmlOperationSignature = new PMLOperationSignature(
+            funcName,
+            VOID_TYPE,
+            args,
+            false
         );
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);

@@ -9,16 +9,16 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class OperationDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
+public class AdminOpDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
-    protected PMLStmtsOperation pmlStmtsOperation;
+    protected PMLStmtsAdminOperation pmlStmtsOperation;
 
-    public OperationDefinitionStatement(PMLStmtsOperation pmlStmtsOperation) {
+    public AdminOpDefinitionStatement(PMLStmtsAdminOperation pmlStmtsOperation) {
         super(new CreateAdminOperationOp());
 
         this.pmlStmtsOperation = pmlStmtsOperation;
@@ -36,8 +36,10 @@ public class OperationDefinitionStatement extends OperationStatement implements 
 
     @Override
     public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
+        // add operation to policy
         VoidResult value = super.execute(ctx, pap);
 
+        // add operation to scope
         ctx.scope().addFunction(pmlStmtsOperation.getName(), pmlStmtsOperation);
 
         return value;
@@ -52,7 +54,7 @@ public class OperationDefinitionStatement extends OperationStatement implements 
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof OperationDefinitionStatement that))
+        if (!(o instanceof AdminOpDefinitionStatement that))
             return false;
         return Objects.equals(op, that.op);
     }

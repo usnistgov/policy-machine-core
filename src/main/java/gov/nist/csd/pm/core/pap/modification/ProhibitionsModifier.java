@@ -53,7 +53,7 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
         }
 
         // check the prohibition parameters are valid
-        checkAccessRightsValid(policyStore.operations().getResourceOperations(), accessRightSet);
+        checkAccessRightsValid(policyStore.operations().getResourceAccessRights(), accessRightSet);
         checkProhibitionSubjectExists(subject);
         checkProhibitionContainersExist(containerConditions);
     }

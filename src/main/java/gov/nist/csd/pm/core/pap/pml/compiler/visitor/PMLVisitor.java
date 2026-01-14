@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.OperationDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -48,7 +48,7 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
     }
 
     private SortedStatements sortStatements(PMLParser.PmlContext ctx) {
-        List<PMLParser.OperationDefinitionStatementContext> operationCtxs = new ArrayList<>();
+        List<PMLParser.AdminOpDefinitionStatementContext> adminOpCtxs = new ArrayList<>();
         List<PMLParser.RoutineDefinitionStatementContext> routineCtxs = new ArrayList<>();
         List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs = new ArrayList<>();
         List<PMLParser.StatementContext> statementCtxs = new ArrayList<>();
@@ -64,8 +64,8 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
                     statementCtxs.add(stmtCtx);
                 }
             } else if (operationStatementContext != null) {
-                if (operationStatementContext.operationDefinitionStatement() != null) {
-                    operationCtxs.add(operationStatementContext.operationDefinitionStatement());
+                if (operationStatementContext.adminOpDefinitionStatement() != null) {
+                    adminOpCtxs.add(operationStatementContext.adminOpDefinitionStatement());
                 } else if (operationStatementContext.routineDefinitionStatement() != null) {
                     routineCtxs.add(operationStatementContext.routineDefinitionStatement());
                 } else {
@@ -74,15 +74,15 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
             }
         }
 
-        return new SortedStatements(operationCtxs, routineCtxs, functionCtxs, statementCtxs);
+        return new SortedStatements(adminOpCtxs, routineCtxs, functionCtxs, statementCtxs);
     }
 
-    private record SortedStatements(List<PMLParser.OperationDefinitionStatementContext> operationCtxs,
+    private record SortedStatements(List<PMLParser.AdminOpDefinitionStatementContext> operationCtxs,
                                     List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
                                     List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs,
                                     List<PMLParser.StatementContext> statementCtxs) {}
 
-    private CompiledFunctions compileFunctions(List<PMLParser.OperationDefinitionStatementContext> operationCtxs,
+    private CompiledFunctions compileFunctions(List<PMLParser.AdminOpDefinitionStatementContext> operationCtxs,
                                                List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
                                                List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs) {
         Map<String, PMLFunctionSignature> functionSignatures = new HashMap<>(visitorCtx.scope().getFunctions());
@@ -90,15 +90,15 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
         // track the function definitions statements to be processed,
         // function signatures are compiled first in the event that one function calls another
         // any function with an error won't be processed but execution will continue inorder to find anymore errors
-        Map<String, PMLParser.OperationDefinitionStatementContext> validOperationDefs = new HashMap<>();
+        Map<String, PMLParser.AdminOpDefinitionStatementContext> validOperationDefs = new HashMap<>();
         Map<String, PMLParser.RoutineDefinitionStatementContext> validRoutineDefs = new HashMap<>();
         Map<String, PMLParser.BasicFunctionDefinitionStatementContext> validFunctionDefs = new HashMap<>();
 
         FunctionSignatureVisitor signatureVisitor = new FunctionSignatureVisitor(visitorCtx, true);
 
         // operations
-        for (PMLParser.OperationDefinitionStatementContext operationCtx : operationCtxs) {
-            PMLOperationSignature signature = signatureVisitor.visitOperationSignature(operationCtx.operationSignature());
+        for (PMLParser.AdminOpDefinitionStatementContext operationCtx : operationCtxs) {
+            PMLOperationSignature signature = signatureVisitor.visitAdminOpSignature(operationCtx.adminOpSignature());
             processSignature(operationCtx, signature, functionSignatures, (ctx) -> validOperationDefs.put(signature.getName(), operationCtx));
         }
 
@@ -117,8 +117,8 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
         // compile all function bodies now that all signatures are compiled -- do not add signatures to ctx again
         signatureVisitor.setAddToCtx(false);
         FunctionDefinitionVisitor functionDefinitionVisitor = new FunctionDefinitionVisitor(visitorCtx, signatureVisitor);
-        List<OperationDefinitionStatement> operations = compileFunctions(operationCtxs,
-            functionDefinitionVisitor::visitOperationDefinitionStatement);
+        List<AdminOpDefinitionStatement> operations = compileFunctions(operationCtxs,
+            functionDefinitionVisitor::visitAdminOpDefinitionStatement);
         List<RoutineDefinitionStatement> routines = compileFunctions(routineCtxs,
             functionDefinitionVisitor::visitRoutineDefinitionStatement);
         List<BasicFunctionDefinitionStatement> functions = compileFunctions(functionCtxs,
@@ -164,7 +164,7 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
         }
     }
 
-    private record CompiledFunctions(List<OperationDefinitionStatement> operations,
+    private record CompiledFunctions(List<AdminOpDefinitionStatement> operations,
                                      List<RoutineDefinitionStatement> routines,
                                      List<BasicFunctionDefinitionStatement> functions) {}
 

@@ -25,8 +25,9 @@ public class Neo4jUtil {
 	public static final Label O_LABEL = Label.label("O");
 	public static final Label U_LABEL = Label.label("U");
 	public static final Label OBLIGATION_LABEL = Label.label("Obligation");
-	public static final Label RESOURCE_OPERATIONS_LABEL = Label.label("ResourceOps");
+	public static final Label RESOURCE_ARS_LABEL = Label.label("ResourceAccessRights");
 	public static final Label ADMIN_OPERATION_LABEL = Label.label("AdminOp");
+	public static final Label RESOURCE_OPERATION_LABEL = Label.label("ResourceOp");
 	public static final Label ADMIN_ROUTINE_LABEL = Label.label("AdminRoutine");
 	public static final Label PROHIBITION_LABEL = Label.label("Prohibition");
 	public static final Label PROCESS_LABEL = Label.label("Process");

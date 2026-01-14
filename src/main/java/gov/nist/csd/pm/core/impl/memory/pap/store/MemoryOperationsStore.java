@@ -2,11 +2,13 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 
@@ -15,39 +17,59 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void setResourceOperations(AccessRightSet accessRightSet) throws PMException {
-        AccessRightSet old = new AccessRightSet(policy.resourceOperations);
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
+        AccessRightSet old = new AccessRightSet(policy.resourceAccessRights);
 
-        policy.resourceOperations = accessRightSet;
+        policy.resourceAccessRights = resourceAccessRights;
 
         txCmdTracker.trackOp(tx, new TxCmd.SetResourceOperationsTxCmd(
                 old,
-                accessRightSet)
+            resourceAccessRights)
         );
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
-        policy.operations.put(operation.getName(), operation);
+    public void createResourceOperation(ResourceOperation operation) throws PMException {
+        policy.resourceOps.put(operation.getName(), operation);
+    }
+
+    @Override
+    public void deleteResourceOperation(String operation) throws PMException {
+        policy.resourceOps.remove(operation);
+    }
+
+    @Override
+    public void createAdminOperation(AdminOperation<?> operation) throws PMException {
+        policy.adminOps.put(operation.getName(), operation);
     }
 
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
-        policy.operations.remove(operation);
+        policy.adminOps.remove(operation);
     }
 
     @Override
-    public AccessRightSet getResourceOperations() throws PMException {
-        return policy.resourceOperations;
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return policy.resourceAccessRights;
+    }
+
+    @Override
+    public Collection<String> getResourceOperationNames() throws PMException {
+        return new ArrayList<>(policy.resourceOps.keySet());
+    }
+
+    @Override
+    public ResourceOperation getResourceOperation(String operationName) throws PMException {
+        return policy.resourceOps.get(operationName);
     }
 
     @Override
     public Collection<String> getAdminOperationNames() throws PMException {
-        return new ArrayList<>(policy.operations.keySet());
+        return new ArrayList<>(policy.adminOps.keySet());
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
-        return policy.operations.get(operationName);
+    public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
+        return policy.adminOps.get(operationName);
     }
 }

@@ -7,20 +7,20 @@ import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.SetResourceOperationsStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.SetResourceAccessRightsStatement;
 import java.util.List;
 
 
-public class SetResourceOperationsStmtVisitor extends PMLBaseVisitor<SetResourceOperationsStatement> {
+public class SetResourceAccessRightsStmtVisitor extends PMLBaseVisitor<SetResourceAccessRightsStatement> {
 
-    public SetResourceOperationsStmtVisitor(VisitorContext visitorCtx) {
+    public SetResourceAccessRightsStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
     @Override
-    public SetResourceOperationsStatement visitSetResourceOperationsStatement(PMLParser.SetResourceOperationsStatementContext ctx) {
+    public SetResourceAccessRightsStatement visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
         Expression<List<String>> expression = ExpressionVisitor.compile(visitorCtx, ctx.accessRightsArr, ListType.of(STRING_TYPE));
 
-        return new SetResourceOperationsStatement(expression);
+        return new SetResourceAccessRightsStatement(expression);
     }
 }

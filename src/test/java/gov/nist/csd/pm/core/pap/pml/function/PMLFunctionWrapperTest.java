@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -31,7 +32,7 @@ class PMLFunctionWrapperTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        operations.createAdminOperation(new Operation<>("op1", List.of(a)) {
+        operations.createAdminOperation(new AdminOperation<>("op1", List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
@@ -42,7 +43,7 @@ class PMLFunctionWrapperTest {
 
         });
 
-        operations.createAdminOperation(new Operation<>("op2", List.of(a)) {
+        operations.createAdminOperation(new AdminOperation<>("op2", List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
@@ -53,7 +54,7 @@ class PMLFunctionWrapperTest {
 
         });
 
-        operations.createAdminOperation(new Operation<>("op3", List.of(a)) {
+        operations.createAdminOperation(new AdminOperation<>("op3", List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 

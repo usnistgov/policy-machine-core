@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.serialization.json;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
@@ -24,7 +23,7 @@ public class JSONDeserializer implements PolicyDeserializer {
         JSONPolicy jsonPolicy = gson.fromJson(input, new TypeToken<JSONPolicy>() {}.getType());
 
         // account for the json schema allowing null properties
-        AccessRightSet resourceOperations = jsonPolicy.getResourceOperations();
+        AccessRightSet resourceOperations = jsonPolicy.getResourceAccessRights();
         if (resourceOperations == null) {
             resourceOperations = new AccessRightSet();
         }
@@ -44,7 +43,7 @@ public class JSONDeserializer implements PolicyDeserializer {
             obligations = new ArrayList<>();
         }
 
-        List<String> operations = jsonPolicy.getOperations();
+        List<String> operations = jsonPolicy.getAdminOperations();
         if (operations == null) {
             operations = new ArrayList<>();
         }
@@ -54,7 +53,7 @@ public class JSONDeserializer implements PolicyDeserializer {
             routines = new ArrayList<>();
         }
 
-        pap.modify().operations().setResourceOperations(resourceOperations);
+        pap.modify().operations().setResourceAccessRights(resourceOperations);
         createGraph(pap, graph);
         createProhibitions(pap, prohibitions);
         createOperations(pap, operations);
@@ -96,6 +95,8 @@ public class JSONDeserializer implements PolicyDeserializer {
         for (String routine : routines) {
             pml += routine + "\n";
         }
+
+        System.out.println(pml);
 
         // author doesnt matter when executing create routine statements
         pap.executePML(new UserContext(0), pml);

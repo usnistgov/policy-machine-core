@@ -29,10 +29,11 @@ public class JSONSerializer implements PolicySerializer {
 
     public JSONPolicy buildJSONPolicy(PolicyQuery policyQuery) throws PMException {
         return new JSONPolicy(
-            policyQuery.operations().getResourceOperations(),
+            policyQuery.operations().getResourceAccessRights(),
             buildGraphJSON(policyQuery),
             buildProhibitionsJSON(policyQuery),
             buildObligationsJSON(policyQuery),
+            buildResourceOperations(policyQuery),
             buildOperationsJSON(policyQuery),
             buildRoutinesJSON(policyQuery)
         );
@@ -51,6 +52,10 @@ public class JSONSerializer implements PolicySerializer {
         }
 
         return json.isEmpty() ? null : json;
+    }
+
+    private List<JSONResourceOperation> buildResourceOperations(PolicyQuery policyQuery) {
+        return null;
     }
 
     private List<String> buildOperationsJSON(PolicyQuery policyQuery) throws PMException {

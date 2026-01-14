@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public abstract class Operation<R> extends Function<R> {
+public abstract sealed class Operation<R> extends Function<R> permits AdminOperation, ResourceOperation{
 
     public static final FormalParameter<String> NAME_PARAM = new FormalParameter<>("name", STRING_TYPE);
     public static final FormalParameter<List<String>> ARSET_PARAM = new FormalParameter<>("arset", ListType.of(STRING_TYPE));

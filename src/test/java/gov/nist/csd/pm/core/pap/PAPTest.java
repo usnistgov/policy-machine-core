@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
@@ -31,7 +32,7 @@ public abstract class PAPTest extends PAPTestInitializer {
     public static final FormalParameter<String> ARG_A = new FormalParameter<>("a", STRING_TYPE);
     public static final FormalParameter<String> ARG_B = new FormalParameter<>("b", STRING_TYPE);
 
-    static Operation<Object> op = new Operation<>("testFunc", List.of()) {
+    static AdminOperation<Object> op = new AdminOperation<>("testFunc", List.of()) {
         @Override
         public void canExecute(PAP pap, UserContext userCtx, Args args) {
 
@@ -133,7 +134,7 @@ public abstract class PAPTest extends PAPTestInitializer {
                 associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
                 associate "ua1" and "ua2" with ["assign"]
                 
-                operation op1(@node string a) {
+                operation op1(node string a) {
                     check "assign" on [a]
                 } {
                     if a == PM_ADMIN_BASE_OA {
@@ -171,7 +172,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testPluginRegistry() {
-        pap.plugins().registerOperation(new Operation<>("op1", List.of()) {
+        pap.plugins().registerOperation(new AdminOperation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -198,7 +199,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().registerOperation(new Operation<>("op1", List.of()) {
+        pap.plugins().registerOperation(new AdminOperation<>("op1", List.of()) {
             @Override
             public Object execute(PAP pap, Args args) throws PMException {
                 return null;

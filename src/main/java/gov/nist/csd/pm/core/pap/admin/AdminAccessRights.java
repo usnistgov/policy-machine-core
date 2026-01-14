@@ -55,9 +55,11 @@ public class AdminAccessRights {
     public static final String DELETE_OBLIGATION_WITH_ANY_PATTERN = "delete_obligation_with_any_pattern";
 
     // operations
-    public static final String SET_RESOURCE_OPERATIONS = "set_resource_operations";
+    public static final String SET_RESOURCE_ACCESS_RIGHTS = "set_resource_access_rights";
     public static final String CREATE_ADMIN_OPERATION = "create_admin_operation";
     public static final String DELETE_ADMIN_OPERATION = "delete_admin_operation";
+    public static final String CREATE_RESOURCE_OPERATION = "create_resource_operation";
+    public static final String DELETE_RESOURCE_OPERATION = "delete_resource_operation";
 
     // routines
     public static final String CREATE_ADMIN_ROUTINE = "create_admin_routine";
@@ -140,7 +142,7 @@ public class AdminAccessRights {
     );
 
     public static final Set<String> ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET = Set.of(
-        SET_RESOURCE_OPERATIONS,
+        SET_RESOURCE_ACCESS_RIGHTS,
         CREATE_ADMIN_OPERATION,
         DELETE_ADMIN_OPERATION
     );

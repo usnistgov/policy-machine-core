@@ -126,7 +126,7 @@ public class TargetEvaluator {
 		return AccessRightResolver.resolvePrivileges(
 			userDagResult,
 			adminTargetResult,
-			policyStore.operations().getResourceOperations()
+			policyStore.operations().getResourceAccessRights()
 		);
 	}
 

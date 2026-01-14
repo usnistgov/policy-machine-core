@@ -3,6 +3,10 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementBlockContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicOrOperationAdminOpStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckAdminOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.FunctionInvokeExpression;
@@ -26,6 +30,28 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     public StatementBlockVisitor(VisitorContext visitorCtx, Type<?> returnType) {
         super(visitorCtx);
         this.returnType = returnType;
+    }
+
+    @Override
+    public Result visitAdminOpStatementBlock(AdminOpStatementBlockContext ctx) {
+        List<AdminOpStatementContext> adminOpStatementContexts = ctx.adminOpStatement();
+        List<PMLStatement<?>> stmts = new ArrayList<>();
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
+
+        for (AdminOpStatementContext adminOpStatementContext : adminOpStatementContexts) {
+            if (adminOpStatementContext instanceof BasicOrOperationAdminOpStatementContext basicOrOp) {
+                stmts.add(statementVisitor.visitStatement(basicOrOp.statement()));
+            } else if (adminOpStatementContext instanceof CheckAdminOpStatementContext check){
+                stmts.add(statementVisitor.visitCheckStatement(check.checkStatement()));
+            }
+        }
+
+        try {
+            boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
+            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
+        } catch (PMException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
     }
 
     @Override

@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE_TO;
 
-public class AssociateOp extends Operation<Void> {
+public class AssociateOp extends AdminOperation<Void> {
 
     public static final NodeFormalParameter ASSOCIATE_UA_PARAM = new NodeFormalParameter("ua", ASSOCIATE);
     public static final NodeFormalParameter ASSOCIATE_TARGET_PARAM = new NodeFormalParameter("target", ASSOCIATE_TO);

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.function;
 
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.List;
 
 public class PluginRegistry {
 
-    private final List<Operation<?>> operations;
+    private final List<AdminOperation<?>> operations;
     private final List<Routine<?>> routines;
 
     public PluginRegistry() {
@@ -15,12 +16,12 @@ public class PluginRegistry {
         routines = new ArrayList<>();
     }
 
-    public PluginRegistry(List<Operation<?>> operations, List<Routine<?>> routines) {
+    public PluginRegistry(List<AdminOperation<?>> operations, List<Routine<?>> routines) {
         this.operations = operations;
         this.routines = routines;
     }
 
-    public List<Operation<?>> getOperations() {
+    public List<AdminOperation<?>> getOperations() {
         return operations;
     }
 
@@ -28,8 +29,8 @@ public class PluginRegistry {
         return routines;
     }
 
-    public Operation<?> getOperation(String name) {
-        for (Operation<?> op : operations) {
+    public AdminOperation<?> getOperation(String name) {
+        for (AdminOperation<?> op : operations) {
             if (op.getName().equals(name)) {
                 return op;
             }
@@ -48,7 +49,7 @@ public class PluginRegistry {
         return null;
     }
 
-    public void registerOperation(Operation<?> op) {
+    public void registerOperation(AdminOperation<?> op) {
         boolean exists = operations.stream()
             .anyMatch(existing -> existing.getName().equals(op.getName()));
 

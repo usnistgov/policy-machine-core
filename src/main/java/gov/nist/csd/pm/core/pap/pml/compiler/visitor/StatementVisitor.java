@@ -60,8 +60,8 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitSetResourceOperationsStatement(PMLParser.SetResourceOperationsStatementContext ctx) {
-        return new SetResourceOperationsStmtVisitor(visitorCtx).visitSetResourceOperationsStatement(ctx);
+    public PMLStatement<?> visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
+        return new SetResourceAccessRightsStmtVisitor(visitorCtx).visitSetResourceAccessRightsStatement(ctx);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitOperationDefinitionStatement(ctx);
+    public PMLStatement<?> visitAdminOpDefinitionStatement(PMLParser.AdminOpDefinitionStatementContext ctx) {
+        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitAdminOpDefinitionStatement(ctx);
     }
 
     @Override

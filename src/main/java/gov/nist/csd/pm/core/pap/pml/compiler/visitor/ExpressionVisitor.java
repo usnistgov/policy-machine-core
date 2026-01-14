@@ -2,14 +2,18 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.NODE_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.arg.NameNodeArg;
+import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
 import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
 import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionListContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringArrayLitContext;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
@@ -30,6 +34,7 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.core.pap.pml.expression.NodeArgExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.ParenExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -45,11 +50,9 @@ import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpres
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,30 +61,19 @@ import java.util.Objects;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.text.StringEscapeUtils;
 
 public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
-    public static void main(String[] args) throws PMException {
-        String s = "{\"a\":\"a\"}";
-        s = StringEscapeUtils.escapeJson(s);
+    public static Expression<String> compileStringExpression(VisitorContext visitorCtx, ExpressionContext ctx) {
+        ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
+        Expression<?> compiledExpression = visitor.visit(ctx);
 
-        try {
-            Expression<String> stringExpression = ExpressionVisitor.fromString(new VisitorContext(new Scope<>()),
-                s, STRING_TYPE);
-            System.out.println(stringExpression);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(s);
-            Expression<String> stringExpression = ExpressionVisitor.fromString(new VisitorContext(new Scope<>()),
-                "\"" + s + "\"", STRING_TYPE);
-            System.out.println(stringExpression);
-        }
+        return new ExpressionWrapper<>(compiledExpression, STRING_TYPE);
     }
 
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
-            ExpressionContext ctx,
-            Type<T> expectedType) {
+                                            ExpressionContext ctx,
+                                            Type<T> expectedType) {
         ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
         Expression<?> compiledExpression = visitor.visit(ctx);
         Type<?> resultType = compiledExpression.getType();
@@ -202,7 +194,13 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             PMLParser.ExpressionContext exprCtx = argExpressions.get(i);
             FormalParameter<?> formalArg = formalArgs.get(i);
 
-            Expression<?> expr = ExpressionVisitor.compile(visitorCtx, exprCtx, formalArg.getType());
+            Expression<?> expr;
+            if (formalArg.getType().equals(NODE_TYPE)) {
+                Expression<String> stringExpression = ExpressionVisitor.compileStringExpression(visitorCtx, exprCtx);
+                expr = new NodeArgExpression(stringExpression);
+            } else {
+                expr = ExpressionVisitor.compile(visitorCtx, exprCtx, formalArg.getType());
+            }
             args.add(expr);
         }
 

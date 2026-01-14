@@ -6,40 +6,39 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 import java.util.List;
 import java.util.Objects;
 
-public class PMLStmtsOperation extends PMLOperation implements PMLStatementSerializable {
+public class PMLStmtsAdminOperation extends PMLAdminOperation implements PMLStatementSerializable {
 
-    private final CheckAndStatementsBlock body;
+    private final PMLStatementBlock body;
 
-    public PMLStmtsOperation(String name,
-                             Type<?> returnType,
-                             List<FormalParameter<?>> formalParameters,
-                             CheckAndStatementsBlock body) {
+    public PMLStmtsAdminOperation(String name,
+                                  Type<?> returnType,
+                                  List<FormalParameter<?>> formalParameters,
+                                  PMLStatementBlock body) {
         super(name, returnType, formalParameters);
         this.body = body;
     }
 
-    public CheckAndStatementsBlock getBody() {
+    public PMLStatementBlock getBody() {
         return body;
     }
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        ExecutionContext ctx = getCtx();
-
-        ctx.executeOperationStatements(this.body.getChecks().getStmts(), args);
+        // enforcement done in operation body execution
     }
 
     @Override
     public Object execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeOperationStatements(this.body.getStatements().getStmts(), args);
+        return ctx.executeOperationStatements(this.body.getStmts(), args);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class PMLStmtsOperation extends PMLOperation implements PMLStatementSeria
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLStmtsOperation that)) return false;
+        if (!(o instanceof PMLStmtsAdminOperation that)) return false;
         if (!super.equals(o)) return false;
 	    return Objects.equals(body, that.body);
     }

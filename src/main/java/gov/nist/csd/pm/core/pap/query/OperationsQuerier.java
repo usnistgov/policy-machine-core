@@ -4,11 +4,13 @@ import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class OperationsQuerier extends Querier implements OperationsQuery {
@@ -21,8 +23,18 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     @Override
-    public AccessRightSet getResourceOperations() throws PMException {
-        return store.operations().getResourceOperations();
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return store.operations().getResourceAccessRights();
+    }
+
+    @Override
+    public Collection<String> getResourceOperationNames() throws PMException {
+        return store.operations().getResourceOperationNames();
+    }
+
+    @Override
+    public ResourceOperation getResourceOperation(String operationName) throws PMException {
+        return store.operations().getResourceOperation(operationName);
     }
 
     @Override
@@ -33,7 +45,7 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
+    public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
         if (pluginRegistry.getOperationNames().contains(operationName)) {
             return pluginRegistry.getOperation(operationName);
         }

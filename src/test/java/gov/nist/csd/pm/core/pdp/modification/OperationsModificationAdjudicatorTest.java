@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pdp.modification;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -62,15 +63,15 @@ class OperationsModificationAdjudicatorTest {
 
 
     @Test
-    void setResourceOperations() throws PMException {
-        assertDoesNotThrow(() -> ok.setResourceOperations(new AccessRightSet("read")));
-        assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceOperations());
-        assertThrows(UnauthorizedException.class, () -> fail.setResourceOperations(new AccessRightSet("read")));
+    void setResourceAccessRights() throws PMException {
+        assertDoesNotThrow(() -> ok.setResourceAccessRights(new AccessRightSet("read")));
+        assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceAccessRights());
+        assertThrows(UnauthorizedException.class, () -> fail.setResourceAccessRights(new AccessRightSet("read")));
     }
 
     @Test
     void createAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1", List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -90,7 +91,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1", List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 

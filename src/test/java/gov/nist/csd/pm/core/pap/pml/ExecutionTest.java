@@ -399,7 +399,7 @@ public class ExecutionTest {
          PAP pap = new TestPAP();
         
         pap.executePML(new TestUserContext("u1"), input);
-        assertTrue(pap.query().operations().getResourceOperations().contains("read"));
+        assertTrue(pap.query().operations().getResourceAccessRights().contains("read"));
 
         String input1 = """
                 set resource operations [["read", "write"], ["exec"]]
@@ -421,7 +421,7 @@ public class ExecutionTest {
     void testDeleteProhibition() throws PMException {
          PAP pap = new TestPAP();
         
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));

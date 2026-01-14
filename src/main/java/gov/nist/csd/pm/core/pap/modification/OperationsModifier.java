@@ -1,15 +1,14 @@
 package gov.nist.csd.pm.core.pap.modification;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.exception.RoutineExistsException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
@@ -24,17 +23,33 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     }
 
     @Override
-    public void setResourceOperations(AccessRightSet resourceOperations) throws PMException {
-        checkSetResourceAccessRightsInput(resourceOperations);
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
+        checkSetResourceAccessRightsInput(resourceAccessRights);
 
-        policyStore.operations().setResourceOperations(resourceOperations);
+        policyStore.operations().setResourceAccessRights(resourceAccessRights);
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
-        if (AdminOperations.isAdminOperation(operation.getName())
-            || policyStore.operations().getAdminOperationNames().contains(operation.getName())
-            || pluginRegistry.getOperationNames().contains(operation.getName())) {
+    public void createResourceOperation(ResourceOperation operation) throws PMException {
+        if (operationExists(operation.getName())) {
+            throw new OperationExistsException(operation.getName());
+        }
+
+        policyStore.operations().createResourceOperation(operation);
+    }
+
+    @Override
+    public void deleteResourceOperation(String operation) throws PMException {
+        if (!policyStore.operations().getAdminOperationNames().contains(operation)) {
+            return;
+        }
+
+        policyStore.operations().deleteResourceOperation(operation);
+    }
+
+    @Override
+    public void createAdminOperation(AdminOperation<?> operation) throws PMException {
+        if (operationExists(operation.getName())) {
             throw new OperationExistsException(operation.getName());
         }
 
@@ -59,15 +74,22 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     /**
      * Check that the provided resource operations are not existing admin access rights, operations or routines.
-     *
-     * @param accessRightSet The access right set to check.
-     * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected void checkSetResourceAccessRightsInput(AccessRightSet accessRightSet) throws PMException {
+    private void checkSetResourceAccessRightsInput(AccessRightSet accessRightSet) throws PMException {
         for (String ar : accessRightSet) {
             if (isAdminAccessRight(ar) || isWildcardAccessRight(ar) ) {
                 throw new AdminAccessRightExistsException(ar);
             }
         }
+    }
+
+    /*
+     * check if operation admin or resource exists with the name
+     */
+    private boolean operationExists(String name) throws PMException {
+        return AdminOperations.isAdminOperation(name)
+            || policyStore.operations().getAdminOperationNames().contains(name)
+            || pluginRegistry.getOperationNames().contains(name)
+            || policyStore.operations().getResourceOperationNames().contains(name);
     }
 }

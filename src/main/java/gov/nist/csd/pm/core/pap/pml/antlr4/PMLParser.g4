@@ -36,10 +36,11 @@ operationStatement: (
     | deassignStatement
     | associateStatement
     | dissociateStatement
-    | setResourceOperationsStatement
+    | setResourceAccessRightsStatement
     | deleteStatement
     | deleteRuleStatement
-    | operationDefinitionStatement
+    | adminOpDefinitionStatement
+    | resourceOpDefinitionStatement
     | routineDefinitionStatement
 ) ;
 
@@ -139,13 +140,15 @@ associateStatement:
 dissociateStatement:
     DISSOCIATE ua=expression AND target=expression ;
 
-setResourceOperationsStatement:
-    SET_RESOURCE_OPERATIONS accessRightsArr=expression;
+setResourceAccessRightsStatement:
+    SET_RESOURCE_ACCESS_RIGHTS accessRightsArr=expression;
 
 deleteStatement:
     DELETE (IF_EXISTS)? deleteType expression ;
 deleteType:
-    NODE #DeleteNode
+    NODE_TYPE #DeleteNode
+    | ADMIN_OP #DeleteAdminOp
+    | RESOURCE_OP #DeleteResourceOp
     | OBLIGATION #DeleteObligation
     | PROHIBITION #DeleteProhibition ;
 
@@ -159,22 +162,32 @@ varSpec: ID ASSIGN_EQUALS expression;
 
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
-operationDefinitionStatement: operationSignature checkStatementBlock? statementBlock ;
-routineDefinitionStatement: routineSignature checkStatementBlock? statementBlock ;
+adminOpDefinitionStatement: adminOpSignature adminOpStatementBlock ;
+resourceOpDefinitionStatement: resourceOpSignature resourceOpStatementBlock? ;
+routineDefinitionStatement: routineSignature statementBlock ;
 basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
 
-operationSignature: OPERATION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
+operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
+operationFormalParam: variableType ID reqCap=stringArrayLit?;
+
+adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
+adminOpStatement:
+  statement #BasicOrOperationAdminOpStatement
+  | checkStatement #CheckAdminOpStatement
+  ;
+resourceOpStatementBlock: OPEN_CURLY checkStatement* CLOSE_CURLY ;
+
 formalParamList: (formalParam (COMMA formalParam)*)? ;
-formalParam: NODE_PARAM? variableType ID;
+formalParam: variableType ID;
 
 returnStatement: RETURN expression?;
 
 checkStatement: CHECK ar=expression ON target=expression ;
-checkStatementBlock: OPEN_CURLY checkStatement* CLOSE_CURLY ;
-
 basicStatementBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 
 idArr: OPEN_BRACKET (ID (COMMA ID)*)? CLOSE_BRACKET ;
@@ -196,6 +209,7 @@ elseStatement:
 variableType:
     STRING_TYPE #StringType
     | BOOL_TYPE #BooleanType
+    | NODE_TYPE #NodeType
     | arrayType #ArrayVarType
     | mapType #MapVarType
     | ANY #AnyType ;
@@ -264,7 +278,7 @@ idIndex:
     | DENY
     | PROHIBITION
     | OBLIGATION
-    | NODE
+    | NODE_TYPE
     | USER
     | PC
     | OA

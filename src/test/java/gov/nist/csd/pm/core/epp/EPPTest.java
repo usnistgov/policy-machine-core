@@ -7,18 +7,18 @@ import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.obligation.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.JavaObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
@@ -55,7 +55,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                operation op1(@node string a, @node []string b) {
+                operation op1(node string a, node []string b) {
                 
                 }
                 
@@ -92,7 +92,7 @@ class EPPTest {
                 }
                 """);
 
-        Operation<String> op2 = new Operation<>("op2", List.of(ARG_A, ARG_B)) {
+        AdminOperation<String> op2 = new AdminOperation<>("op2", List.of(ARG_A, ARG_B)) {
 
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {
@@ -325,7 +325,7 @@ class EPPTest {
     void testCustomFunctionInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        PMLOperation pmlOperation = new PMLOperation("testFunc", new VoidType()) {
+        PMLAdminOperation pmlAdminOperation = new PMLAdminOperation("testFunc", new VoidType()) {
 
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {
@@ -341,7 +341,7 @@ class EPPTest {
 
         };
 
-        pap.modify().operations().createAdminOperation(pmlOperation);
+        pap.modify().operations().createAdminOperation(pmlAdminOperation);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);

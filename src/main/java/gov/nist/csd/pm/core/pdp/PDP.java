@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.common.tx.TxRunner;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.AccessAdjudication;
@@ -81,7 +81,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     @Override
     public Node adjudicateResourceOperation(UserContext user, long policyElementId, String resourceOperation) throws PMException {
-        if (!pap.query().operations().getResourceOperations().contains(resourceOperation)) {
+        if (!pap.query().operations().getResourceAccessRights().contains(resourceOperation)) {
             throw new OperationDoesNotExistException(resourceOperation);
         }
 
@@ -135,8 +135,8 @@ public class PDP implements EventPublisher, AccessAdjudication {
     private Object executeOperation(UserContext user, PDPTx pdpTx, String op, Map<String, Object> actualArgs) throws PMException {
         Operation<?> operation = pap.query().operations().getAdminOperation(op);
 
-        if (operation instanceof PMLOperation) {
-            ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
+        if (operation instanceof PMLAdminOperation) {
+            ((PMLAdminOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation

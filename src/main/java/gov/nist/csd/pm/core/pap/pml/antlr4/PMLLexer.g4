@@ -4,7 +4,8 @@ lexer grammar PMLLexer;
 package gov.nist.csd.pm.core.pap.pml.antlr;
 }
 
-OPERATION: 'operation';
+ADMIN_OP: 'adminop';
+RESOURCE_OP: 'resourceop';
 CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';
@@ -27,7 +28,7 @@ INTERSECTION: 'intersection' | 'inter';
 UNION: 'union' ;
 PROCESS: 'process';
 
-SET_RESOURCE_OPERATIONS: 'set resource operations';
+SET_RESOURCE_ACCESS_RIGHTS: 'set resource access rights';
 ASSIGN: 'assign' ;
 DEASSIGN: 'deassign' ;
 FROM: 'from' ;

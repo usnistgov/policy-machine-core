@@ -10,15 +10,20 @@ import java.util.List;
 
 public class PMLOperationSignature extends PMLFunctionSignature {
 
+    private boolean isAdminOp;
+
     public PMLOperationSignature(String name,
                                  Type<?> returnType,
-                                 List<FormalParameter<?>> formalParameters) {
+                                 List<FormalParameter<?>> formalParameters,
+                                 boolean isAdminOp) {
         super(name, returnType, formalParameters);
+
+        this.isAdminOp = isAdminOp;
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return toString("operation", indentLevel);
+        return toString(isAdminOp ? "adminop" : "resourceop", indentLevel);
     }
 
     @Override
@@ -29,7 +34,7 @@ public class PMLOperationSignature extends PMLFunctionSignature {
                 pml += ", ";
             }
 
-            pml += ((formalParameter instanceof NodeFormalParameter) ? "@node " : "") +
+            pml += ((formalParameter instanceof NodeFormalParameter) ? "node " : "") +
                 TypeStringer.toPMLString(formalParameter.getType()) + " " +
                 formalParameter.getName();
         }

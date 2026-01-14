@@ -12,7 +12,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.*;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
-import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import it.unimi.dsi.fastutil.longs.LongList;
 import org.junit.jupiter.api.Test;
@@ -825,7 +824,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGetAccessibleNodes() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -852,7 +851,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph1() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -866,7 +865,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph2() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
@@ -886,7 +885,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph3() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
@@ -902,7 +901,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph4() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(id("pc1")));
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(id("pc1")));
@@ -922,7 +921,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph5() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
@@ -943,7 +942,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph6() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -963,7 +962,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph7() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
@@ -982,7 +981,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph8() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
@@ -1000,7 +999,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph9() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
@@ -1020,7 +1019,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph10() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1040,7 +1039,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph11() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1058,7 +1057,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph12() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
@@ -1076,7 +1075,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph13() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
@@ -1097,7 +1096,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph14() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1118,7 +1117,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph15() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
@@ -1139,7 +1138,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph16() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(ua2));
@@ -1160,7 +1159,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph18() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
@@ -1177,7 +1176,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph19() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
@@ -1194,7 +1193,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph20() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1212,7 +1211,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph21() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1232,7 +1231,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph22() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long pc2 = pap.modify().graph().createPolicyClass("pc2");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1250,7 +1249,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph23WithProhibitions() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1280,7 +1279,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph24WithProhibitions() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1319,7 +1318,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph25WithProhibitions() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1347,7 +1346,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testGraph25WithProhibitions2() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1371,7 +1370,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testDeciderWithUA() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
@@ -1392,7 +1391,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testProhibitionsAllCombinations() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         long oa2 = pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
@@ -1480,7 +1479,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testPermissions() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -1507,7 +1506,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testPermissionsInOnlyOnePC() throws PMException {
-        pap.modify().operations().setResourceOperations(RWE);
+        pap.modify().operations().setResourceAccessRights(RWE);
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createPolicyClass("pc2");
         pap.modify().graph().createUserAttribute("ua3", ids("pc1"));
@@ -1527,7 +1526,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testProhibitionsWithContainerAsTarget() throws PMException {
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
@@ -1545,7 +1544,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testProhibitionWithContainerAsTargetComplement() throws PMException {
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
@@ -1562,7 +1561,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testAssociationWithObject() throws PMException {
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
@@ -1576,7 +1575,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
     @Test
     void testAssociationWithObjectAndProhibitions() throws PMException {
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));

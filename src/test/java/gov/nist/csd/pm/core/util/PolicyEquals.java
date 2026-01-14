@@ -62,8 +62,8 @@ public class PolicyEquals {
         assertEquals(aObligations, bObligations);
 
         // check operations
-        AccessRightSet aResOps = a.operations().getResourceOperations();
-        AccessRightSet bResOps = b.operations().getResourceOperations();
+        AccessRightSet aResOps = a.operations().getResourceAccessRights();
+        AccessRightSet bResOps = b.operations().getResourceAccessRights();
         assertEquals(aResOps, bResOps);
 
         Collection<String> aOps = new HashSet<>(a.operations().getAdminOperationNames());

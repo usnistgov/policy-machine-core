@@ -42,7 +42,7 @@ class CreateProhibitionStatementTest {
         );
 
         PAP pap = new TestPAP();
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc2");
         pap.modify().graph().createUserAttribute("ua2", ids("pc2"));
         pap.modify().graph().createUser("u2", ids("ua2"));

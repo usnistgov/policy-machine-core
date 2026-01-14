@@ -221,7 +221,7 @@ public abstract class PAP implements FunctionExecutor, Transactional {
 
         boolean prohibitionsEmpty = query().prohibitions().getProhibitions().isEmpty();
         boolean obligationsEmpty = query().obligations().getObligations().isEmpty();
-        boolean resOpsEmpty = query().operations().getResourceOperations().isEmpty();
+        boolean resOpsEmpty = query().operations().getResourceAccessRights().isEmpty();
 
         // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));

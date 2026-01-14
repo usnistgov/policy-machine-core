@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SetResourceOperationsStatementTest {
+class SetResourceAccessRightsStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        SetResourceOperationsStatement stmt = new SetResourceOperationsStatement(
+        SetResourceAccessRightsStatement stmt = new SetResourceAccessRightsStatement(
                 buildArrayLiteral("a", "b", "c", "d")
         );
 
@@ -26,13 +26,13 @@ class SetResourceOperationsStatementTest {
 
         assertEquals(
                 new AccessRightSet("a", "b", "c", "d"),
-                pap.query().operations().getResourceOperations()
+                pap.query().operations().getResourceAccessRights()
         );
     }
 
     @Test
     void testToFormattedString() {
-        SetResourceOperationsStatement stmt = new SetResourceOperationsStatement(
+        SetResourceAccessRightsStatement stmt = new SetResourceAccessRightsStatement(
                 buildArrayLiteral("a", "b", "c", "d")
         );
 

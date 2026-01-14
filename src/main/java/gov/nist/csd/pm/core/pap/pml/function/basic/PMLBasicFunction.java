@@ -7,7 +7,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
@@ -16,7 +16,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLBasicFunction extends Operation<Object> implements PMLFunction {
+public abstract class PMLBasicFunction extends AdminOperation<Object> implements PMLFunction {
 
 	public static final FormalParameter<String> NODE_NAME_PARAM = new FormalParameter<>("nodeName", STRING_TYPE);
 

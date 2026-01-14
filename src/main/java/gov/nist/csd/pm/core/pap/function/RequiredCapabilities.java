@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import java.util.List;
 
 /**
  * RequiredCapabilities represents the access rights needed on an argument of an operation.
@@ -17,6 +18,10 @@ public class RequiredCapabilities {
     }
 
     public RequiredCapabilities(String ... reqCaps) {
+        this.reqCaps = new AccessRightSet(reqCaps);
+    }
+
+    public RequiredCapabilities(List<String> reqCaps) {
         this.reqCaps = new AccessRightSet(reqCaps);
     }
 

@@ -19,7 +19,7 @@ public class Main {
         PAP pap = new MemoryPAP();
 
         // set the resource operations the policy will support
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
         // create a simple configuration with one of each node type, granting u1 read access to o1.
         long pc1 = pap.modify().graph().createPolicyClass("pc1");

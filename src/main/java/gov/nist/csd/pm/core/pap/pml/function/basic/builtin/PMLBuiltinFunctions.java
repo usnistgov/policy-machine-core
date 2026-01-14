@@ -25,6 +25,8 @@ public class PMLBuiltinFunctions {
     private static final Search search = new Search();
     private static final Append append = new Append();
     private static final AppendAll appendAll = new AppendAll();
+    private static final Name name = new Name();
+    private static final Node node = new Node();
 
     private static final Map<String, PMLBasicFunction> BUILTIN_FUNCTIONS = new HashMap<>();
 
@@ -46,6 +48,8 @@ public class PMLBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(nodeExists.getName(), nodeExists);
         BUILTIN_FUNCTIONS.put(getNode.getName(), getNode);
         BUILTIN_FUNCTIONS.put(search.getName(), search);
+        BUILTIN_FUNCTIONS.put(name.getName(), name);
+        BUILTIN_FUNCTIONS.put(node.getName(), node);
     }
 
     public static Map<String, PMLBasicFunction> builtinFunctions() {

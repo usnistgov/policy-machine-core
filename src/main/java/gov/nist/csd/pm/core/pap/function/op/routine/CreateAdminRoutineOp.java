@@ -4,7 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.RoutineType;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_ADMIN_ROUTINE;
 
-public class CreateAdminRoutineOp extends Operation<Void> {
+public class CreateAdminRoutineOp extends AdminOperation<Void> {
 
     public static final FormalParameter<Routine<?>> ROUTINE_PARAM = new FormalParameter<>("routine", new RoutineType());
 

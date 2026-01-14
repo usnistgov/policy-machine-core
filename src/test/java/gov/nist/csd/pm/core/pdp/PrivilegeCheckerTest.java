@@ -20,7 +20,7 @@ class PrivilegeCheckerTest {
     void testAccessRightChecker() throws PMException {
         PAP pap = new TestPAP();
 
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
 
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));

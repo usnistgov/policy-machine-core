@@ -2,6 +2,8 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
@@ -17,12 +19,13 @@ public class MemoryPolicy {
 
     protected Map<Long, Vertex> graph;
     protected Map<String, Long> nameToIds;
-    protected AccessRightSet resourceOperations;
+    protected AccessRightSet resourceAccessRights;
     protected LongArraySet pcs;
     protected Map<Long, Collection<Prohibition>> nodeProhibitions;
     protected Map<String, Collection<Prohibition>> processProhibitions;
     protected List<Obligation> obligations;
-    protected Map<String, Operation<?>> operations;
+    protected Map<String, AdminOperation<?>> adminOps;
+    protected Map<String, ResourceOperation> resourceOps;
     protected Map<String, Routine<?>> routines;
 
     public MemoryPolicy() {
@@ -33,11 +36,12 @@ public class MemoryPolicy {
         this.graph = new Long2ObjectOpenHashMap<>();
         this.nameToIds = new Object2LongOpenHashMap<>();
         this.pcs = new LongArraySet();
-        this.resourceOperations = new AccessRightSet();
+        this.resourceAccessRights = new AccessRightSet();
         this.nodeProhibitions = new HashMap<>();
         this.processProhibitions = new HashMap<>();
         this.obligations = new ArrayList<>();
-        this.operations = new HashMap<>();
+        this.adminOps = new HashMap<>();
+        this.resourceOps = new HashMap<>();
         this.routines = new HashMap<>();
     }
 

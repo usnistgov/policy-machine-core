@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.NodeArg;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
@@ -13,7 +14,7 @@ import java.util.List;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN_FROM;
 
-public class DeassignOp extends Operation<Void> {
+public class DeassignOp extends AdminOperation<Void> {
 
     public static final NodeFormalParameter DEASSIGN_ASCENDANT_PARAM =
         new NodeFormalParameter("ascendant", DEASSIGN);

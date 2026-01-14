@@ -14,7 +14,7 @@ import java.util.Map;
 
 public sealed abstract class Type<T> implements Serializable
     permits AnyType, BooleanType, ListType, LongType, MapType, StringType, VoidType, RuleType, RoutineType,
-    OperationType, ProhibitionSubjectArgType, ContainerConditionType, NodeType {
+    AdminOperationType, ProhibitionSubjectArgType, ContainerConditionType, NodeType, ResourceOperationType {
 
     public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {

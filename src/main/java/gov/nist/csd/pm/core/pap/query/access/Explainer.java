@@ -37,7 +37,7 @@ public class Explainer {
 		TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
 		// resolve privs and prohibitions
-		AccessRightSet priv = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceOperations());
+		AccessRightSet priv = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
 		AccessRightSet deniedPriv = resolveDeniedAccessRights(userDagResult, targetDagResult);
 		List<Prohibition> prohibitions = computeSatisfiedProhibitions(userDagResult, targetDagResult);
 

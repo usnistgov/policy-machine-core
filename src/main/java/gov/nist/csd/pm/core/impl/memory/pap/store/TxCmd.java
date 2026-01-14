@@ -25,7 +25,7 @@ public abstract class TxCmd implements TxRollbackSupport {
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.operations().setResourceOperations(oldAccessRights);
+            memoryPolicyStore.operations().setResourceAccessRights(oldAccessRights);
         }
     }
 

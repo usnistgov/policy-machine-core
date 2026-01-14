@@ -1,4 +1,4 @@
-set resource operations ["read", "write", "delete_project", "delete_readme"]
+set resource access rights ["read", "write", "delete_project", "delete_readme"]
 
 create pc "RBAC"
 
@@ -40,27 +40,27 @@ routine deleteAllProjects(string locProjectOA) {
     }
 }
 
-operation deleteReadme(@node string projectReadme) {
+adminop deleteReadme(node projectReadme) {
     check "delete_readme" on [projectReadme]
-} {
+
     delete node projectReadme
 }
 
-operation deleteProject(@node string projectName) {
+adminop deleteProject(node projectName) {
     check "delete_project" on [projectName]
-} {
+
     delete node projectName
 }
 
-operation createProject(string projectName, @node string locProjectAttr) {
+adminop createProject(string projectName, node locProjectAttr) {
    check "assign_to" on ["project"]
    check "assign_to" on [locProjectAttr]
-} {
-    create oa projectName in ["project", locProjectAttr]
-    create o projectName + " README" in [projectName]
+
+   create oa projectName in ["project", locProjectAttr]
+   create o projectName + " README" in [projectName]
 }
 
-operation createProjectAdmin(string projectName) {
+adminop createProjectAdmin(string projectName) {
     uaName := projectName + " admin"
     create UA uaName in ["writer"]
     associate uaName and projectName with ["*"]

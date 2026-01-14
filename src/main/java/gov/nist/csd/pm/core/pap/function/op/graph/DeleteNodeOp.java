@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeListFormalParameter;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
 
-public class DeleteNodeOp extends Operation<Void> {
+public class DeleteNodeOp extends AdminOperation<Void> {
 
     public static final NodeFormalParameter DELETE_NODE_NODE_PARAM =
         new NodeFormalParameter("node");

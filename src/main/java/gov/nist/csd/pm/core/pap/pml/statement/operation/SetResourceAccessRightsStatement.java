@@ -6,7 +6,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 
@@ -14,18 +14,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class SetResourceOperationsStatement extends OperationStatement {
+public class SetResourceAccessRightsStatement extends OperationStatement {
 
-    private final Expression<List<String>> operationsExpr;
+    private final Expression<List<String>> arsExpr;
 
-    public SetResourceOperationsStatement(Expression<List<String>> operationsExpr) {
-        super(new SetResourceOperationsOp());
-        this.operationsExpr = operationsExpr;
+    public SetResourceAccessRightsStatement(Expression<List<String>> arsExpr) {
+        super(new SetResourceAccessRights());
+        this.arsExpr = arsExpr;
     }
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        List<String> opValues = operationsExpr.execute(ctx, pap);
+        List<String> opValues = arsExpr.execute(ctx, pap);
         AccessRightSet accessRightSet = new AccessRightSet(opValues);
 
         return new Args()
@@ -34,18 +34,18 @@ public class SetResourceOperationsStatement extends OperationStatement {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + "set resource operations " + operationsExpr;
+        return indent(indentLevel) + "set resource operations " + arsExpr;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SetResourceOperationsStatement that)) return false;
-        return Objects.equals(operationsExpr, that.operationsExpr);
+        if (!(o instanceof SetResourceAccessRightsStatement that)) return false;
+        return Objects.equals(arsExpr, that.arsExpr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(operationsExpr);
+        return Objects.hash(arsExpr);
     }
 } 

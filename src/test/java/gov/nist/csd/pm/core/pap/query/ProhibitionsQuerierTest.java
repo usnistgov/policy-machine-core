@@ -33,7 +33,7 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
             long oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
 
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
 		            true, List.of(
@@ -92,7 +92,7 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
             long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
             long oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject1), new AccessRightSet("read"),
 		            true, List.of(new ContainerCondition(id("oa1"), true),
@@ -133,7 +133,7 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
             long oa3 = pap.modify().graph().createObjectAttribute("oa3", List.of(pc1));
             long oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
 		            true, List.of(new ContainerCondition(id("oa1"), true),
@@ -161,7 +161,7 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long subject = pap.modify().graph().createUserAttribute("subject", List.of(pc1));
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
         pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
             true, List.of(new ContainerCondition(oa1, true)));

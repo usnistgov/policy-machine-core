@@ -14,8 +14,7 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.core.pap.pml.function.operation.CheckAndStatementsBlock;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.scope.FunctionAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
@@ -41,23 +40,19 @@ class FunctionInvokeExpressionTest {
     private static final FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
     private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);
 
-	static PMLStmtsOperation voidFunc = new PMLStmtsOperation("voidFunc", new VoidType(),
+	static PMLStmtsAdminOperation voidFunc = new PMLStmtsAdminOperation("voidFunc", new VoidType(),
             List.of(a, b),
-            new CheckAndStatementsBlock(
-            new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                             new CreatePolicyClassStatement(new VariableReferenceExpression<>("a", STRING_TYPE)),
                             new CreatePolicyClassStatement(new VariableReferenceExpression<>("b", STRING_TYPE))
-            ))));
-    static PMLStmtsOperation stringFunc = new PMLStmtsOperation("stringFunc",
+            )));
+    static PMLStmtsAdminOperation stringFunc = new PMLStmtsAdminOperation("stringFunc",
             STRING_TYPE,
             List.of(a, b),
-            new CheckAndStatementsBlock(
-            new PMLStatementBlock(),
             new PMLStatementBlock(List.of(
                     new VariableAssignmentStatement("x", false, new StringLiteralExpression("test")),
                     new ReturnStatement(new StringLiteralExpression("test_ret"))
-            ))));
+            )));
 
     private Scope<Variable, PMLFunctionSignature> testScope() throws
                                                               FunctionAlreadyDefinedInScopeException {

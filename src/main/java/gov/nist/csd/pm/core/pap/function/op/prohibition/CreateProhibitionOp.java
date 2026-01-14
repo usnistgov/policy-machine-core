@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.function.op.prohibition;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.pap.PAP;
 
 import gov.nist.csd.pm.core.pap.function.arg.Args;

@@ -174,7 +174,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void testSuccess() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
             long pc1 = pap.modify().graph().createPolicyClass("pc1");
             long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
             long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
@@ -211,7 +211,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void Success() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
             long pc1 = pap.modify().graph().createPolicyClass("pc1");
             long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
             long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));

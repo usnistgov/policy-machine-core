@@ -366,7 +366,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         Node targetNode = policyStore.graph().getNodeById(target);
 
         // check the access rights are valid
-        checkAccessRightsValid(policyStore.operations().getResourceOperations(), accessRights);
+        checkAccessRightsValid(policyStore.operations().getResourceAccessRights(), accessRights);
 
         // check the types of each node make a valid association
         Association.checkAssociation(uaNode.getType(), targetNode.getType());

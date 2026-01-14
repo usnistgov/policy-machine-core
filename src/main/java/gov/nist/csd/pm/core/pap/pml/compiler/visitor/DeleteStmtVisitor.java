@@ -5,9 +5,11 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteAdminOpStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteNodeStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteObligationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteProhibitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteResourceOpStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteStatement;
 
 
@@ -24,12 +26,17 @@ public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
         boolean ifExists = ctx.IF_EXISTS() != null;
 
         PMLParser.DeleteTypeContext deleteTypeCtx = ctx.deleteType();
-        if (deleteTypeCtx instanceof PMLParser.DeleteNodeContext) {
-           return new DeleteNodeStatement(nameExpr, ifExists);
-        } else if (deleteTypeCtx instanceof PMLParser.DeleteProhibitionContext) {
-            return new DeleteProhibitionStatement(nameExpr, ifExists);
-        } else {
-            return new DeleteObligationStatement(nameExpr, ifExists);
-        }
+        return switch (deleteTypeCtx) {
+            case PMLParser.DeleteNodeContext deleteNodeContext ->
+                new DeleteNodeStatement(nameExpr, ifExists);
+            case PMLParser.DeleteProhibitionContext deleteProhibitionContext ->
+                new DeleteProhibitionStatement(nameExpr, ifExists);
+            case PMLParser.DeleteAdminOpContext deleteAdminOpContext ->
+                new DeleteAdminOpStatement(nameExpr, ifExists);
+            case PMLParser.DeleteResourceOpContext deleteResourceOpContext ->
+                new DeleteResourceOpStatement(nameExpr, ifExists);
+            case null, default ->
+                new DeleteObligationStatement(nameExpr, ifExists);
+        };
     }
 }

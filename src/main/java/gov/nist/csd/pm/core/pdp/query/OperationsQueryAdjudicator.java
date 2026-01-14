@@ -2,13 +2,15 @@ package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Adjudicate queries on operations. Because operations are not Policy Elements, there are no access checks on
@@ -23,8 +25,18 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public AccessRightSet getResourceOperations() throws PMException {
-        return pap.query().operations().getResourceOperations();
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return pap.query().operations().getResourceAccessRights();
+    }
+
+    @Override
+    public Collection<String> getResourceOperationNames() throws PMException {
+        return pap.query().operations().getResourceOperationNames();
+    }
+
+    @Override
+    public ResourceOperation getResourceOperation(String operationName) throws PMException {
+        return pap.query().operations().getResourceOperation(operationName);
     }
 
     @Override
@@ -33,7 +45,7 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
+    public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
         return pap.query().operations().getAdminOperation(operationName);
     }
 }

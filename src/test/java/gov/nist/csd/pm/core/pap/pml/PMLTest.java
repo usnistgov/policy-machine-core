@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -47,7 +48,7 @@ public class PMLTest {
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
-        Operation<?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");

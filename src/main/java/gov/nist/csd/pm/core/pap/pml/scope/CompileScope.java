@@ -10,7 +10,8 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
+import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLStmtsRoutine;
 
 import java.util.Collection;
@@ -60,13 +61,14 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
-            if (operation instanceof PMLStmtsOperation pmlStmtsOperation) {
+            if (operation instanceof PMLStmtsAdminOperation pmlStmtsOperation) {
                 addFunction(opName, pmlStmtsOperation.getSignature());
             } else {
                 addFunction(opName, new PMLOperationSignature(
                     operation.getName(),
                     ANY_TYPE,
-                    operation.getFormalParameters()
+                    operation.getFormalParameters(),
+                    true
                 ));
             }
         }
@@ -78,7 +80,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
             if (routine instanceof PMLStmtsRoutine pmlStmtsRoutine) {
                 addFunction(routineName, pmlStmtsRoutine.getSignature());
             } else {
-                addFunction(routineName, new PMLOperationSignature(
+                addFunction(routineName, new PMLRoutineSignature(
                     routine.getName(),
                     ANY_TYPE,
                     routine.getFormalParameters()

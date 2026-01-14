@@ -13,7 +13,7 @@ import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class OperationDefinitionStatementTest {
+class AdminOpDefinitionStatementTest {
 
     @Test
     void testWithChecks() throws PMException {

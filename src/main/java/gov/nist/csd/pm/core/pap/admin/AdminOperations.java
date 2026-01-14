@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.function.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceOperationsOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp;
@@ -47,7 +47,7 @@ public class AdminOperations {
 
             new CreateAdminOperationOp(),
             new DeleteAdminOperationOp(),
-            new SetResourceOperationsOp(),
+            new SetResourceAccessRights(),
 
             new CreateProhibitionOp(),
             new DeleteProhibitionOp(),

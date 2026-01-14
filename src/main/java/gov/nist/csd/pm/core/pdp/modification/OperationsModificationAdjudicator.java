@@ -7,7 +7,8 @@ import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperatio
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.op.operation.*;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
@@ -24,17 +25,37 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     }
 
     @Override
-    public void setResourceOperations(AccessRightSet accessRightSet) throws PMException {
-        SetResourceOperationsOp op = new SetResourceOperationsOp();
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
+        SetResourceAccessRights op = new SetResourceAccessRights();
         Args args = new Args()
-            .put(ARSET_PARAM, new ArrayList<>(accessRightSet));
+            .put(ARSET_PARAM, new ArrayList<>(resourceAccessRights));
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
+    public void createResourceOperation(ResourceOperation operation) throws PMException {
+        CreateResourceOperationOp op = new CreateResourceOperationOp();
+        Args args = new Args()
+            .put(CreateResourceOperationOp.OPERATION_PARAM, operation);
+
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+    }
+
+    @Override
+    public void deleteResourceOperation(String operation) throws PMException {
+        DeleteResourceOperationOp op = new DeleteResourceOperationOp();
+        Args args = new Args()
+            .put(NAME_PARAM, operation);
+
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+    }
+
+    @Override
+    public void createAdminOperation(AdminOperation<?> operation) throws PMException {
         CreateAdminOperationOp op = new CreateAdminOperationOp();
         Args args = new Args()
             .put(OPERATION_PARAM, operation);

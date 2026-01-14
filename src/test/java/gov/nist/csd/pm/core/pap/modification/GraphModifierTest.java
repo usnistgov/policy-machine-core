@@ -694,7 +694,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             assertThrows(UnknownAccessRightException.class,
                     () -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read")));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
             assertThrows(UnknownAccessRightException.class,
                     () -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("write")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read")));
@@ -727,7 +727,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
 
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
             pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read"));
 
             assertEquals(
@@ -746,7 +746,7 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
 
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
             pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read"));
 
             Collection<Association> assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));

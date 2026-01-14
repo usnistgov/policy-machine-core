@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    static Operation<?> testOp = new Operation<>("test", List.of()) {
+    static AdminOperation<?> testOp = new AdminOperation<>("test", List.of()) {
         @Override
         public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -39,14 +40,14 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testAdminAccessRightExistsException() {
             assertThrows(AdminAccessRightExistsException.class, () ->
-                    pap.modify().operations().setResourceOperations(new AccessRightSet(CREATE_POLICY_CLASS)));
+                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(CREATE_POLICY_CLASS)));
         }
 
         @Test
         void testSuccess() throws PMException {
             AccessRightSet arset = new AccessRightSet("read", "write");
-            pap.modify().operations().setResourceOperations(arset);
-            assertEquals(arset, pap.query().operations().getResourceOperations());
+            pap.modify().operations().setResourceAccessRights(arset);
+            assertEquals(arset, pap.query().operations().getResourceAccessRights());
         }
     }
 

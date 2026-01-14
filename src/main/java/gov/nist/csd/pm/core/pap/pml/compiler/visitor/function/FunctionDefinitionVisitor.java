@@ -1,9 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.function;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
+
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementBlockVisitor;
@@ -12,14 +17,17 @@ import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLStmtsBasicFunction;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsOperation;
-import gov.nist.csd.pm.core.pap.pml.function.operation.CheckAndStatementsBlock;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.OperationDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.CheckStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.ResourceOpDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 
 
@@ -35,17 +43,16 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     }
 
     @Override
-    public OperationDefinitionStatement visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
-        PMLOperationSignature signature = functionSignatureVisitor.visitOperationSignature(ctx.operationSignature());
+    public AdminOpDefinitionStatement visitAdminOpDefinitionStatement(AdminOpDefinitionStatementContext ctx) {
+        PMLOperationSignature signature = functionSignatureVisitor.visitAdminOpSignature(ctx.adminOpSignature());
 
-        CheckAndStatementsBlock body = parseBody(
-            ctx.checkStatementBlock(),
-            ctx.statementBlock(),
+        PMLStatementBlock body = parseBody(
+            ctx.adminOpStatementBlock(),
             signature.getReturnType(),
             signature.getFormalArgs()
         );
 
-        return new OperationDefinitionStatement(new PMLStmtsOperation(
+        return new AdminOpDefinitionStatement(new PMLStmtsAdminOperation(
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalArgs(),
@@ -54,11 +61,27 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     }
 
     @Override
+    public ResourceOpDefinitionStatement visitResourceOpDefinitionStatement(ResourceOpDefinitionStatementContext ctx) {
+        PMLOperationSignature resourceOpSignature =
+            functionSignatureVisitor.visitResourceOpSignature(ctx.resourceOpSignature());
+
+        PMLStatementBlock pmlStatementBlock = parseResourceOpCheckStatements(
+            ctx.resourceOpStatementBlock().checkStatement(),
+            resourceOpSignature.getFormalArgs()
+        );
+
+        return new ResourceOpDefinitionStatement(new PMLResourceOperation(
+            resourceOpSignature.getName(),
+            resourceOpSignature.getFormalArgs(),
+            pmlStatementBlock
+        ));
+    }
+
+    @Override
     public RoutineDefinitionStatement visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
         PMLRoutineSignature signature = functionSignatureVisitor.visitRoutineSignature(ctx.routineSignature());
 
-        CheckAndStatementsBlock body = parseBody(
-            null,
+        PMLStatementBlock body = parseBody(
             ctx.statementBlock(),
             signature.getReturnType(),
             signature.getFormalArgs()
@@ -68,7 +91,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalArgs(),
-            body.getStatements()
+            body
         ));
     }
 
@@ -76,7 +99,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
     public BasicFunctionDefinitionStatement visitBasicFunctionDefinitionStatement(PMLParser.BasicFunctionDefinitionStatementContext ctx) {
         PMLFunctionSignature signature = functionSignatureVisitor.visitBasicFunctionSignature(ctx.basicFunctionSignature());
 
-        CheckAndStatementsBlock body = parseBody(
+        PMLStatementBlock body = parseBody(
             ctx.basicStatementBlock(),
             signature.getReturnType(),
             signature.getFormalArgs()
@@ -86,11 +109,25 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalArgs(),
-            body.getStatements()
+            body
         ));
     }
 
-    private CheckAndStatementsBlock parseBody(PMLParser.BasicStatementBlockContext ctx,
+    private PMLStatementBlock parseResourceOpCheckStatements(List<CheckStatementContext> checkStatementContexts, List<FormalParameter<?>> formalArgs) {
+        VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
+        StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, VOID_TYPE);
+
+        List<PMLStatement<?>> checkStatements = new ArrayList<>();
+        for (CheckStatementContext checkStatementContext : checkStatementContexts) {
+            CheckStatementVisitor checkStatementBlockVisitor = new CheckStatementVisitor(localVisitorCtx);
+            CheckStatement checkStatement = checkStatementBlockVisitor.visitCheckStatement(checkStatementContext);
+            checkStatements.add(checkStatement);
+        }
+
+        return new PMLStatementBlock(checkStatements);
+    }
+
+    private PMLStatementBlock parseBody(PMLParser.BasicStatementBlockContext ctx,
                                               Type<?> returnType,
                                               List<FormalParameter<?>> formalArgs) {
         // create a new scope for the function body
@@ -103,11 +140,26 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             throw new PMLCompilationRuntimeException(ctx, "not all conditional paths return");
         }
 
-        return new CheckAndStatementsBlock(new PMLStatementBlock(), result.stmts());
+        return result.stmts();
     }
 
-    private CheckAndStatementsBlock parseBody(PMLParser.CheckStatementBlockContext checkStatementBlockCtx,
-                                              PMLParser.StatementBlockContext statementBlockCtx,
+    private PMLStatementBlock parseBody(PMLParser.AdminOpStatementBlockContext ctx,
+                                              Type<?> returnType,
+                                              List<FormalParameter<?>> formalArgs) {
+        // create a new scope for the function body
+        VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
+
+        StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
+        StatementBlockVisitor.Result result = statementBlockVisitor.visitAdminOpStatementBlock(ctx);
+
+        if (!result.allPathsReturned() && !returnType.equals(new VoidType())) {
+            throw new PMLCompilationRuntimeException(ctx, "not all conditional paths return");
+        }
+
+        return result.stmts();
+    }
+
+    private PMLStatementBlock parseBody(PMLParser.StatementBlockContext statementBlockCtx,
                                               Type<?> returnType,
                                               List<FormalParameter<?>> formalArgs) {
         VisitorContext localVisitorCtx = initLocalVisitorCtx(formalArgs);
@@ -118,14 +170,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             throw new PMLCompilationRuntimeException(statementBlockCtx, "not all conditional paths return");
         }
 
-        // get checks
-        PMLStatementBlock checks = new PMLStatementBlock();
-        if (checkStatementBlockCtx != null) {
-            CheckStatementBlockVisitor checkStatementBlockVisitor = new CheckStatementBlockVisitor(localVisitorCtx);
-            checks = checkStatementBlockVisitor.visitCheckStatementBlock(checkStatementBlockCtx);
-        }
-
-        return new CheckAndStatementsBlock(checks, result.stmts());
+        return result.stmts();
     }
 
     private VisitorContext initLocalVisitorCtx(List<FormalParameter<?>> formalArgs) {

@@ -7,6 +7,7 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ContainerConditionType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ProhibitionSubjectArgType;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
@@ -16,7 +17,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class ProhibitionOp extends Operation<Void> {
+public abstract class ProhibitionOp extends AdminOperation<Void> {
 
     public static final FormalParameter<ProhibitionSubject> SUBJECT_PARAM = new FormalParameter<>("subject", new ProhibitionSubjectArgType());
     public static final FormalParameter<Boolean> INTERSECTION_PARAM = new FormalParameter<>("intersection", BOOLEAN_TYPE);

@@ -2,7 +2,9 @@ package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
@@ -27,13 +29,13 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public void setResourceOperations(AccessRightSet resourceOperations) throws PMException {
-		String[] opsArr = resourceOperations.toArray(String[]::new);
+	public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
+		String[] opsArr = resourceAccessRights.toArray(String[]::new);
 
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(RESOURCE_OPERATIONS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			Node node = tx.findNode(RESOURCE_ARS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
 			if (node == null) {
-				node = tx.createNode(RESOURCE_OPERATIONS_LABEL);
+				node = tx.createNode(RESOURCE_ARS_LABEL);
 				node.setProperty(NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
 			}
 
@@ -42,7 +44,30 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public void createAdminOperation(Operation<?> operation) throws PMException {
+	public void createResourceOperation(ResourceOperation operation) throws PMException {
+		String hex = Neo4jUtil.serialize(operation);
+
+		txHandler.runTx(tx -> {
+			Node node = tx.createNode(RESOURCE_OPERATION_LABEL);
+			node.setProperty(NAME_PROPERTY, operation.getName());
+			node.setProperty(DATA_PROPERTY, hex);
+		});
+	}
+
+	@Override
+	public void deleteResourceOperation(String operation) throws PMException {
+		txHandler.runTx(tx -> {
+			Node node = tx.findNode(RESOURCE_OPERATION_LABEL, NAME_PROPERTY, operation);
+			if (node == null) {
+				return;
+			}
+
+			node.delete();
+		});
+	}
+
+	@Override
+	public void createAdminOperation(AdminOperation<?> operation) throws PMException {
 		String hex = Neo4jUtil.serialize(operation);
 
 		txHandler.runTx(tx -> {
@@ -65,11 +90,11 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public AccessRightSet getResourceOperations() throws PMException {
+	public AccessRightSet getResourceAccessRights() throws PMException {
 		AccessRightSet resourceOperations = new AccessRightSet();
 
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(RESOURCE_OPERATIONS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			Node node = tx.findNode(RESOURCE_ARS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
 			if (node == null) {
 				return;
 			}
@@ -79,6 +104,16 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 		});
 
 		return resourceOperations;
+	}
+
+	@Override
+	public Collection<String> getResourceOperationNames() throws PMException {
+		return List.of();
+	}
+
+	@Override
+	public ResourceOperation getResourceOperation(String operationName) throws PMException {
+		return null;
 	}
 
 	@Override
@@ -98,8 +133,8 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public Operation<?> getAdminOperation(String operationName) throws PMException {
-		AtomicReference<Operation<?>> operation = new AtomicReference<>();
+	public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
+		AtomicReference<AdminOperation<?>> operation = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
 			Node node = tx.findNode(ADMIN_OPERATION_LABEL, NAME_PROPERTY, operationName);
@@ -107,7 +142,7 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 				return;
 			}
 
-			Operation<?> op = (Operation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader);
+			AdminOperation<?> op = (AdminOperation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader);
 			operation.set(op);
 		});
 

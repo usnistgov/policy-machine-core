@@ -58,7 +58,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         void testProhibitionContainerDoesNotExistException() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
             assertThrows(
                     NodeDoesNotExistException.class,
                     () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
@@ -72,7 +72,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
                     true,
@@ -151,7 +151,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
                     true, List.of(

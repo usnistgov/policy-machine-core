@@ -22,6 +22,7 @@ class JSONSerializerTest {
 
         String serialize = pap.serialize(new JSONSerializer());
         MemoryPAP pap2 = new MemoryPAP();
+        System.out.println(serialize);
         pap2.deserialize(serialize, new JSONDeserializer());
         pap2.serialize(new JSONSerializer());
 

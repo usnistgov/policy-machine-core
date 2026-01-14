@@ -21,11 +21,12 @@ class PMLStmtsOperationSignatureTest {
                 new NodeFormalParameter("a"),
                 new FormalParameter<>("b", STRING_TYPE),
                 new FormalParameter<>("c", STRING_TYPE)
-            )
+            ),
+            true
         );
 
         assertEquals(
-                "operation op1(@node string a, string b, string c) string ",
+                "adminop op1(node string a, string b, string c) string ",
                 pmlStmtsOperationSignature.toFormattedString(0)
         );
     }
