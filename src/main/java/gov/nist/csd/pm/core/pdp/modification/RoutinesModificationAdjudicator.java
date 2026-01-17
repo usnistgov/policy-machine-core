@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp.ROUTINE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -8,7 +8,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp;
 import gov.nist.csd.pm.core.pap.function.op.routine.DeleteAdminRoutineOp;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.modification.RoutinesModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;

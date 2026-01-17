@@ -30,6 +30,10 @@ public class ErrorLog {
     }
 
     public void addErrors(List<CompileError> errors) {
+        if (errors == null) {
+            return;
+        }
+
         this.errors.addAll(errors);
     }
 

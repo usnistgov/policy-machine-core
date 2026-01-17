@@ -11,10 +11,11 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import java.util.List;
 import java.util.Objects;
 
-public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializable {
+public class PMLStmtsRoutine<T> extends PMLRoutine<T> implements PMLStatementSerializable {
+
     private PMLStatementBlock statements;
 
-    public PMLStmtsRoutine(String name, Type<?> returnType, List<FormalParameter<?>> formalParameters, PMLStatementBlock statements) {
+    public PMLStmtsRoutine(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters, PMLStatementBlock statements) {
         super(name, returnType, formalParameters);
         this.statements = statements;
     }
@@ -28,10 +29,12 @@ public class PMLStmtsRoutine extends PMLRoutine implements PMLStatementSerializa
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public T execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeRoutineStatements(statements.getStmts(), args);
+        Object result = ctx.executeRoutineStatements(statements.getStmts(), args);
+
+        return getReturnType().cast(result);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class AnyTypeFunctionTest {
         );
 
         // Add the function to the scope
-        CompileScope scope = new CompileScope();
+        CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addFunction("testFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
@@ -87,7 +87,7 @@ public class AnyTypeFunctionTest {
         );
 
         // Add the function to the scope
-        CompileScope scope = new CompileScope();
+        CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addFunction("objectReturningFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
@@ -130,7 +130,7 @@ public class AnyTypeFunctionTest {
         );
 
         // Add the function to the scope
-        CompileScope scope = new CompileScope();
+        CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addFunction("collectionsFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
@@ -169,7 +169,7 @@ public class AnyTypeFunctionTest {
         );
 
         // Add the function to the scope
-        CompileScope scope = new CompileScope();
+        CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addFunction("nestedFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
@@ -206,7 +206,7 @@ public class AnyTypeFunctionTest {
         );
 
         // Add the function to the scope
-        CompileScope scope = new CompileScope();
+        CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addFunction("mixedParamFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 

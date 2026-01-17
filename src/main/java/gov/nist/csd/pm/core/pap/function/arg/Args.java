@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 
 public class Args {
 
-	public static Args of(Function<?> function, Map<String, Object> actualArgs) {
+	public static Args of(Function<?, ?> function, Map<String, Object> actualArgs) {
 		List<FormalParameter<?>> formalParameters = function.getFormalParameters();
 
 		Args args = new Args();

@@ -122,7 +122,7 @@ public class TypeCoercionTest {
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
                 MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)));
         
@@ -153,7 +153,7 @@ public class TypeCoercionTest {
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
                 MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)));
         
@@ -178,7 +178,7 @@ public class TypeCoercionTest {
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, 
                 MapType.of(STRING_TYPE, ANY_TYPE));
         

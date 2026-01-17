@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -22,7 +23,7 @@ class CreateNonPCStmtVisitorTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        testGlobalScope = new CompileScope();
+        testGlobalScope = new CompileScope(new MemoryPAP());
     }
 
     @Test

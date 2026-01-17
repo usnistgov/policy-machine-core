@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
@@ -29,7 +30,7 @@ class MapLiteralTest {
                 }
                 """);
 
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<Map<String, Object>> actual = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE,
             ANY_TYPE));
         

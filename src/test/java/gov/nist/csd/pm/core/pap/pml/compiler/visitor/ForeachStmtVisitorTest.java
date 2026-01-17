@@ -7,6 +7,7 @@ import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.tes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
@@ -23,11 +24,11 @@ import org.junit.jupiter.api.Test;
 
 class ForeachStmtVisitorTest {
 
-    private static Scope<Variable, PMLFunctionSignature> testScope;
+    private static CompileScope testScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testScope = new CompileScope();
+        testScope = new CompileScope(new MemoryPAP());
     }
 
     @Test
@@ -37,7 +38,7 @@ class ForeachStmtVisitorTest {
                 foreach x in ["a", "b"] {}
                 """);
         VisitorContext visitorCtx = new VisitorContext(testScope);
-        PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
+        PMLStatement<?> stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new ForeachStatement("x", null, buildArrayLiteral("a", "b"), List.of()).toString(),

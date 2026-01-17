@@ -9,8 +9,8 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deser
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -4,7 +4,7 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.LONG_TYPE;
 
 import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 
-public class NodeIdFormalParameter extends NodeFormalParameter<Long> {
+public final class NodeIdFormalParameter extends NodeFormalParameter<Long> {
 
     public NodeIdFormalParameter(String name, RequiredCapabilities reqCap) {
         super(name, LONG_TYPE, reqCap);

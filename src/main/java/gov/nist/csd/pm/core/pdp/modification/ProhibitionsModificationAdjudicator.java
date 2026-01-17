@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.CONTAINERS_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.INTERSECTION_PARAM;

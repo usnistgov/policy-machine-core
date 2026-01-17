@@ -9,11 +9,15 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
+import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
+import gov.nist.csd.pm.core.pap.function.QueryFunction;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
@@ -32,7 +36,6 @@ import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public abstract class PAP implements FunctionExecutor, Transactional {
 
@@ -126,9 +129,13 @@ public abstract class PAP implements FunctionExecutor, Transactional {
     }
 
     @Override
-    public <R> R executeFunction(Function<R> function, Map<String, Object> rawArgs) throws PMException {
-        Args args = function.validateAndPrepareArgs(rawArgs);
-        return function.execute(this, args);
+    public Object executeFunction(Function<?, ?> function, Args args) throws PMException {
+        return switch (function) {
+            case BasicFunction<?> basicFunction -> basicFunction.execute(null, args);
+            case QueryFunction<?> queryFunction -> queryFunction.execute(this.query(), args);
+            case Operation<?> operation -> operation.execute(this, args);
+            case Routine<?> routine -> routine.execute(this, args);
+        };
     }
 
     /**

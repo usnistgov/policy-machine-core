@@ -6,7 +6,7 @@ import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import java.util.List;
 
-public class NodeIdListFormalParameter extends NodeFormalParameter<List<Long>> {
+public final class NodeIdListFormalParameter extends NodeFormalParameter<List<Long>> {
 
     public NodeIdListFormalParameter(String name, RequiredCapabilities reqCap) {
         super(name, ListType.of(LONG_TYPE), reqCap);

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
-import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
+import gov.nist.csd.pm.core.pap.function.Function;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +26,9 @@ public class PMLBuiltinFunctions {
     private static final Append append = new Append();
     private static final AppendAll appendAll = new AppendAll();
     private static final Name name = new Name();
-    private static final Id node = new Id();
+    private static final Id id = new Id();
 
-    private static final Map<String, PMLBasicFunction> BUILTIN_FUNCTIONS = new HashMap<>();
+    private static final Map<String, Function<?, ?>> BUILTIN_FUNCTIONS = new HashMap<>();
 
     static {
         BUILTIN_FUNCTIONS.put(contains.getName(), contains);
@@ -49,10 +49,10 @@ public class PMLBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(getNode.getName(), getNode);
         BUILTIN_FUNCTIONS.put(search.getName(), search);
         BUILTIN_FUNCTIONS.put(name.getName(), name);
-        BUILTIN_FUNCTIONS.put(node.getName(), node);
+        BUILTIN_FUNCTIONS.put(id.getName(), id);
     }
 
-    public static Map<String, PMLBasicFunction> builtinFunctions() {
+    public static Map<String, Function<?, ?>> builtinFunctions() {
         return new HashMap<>(BUILTIN_FUNCTIONS);
     }
 

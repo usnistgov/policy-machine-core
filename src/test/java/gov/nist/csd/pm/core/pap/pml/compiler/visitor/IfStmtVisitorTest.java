@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
@@ -35,7 +36,7 @@ class IfStmtVisitorTest {
                     x := "c"
                 }
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement<?> stmt = new IfStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -50,7 +51,7 @@ class IfStmtVisitorTest {
 
     @Test
     void testConditionExpressionsNotBool() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """

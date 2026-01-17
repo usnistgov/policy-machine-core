@@ -119,9 +119,9 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     }
 
     private <U extends ParserRuleContext> void addSignatureToCtx(VisitorContext visitorCtx,
-                                                                       U ctx,
-                                                                       String funcName,
-                                                                       PMLFunctionSignature signature, boolean addToCtx) {
+                                                                 U ctx,
+                                                                 String funcName,
+                                                                 PMLFunctionSignature signature, boolean addToCtx) {
         if (!addToCtx) {
             return;
         }

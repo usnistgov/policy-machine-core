@@ -55,9 +55,8 @@ class FunctionInvokeExpressionTest {
                     new ReturnStatement(new StringLiteralExpression("test_ret"))
             )));
 
-    private Scope<Variable, PMLFunctionSignature> testScope() throws
-                                                              FunctionAlreadyDefinedInScopeException {
-        Scope<Variable, PMLFunctionSignature> scope = new Scope<>();
+    private CompileScope testScope() throws PMException {
+        CompileScope scope = new CompileScope(new MemoryPAP());
 
         scope.addFunction(voidFunc.getName(), voidFunc.getSignature());
         scope.addFunction(stringFunc.getName(), stringFunc.getSignature());
@@ -75,13 +74,17 @@ class FunctionInvokeExpressionTest {
 
         VisitorContext visitorContext = new VisitorContext(testScope());
 
-        Expression e = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
+        Expression<?> e = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
         assertEquals(
-                new FunctionInvokeExpression<>(voidFunc.getSignature(), List.of(
+                new FunctionInvokeExpression<>(
+                    voidFunc.getSignature().getName(),
+                    List.of(
                         new StringLiteralExpression("a"),
                         new StringLiteralExpression("b")
-                ), new VoidType()),
+                    ),
+                    new VoidType()
+                ),
                 e
         );
         assertEquals(
@@ -97,8 +100,8 @@ class FunctionInvokeExpressionTest {
     }
 
     @Test
-    void testFunctionNotInScope() throws FunctionAlreadyDefinedInScopeException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+    void testFunctionNotInScope() throws PMException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """

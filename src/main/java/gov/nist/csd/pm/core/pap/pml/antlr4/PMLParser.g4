@@ -38,7 +38,6 @@ operationStatement: (
     | dissociateStatement
     | setResourceAccessRightsStatement
     | deleteStatement
-    | deleteRuleStatement
     | adminOpDefinitionStatement
     | resourceOpDefinitionStatement
     | routineDefinitionStatement
@@ -55,13 +54,14 @@ nonPCNodeType:
     (OA | UA | O | U) ;
 
 createObligationStatement:
-    CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
-createRuleStatement:
-    CREATE RULE ruleName=expression
-    WHEN subjectPattern
-    PERFORMS operationPattern
-    (ON argPattern)?
+    CREATE OBLIGATION name=expression
+    eventPattern
     response ;
+
+eventPattern:
+  WHEN subjectPattern
+  PERFORMS operationPattern
+  ;
 
 // subject
 subjectPattern:
@@ -82,34 +82,17 @@ basicSubjectPatternExpr:
 // operation
 operationPattern:
     ANY OPERATION #AnyOperation
-    | stringLit #IDOperation ;
+    | (opName=ID onPattern?) #OperationPatternFunc ;
+onPattern: ON OPEN_PAREN argNames CLOSE_PAREN onPatternBlock? ;
+onPatternBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
+argNames: ID (COMMA ID)*;
 
-// args
-argPattern: OPEN_CURLY (argPatternElement (COMMA argPatternElement)*)? CLOSE_CURLY ;
-argPatternElement: key=ID COLON (single=argPatternExpression | multiple=argPatternExpressionArray);
-
-argPatternExpressionArray: OPEN_BRACKET argPatternExpression (COMMA argPatternExpression)* CLOSE_BRACKET ;
-
-argPatternExpression:
-     basicArgPatternExpr #BasicArgPatternExpression
-     | EXCLAMATION argPatternExpression #NegateArgPatternExpression
-     | OPEN_PAREN argPatternExpression CLOSE_PAREN #ParenArgPatternExpression
-     | left=argPatternExpression (LOGICAL_AND | LOGICAL_OR) right=argPatternExpression #LogicalArgPatternExpression ;
-
-basicArgPatternExpr:
-    ANY #AnyPolicyElement
-    | IN stringLit #InPolicyElement
-    | stringLit #PolicyElement ;
 
 // response
 response:
     DO OPEN_PAREN ID CLOSE_PAREN responseBlock;
 responseBlock:
-    OPEN_CURLY responseStatement* CLOSE_CURLY ;
-responseStatement:
-    statement
-    | createRuleStatement
-    | deleteRuleStatement ;
+    OPEN_CURLY statement* CLOSE_CURLY ;
 
 createProhibitionStatement:
     CREATE PROHIBITION name=expression
@@ -151,9 +134,6 @@ deleteType:
     | RESOURCE_OP #DeleteResourceOp
     | OBLIGATION #DeleteObligation
     | PROHIBITION #DeleteProhibition ;
-
-deleteRuleStatement:
-    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression ;
 
 variableDeclarationStatement:
     VAR (varSpec | OPEN_PAREN (varSpec)* CLOSE_PAREN) #VarDeclaration
@@ -231,9 +211,11 @@ expressionList: expression (COMMA expression)* ;
 
 literal:
     stringLit #StringLiteral
+    | int64Lit #Int64Literal
     | boolLit #BoolLiteral
     | arrayLit #ArrayLiteral
     | mapLit #MapLiteral;
+int64Lit: INT64_DECIMAL ;
 stringLit: DOUBLE_QUOTE_STRING;
 boolLit: TRUE | FALSE;
 arrayLit: OPEN_BRACKET expressionList? CLOSE_BRACKET ;

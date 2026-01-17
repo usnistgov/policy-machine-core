@@ -64,24 +64,20 @@ adminop createProjectAdmin(string projectName) {
     on union of {projectName: false}
 }
 
-create obligation "create us project admin" {
-    create rule "us project"
+create obligation "create us project admin"
     when any user
-    performs "createProject"
-    on {
-        locProjectAttr: "US project"
+    performs createProject on (locProjectAttr) {
+      return locProjectAttr == "US project"
     }
     do(ctx) {
         createProjectAdmin(ctx.args.projectName)
     }
 
-    create rule "eu project"
+create obligation "create eu project admin"
     when any user
-    performs "createProject"
-    on {
-        locProjectAttr: "EU project"
+    performs createProject on (locProjectAttr) {
+        return locProjectAttr == "EU project"
     }
     do(ctx) {
         createProjectAdmin(ctx.args.projectName)
     }
-}

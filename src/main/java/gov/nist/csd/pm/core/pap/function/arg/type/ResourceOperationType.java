@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.function.arg.type;
 
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 
 public final class ResourceOperationType extends Type<ResourceOperation> {
 

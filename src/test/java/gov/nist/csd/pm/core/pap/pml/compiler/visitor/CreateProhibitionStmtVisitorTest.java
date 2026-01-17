@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubjectType;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -31,7 +32,7 @@ class CreateProhibitionStmtVisitorTest {
                 access rights ["read"]
                 on union of {"oa1": true}
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement<?> stmt = new CreateProhibitionStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -51,7 +52,7 @@ class CreateProhibitionStmtVisitorTest {
 
     @Test
     void testInvalidExpressions() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """

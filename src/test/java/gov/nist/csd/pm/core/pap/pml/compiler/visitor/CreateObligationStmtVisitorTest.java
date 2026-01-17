@@ -4,6 +4,11 @@ import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.tes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -20,20 +25,30 @@ class CreateObligationStmtVisitorTest {
     void testSuccess() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                create obligation "test" {}
+                create obligation "test"
+                when any user
+                performs any operation
+                do(ctx) {}
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
-                new CreateObligationStatement(new StringLiteralExpression("test"), List.of()),
+                new CreateObligationStatement(
+                    new StringLiteralExpression("test"),
+                    new EventPattern(
+                        new SubjectPattern(),
+                        new AnyOperationPattern()
+                    ),
+                    new PMLObligationResponse("ctx", List.of())
+                ),
                 stmt
         );
     }
 
     @Test
     void testInvalidNameExpression() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """

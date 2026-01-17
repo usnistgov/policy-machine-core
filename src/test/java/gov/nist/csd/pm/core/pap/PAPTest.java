@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,8 +15,8 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
@@ -31,14 +32,14 @@ public abstract class PAPTest extends PAPTestInitializer {
     public static final FormalParameter<String> ARG_A = new FormalParameter<>("a", STRING_TYPE);
     public static final FormalParameter<String> ARG_B = new FormalParameter<>("b", STRING_TYPE);
 
-    static AdminOperation<Object> op = new AdminOperation<>("testFunc", List.of()) {
+    static AdminOperation<Void> op = new AdminOperation<>("testFunc", VOID_TYPE, List.of()) {
         @Override
         public void canExecute(PAP pap, UserContext userCtx, Args args) {
 
         }
 
         @Override
-        public Object execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, Args args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
             return null;
         }
@@ -171,22 +172,22 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testPluginRegistry() {
-        pap.plugins().registerOperation(new AdminOperation<>("op1", List.of()) {
+        pap.plugins().registerOperation(new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 
         });
 
-        pap.plugins().registerRoutine(new Routine<>("routine1", List.of()) {
+        pap.plugins().registerRoutine(new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 
@@ -198,9 +199,9 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().registerOperation(new AdminOperation<>("op1", List.of()) {
+        pap.plugins().registerOperation(new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 

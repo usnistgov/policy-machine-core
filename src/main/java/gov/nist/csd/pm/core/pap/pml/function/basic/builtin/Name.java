@@ -4,12 +4,14 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
-public class Name extends PMLBasicFunction {
+public class Name extends PMLQueryFunction<String> {
 
     public static final NodeIdFormalParameter NODE_PARAM =
         new NodeIdFormalParameter("id");
@@ -23,8 +25,8 @@ public class Name extends PMLBasicFunction {
     }
 
     @Override
-    public String execute(PAP pap, Args args) throws PMException {
+    public String execute(PolicyQuery query, Args args) throws PMException {
         long id = args.get(NODE_PARAM);
-        return pap.query().graph().getNodeById(id).getName();
+        return query.graph().getNodeById(id).getName();
     }
 }

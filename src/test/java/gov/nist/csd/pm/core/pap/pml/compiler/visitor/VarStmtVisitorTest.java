@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
@@ -23,12 +25,12 @@ class VarStmtVisitorTest {
     class VarDeclarationTest {
 
         @Test
-        void testSuccess() throws UnknownVariableInScopeException {
+        void testSuccess() throws PMException {
             PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                     """
                      var x = "a"
                      """);
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             new VarStmtVisitor(visitorCtx)
                     .visit(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -37,8 +39,8 @@ class VarStmtVisitorTest {
         }
 
         @Test
-        void testReassign() throws VariableAlreadyDefinedInScopeException {
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        void testReassign() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             testCompilationError(
                     """
@@ -49,8 +51,8 @@ class VarStmtVisitorTest {
         }
 
         @Test
-        void testReassignConstant() throws VariableAlreadyDefinedInScopeException {
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        void testReassignConstant() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
             testCompilationError(
@@ -62,8 +64,8 @@ class VarStmtVisitorTest {
         }
 
         @Test
-        void testReassignInBlock() throws VariableAlreadyDefinedInScopeException {
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        void testReassignInBlock() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
             testCompilationError(
@@ -82,12 +84,12 @@ class VarStmtVisitorTest {
     @Nested
     class ShortDeclarationTest {
         @Test
-        void testSuccess() throws UnknownVariableInScopeException {
+        void testSuccess() throws PMException {
             PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                     """
                      x := "a"
                      """);
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             new VarStmtVisitor(visitorCtx)
                     .visit(ctx);
             assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -96,8 +98,8 @@ class VarStmtVisitorTest {
         }
 
         @Test
-        void testReassign() throws VariableAlreadyDefinedInScopeException {
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        void testReassign() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
             testCompilationError(
                     """
@@ -111,12 +113,12 @@ class VarStmtVisitorTest {
     @Nested
     class VariableAssignmentTest {
         @Test
-        void testSuccess() throws UnknownVariableInScopeException, VariableAlreadyDefinedInScopeException {
+        void testSuccess() throws PMException {
             PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                     """
                      x = "a"
                      """);
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             VariableAssignmentStatement stmt =
                     (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
@@ -130,7 +132,7 @@ class VarStmtVisitorTest {
                     """
                      x += "a"
                      """);
-            visitorCtx = new VisitorContext(new CompileScope());
+            visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, false));
             stmt = (VariableAssignmentStatement) new VarStmtVisitor(visitorCtx)
                     .visit(ctx);
@@ -141,8 +143,8 @@ class VarStmtVisitorTest {
         }
 
         @Test
-        void testVariableDoesNotExist() {
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        void testVariableDoesNotExist() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
             testCompilationError(
                     """
@@ -153,8 +155,8 @@ class VarStmtVisitorTest {
         }
 
         @Test
-        void testVariableIsConstant() throws VariableAlreadyDefinedInScopeException {
-            VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        void testVariableIsConstant() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
             visitorCtx.scope().addVariable("x", new Variable("x", STRING_TYPE, true));
 
             testCompilationError(

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.function.arg.type;
 
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 
 public final class AdminOperationType extends Type<AdminOperation<?>> {
 

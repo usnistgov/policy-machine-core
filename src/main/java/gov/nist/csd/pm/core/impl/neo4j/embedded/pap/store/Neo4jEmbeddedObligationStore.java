@@ -7,7 +7,8 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deser
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +29,8 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
-		Obligation obligation = new Obligation(authorId, name, rules);
+	public void createObligation(long authorId, String name, EventPattern eventPattern, ObligationResponse response) throws PMException {
+		Obligation obligation = new Obligation(authorId, name, eventPattern, response);
 		String hex = Neo4jUtil.serialize(obligation);
 
 		txHandler.runTx(tx -> {

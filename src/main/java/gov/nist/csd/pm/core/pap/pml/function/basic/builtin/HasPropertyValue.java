@@ -3,18 +3,22 @@ package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction.NODE_NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.pml.function.basic.builtin.Env.KEY_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
 
-public class HasPropertyValue extends PMLBasicFunction {
+public class HasPropertyValue extends PMLQueryFunction<Boolean> {
 
     public static final FormalParameter<String> VALUE_PARAM = new FormalParameter<>("value", STRING_TYPE);
 
@@ -27,11 +31,11 @@ public class HasPropertyValue extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public Boolean execute(PolicyQuery query, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
         String key = args.get(KEY_PARAM);
         String value = args.get(VALUE_PARAM);
-        Node node = pap.query().graph().getNodeByName(nodeName);
+        Node node = query.graph().getNodeByName(nodeName);
         boolean has = node.getProperties().containsKey(key);
         if (!has) {
             return false;

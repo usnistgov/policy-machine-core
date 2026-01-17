@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,7 +13,7 @@ import gov.nist.csd.pm.core.common.exception.RoutineExistsException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.List;
@@ -21,50 +22,48 @@ import org.junit.jupiter.api.Test;
 
 public abstract class RoutinesModifierTest extends PAPTestInitializer {
 
-
-
     static Routine<Void> routine1 = new Routine<>(
-            "routine1",
-            List.of(ARG_A, ARG_B)
+        "routine1",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
     ) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
-
     };
 
     static Routine<Void> routine2 = new Routine<>(
-            "routine2",
-            List.of(ARG_A, ARG_B)
+        "routine2",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
     ) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
-
     };
 
     static Routine<Void> routine3 = new Routine<>(
-            "routine3",
-            List.of(ARG_A, ARG_B)
+        "routine3",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
     ) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
-
     };
 
     static Routine<Void> routine4 = new Routine<>(
-            "routine4",
-            List.of(ARG_A, ARG_B)
+        "routine4",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
     ) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
-
     };
 
     @Nested

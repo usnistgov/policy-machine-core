@@ -12,8 +12,9 @@ import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
 import java.util.Map;
+import org.apache.arrow.flatbuf.Bool;
 
-public class ContainsKey extends PMLBasicFunction {
+public class ContainsKey extends PMLBasicFunction<Boolean> {
 
     public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", MapType.of(
         ANY_TYPE, ANY_TYPE));
@@ -29,7 +30,7 @@ public class ContainsKey extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public Boolean execute(Void v, Args args) throws PMException {
         Map<Object, Object> valueMap = args.get(MAP_PARAM);
         Object element = args.get(KEY_PARAM);
         return valueMap.containsKey(element);

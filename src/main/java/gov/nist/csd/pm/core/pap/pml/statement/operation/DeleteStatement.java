@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;

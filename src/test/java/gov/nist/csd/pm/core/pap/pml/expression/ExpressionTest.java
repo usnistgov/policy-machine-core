@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
@@ -28,7 +29,7 @@ class ExpressionTest {
                 """
                 a
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
         Expression<?> actual = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
         assertEquals(
@@ -40,7 +41,7 @@ class ExpressionTest {
                 """
                 a
                 """);
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("a", new Variable("a", ListType.of(STRING_TYPE), false));
         actual = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
         assertEquals(
@@ -55,7 +56,7 @@ class ExpressionTest {
                 """
                 a
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
@@ -71,7 +72,7 @@ class ExpressionTest {
 
     @Test
     void testCompileStringExpression_Literal() throws PMException {
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expression = ExpressionVisitor.fromString(visitorContext, "\"test\"", STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(new StringLiteralExpression("test"), expression);
@@ -79,7 +80,7 @@ class ExpressionTest {
 
     @Test
     void testCompileStringExpression_VarRef() throws PMException {
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("test", new Variable("test", STRING_TYPE, true));
         Expression<?> expression = ExpressionVisitor.fromString(visitorContext, "test", STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -88,7 +89,7 @@ class ExpressionTest {
 
     @Test
     void testCompileStringExpression_FuncInvoke() throws PMException {
-        CompileScope compileScope = new CompileScope();
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
         PMLFunctionSignature signature = new PMLBasicFunctionSignature(
                 "test",
                 STRING_TYPE,
@@ -99,14 +100,14 @@ class ExpressionTest {
 
         Expression<?> expression = ExpressionVisitor.fromString(visitorContext, "test()", STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new FunctionInvokeExpression(signature, List.of(), signature.getReturnType()), expression);
+        assertEquals(new FunctionInvokeExpression<>(signature.getName(), List.of(), signature.getReturnType()), expression);
     }
 
     @Test
     void testCompileStringExpression_NonString_Error() throws PMException {
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
-                () -> ExpressionVisitor.fromString(new VisitorContext(new CompileScope()),
+                () -> ExpressionVisitor.fromString(new VisitorContext(new CompileScope(new MemoryPAP())),
                         "\"test\" == \"test\"",
                         STRING_TYPE
                 )
@@ -115,7 +116,7 @@ class ExpressionTest {
 
         e = assertThrows(
                 PMLCompilationRuntimeException.class,
-                () -> ExpressionVisitor.fromString(new VisitorContext(new CompileScope()),
+                () -> ExpressionVisitor.fromString(new VisitorContext(new CompileScope(new MemoryPAP())),
                         "[\"a\", \"b\"]",
                         STRING_TYPE
                 )

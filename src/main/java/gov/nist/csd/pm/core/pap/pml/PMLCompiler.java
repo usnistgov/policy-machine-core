@@ -22,17 +22,12 @@ public class PMLCompiler {
     public PMLCompiler() {
     }
 
-    public List<PMLStatement<?>> compilePML(String input) throws PMException {
-        Scope<Variable, PMLFunctionSignature> scope = new CompileScope();
-        return compilePMLWithScope(scope, input);
-    }
-
     public List<PMLStatement<?>> compilePML(PAP pap, String input) throws PMException {
-        Scope<Variable, PMLFunctionSignature> scope = new CompileScope(pap);
+        CompileScope scope = new CompileScope(pap);
         return compilePMLWithScope(scope, input);
     }
 
-    private List<PMLStatement<?>> compilePMLWithScope(Scope<Variable, PMLFunctionSignature> scope, String input) throws PMException {
+    private List<PMLStatement<?>> compilePMLWithScope(CompileScope scope, String input) throws PMException {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 
         PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));

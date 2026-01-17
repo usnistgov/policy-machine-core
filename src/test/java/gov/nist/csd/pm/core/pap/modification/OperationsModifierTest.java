@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.modification;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_POLICY_CLASS;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,7 +15,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    static AdminOperation<?> testOp = new AdminOperation<>("test", List.of()) {
+    static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of()) {
         @Override
         public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 

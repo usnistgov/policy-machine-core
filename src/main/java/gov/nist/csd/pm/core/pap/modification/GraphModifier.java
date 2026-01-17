@@ -29,16 +29,12 @@ import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -220,7 +216,6 @@ public class GraphModifier extends Modifier implements GraphModification {
         }
 
         checkIfNodeInProhibition(id);
-        checkIfNodeInObligation(id);
 
         return true;
     }
@@ -242,50 +237,6 @@ public class GraphModifier extends Modifier implements GraphModification {
                 }
             }
         }
-    }
-
-    /**
-     * Helper method to check if a given node is referenced in any obligations. The default implementation loads all
-     * obligations into memory and then searches through each one.
-     *
-     * @param id             The node to check for.
-     * @throws PMException If any PM related exceptions occur in the implementing class.
-     */
-    protected void checkIfNodeInObligation(long id) throws PMException {
-        Node node = policyStore.graph().getNodeById(id);
-
-        Collection<Obligation> obligations = policyStore.obligations().getObligations();
-        for (Obligation obligation : obligations) {
-            // if the node is the author of the obligation or referenced in any rules throw an exception
-            if (obligation.getAuthorId() == id) {
-                throw new NodeReferencedInObligationException(node.nameAndId(), obligation.getName());
-            }
-
-            // check if node referenced in pattern
-            for (Rule rule : obligation.getRules()) {
-                EventPattern eventPattern = rule.getEventPattern();
-
-                // check subject and operation patterns
-                boolean referenced = checkPatternForNode(node.getName(), eventPattern.getSubjectPattern());
-
-                // check arg patterns
-                for (List<ArgPatternExpression> pattern : eventPattern.getArgPatterns().values()) {
-                    for (ArgPatternExpression argPatternExpression : pattern) {
-                        if (checkPatternForNode(node.getName(), argPatternExpression)) {
-                            referenced = true;
-                        }
-                    }
-                }
-
-                if (referenced) {
-                    throw new NodeReferencedInObligationException(node.nameAndId(), obligation.getName());
-                }
-            }
-        }
-    }
-
-    private boolean checkPatternForNode(String entity, Pattern pattern) {
-        return pattern.getReferencedNodes().nodes().contains(entity);
     }
 
     /**

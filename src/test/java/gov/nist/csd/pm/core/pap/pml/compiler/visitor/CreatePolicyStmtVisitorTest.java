@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.tes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -21,7 +22,7 @@ class CreatePolicyStmtVisitorTest {
                 """
                 create PC "test"
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -37,7 +38,7 @@ class CreatePolicyStmtVisitorTest {
                 """
                 create PC "test" 
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement stmt = new CreatePolicyStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -48,7 +49,7 @@ class CreatePolicyStmtVisitorTest {
 
     @Test
     void testInvalidNameExpression() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """

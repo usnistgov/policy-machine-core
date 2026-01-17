@@ -120,6 +120,10 @@ PLUS                    : '+';
 
 DOUBLE_QUOTE_STRING     : '"' (~["\\\r\n] | EscapeSequence)* '"';
 
+// int64 literal
+
+INT64_DECIMAL           : [-]? [0-9]+ ;
+
 // Hidden tokens
 // WS:                 [ \t]+ -> channel(HIDDEN);
 // NL:                 [\r\n]+ -> channel(HIDDEN);

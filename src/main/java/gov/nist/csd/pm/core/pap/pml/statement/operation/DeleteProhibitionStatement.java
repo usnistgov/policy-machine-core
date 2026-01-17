@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.CONTAINERS_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.INTERSECTION_PARAM;
@@ -13,7 +13,6 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteStatement.Type;
 import java.util.ArrayList;
 
 public class DeleteProhibitionStatement extends DeleteStatement {

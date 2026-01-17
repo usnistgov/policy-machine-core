@@ -1,24 +1,28 @@
 package gov.nist.csd.pm.core.pap.function;
 
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PluginRegistry {
 
+    private final List<BasicFunction<?>> basicFunctions;
+    private final List<QueryFunction<?>> queryFunctions;
     private final List<AdminOperation<?>> operations;
     private final List<Routine<?>> routines;
 
     public PluginRegistry() {
+        basicFunctions = new ArrayList<>();
+        queryFunctions = new ArrayList<>();
         operations = new ArrayList<>();
         routines = new ArrayList<>();
     }
 
-    public PluginRegistry(List<AdminOperation<?>> operations, List<Routine<?>> routines) {
-        this.operations = operations;
-        this.routines = routines;
+    public List<BasicFunction<?>> getBasicFunctions() {
+        return basicFunctions;
+    }
+
+    public List<QueryFunction<?>> getQueryFunctions() {
+        return queryFunctions;
     }
 
     public List<AdminOperation<?>> getOperations() {
@@ -27,6 +31,26 @@ public class PluginRegistry {
 
     public List<Routine<?>> getRoutines() {
         return routines;
+    }
+
+    public BasicFunction<?> getBasicFunction(String name) {
+        for (BasicFunction<?> basicFunction : basicFunctions) {
+            if (basicFunction.getName().equals(name)) {
+                return basicFunction;
+            }
+        }
+
+        return null;
+    }
+
+    public QueryFunction<?> getQueryFunction(String name) {
+        for (QueryFunction<?> queryFunction : queryFunctions) {
+            if (queryFunction.getName().equals(name)) {
+                return queryFunction;
+            }
+        }
+
+        return null;
     }
 
     public AdminOperation<?> getOperation(String name) {
@@ -49,6 +73,32 @@ public class PluginRegistry {
         return null;
     }
 
+    public void registerBasicFunction(BasicFunction<?> basicFunction) {
+        boolean exists = basicFunctions.stream()
+            .anyMatch(existing -> existing.getName().equals(basicFunction.getName()));
+
+        if (exists) {
+            throw new IllegalArgumentException(
+                "A basic function with the name " + basicFunction.getName() + " is already registered"
+            );
+        }
+
+        basicFunctions.add(basicFunction);
+    }
+
+    public void registerBasicFunction(QueryFunction<?> queryFunction) {
+        boolean exists = queryFunctions.stream()
+            .anyMatch(existing -> existing.getName().equals(queryFunction.getName()));
+
+        if (exists) {
+            throw new IllegalArgumentException(
+                "A query function with the name " + queryFunction.getName() + " is already registered"
+            );
+        }
+
+        queryFunctions.add(queryFunction);
+    }
+
     public void registerOperation(AdminOperation<?> op) {
         boolean exists = operations.stream()
             .anyMatch(existing -> existing.getName().equals(op.getName()));
@@ -63,7 +113,7 @@ public class PluginRegistry {
     }
 
     public void registerRoutine(Routine<?> routine) {
-        boolean exists = operations.stream()
+        boolean exists = routines.stream()
             .anyMatch(existing -> existing.getName().equals(routine.getName()));
 
         if (exists) {
@@ -73,6 +123,14 @@ public class PluginRegistry {
         }
 
         routines.add(routine);
+    }
+
+    public void removeBasicFunction(BasicFunction<?> basicFunction) {
+        basicFunctions.removeIf(op -> op.getName().equals(basicFunction.getName()));
+    }
+
+    public void removeQueryFunction(QueryFunction<?> queryFunction) {
+        basicFunctions.removeIf(op -> op.getName().equals(queryFunction.getName()));
     }
 
     public void removeOperation(String opName) {
@@ -92,6 +150,18 @@ public class PluginRegistry {
     public List<String> getRoutineNames() {
         return routines.stream()
             .map(Routine::getName)
+            .toList();
+    }
+
+    public List<String> getBasicFunctionNames() {
+        return basicFunctions.stream()
+            .map(BasicFunction::getName)
+            .toList();
+    }
+
+    public List<String> getQueryFunctionNames() {
+        return queryFunctions.stream()
+            .map(QueryFunction::getName)
             .toList();
     }
 }

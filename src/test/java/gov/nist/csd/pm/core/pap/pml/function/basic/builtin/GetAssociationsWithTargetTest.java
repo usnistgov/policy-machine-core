@@ -25,7 +25,7 @@ class GetAssociationsWithTargetTest {
         graph.associate(ua1, oa1, new AccessRightSet("*"));
 
         GetAssociationsWithTarget getAssociationsWithTarget = new GetAssociationsWithTarget();
-        List<Map<String, Object>> result = getAssociationsWithTarget.execute(pap, new Args(Map.of(NODE_NAME_PARAM, "oa1")));
+        List<Map<String, Object>> result = getAssociationsWithTarget.execute(pap.query(), new Args(Map.of(NODE_NAME_PARAM, "oa1")));
 
         assertEquals(1, result.size());
         assertEquals(Map.of("ua", "ua1", "target", "oa1", "arset", List.of("*")), result.getFirst());

@@ -5,7 +5,8 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_USER;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class CreateUserOp extends AdminOperation<Long> {
     public CreateUserOp() {
         super(
             "create_user",
+            BasicTypes.LONG_TYPE,
             List.of(NAME_PARAM, CREATE_U_DESCENDANTS_PARAM)
         );
     }

@@ -26,7 +26,7 @@ class PlusExpressionTest {
                 """
                 "a" + "b"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -49,7 +49,7 @@ class PlusExpressionTest {
                 """
                 "a" + "b" + "c"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -72,7 +72,7 @@ class PlusExpressionTest {
                 """
                 "a" + "b" + ["c"]
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
                 () -> ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE)

@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.modification;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.RoutineExistsException;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class RoutinesModifier extends Modifier implements RoutinesModification {

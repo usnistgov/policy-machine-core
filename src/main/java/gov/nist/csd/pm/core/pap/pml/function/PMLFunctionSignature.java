@@ -29,7 +29,7 @@ public abstract class PMLFunctionSignature implements PMLStatementSerializable {
         return returnType;
     }
 
-    public List<FormalParameter<?>> getFormalArgs() {
+    public List<FormalParameter<?>> getFormalParameters() {
         return formalParameters;
     }
 

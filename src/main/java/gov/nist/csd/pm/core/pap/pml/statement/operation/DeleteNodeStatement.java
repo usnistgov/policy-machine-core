@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.TYPE_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.TYPE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;

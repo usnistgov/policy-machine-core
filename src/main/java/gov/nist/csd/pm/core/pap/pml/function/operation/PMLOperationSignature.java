@@ -30,7 +30,7 @@ public class PMLOperationSignature extends PMLFunctionSignature {
     @Override
     protected String serializeFormalArgs() {
         String pml = "";
-        for (FormalParameter<?> formalParameter : getFormalArgs()) {
+        for (FormalParameter<?> formalParameter : getFormalParameters()) {
             if (!pml.isEmpty()) {
                 pml += ", ";
             }

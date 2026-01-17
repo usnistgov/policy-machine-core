@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
@@ -20,6 +21,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionListContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.IndexContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.Int64LiteralContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
@@ -39,6 +41,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.ParenExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.PlusExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.Int64LiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.BracketIndexExpression;
@@ -155,9 +158,9 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     public FunctionInvokeExpression<?> visitFunctionInvoke(FunctionInvokeContext ctx) {
         String funcName = ctx.ID().getText();
 
-        PMLFunctionSignature signature;
+        PMLFunctionSignature function;
         try {
-            signature = visitorCtx.scope().getFunction(funcName);
+            function = visitorCtx.scope().getFunction(funcName);
         } catch (UnknownFunctionInScopeException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
@@ -169,7 +172,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             argExpressions = expressionListContext.expression();
         }
 
-        List<FormalParameter<?>> formalArgs = signature.getFormalArgs();
+        List<FormalParameter<?>> formalArgs = function.getFormalParameters();
         if (formalArgs.size() != argExpressions.size()) {
             throw new PMLCompilationRuntimeException(
                     ctx,
@@ -186,7 +189,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             args.add(expr);
         }
 
-        return new FunctionInvokeExpression<>(signature, args, signature.getReturnType());
+        return new FunctionInvokeExpression<>(funcName, args, function.getReturnType());
     }
 
     @Override
@@ -234,6 +237,12 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     public Expression<?> visitStringLiteral(PMLParser.StringLiteralContext ctx) {
         String text = ctx.stringLit().getText();
         return new StringLiteralExpression(removeQuotes(text));
+    }
+
+    @Override
+    public Expression<?> visitInt64Literal(Int64LiteralContext ctx) {
+        String text = ctx.int64Lit().getText();
+        return new Int64LiteralExpression(Long.parseLong(text));
     }
 
     @Override

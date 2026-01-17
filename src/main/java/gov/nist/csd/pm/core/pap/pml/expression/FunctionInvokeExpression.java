@@ -3,12 +3,12 @@ package gov.nist.csd.pm.core.pap.pml.expression;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLExecutionException;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,20 +16,20 @@ import java.util.Objects;
 
 public class FunctionInvokeExpression<T> extends Expression<T> {
 
-    private final PMLFunctionSignature functionSignature;
+    private final String name;
     private final List<Expression<?>> actualArgsList;
     private final Type<T> expectedReturnType;
 
-    public FunctionInvokeExpression(PMLFunctionSignature functionSignature,
+    public FunctionInvokeExpression(String name,
                                     List<Expression<?>> actualArgsList,
                                     Type<T> expectedReturnType) {
-        this.functionSignature = functionSignature;
+        this.name = name;
         this.actualArgsList = actualArgsList;
         this.expectedReturnType = expectedReturnType;
     }
 
-    public PMLFunctionSignature getFunctionSignature() {
-        return functionSignature;
+    public String getName() {
+        return name;
     }
 
     public List<Expression<?>> getActualArgsList() {
@@ -48,27 +48,41 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
     @Override
     public T execute(ExecutionContext ctx, PAP pap) throws PMException {
         ExecutionContext funcInvokeCtx = ctx.copy();
-        Function<?> function = funcInvokeCtx.scope().getFunction(functionSignature.getName());
-        Map<String, Object> actualArgValues = prepareArgExpressions(funcInvokeCtx, pap, function);
+        Function<?, ?> function = funcInvokeCtx.scope().getFunction(name);
+
+        // ensure the function return type matches the expected return type
+        Type<?> funcReturnType = function.getReturnType();
+        if (!funcReturnType.isCastableTo(expectedReturnType)) {
+            throw new PMException("expected return type " + expectedReturnType +
+                " but function " + function.getName() + " returns " + funcReturnType);
+        }
+
+        Args actualArgValues = prepareArgExpressions(funcInvokeCtx, pap, function);
 
         // set the ctx if PML function
         if (function instanceof PMLFunction pmlFunction) {
             pmlFunction.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
-        // execute the function
-        return (T) pap.executeFunction(function, actualArgValues);
+        Object result = pap.executeFunction(function, actualArgValues);
+        Type<?> actualType = Type.resolveTypeOfObject(result);
+
+        if (!actualType.isCastableTo(expectedReturnType)) {
+            throw new PMException("Function return type mismatch. Expected " + expectedReturnType + " but got " + actualType);
+        }
+
+        return expectedReturnType.cast(result);
     }
 
-    private Map<String, Object> prepareArgExpressions(ExecutionContext ctx, PAP pap, Function<?> function) throws PMException {
+    private Args prepareArgExpressions(ExecutionContext ctx, PAP pap, Function<?, ?> function) throws PMException {
         List<FormalParameter<?>> formalParams = function.getFormalParameters();
 
         if (actualArgsList.size() != formalParams.size()) {
             throw new PMLExecutionException("expected " + formalParams.size() + " args for function \""
-                + functionSignature.getName() + "\", got " + formalParams.size());
+                + name + "\", got " + formalParams.size());
         }
 
-        Map<String, Object > values = new HashMap<>();
+        Map<FormalParameter<?>, Object> values = new HashMap<>();
         for (int i = 0; i < formalParams.size(); i++) {
             FormalParameter<?> formalParam = formalParams.get(i);
             Expression<?> argExpr = actualArgsList.get(i);
@@ -78,15 +92,15 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
                 throw new PMLExecutionException("expected type " + formalParam.getType() + ", got type " + argExpr.getType());
             }
 
-            values.put(formalParam.getName(), argValue);
+            values.put(formalParam, argValue);
         }
 
-        return values;
+        return new Args(values);
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return String.format("%s%s(%s)", indent(indentLevel), functionSignature.getName(), argsToString());
+        return String.format("%s%s(%s)", indent(indentLevel), name, argsToString());
     }
 
     private String argsToString() {
@@ -109,12 +123,12 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
         if (!(o instanceof FunctionInvokeExpression<?> that)) {
             return false;
         }
-        return Objects.equals(functionSignature, that.functionSignature) && Objects.equals(
-            actualArgsList, that.actualArgsList) && Objects.equals(expectedReturnType, that.expectedReturnType);
+        return Objects.equals(name, that.name) && Objects.equals(actualArgsList, that.actualArgsList)
+            && Objects.equals(expectedReturnType, that.expectedReturnType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(functionSignature, actualArgsList, expectedReturnType);
+        return Objects.hash(name, actualArgsList, expectedReturnType);
     }
 }

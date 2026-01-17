@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionDefinitionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionSignatureVisitor;
@@ -18,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
@@ -120,13 +120,13 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
             functionDefinitionVisitor::visitAdminOpDefinitionStatement);
         List<RoutineDefinitionStatement> routines = compileFunctions(routineCtxs,
             functionDefinitionVisitor::visitRoutineDefinitionStatement);
-        List<BasicFunctionDefinitionStatement> functions = compileFunctions(functionCtxs,
+        List<BasicFunctionDefinitionStatement> basicFunctions = compileFunctions(functionCtxs,
             functionDefinitionVisitor::visitBasicFunctionDefinitionStatement);
 
-        return new CompiledFunctions(operations, routines, functions);
+        return new CompiledFunctions(operations, routines, basicFunctions);
     }
 
-    private <T, R> List<R> compileFunctions(List<T> contexts, Function<T, R> visitor) {
+    private <T, R> List<R> compileFunctions(List<T> contexts, java.util.function.Function<T, R> visitor) {
         List<R> results = new ArrayList<>();
         for (T context : contexts) {
             try {

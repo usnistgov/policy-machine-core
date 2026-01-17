@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import java.util.List;
 import java.util.Objects;
@@ -12,13 +13,21 @@ import org.antlr.v4.runtime.ListTokenSource;
 
 public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLFunctionSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
 
-    public VisitorContext(Scope<Variable, PMLFunctionSignature> scope) {
+    public VisitorContext(CompileScope scope) {
         this(new CommonTokenStream(new ListTokenSource(List.of())), scope, new ErrorLog(), new PMLErrorHandler());
     }
 
     public VisitorContext copy() {
         // want to persist the error tracker and tokens
         return new VisitorContext(this.tokens, scope.copy(), this.errorLog, this.pmlErrorHandler);
+    }
+
+    public VisitorContext copyBasicAndQueryOnly() {
+        return new VisitorContext(this.tokens, scope.copyBasicAndQueryFunctionsOnly(), this.errorLog, this.pmlErrorHandler);
+    }
+
+    public VisitorContext copyBasicOnly() {
+        return new VisitorContext(this.tokens, scope.copyBasicFunctionsOnly(), this.errorLog, this.pmlErrorHandler);
     }
 
     @Override

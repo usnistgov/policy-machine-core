@@ -10,8 +10,9 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
+import org.apache.arrow.flatbuf.Bool;
 
-public class Contains extends PMLBasicFunction {
+public class Contains extends PMLBasicFunction<Boolean> {
 
     public static final FormalParameter<List<Object>> ARR_PARAM = new FormalParameter<>("arr", ListType.of(ANY_TYPE));
     public static final FormalParameter<Object> ELEMENT_PARAM = new FormalParameter<>("element", ANY_TYPE);
@@ -25,7 +26,7 @@ public class Contains extends PMLBasicFunction {
     }
 
     @Override
-    public Boolean execute(PAP pap, Args args) throws PMException {
+    public Boolean execute(Void v, Args args) throws PMException {
         List<Object> valueArr = args.get(ARR_PARAM);
         Object element = args.get(ELEMENT_PARAM);
         return valueArr.contains(element);

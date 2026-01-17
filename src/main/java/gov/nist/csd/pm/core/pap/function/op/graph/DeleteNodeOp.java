@@ -14,7 +14,8 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -30,8 +31,9 @@ public class DeleteNodeOp extends AdminOperation<Void> {
 
     public DeleteNodeOp() {
         super(
-                "delete_node",
-                List.of(DELETE_NODE_NODE_ID_PARAM, TYPE_PARAM, DELETE_NODE_DESCENDANTS_PARAM)
+            "delete_node",
+            BasicTypes.VOID_TYPE,
+            List.of(DELETE_NODE_NODE_ID_PARAM, TYPE_PARAM, DELETE_NODE_DESCENDANTS_PARAM)
         );
     }
 

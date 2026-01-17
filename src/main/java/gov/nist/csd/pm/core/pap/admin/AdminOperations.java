@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.admin;
 
 import gov.nist.csd.pm.core.common.exception.AdminOperationDoesNotExistException;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
@@ -16,7 +16,9 @@ import gov.nist.csd.pm.core.pap.function.op.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.function.op.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.DeleteResourceOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
@@ -47,6 +49,8 @@ public class AdminOperations {
             new CreateAdminOperationOp(),
             new DeleteAdminOperationOp(),
             new SetResourceAccessRights(),
+            new CreateResourceOperationOp(),
+            new DeleteResourceOperationOp(),
 
             new CreateProhibitionOp(),
             new DeleteProhibitionOp(),

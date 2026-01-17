@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
 
-public class Env extends PMLBasicFunction {
+public class Env extends PMLBasicFunction<String> {
 
 	public static final FormalParameter<String> KEY_PARAM = new FormalParameter<>("key", STRING_TYPE);
 
@@ -22,7 +22,7 @@ public class Env extends PMLBasicFunction {
 	}
 
 	@Override
-	public Object execute(PAP pap, Args args) throws PMException {
+	public String execute(Void v, Args args) throws PMException {
 		return System.getenv(args.get(KEY_PARAM));
 	}
 }

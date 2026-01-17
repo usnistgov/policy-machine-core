@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.tes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 class AssociateStmtVisitorTest {
 
-    VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+    VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
     AssociateStmtVisitorTest() throws PMException {
     }

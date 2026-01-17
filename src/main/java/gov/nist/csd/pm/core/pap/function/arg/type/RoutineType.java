@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.function.arg.type;
 
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 
 public final class RoutineType extends Type<Routine<?>> {
 

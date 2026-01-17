@@ -8,13 +8,15 @@ import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
+import gov.nist.csd.pm.core.pap.pml.type.TypeResolver;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 import java.util.Objects;
 
-public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatementSerializable {
+public class PMLStmtsBasicFunction<T> extends PMLBasicFunction<T> implements PMLStatementSerializable {
     private PMLStatementBlock statements;
 
-    public PMLStmtsBasicFunction(String name, Type<?> returnType, List<FormalParameter<?>> formalArgs, PMLStatementBlock statements) {
+    public PMLStmtsBasicFunction(String name, Type<T> returnType, List<FormalParameter<?>> formalArgs, PMLStatementBlock statements) {
         super(name, returnType, formalArgs);
         this.statements = statements;
     }
@@ -28,10 +30,12 @@ public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatem
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public T execute(Void query, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeRoutineStatements(statements.getStmts(), args);
+        Object result = ctx.executeRoutineStatements(statements.getStmts(), args);
+
+        return getReturnType().cast(result);
     }
 
     @Override
@@ -51,7 +55,7 @@ public class PMLStmtsBasicFunction extends PMLBasicFunction implements PMLStatem
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLStmtsBasicFunction that)) return false;
+        if (!(o instanceof PMLStmtsBasicFunction<?> that)) return false;
         return Objects.equals(statements, that.statements);
     }
 

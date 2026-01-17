@@ -1,49 +1,72 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
+import gov.nist.csd.pm.core.pap.function.QueryFunction;
+import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.LogicalArgPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.NodeNameArgPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.UsernamePatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 
 class CreateObligationStatementTest {
 
     @Test
     void testSuccess() throws PMException {
-        CreateObligationStatement stmt = new CreateObligationStatement(new StringLiteralExpression("o1"), List.of(
-                new CreateRuleStatement(
-                        new StringLiteralExpression("rule1"),
-                        new SubjectPattern(),
-                        new OperationPattern("e1"),
-                        Map.of(
-                                "opnd1", List.of(new LogicalArgPatternExpression(
-                                        new NodeNameArgPatternExpression("oa1"),
-                                        new NodeNameArgPatternExpression("oa2"),
-                                        false
-                                ))
-                        ),
-                        new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
-                        ))
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(),
+            new MatchesOperationPattern(
+                "e1",
+                Set.of("opnd1"),
+                new PMLStmtsQueryFunction<>(
+                    "",
+                    BOOLEAN_TYPE,
+                    List.of(new NodeNameFormalParameter("opnd1")),
+                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), """
+                        return opnd1 == "oa1" || opnd1 == "oa2"
+                        """))
                 )
-        ));
+            )
+        );
+
+        CreateObligationStatement stmt = new CreateObligationStatement(
+            new StringLiteralExpression("o1"),
+            eventPattern,
+            new PMLObligationResponse(
+                "evtCtx", List.of(
+                new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
+            )
+            ));
 
         MemoryPAP pap = new TestPAP();
         pap.modify().graph().createPolicyClass("pc1");
@@ -58,87 +81,114 @@ class CreateObligationStatementTest {
         assertTrue(pap.query().obligations().obligationExists("o1"));
 
         Obligation actual = pap.query().obligations().getObligation("o1");
-        assertEquals(1, actual.getRules().size());
         assertEquals(id("u2"), actual.getAuthorId());
-        Rule rule = actual.getRules().get(0);
-        assertEquals("rule1", rule.getName());
-        assertEquals(new EventPattern(
-                new SubjectPattern(),
-                new OperationPattern("e1"),
-                Map.of(
-                        "opnd1", List.of(new LogicalArgPatternExpression(
-                                new NodeNameArgPatternExpression("oa1"),
-                                new NodeNameArgPatternExpression("oa2"),
-                                false
-                        ))
-                )
-        ), rule.getEventPattern());
+        assertEquals(eventPattern, actual.getEventPattern());
     }
 
     @Test
-    void testToFormattedString() {
-        CreateObligationStatement stmt = new CreateObligationStatement(
-                new StringLiteralExpression("obl1"),
-                List.of(
-                        new CreateRuleStatement(
-                                new StringLiteralExpression("rule1"),
-                                new SubjectPattern(),
-                                new OperationPattern("e1"),
-                                Map.of(
-                                        "opnd1", List.of(new LogicalArgPatternExpression(
-                                                new NodeNameArgPatternExpression("oa1"),
-                                                new NodeNameArgPatternExpression("oa2"),
-                                                false
-                                        ))
-                                ),
-                                new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
-                                ))
-                        ),
-                        new CreateRuleStatement(
-                                new StringLiteralExpression("rule2"),
-                                new SubjectPattern(new UsernamePatternExpression("u1")),
-                                new OperationPattern("e3"),
-                                Map.of(
-                                        "opnd1", List.of(new LogicalArgPatternExpression(
-                                                new NodeNameArgPatternExpression("oa1"),
-                                                new NodeNameArgPatternExpression("oa2"),
-                                                false
-                                        ))
-                                ),
-                                new CreateRuleStatement.ResponseBlock("evtCtx", List.of(
-                                        new CreatePolicyClassStatement(new StringLiteralExpression("pc3"))
-                                ))
-                        )
+    void testToFormattedString() throws PMException {
+        EventPattern eventPattern1 = new EventPattern(
+            new SubjectPattern(),
+            new MatchesOperationPattern(
+                "e1",
+                Set.of("opnd1"),
+                new PMLStmtsQueryFunction<>(
+                    "",
+                    BOOLEAN_TYPE,
+                    List.of(new NodeNameFormalParameter("opnd1")),
+                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), """
+                        return opnd1 == "oa1" || opnd1 == "oa2"
+                        """))
                 )
+            )
+        );
 
+        CreateObligationStatement stmt1 = new CreateObligationStatement(
+            new StringLiteralExpression("obl1"),
+            eventPattern1,
+            new PMLObligationResponse(
+                "evtCtx",
+                List.of(new CreatePolicyClassStatement(new StringLiteralExpression("pc2")))
+            )
         );
+
+        CreateObligationStatement stmt2 = new CreateObligationStatement(
+            new StringLiteralExpression("obl2"),
+            eventPattern1,
+            new PMLObligationResponse(
+                "evtCtx",
+                List.of(new CreatePolicyClassStatement(new StringLiteralExpression("pc3")))
+            )
+        );
+
         assertEquals(
-                """
-                        create obligation "obl1" {
-                            create rule "rule1"
-                            when any user
-                            performs "e1"
-                            on {
-                                opnd1: "oa1" || "oa2"
-                            }
-                            do (evtCtx) {
-                                create PC "pc2"
-                            }
-                            
-                            create rule "rule2"
-                            when user "u1"
-                            performs "e3"
-                            on {
-                                opnd1: "oa1" || "oa2"
-                            }
-                            do (evtCtx) {
-                                create PC "pc3"
-                            }
-                            
-                        }""",
-                stmt.toFormattedString(0)
+            """
+                    create obligation "obl1"
+                    when any user
+                    performs e1 on (opnd1) {
+                        return opnd1 == "oa1" || opnd1 == "oa2"
+                    }
+                    do (evtCtx) {
+                        create PC "pc2"
+                    }
+                    }""",
+            stmt1.toFormattedString(0)
         );
+
+        assertEquals(
+            """
+                    create obligation "obl1"
+                    when user "u1"
+                    performs e1 on (opnd1) {
+                        return opnd1 == "oa1" || opnd1 == "oa2"
+                    }
+                    do (evtCtx) {
+                        create PC "pc3"
+                    }
+                    """,
+            stmt1.toFormattedString(0)
+        );
+    }
+
+    @Test
+    void testCreateRuleInResponse() throws PMException {
+        String pml = """
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            
+            associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
+            
+            create obligation "o1" {
+                create rule "rule1"
+                when any user
+                performs any operation
+                do(ctx) {
+                    create rule "rule2"
+                    when any user
+                    performs any operation
+                    do(ctx2) {
+                        create pc "pc2"
+                    }
+                }
+            }
+            """;
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new UserContext(id("u1")), pml);
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        epp.processEvent(new EventContext(
+            new EventContextUser("u1"),
+            "test",
+            new HashMap<>()
+        ));
+        epp.processEvent(new EventContext(
+            new EventContextUser("u1"),
+            "test",
+            new HashMap<>()
+        ));
+        assertTrue(pap.query().graph().nodeExists("pc2"));
     }
 
 }

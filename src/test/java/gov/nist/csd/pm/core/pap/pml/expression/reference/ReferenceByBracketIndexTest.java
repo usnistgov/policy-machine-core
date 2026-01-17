@@ -33,7 +33,7 @@ class ReferenceByBracketIndexTest {
             new StringLiteralExpression("b"),
             ListType.of(STRING_TYPE)
         );
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("a", new Variable("a", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE)), false));
 
         assertEquals(

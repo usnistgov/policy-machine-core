@@ -7,12 +7,9 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementBlockContext
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicOrOperationAdminOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckAdminOpStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OnPatternBlockContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.core.pap.pml.expression.FunctionInvokeExpression;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.IfStatement;
@@ -54,24 +51,26 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     @Override
     public Result visitBasicStatementBlock(PMLParser.BasicStatementBlockContext ctx) {
         List<PMLStatement<?>> stmts = new ArrayList<>();
-        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyBasicOnly());
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
             PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
+            stmts.add(pmlStatement);
+        }
 
-            if (pmlStatement instanceof FunctionInvokeExpression<?> functionInvokeExpression) {
-                String functionName = functionInvokeExpression.getFunctionSignature().getName();
+        try {
+            boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
+            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
+        } catch (PMException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+    }
 
-	            try {
-                    PMLFunctionSignature signature = visitorCtx.scope().getFunction(functionName);
-
-                    if (!(signature instanceof PMLBasicFunctionSignature)){
-                        visitorCtx.errorLog().addError(statementContext, "only PML basic functions (defined as 'function') allowed in basic statement block");
-                    }
-                } catch (UnknownFunctionInScopeException e) {
-                    visitorCtx.errorLog().addError(statementContext, e.getMessage());
-	            }
-            }
-
+    @Override
+    public Result visitOnPatternBlock(OnPatternBlockContext ctx) {
+        List<PMLStatement<?>> stmts = new ArrayList<>();
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyBasicAndQueryOnly());
+        for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
+            PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
             stmts.add(pmlStatement);
         }
 

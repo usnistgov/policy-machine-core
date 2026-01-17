@@ -26,12 +26,11 @@ import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssociationExceptio
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.InSubjectPatternExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -434,27 +433,6 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                     () -> pap.modify().graph().deleteNode(id("oa1")));
 
             pap.modify().prohibitions().deleteProhibition("pro1");
-            pap.modify().obligations().createObligation(id("u1"), "oblLabel",
-                    List.of(new Rule(
-                            "rule1",
-                            new EventPattern(
-                                    new SubjectPattern(new InSubjectPatternExpression("ua1")),
-                                    new OperationPattern("event1")
-                            ),
-                            new PMLObligationResponse("evtCtx", List.of())
-                    ),
-                    new Rule(
-                            "rule1",
-                            new EventPattern(
-                                    new SubjectPattern(new InSubjectPatternExpression("ua1")),
-                                    new OperationPattern("event1")
-                            ),
-                            new PMLObligationResponse("evtCtx", List.of())
-                    ))
-            );
-
-            assertThrows(NodeReferencedInObligationException.class,
-                    () -> pap.modify().graph().deleteNode(id("ua1")));
         }
 
         @Test

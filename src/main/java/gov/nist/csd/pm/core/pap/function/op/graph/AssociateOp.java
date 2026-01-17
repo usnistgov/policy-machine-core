@@ -2,12 +2,13 @@ package gov.nist.csd.pm.core.pap.function.op.graph;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE_TO;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class AssociateOp extends AdminOperation<Void> {
     public AssociateOp() {
         super(
             "associate",
+            VOID_TYPE,
             List.of(ASSOCIATE_UA_PARAM, ASSOCIATE_TARGET_PARAM, ARSET_PARAM)
         );
     }

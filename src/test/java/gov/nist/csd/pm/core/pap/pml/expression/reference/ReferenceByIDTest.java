@@ -18,7 +18,7 @@ class ReferenceByIDTest {
     @Test
     void testGetType() throws PMException {
         VariableReferenceExpression<?> a = new VariableReferenceExpression<>("a", STRING_TYPE);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("a", new Variable("a", STRING_TYPE, false));
 
         assertEquals(

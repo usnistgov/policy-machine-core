@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,8 +15,8 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -47,14 +48,14 @@ public class PMLTest {
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
-        AdminOperation<?> op1 = new AdminOperation<>("op1", List.of(ARGA, ARGB, ARGC)) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
             }
 
             @Override
-            public Object execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 String a = actualArgs.get(ARGA);
                 List<String> b = actualArgs.get(ARGB);
                 Map<String, String> c = actualArgs.get(ARGC);
@@ -76,10 +77,10 @@ public class PMLTest {
         };
         pap.modify().operations().createAdminOperation(op1);
 
-        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", List.of(ARGA, ARGB, ARGC)) {
+        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
-                pap.executeFunction(op1, args.toMap());
+            public Void execute(PAP pap, Args args) throws PMException {
+                pap.executeFunction(op1, args);
 
                 return null;
             }

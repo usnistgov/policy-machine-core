@@ -9,8 +9,10 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
+import org.checkerframework.checker.units.qual.A;
+import scala.App;
 
-public class Append extends PMLBasicFunction {
+public class Append extends PMLBasicFunction<List<Object>> {
 
     public static final FormalParameter<List<Object>> DST_PARAM = new FormalParameter<>("dst", ListType.of(ANY_TYPE));
     public static final FormalParameter<Object> SRC_PARAM = new FormalParameter<>("src", ANY_TYPE);
@@ -24,7 +26,7 @@ public class Append extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public List<Object> execute(Void pap, Args args) throws PMException {
         List<Object> valueArr = args.get(DST_PARAM);
         Object srcValue = args.get(SRC_PARAM);
 

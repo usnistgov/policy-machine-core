@@ -71,11 +71,6 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
-        return new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
-    }
-
-    @Override
     public PMLStatement<?> visitVariableAssignmentStatement(PMLParser.VariableAssignmentStatementContext ctx) {
         return new VarStmtVisitor(visitorCtx).visitVariableAssignmentStatement(ctx);
     }

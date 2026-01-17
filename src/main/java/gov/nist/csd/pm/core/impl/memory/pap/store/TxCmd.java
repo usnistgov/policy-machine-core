@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import java.util.Collection;
 import java.util.Map;
@@ -202,7 +202,8 @@ public abstract class TxCmd implements TxRollbackSupport {
             memoryPolicyStore.obligations().createObligation(
                     obligationToDelete.getAuthorId(),
                     obligationToDelete.getName(),
-                    obligationToDelete.getRules()
+                    obligationToDelete.getEventPattern(),
+                    obligationToDelete.getResponse()
             );
         }
     }

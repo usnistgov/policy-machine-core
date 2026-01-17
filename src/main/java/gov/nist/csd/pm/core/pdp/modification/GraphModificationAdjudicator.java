@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.PROPERTIES_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.PROPERTIES_PARAM;
 import static gov.nist.csd.pm.core.pdp.event.EventContextUtil.buildEventContext;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
@@ -13,7 +13,7 @@ import gov.nist.csd.pm.core.common.graph.node.Properties;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;

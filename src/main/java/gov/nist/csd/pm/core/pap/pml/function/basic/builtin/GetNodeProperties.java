@@ -1,18 +1,21 @@
 package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction.NODE_NAME_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.QueryFunction;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 import java.util.Map;
 
-public class GetNodeProperties extends PMLBasicFunction {
+public class GetNodeProperties extends QueryFunction<Map<String, String>> {
 
     private static final Type<Map<String, String>> returnType = MapType.of(STRING_TYPE, STRING_TYPE);
 
@@ -26,8 +29,8 @@ public class GetNodeProperties extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
-        Node node = pap.query().graph().getNodeByName(args.get(NODE_NAME_PARAM));
+    public Map<String, String> execute(PolicyQuery query, Args args) throws PMException {
+        Node node = query.graph().getNodeByName(args.get(NODE_NAME_PARAM));
         return node.getProperties();
     }
 }

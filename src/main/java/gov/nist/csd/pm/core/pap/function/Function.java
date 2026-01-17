@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pap.function;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
@@ -14,14 +13,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class Function<R> implements Serializable {
+public abstract sealed class Function<T, R> implements Serializable
+    permits Operation, Routine, BasicFunction, QueryFunction {
 
     private static final long serialVersionUID = 1L;
     protected final String name;
+    protected final Type<R> returnType;
     protected final List<FormalParameter<?>> parameters;
 
-    public Function(String name, List<FormalParameter<?>> parameters) {
+    public Function(String name, Type<R> returnType, List<FormalParameter<?>> parameters) {
         this.name = name;
+        this.returnType = returnType;
         this.parameters = parameters;
     }
 
@@ -29,13 +31,60 @@ public abstract class Function<R> implements Serializable {
      * Execute the function with the given arguments and PAP object. This method allows for modification and querying of
      * the underlying policy.
      *
-     * @param pap  The PAP object.
+     * @param t  The object to execute on.
      * @param args The arguments passed to the function execution.
      * @return The function return value.
      */
-    public abstract R execute(PAP pap, Args args) throws PMException;
+    public abstract R execute(T t, Args args) throws PMException;
 
+    /**
+     * Convert the given map of raw args to an Arg object with type checking on arg values.
+     * @param rawArgs The raw args to validate and prepare.
+     * @return An Args object.
+     */
     public Args validateAndPrepareArgs(Map<String, Object> rawArgs) {
+        return validateAndPrepareArgs(rawArgs, true);
+    }
+
+    /**
+     * Convert the given map of raw args to an Arg object with type checking on arg values. This method allows for only
+     * a subset of the expected args to be included but will throw an exception for unrecognized args.
+     * @param rawArgs The raw args to validate and prepare.
+     * @return An Args object.
+     */
+    public Args validateAndPrepareSubsetArgs(Map<String, Object> rawArgs) {
+        return validateAndPrepareArgs(rawArgs, false);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Type<R> getReturnType() {
+        return returnType;
+    }
+
+    public List<FormalParameter<?>> getFormalParameters() {
+        return parameters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Function<?, ?> function)) {
+            return false;
+        }
+        return Objects.equals(name, function.name) && Objects.equals(parameters, function.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, parameters);
+    }
+
+    private Args validateAndPrepareArgs(Map<String, Object> rawArgs, boolean checkMissing) {
         Map<String, FormalParameter<?>> paramMap = parameters.stream()
             .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
 
@@ -51,11 +100,13 @@ public abstract class Function<R> implements Serializable {
         }
 
         // check for missing args
-        Set<String> missing = new HashSet<>(expectedKeys);
-        missing.removeAll(actualKeys);
-        if (!missing.isEmpty()) {
-            throw new IllegalArgumentException(
-                String.format("missing required arguments for function '%s': %s", name, missing));
+        if (checkMissing) {
+            Set<String> missing = new HashSet<>(expectedKeys);
+            missing.removeAll(actualKeys);
+            if (!missing.isEmpty()) {
+                throw new IllegalArgumentException(
+                    String.format("missing required arguments for function '%s': %s", name, missing));
+            }
         }
 
         // build type safe map
@@ -77,29 +128,5 @@ public abstract class Function<R> implements Serializable {
         }
 
         return new Args(argsWithFormalParams);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<FormalParameter<?>> getFormalParameters() {
-        return parameters;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Function<?> function)) {
-            return false;
-        }
-        return Objects.equals(name, function.name) && Objects.equals(parameters, function.parameters);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, parameters);
     }
 }

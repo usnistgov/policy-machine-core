@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.tes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -25,8 +26,8 @@ class ContinueStmtVisitorTest {
                     continue
                 }
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        PMLStatement<?> stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new ForeachStatement("x", null, buildArrayLiteral("a"), List.of(
@@ -38,7 +39,7 @@ class ContinueStmtVisitorTest {
 
     @Test
     void testNotInForLoop() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """

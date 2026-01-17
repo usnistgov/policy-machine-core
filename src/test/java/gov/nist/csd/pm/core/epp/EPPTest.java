@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
@@ -23,27 +24,36 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.JavaObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.modification.GraphModification;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.LogicalSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.ProcessSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.response.JavaObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
-import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import it.unimi.dsi.fastutil.longs.LongList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class EPPTest {
@@ -63,13 +73,10 @@ class EPPTest {
                 
                 }
                 
-                create obligation "obl1" {
-                    create rule "op1"
+                create obligation "obl1"
                     when any user
-                    performs "op1"
-                    on {
-                        a: "oa1",
-                        b: "oa1"
+                    performs op1 on (a, b) {
+                        return a == "oa1" && b == "oa1"
                     }
                     do(ctx) {
                         create pc ctx.args.a + "pc1"
@@ -79,21 +86,19 @@ class EPPTest {
                         }
                     }
                 
-                    create rule "op2"
+                create obligation "obl2"
                     when any user
-                    performs "op2"
-                    on {
-                        a: "oa2",
-                        b: "oa2"
+                    performs op2 on (a, b) {
+                        return a == "oa2" && b == "oa2"
                     }
                     do(ctx) {
                         create pc ctx.args.a + "pc3"
-                        create pc ctx.args.b + "pc4"                
+                        create pc ctx.args.b + "pc4"
                     }
                 }
                 """);
 
-        AdminOperation<String> op2 = new AdminOperation<>("op2", List.of(ARG_A, ARG_B)) {
+        AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(ARG_A, ARG_B)) {
 
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {
@@ -101,7 +106,7 @@ class EPPTest {
             }
 
             @Override
-            public String execute(PAP pap, Args args) {
+            public String execute(PAP pap, Args args) throws PMException {
                 return "";
             }
         };
@@ -154,6 +159,7 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 
                 set resource access rights ["read"]
+                resoruceop read_file(@node("read") string name)
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
@@ -161,23 +167,22 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["read"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
-                create obligation "obl1" {
-                    create rule "op1"
+                create obligation "obl1"
                     when any user
-                    performs "read"
-                    on {
-                        target: "oa1"
+                    performs read 
+                    on (name) {
+                        return name == "oa1"
                     }
                     do(ctx) {
                         create pc ctx.args.target + "pc1"
                     }
-                }
                 """);
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        assertDoesNotThrow(() -> pdp.adjudicateResourceOperation(new UserContext(id("u1")), id("oa1"), "read"));
+        assertDoesNotThrow(() -> pdp.adjudicateResourceOperation(new UserContext(id("u1")), "read_file",
+            Map.of("name", id("oa1"))));
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
     }
 
@@ -198,9 +203,9 @@ class EPPTest {
                 create obligation "test" {
                     create rule "rule1"
                     when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
+                    performs create_object_attribute
+                    on (descendants) {
+                        return contains(descendants, id("oa1"))
                     }
                     do(evtCtx) {
                         create PC "pc2"
@@ -237,9 +242,9 @@ class EPPTest {
                 create obligation "test" {
                     create rule "rule1"
                     when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
+                    performs create_object_attribute
+                    on (descendants) {
+                        return contains(descendants, id("oa1"))
                     }
                     do(ctx) {
                         name := ctx.opName
@@ -288,19 +293,16 @@ class EPPTest {
 
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
             policy.modify().obligations().createObligation(id("u1"), "test",
-                List.of(new Rule(
-                    "rule1",
-                    new EventPattern(new SubjectPattern(), new OperationPattern(CREATE_OBJECT_ATTRIBUTE)),
-                    new PMLObligationResponse("evtCtx", List.of(
-                        new CreateNonPCStatement(
-                            new StringLiteralExpression("o2"),
-                            NodeType.O,
-                            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("oa1")), STRING_TYPE)
-                        ),
+                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(CREATE_OBJECT_ATTRIBUTE)),
+                new PMLObligationResponse("evtCtx", List.of(
+                    new CreateNonPCStatement(
+                        new StringLiteralExpression("o2"),
+                        NodeType.O,
+                        ArrayLiteralExpression.of(List.of(new StringLiteralExpression("oa1")), STRING_TYPE)
+                    ),
 
-                        // expect error for node already exists
-                        new CreatePolicyClassStatement(new StringLiteralExpression("pc1"))
-                    ))
+                    // expect error for node already exists
+                    new CreatePolicyClassStatement(new StringLiteralExpression("pc1"))
                 ))
             );
 
@@ -311,8 +313,8 @@ class EPPTest {
             new EventContextUser("u1", null),
             CREATE_OBJECT_ATTRIBUTE,
             Map.of(
-                "name", "oa2",
-                "descendants", List.of("pc1")
+                "name", id("oa2"),
+                "descendants", List.of(id("pc1"))
             )
         );
 
@@ -326,7 +328,7 @@ class EPPTest {
     void testCustomFunctionInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        PMLAdminOperation pmlAdminOperation = new PMLAdminOperation("testFunc", new VoidType()) {
+        PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType()) {
 
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {
@@ -334,10 +336,10 @@ class EPPTest {
             }
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
-                return new VoidResult();
+                return null;
             }
 
         };
@@ -357,17 +359,15 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
-                create obligation "test" {
-                    create rule "rule1"
+                create obligation "test"
                     when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
+                    performs create_object_attribute
+                    on (descendants) {
+                        return contains(descendants, id("oa1"))
                     }
                     do(evtCtx) {
                         testFunc()
                     }
-                }
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
 
@@ -397,12 +397,11 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["*a"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
                 
-                create obligation "test" {
-                    create rule "rule1"
+                create obligation "test"
                     when any user
-                    performs "create_object_attribute"
-                    on {
-                        descendants: "oa1"
+                    performs create_object_attribute
+                    on (descendants) {
+                        return contains(descendants, id("oa1"))
                     }
                     do(evtCtx) {
                         if true {
@@ -444,7 +443,7 @@ class EPPTest {
                 create obligation "obl1" {
                     create rule "rule1"
                     when any user
-                    performs "create_policy_class"
+                    performs create_policy_class
                     do(ctx) {
                         op1()
                         routine1()
@@ -549,7 +548,7 @@ class EPPTest {
                 """;
 
         PMLCompiler pmlCompiler = new PMLCompiler();
-        assertDoesNotThrow(() -> pmlCompiler.compilePML(pml));
+        assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
     }
 
     @Test
@@ -571,24 +570,325 @@ class EPPTest {
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
 
-        pap.modify().obligations().createObligation(id("u1"), "obligation", List.of(
-            new Rule(
-                "rule1",
-                new EventPattern(
-                    new SubjectPattern(),
-                    new OperationPattern("assign")
-                ),
-                new JavaObligationResponse() {
+        pap.modify().obligations().createObligation(id("u1"), "obligation",
+            new EventPattern(
+                new SubjectPattern(),
+                new MatchesOperationPattern("assign")
+            ),
+            new JavaObligationResponse() {
 
-                    @Override
-                    public void execute(PAP pap, UserContext author, EventContext evtCtx) throws PMException {
-                        pap.modify().graph().createPolicyClass("test");
-                    }
+                @Override
+                public void execute(PAP pap, UserContext author, EventContext evtCtx) throws PMException {
+                    pap.modify().graph().createPolicyClass("test");
                 }
-            )
-        ));
+            }
+        );
 
         pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
         assertFalse(pap.query().graph().nodeExists("test"));
+    }
+
+    private MemoryPAP testPAP() throws PMException {
+        MemoryPAP pap = new TestPAP();
+
+        GraphModification graph = pap.modify().graph();
+
+        long pc1 = graph.createPolicyClass("pc1");
+        long ua1 = graph.createUserAttribute("ua1", LongList.of(pc1));
+        graph.createUser("u1", LongList.of(ua1));
+
+        return pap;
+    }
+
+    @Test
+    void testUserAttributesMatches() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new InSubjectPatternExpression("ua1")),
+            new AnyOperationPattern()
+        );
+
+        PAP pap = testPAP();
+
+        UserContext userCtx = new UserContext(List.of(id("ua1")));
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+
+    }
+
+    @Test
+    void testUserAttributesNotMatches() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new InSubjectPatternExpression("ua1")),
+            new AnyOperationPattern()
+        );
+
+        PAP pap = testPAP();
+
+        UserContext userCtx = new UserContext(List.of(id("ua2")));
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testOperationMatches() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(),
+            new AnyOperationPattern()
+        );
+
+        PAP pap = testPAP();
+
+        UserContext userCtx = new UserContext(id("u1"));
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testOperationDoesNotMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(),
+            new MatchesOperationPattern("op1")
+        );
+
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            """);
+
+        UserContext userCtx = new UserContext(id("u1"));
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertFalse(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testUserDoesNotMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new UsernamePatternExpression("u2")),
+            new AnyOperationPattern()
+        );
+
+        MemoryPAP pap = new TestPAP();
+        pap.executePML(new TestUserContext("u1"), """
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            """);
+
+        UserContext userCtx = new UserContext(id("u1"), "");
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertFalse(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testUserAndProcessMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new LogicalSubjectPatternExpression(
+                new UsernamePatternExpression("u1"),
+                new ProcessSubjectPatternExpression("p1"),
+                false
+            )),
+            new AnyOperationPattern()
+        );
+
+        MemoryPAP pap = new TestPAP();
+
+        EventContext eventContext = new EventContext(
+            new EventContextUser("u1", "p1"),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        UserContext userCtx = new UserContext(id("u1"), "");
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testUserMatchesProcessDoesNotMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new LogicalSubjectPatternExpression(
+                new UsernamePatternExpression("u1"),
+                new ProcessSubjectPatternExpression("p1"),
+                false
+            )),
+            new AnyOperationPattern()
+        );
+
+        MemoryPAP pap = new TestPAP();
+
+        EventContext eventContext = new EventContext(
+            new EventContextUser("u1", "p2"),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        UserContext userCtx = new UserContext(id("u1"), "p2");
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testUserAndProcessDoNotMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new LogicalSubjectPatternExpression(
+                new UsernamePatternExpression("u2"),
+                new ProcessSubjectPatternExpression("p1"),
+                false
+            )),
+            new AnyOperationPattern()
+        );
+
+        MemoryPAP pap = new TestPAP();
+
+        EventContext eventContext = new EventContext(
+            new EventContextUser("u1", "p2"),
+            "assign",
+            Map.of("ascendant", id("a"), "descendants", List.of(id("b")))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        UserContext userCtx = new UserContext(id("u1"), "");
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testArgsMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new UsernamePatternExpression("u1")),
+            new MatchesOperationPattern(
+                "e1",
+                Set.of("opnd1"),
+                new PMLStmtsQueryFunction<>(
+                    "",
+                    BOOLEAN_TYPE,
+                    List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
+                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), """
+                        return name(ascendant) == "a"
+                        """))
+                )
+            )
+        );
+
+        MemoryPAP pap = new TestPAP();
+
+        UserContext userCtx = new UserContext(id("u1"), "");
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", id("a"), "descendants", List.of(id("b")))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertTrue(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
+    }
+
+    @Test
+    void testArgsDoNotMatch() throws PMException {
+        EventPattern eventPattern = new EventPattern(
+            new SubjectPattern(new UsernamePatternExpression("u1")),
+            new MatchesOperationPattern(
+                "e1",
+                Set.of("ascendant", "descendants"),
+                new PMLStmtsQueryFunction<>(
+                    "",
+                    BOOLEAN_TYPE,
+                    List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
+                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), """
+                        return name(ascendant) == "b"
+                        """))
+                )
+            )
+        );
+
+        MemoryPAP pap = new TestPAP();
+
+        UserContext userCtx = new UserContext(id("u1"), "");
+
+        EventContext eventContext = new EventContext(
+            EventContextUser.fromUserContext(userCtx, pap),
+            "assign",
+            Map.of("ascendant", "a", "descendants", List.of("b"))
+        );
+
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        pdp.runTx(userCtx, pdpTx -> {
+            assertFalse(epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+            return null;
+        });
     }
 }

@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
 
-public class AppendAll extends PMLBasicFunction {
+public class AppendAll extends PMLBasicFunction<List<Object>> {
 
     public static final FormalParameter<List<Object>> SRC_LIST_PARAM = new FormalParameter<>("src", ListType.of(ANY_TYPE));
 
@@ -24,7 +24,7 @@ public class AppendAll extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public List<Object> execute(Void v, Args args) throws PMException {
         List<Object> valueArr = args.get(DST_PARAM);
         List<Object> srcValue = args.get(SRC_LIST_PARAM);
 

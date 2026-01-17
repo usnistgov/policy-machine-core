@@ -4,7 +4,8 @@ import gov.nist.csd.pm.core.pap.function.RequiredCapabilities;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 
-public abstract class NodeFormalParameter<T> extends FormalParameter<T> {
+public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>
+	permits NodeIdFormalParameter, NodeIdListFormalParameter, NodeNameFormalParameter, NodeNameListFormalParameter {
 
 	private RequiredCapabilities reqCap;
 

@@ -8,10 +8,11 @@ import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.function.arg.type.ContainerConditionType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.ProhibitionSubjectArgType;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +24,7 @@ public abstract class ProhibitionOp extends AdminOperation<Void> {
     public static final FormalParameter<List<ContainerCondition>> CONTAINERS_PARAM = new FormalParameter<>("containers", new ListType<>(new ContainerConditionType()));
 
     public ProhibitionOp(String opName, List<FormalParameter<?>> formalParameters) {
-        super(opName, formalParameters);
+        super(opName, BasicTypes.VOID_TYPE,formalParameters);
     }
 
     protected void checkSubject(PAP pap, UserContext userCtx, ProhibitionSubject subject, String nodeAR, String processAR) throws PMException {

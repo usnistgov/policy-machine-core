@@ -27,7 +27,7 @@ class NegatedExpressionTest {
                 """
                 !true
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 

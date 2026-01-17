@@ -1,36 +1,58 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
+
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Scope<V, F> implements Serializable {
+public abstract class Scope<V, F> implements Serializable {
 
+    private PAP pap;
     private Map<String, V> constants;
     private Map<String, V> variables;
     private Map<String, F> functions;
     private Scope<V, F> parentScope;
 
-    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, F> functions, Scope<V, F> parentScope) {
+    public Scope(PAP pap, Map<String, V> constants, Map<String, F> functions) throws PMException {
+        this.pap = pap;
+        this.constants = constants;
+        this.variables = new HashMap<>();
+        this.functions = functions;
+    }
+
+    public Scope(PAP pap, Map<String, V> constants, Map<String, F> functions, Scope<V, F> parentScope) throws PMException {
+        this.pap = pap;
+        this.constants = constants;
+        this.variables = new HashMap<>();
+        this.functions = functions;
+        this.parentScope = parentScope;
+    }
+
+    protected Scope(PAP pap,
+                  Map<String, V> constants,
+                  Map<String, V> variables,
+                  Map<String, F> functions,
+                  Scope<V, F> parentScope) {
+        this.pap = pap;
         this.constants = constants;
         this.variables = variables;
         this.functions = functions;
         this.parentScope = parentScope;
     }
 
-    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, F> functions) {
-        this.constants = constants;
-        this.variables = variables;
-        this.functions = functions;
-        this.parentScope = null;
+    public abstract Scope<V, F> copy();
+    public abstract Scope<V, F> copyBasicFunctionsOnly();
+    public abstract Scope<V, F> copyBasicAndQueryFunctionsOnly();
+
+    public PAP getPap() {
+        return pap;
     }
 
-    public Scope() {
-        this.constants = new HashMap<>();
-        this.variables = new HashMap<>();
-        this.functions = new HashMap<>();
-        this.parentScope = null;
+    public void setPap(PAP pap) {
+        this.pap = pap;
     }
 
     public Map<String, V> getConstants() {
@@ -63,15 +85,6 @@ public class Scope<V, F> implements Serializable {
 
     public void setParentScope(Scope<V, F> parentScope) {
         this.parentScope = parentScope;
-    }
-
-    public Scope<V, F> copy() {
-        return new Scope<>(
-                new HashMap<>(this.constants),
-                new HashMap<>(this.variables),
-                new HashMap<>(this.functions),
-                this.parentScope != null ? this.parentScope.copy() : null
-        );
     }
 
     public F getFunction(String name) throws UnknownFunctionInScopeException {
@@ -135,6 +148,21 @@ public class Scope<V, F> implements Serializable {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Scope<?, ?> scope)) return false;
+        return Objects.equals(constants, scope.constants) && Objects.equals(
+            variables,
+            scope.variables
+        ) && Objects.equals(functions, scope.functions) && Objects.equals(parentScope, scope.parentScope);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(constants, variables, functions, parentScope);
+    }
+
     private boolean parentHasVariable(String name) {
         return parentScope != null && parentScope.variables.containsKey(name);
     }
@@ -143,18 +171,5 @@ public class Scope<V, F> implements Serializable {
         return parentScope != null && parentScope.functions.containsKey(name);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Scope<?, ?> scope)) return false;
-	    return Objects.equals(constants, scope.constants) && Objects.equals(
-                variables,
-                scope.variables
-        ) && Objects.equals(functions, scope.functions) && Objects.equals(parentScope, scope.parentScope);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(constants, variables, functions, parentScope);
-    }
 }

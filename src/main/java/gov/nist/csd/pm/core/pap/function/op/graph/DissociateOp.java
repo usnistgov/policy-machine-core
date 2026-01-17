@@ -6,7 +6,8 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import java.util.List;
 
@@ -17,8 +18,9 @@ public class DissociateOp extends AdminOperation<Void> {
 
     public DissociateOp() {
         super(
-                "dissociate",
-                List.of(DISSOCIATE_UA_PARAM, DISSOCIATE_TARGET_PARAM)
+            "dissociate",
+            BasicTypes.VOID_TYPE,
+            List.of(DISSOCIATE_UA_PARAM, DISSOCIATE_TARGET_PARAM)
         );
     }
 

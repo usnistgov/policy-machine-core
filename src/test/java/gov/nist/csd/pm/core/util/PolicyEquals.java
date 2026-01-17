@@ -13,6 +13,7 @@ import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 public class PolicyEquals {
 
@@ -55,8 +56,8 @@ public class PolicyEquals {
         assertEquals(aProhibitions, bProhibitions);
 
         // check obligations
-        Collection<Obligation> aObligations = new HashSet<>(a.obligations().getObligations());
-        Collection<Obligation> bObligations = new HashSet<>(b.obligations().getObligations());
+        Set<Obligation> aObligations = new HashSet<>(a.obligations().getObligations());
+        Set<Obligation> bObligations = new HashSet<>(b.obligations().getObligations());
 
         assertEquals(aObligations, bObligations);
 

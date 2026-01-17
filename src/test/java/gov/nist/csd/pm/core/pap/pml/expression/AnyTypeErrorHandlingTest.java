@@ -83,7 +83,7 @@ public class AnyTypeErrorHandlingTest {
     
     @Test
     void testVariableWithObjectType() throws PMException {
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("objVar", new Variable("objVar", ANY_TYPE, false));
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression("objVar");
@@ -140,7 +140,7 @@ public class AnyTypeErrorHandlingTest {
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE, ANY_TYPE));
         
         Map<?, ?> result = (Map<?, ?>) mapExpr.execute(executionContext, pap);

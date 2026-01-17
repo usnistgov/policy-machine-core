@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.OPERATION_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;

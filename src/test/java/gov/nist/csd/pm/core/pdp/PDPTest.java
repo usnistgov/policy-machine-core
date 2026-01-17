@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pdp;
 import static gov.nist.csd.pm.core.pap.PAPTest.testAdminPolicy;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,7 +24,11 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
@@ -123,7 +127,12 @@ class PDPTest {
             });
         });
 
-        pap.modify().obligations().createObligation(id("u1"), "obl1", List.of());
+        pap.modify().obligations().createObligation(
+            id("u1"),
+            "obl1",
+            new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
+            new PMLObligationResponse("evt", List.of())
+        );
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
             pdp.bootstrap(new PolicyBootstrapper() {
@@ -165,6 +174,10 @@ class PDPTest {
         PAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), """
                 set resource access rights ["read", "write"]
+                
+                resourceop read_file(@node("read") string name)
+                resourceop write_file(@node("read") string name)
+                
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -176,12 +189,14 @@ class PDPTest {
 
         PDP pdp = new PDP(pap);
 
-        Object resp = pdp.adjudicateResourceOperation(new TestUserContext("u1"), id("o1"), "read");
+        Object resp = pdp.adjudicateResourceOperation(new TestUserContext("u1"), "read_file",
+            Map.of("name", "o1"));
         assertEquals(resp, pap.query().graph().getNodeByName("o1"));
 
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), id("o1"), "write")
+            () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), "write_file",
+                Map.of("name", "o1"))
         );
     }
 
@@ -231,6 +246,8 @@ class PDPTest {
                 create u "u1" in ["ua1"]
                 
                 set resource access rights ["read", "write"]
+                
+                resourceop read_file(@node("read") int64 id)
 
                 """);
         PDP pdp = new PDP(pap);
@@ -239,9 +256,10 @@ class PDPTest {
                     "op1",
                     Map.of()));
         assertThrows(NodeDoesNotExistException.class,
-                () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), id("oa1"), "read"));
+                () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), "read_file",
+                    Map.of("id", id("oa1"))));
         assertThrows(OperationDoesNotExistException.class,
-                () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), id("ua1"), "x"));
+                () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), "write_file", Map.of()));
     }
 
     @Test
@@ -256,7 +274,7 @@ class PDPTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().routines().createAdminRoutine(new Routine<String>("routine1", List.of(a)) {
+        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));

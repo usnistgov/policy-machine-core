@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -9,7 +10,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -65,7 +66,7 @@ class RoutinesModificationAdjudicatorTest {
 
     @Test
     void createAdminRoutine() throws PMException {
-        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
@@ -80,7 +81,7 @@ class RoutinesModificationAdjudicatorTest {
 
     @Test
     void deleteAdminRoutine() throws PMException {
-        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;

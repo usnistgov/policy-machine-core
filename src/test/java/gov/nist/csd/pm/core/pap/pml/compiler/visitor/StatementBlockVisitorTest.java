@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.pml.TestPMLParser.toStatementBlockCtx;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -16,11 +17,11 @@ import org.junit.jupiter.api.Test;
 
 class StatementBlockVisitorTest {
 
-    private static Scope<Variable, PMLFunctionSignature> testGlobalScope;
+    private static CompileScope testGlobalScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testGlobalScope = new CompileScope();
+        testGlobalScope = new CompileScope(new MemoryPAP());
     }
 
     @Test

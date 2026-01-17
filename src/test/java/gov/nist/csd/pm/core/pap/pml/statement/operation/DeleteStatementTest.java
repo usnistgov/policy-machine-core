@@ -14,13 +14,13 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
@@ -44,11 +44,10 @@ class DeleteStatementTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
         UserContext userContext = new TestUserContext("u1");
-        pap.modify().obligations().createObligation(userContext.getUser(), "o1", List.of(new Rule(
-                "rule1",
-                new EventPattern(new SubjectPattern(), new OperationPattern("e1")),
+        pap.modify().obligations().createObligation(userContext.getUser(), "o1",
+                new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                 new PMLObligationResponse("e", List.of())
-        )));
+        );
         pap.modify().prohibitions().createProhibition("p1",
                                     new ProhibitionSubject(id("ua1")),
 		        new AccessRightSet("read"),

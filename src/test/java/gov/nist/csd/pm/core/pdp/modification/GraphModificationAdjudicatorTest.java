@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

@@ -15,9 +15,9 @@ import java.util.Objects;
 
 public class AdminOpDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
-    protected PMLStmtsAdminOperation pmlStmtsOperation;
+    protected PMLStmtsAdminOperation<?> pmlStmtsOperation;
 
-    public AdminOpDefinitionStatement(PMLStmtsAdminOperation pmlStmtsOperation) {
+    public AdminOpDefinitionStatement(PMLStmtsAdminOperation<?> pmlStmtsOperation) {
         super(new CreateAdminOperationOp());
 
         this.pmlStmtsOperation = pmlStmtsOperation;

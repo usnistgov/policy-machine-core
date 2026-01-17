@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -8,7 +9,7 @@ import gov.nist.csd.pm.core.common.exception.RoutineDoesNotExistException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.Collection;
@@ -20,17 +21,17 @@ import org.junit.jupiter.api.Test;
 
 public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
-    static Routine<Object> r1 = new Routine<>("r1", List.of()) {
+    static Routine<Void> r1 = new Routine<>("r1", VOID_TYPE, List.of()) {
         @Override
-        public Object execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
 
     };
-    static Routine<Object> r2 = new Routine<>("r2", List.of()) {
+    static Routine<Void> r2 = new Routine<>("r2", VOID_TYPE, List.of()) {
 
         @Override
-        public Object execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
 
@@ -46,9 +47,9 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         Collection<String> adminRoutineNames = pap.query().routines().getAdminRoutineNames();
         assertEquals(new HashSet<>(adminRoutineNames), Set.of("r1", "r2", "deleteAllProjects"));
 
-        pap.plugins().registerRoutine(new Routine("r3", List.of()) {
+        pap.plugins().registerRoutine(new Routine<>("r3", VOID_TYPE, List.of()) {
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 

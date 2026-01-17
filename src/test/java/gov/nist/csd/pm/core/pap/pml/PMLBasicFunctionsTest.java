@@ -33,14 +33,12 @@ public class PMLBasicFunctionsTest {
                     create pc name
                 }
                 
-                create obligation "ob1" {
-                    create rule "r1"
+                create obligation "ob1"
                     when any user
                     performs any operation
                     do(ctx) {
                         op1("test")
                     }
-                }
                 """;
 		MemoryPAP pap = new TestPAP();
 		pap.executePML(new TestUserContext("u1"), pml);
@@ -75,14 +73,12 @@ public class PMLBasicFunctionsTest {
                     }
                 }
                 
-                create obligation "ob1" {
-                    create rule "r1"
+                create obligation "ob1"
                     when any user
                     performs any operation
                     do(ctx) {
                         op1("test")
                     }
-                }
                 """;
 		MemoryPAP pap = new TestPAP();
 		pap.executePML(new TestUserContext("u1"), pml);
@@ -118,14 +114,12 @@ public class PMLBasicFunctionsTest {
                     create pc "pc2"
                 }
                 
-                create obligation "ob1" {
-                    create rule "r1"
+                create obligation "ob1"
                     when any user
-                    performs "op1"
+                    performs op1
                     do(ctx) {
                         create pc "pc3"
                     }
-                }
                 """;
 		MemoryPAP pap = new TestPAP();
 		pap.executePML(new TestUserContext("u1"), pml);
@@ -157,14 +151,12 @@ public class PMLBasicFunctionsTest {
                     create pc "pc2"
                 }
                 
-                create obligation "ob1" {
-                    create rule "r1"
+                create obligation "ob1"
                     when any user
                     performs any operation
                     do(ctx) {
                         create pc "pc3"
                     }
-                }
                 """;
 		MemoryPAP pap = new TestPAP();
 		pap.executePML(new TestUserContext("u1"), pml);
@@ -233,7 +225,6 @@ public class PMLBasicFunctionsTest {
 			if x == "end" {
 				return
 			}
-			
 			
 			op1("end")
 		}

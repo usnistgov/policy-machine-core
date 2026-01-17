@@ -7,9 +7,10 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.function.arg.type.RoutineType;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
@@ -19,8 +20,9 @@ public class CreateAdminRoutineOp extends AdminOperation<Void> {
 
     public CreateAdminRoutineOp() {
         super(
-                "create_admin_routine",
-                List.of(ROUTINE_PARAM)
+            "create_admin_routine",
+            BasicTypes.VOID_TYPE,
+            List.of(ROUTINE_PARAM)
         );
     }
 

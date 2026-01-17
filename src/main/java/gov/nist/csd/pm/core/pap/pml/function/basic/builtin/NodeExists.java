@@ -2,15 +2,20 @@ package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction.NODE_NAME_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
+import org.apache.arrow.flatbuf.Bool;
 
 
-public class NodeExists extends PMLBasicFunction {
+public class NodeExists extends PMLQueryFunction<Boolean> {
 
     public NodeExists() {
         super(
@@ -21,8 +26,8 @@ public class NodeExists extends PMLBasicFunction {
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public Boolean execute(PolicyQuery query, Args args) throws PMException {
         String value = args.get(NODE_NAME_PARAM);
-        return pap.query().graph().nodeExists(value);
+        return query.graph().nodeExists(value);
     }
 }

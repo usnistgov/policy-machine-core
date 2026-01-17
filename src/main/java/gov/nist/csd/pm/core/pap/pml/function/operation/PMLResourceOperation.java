@@ -6,7 +6,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;

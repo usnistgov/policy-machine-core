@@ -12,12 +12,12 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
-public class PMLStmtsAdminOperation extends PMLAdminOperation implements PMLStatementSerializable {
+public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements PMLStatementSerializable {
 
     private final PMLStatementBlock body;
 
     public PMLStmtsAdminOperation(String name,
-                                  Type<?> returnType,
+                                  Type<T> returnType,
                                   List<FormalParameter<?>> formalParameters,
                                   PMLStatementBlock body) {
         super(name, returnType, formalParameters);
@@ -34,10 +34,12 @@ public class PMLStmtsAdminOperation extends PMLAdminOperation implements PMLStat
     }
 
     @Override
-    public Object execute(PAP pap, Args args) throws PMException {
+    public T execute(PAP pap, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
-        return ctx.executeOperationStatements(this.body.getStmts(), args);
+        Object result = ctx.executeOperationStatements(this.body.getStmts(), args);
+
+        return getReturnType().cast(result);
     }
 
     @Override

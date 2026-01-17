@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,8 +11,8 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
@@ -23,10 +24,10 @@ import org.junit.jupiter.api.Test;
 
 public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
-    static AdminOperation<Object> op1 = new AdminOperation<>("op1", List.of()) {
+    static AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
 
         @Override
-        public Object execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
 
@@ -36,9 +37,9 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         }
     };
 
-    static AdminOperation<Object> op2 = new AdminOperation<>("op2", List.of()) {
+    static AdminOperation<Void> op2 = new AdminOperation<>("op2", VOID_TYPE, List.of()) {
         @Override
-        public Object execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
 
@@ -72,9 +73,9 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
 
-        pap.plugins().registerOperation(new AdminOperation<>("op3", List.of()) {
+        pap.plugins().registerOperation(new AdminOperation<>("op3", VOID_TYPE, List.of()) {
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 

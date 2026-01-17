@@ -24,7 +24,7 @@ class ParenExpressionTest {
 
     @BeforeAll
     static void setup() throws PMException {
-        compileScope = new CompileScope();
+        compileScope = new CompileScope(new MemoryPAP());
     }
 
     @Test

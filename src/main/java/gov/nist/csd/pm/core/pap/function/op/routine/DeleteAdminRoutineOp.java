@@ -6,16 +6,18 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class DeleteAdminRoutineOp extends AdminOperation<Void> {
-    
+
     public DeleteAdminRoutineOp() {
         super(
-                "delete_admin_routine",
-                List.of(NAME_PARAM)
+            "delete_admin_routine",
+            BasicTypes.VOID_TYPE,
+            List.of(NAME_PARAM)
         );
     }
 

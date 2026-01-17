@@ -20,7 +20,7 @@ import java.util.Objects;
 public class ExecutionContext implements Serializable {
 
     protected final UserContext author;
-    protected final Scope<Object, Function<?>> scope;
+    protected final Scope<Object, Function<?, ?>> scope;
     protected final PAP pap;
 
     public ExecutionContext(UserContext author, PAP pap) throws PMException {
@@ -29,7 +29,7 @@ public class ExecutionContext implements Serializable {
         this.pap = pap;
     }
 
-    public ExecutionContext(UserContext author, PAP pap, Scope<Object, Function<?>> scope) throws PMException {
+    public ExecutionContext(UserContext author, PAP pap, Scope<Object, Function<?, ?>> scope) throws PMException {
         this.author = author;
         this.scope = scope;
         this.pap = pap;
@@ -39,7 +39,7 @@ public class ExecutionContext implements Serializable {
         return author;
     }
 
-    public Scope<Object, Function<?>> scope() {
+    public Scope<Object, Function<?, ?>> scope() {
         return scope;
     }
 

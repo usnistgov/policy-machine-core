@@ -96,7 +96,7 @@ public class TypeCompatibilityTest {
 
     @Test
     void testCompileExpressionsWithObjectTypeExpected() throws PMException {
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         
         PMLParser.ExpressionContext stringCtx = TestPMLParser.parseExpression("\"test\"");
         Expression<?> stringExpr = ExpressionVisitor.compile(visitorContext, stringCtx, ANY_TYPE);
@@ -111,7 +111,7 @@ public class TypeCompatibilityTest {
 
     @Test
     void testCompileHeterogeneousCollections() throws PMException {
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         
         PMLParser.ExpressionContext arrayCtx = TestPMLParser.parseExpression("""
                 ["a", "value", true]

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +12,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -73,7 +74,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void createAdminOperation() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -93,7 +94,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 

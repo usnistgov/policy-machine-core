@@ -9,12 +9,15 @@ import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
+import gov.nist.csd.pm.core.pap.function.QueryFunction;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.function.Operation;
+import gov.nist.csd.pm.core.pap.function.Routine;
+import gov.nist.csd.pm.core.pap.function.arg.type.Type;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.scope.ExecuteScope;
@@ -31,7 +34,6 @@ import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
-import java.util.Map;
 
 public class PDPTx implements FunctionExecutor {
 
@@ -50,9 +52,9 @@ public class PDPTx implements FunctionExecutor {
     }
 
     @Override
-    public <R> R executeFunction(Function<R> function,
-                                 Map<String, Object> rawArgs) throws PMException {
-        return this.txExecutor.executeFunction(function, rawArgs);
+    public Object executeFunction(Function<?, ?> function,
+                                 Args args) throws PMException {
+        return this.txExecutor.executeFunction(function, args);
     }
 
     /**
@@ -148,18 +150,17 @@ public class PDPTx implements FunctionExecutor {
         }
 
         @Override
-        public <R> R executeFunction(Function<R> function,
-                                     Map<String, Object> rawArgs) throws PMException {
-            Args args = function.validateAndPrepareArgs(rawArgs);
-
-            if (function instanceof Routine<R> routine) {
-                return routine.execute(this, args);
-            } else if (function instanceof Operation<R> operation) {
-                operation.canExecute(pap, userCtx, args);
-                return operation.execute(pap, args);
-            }
-
-            return function.execute(pap, args);
+        public Object executeFunction(Function<?, ?> function,
+                                     Args args) throws PMException {
+            return switch (function) {
+                case BasicFunction<?> basicFunction -> basicFunction.execute(null, args);
+                case QueryFunction<?> queryFunction -> queryFunction.execute(this.query(), args);
+                case Operation<?> operation -> {
+                    operation.canExecute(pap, userCtx, args);
+                    yield operation.execute(this, args);
+                }
+                case Routine<?> routine -> routine.execute(this, args);
+            };
         }
 
         @Override
@@ -229,7 +230,7 @@ public class PDPTx implements FunctionExecutor {
 
         public PDPExecutionContext(UserContext author,
                                    TxExecutor pdpTx,
-                                   Scope<Object, Function<?>> scope) throws PMException {
+                                   Scope<Object, Function<?, ?>> scope) throws PMException {
             super(author, pdpTx.pap, scope);
             this.pdpTx = pdpTx;
         }

@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.pdp;
 
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -7,8 +8,8 @@ import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -38,14 +39,14 @@ class PMLBootstrapperTest {
                 routine1()
                 """;
 
-        AdminOperation<?> op1 = new AdminOperation<>("op1", List.of()) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("op1");
 
                 return null;
@@ -53,9 +54,9 @@ class PMLBootstrapperTest {
 
         };
 
-        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
-            public Object execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("routine1");
                 return null;
             }

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import java.util.Collection;
 
 /**

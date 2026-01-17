@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.response.JavaObligationResponse;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

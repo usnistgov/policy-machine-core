@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp.ASSOCIATE_TARGET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp.ASSOCIATE_UA_PARAM;
 

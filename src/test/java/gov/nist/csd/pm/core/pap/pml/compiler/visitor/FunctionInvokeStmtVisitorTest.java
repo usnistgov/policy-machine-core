@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.tes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -33,7 +34,7 @@ class FunctionInvokeStmtVisitorTest {
     );
 
     FunctionInvokeExpression<String> expected = new FunctionInvokeExpression(
-        signature,
+        signature.getName(),
         List.of(
             new StringLiteralExpression("a"),
             new StringLiteralExpression("b"),
@@ -49,7 +50,7 @@ class FunctionInvokeStmtVisitorTest {
             func1("a", "b", ["c", "d"])
             """);
 
-        CompileScope compileScope = new CompileScope();
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
         compileScope.addFunction("func1", signature);
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
@@ -63,7 +64,7 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testFunctionDoesNotExist() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
             """
@@ -75,7 +76,7 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testWrongNumberOfArgs() throws PMException {
-        CompileScope compileScope = new CompileScope();
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
         compileScope.addFunction("func1", signature);
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
@@ -90,7 +91,7 @@ class FunctionInvokeStmtVisitorTest {
 
     @Test
     void testWrongArgType() throws PMException {
-        CompileScope compileScope = new CompileScope();
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
         compileScope.addFunction("func1", signature);
         VisitorContext visitorCtx = new VisitorContext(compileScope);
         testCompilationError(
@@ -114,16 +115,16 @@ class FunctionInvokeStmtVisitorTest {
             List.of()
         );
 
-        CompileScope compileScope = new CompileScope();
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
         compileScope.addFunction("func1", signature);
 
         VisitorContext visitorCtx = new VisitorContext(compileScope);
-        PMLStatement stmt = new FunctionInvokeStmtVisitor(visitorCtx)
+        PMLStatement<?> stmt = new FunctionInvokeStmtVisitor(visitorCtx)
             .visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
 
-        FunctionInvokeExpression expected = new FunctionInvokeExpression(
-            signature,
+        FunctionInvokeExpression<?> expected = new FunctionInvokeExpression(
+            signature.getName(),
             List.of(),
             signature.getReturnType()
         );

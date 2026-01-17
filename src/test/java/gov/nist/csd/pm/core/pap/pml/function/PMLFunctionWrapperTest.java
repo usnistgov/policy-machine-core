@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.function;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -8,7 +9,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
@@ -31,34 +32,34 @@ class PMLFunctionWrapperTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        operations.createAdminOperation(new AdminOperation<>("op1", List.of(a)) {
+        operations.createAdminOperation(new AdminOperation<>("op1", STRING_TYPE, List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
             }
 
         });
 
-        operations.createAdminOperation(new AdminOperation<>("op2", List.of(a)) {
+        operations.createAdminOperation(new AdminOperation<>("op2", STRING_TYPE, List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
             }
 
         });
 
-        operations.createAdminOperation(new AdminOperation<>("op3", List.of(a)) {
+        operations.createAdminOperation(new AdminOperation<>("op3", STRING_TYPE, List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
             }
 
