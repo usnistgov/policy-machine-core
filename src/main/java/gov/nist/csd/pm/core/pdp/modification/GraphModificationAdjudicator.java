@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.Properties;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
@@ -162,14 +163,14 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         executeOp(op, args);
     }
 
-    private <R> void executeOp(Operation<R> op, Args args, EventContext eventContext) throws PMException {
+    private <R> void executeOp(AdminOperation<R> op, Args args, EventContext eventContext) throws PMException {
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
 
         eventPublisher.publishEvent(eventContext);
     }
 
-    private <R> R executeOp(Operation<R> op, Args args) throws PMException {
+    private <R> R executeOp(AdminOperation<R> op, Args args) throws PMException {
         op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 

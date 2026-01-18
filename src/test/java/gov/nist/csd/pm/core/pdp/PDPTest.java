@@ -28,7 +28,7 @@ import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
@@ -131,7 +131,7 @@ class PDPTest {
             id("u1"),
             "obl1",
             new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-            new PMLObligationResponse("evt", List.of())
+            new ObligationResponse("evt", List.of())
         );
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {

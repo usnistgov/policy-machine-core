@@ -99,8 +99,8 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
     private static Map<String, PMLFunctionSignature> loadFunctions(PAP pap) throws PMException {
         Map<String, PMLFunctionSignature> functions = new HashMap<>();
 
-        // add pml operations and routines stored in PAP
-        Map<String, Function<?, ?>> builtinFuncs = PMLBuiltinFunctions.builtinFunctions();
+        // add builtin operations and routines stored in PAP
+        Map<String, Function<?>> builtinFuncs = PMLBuiltinFunctions.builtinFunctions();
         builtinFuncs.values().forEach(f -> {
             functions.put(f.getName(), getFunctionSignature(f));
         });
@@ -115,7 +115,12 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
             functions.put(opName, getFunctionSignature(operation));
+        }
 
+        opNames = pap.query().operations().getResourceOperationNames();
+        for (String opName : opNames) {
+            Operation<?> operation = pap.query().operations().getResourceOperation(opName);
+            functions.put(opName, getFunctionSignature(operation));
         }
 
         // same for routines
@@ -140,7 +145,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         return functions;
     }
 
-    private static PMLFunctionSignature getFunctionSignature(Function<?, ?> func) {
+    private static PMLFunctionSignature getFunctionSignature(Function<?> func) {
         return switch (func) {
             case BasicFunction<?> basicFunction -> new PMLBasicFunctionSignature(
                 func.getName(), func.getReturnType(), func.getFormalParameters()

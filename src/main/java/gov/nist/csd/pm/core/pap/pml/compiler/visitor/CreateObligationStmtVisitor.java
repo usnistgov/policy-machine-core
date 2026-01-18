@@ -10,7 +10,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OnPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AnyOperationContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventPatternContext;
@@ -53,7 +53,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
     public CreateObligationStatement visitCreateObligationStatement(PMLParser.CreateObligationStatementContext ctx) {
         Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.name, STRING_TYPE);
         EventPattern eventPattern = new EventPatternVisitor(visitorCtx).visit(ctx.eventPattern());
-        PMLObligationResponse response = new ResponseVisitor(visitorCtx).visitResponse(ctx.response());
+        ObligationResponse response = new ResponseVisitor(visitorCtx).visitResponse(ctx.response());
 
         return new CreateObligationStatement(name, eventPattern, response);
     }
@@ -204,14 +204,14 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
         }
     }
 
-    static class ResponseVisitor extends PMLBaseVisitor<PMLObligationResponse> {
+    static class ResponseVisitor extends PMLBaseVisitor<ObligationResponse> {
 
         public ResponseVisitor(VisitorContext visitorCtx) {
             super(visitorCtx);
         }
 
         @Override
-        public PMLObligationResponse visitResponse(PMLParser.ResponseContext ctx) {
+        public ObligationResponse visitResponse(PMLParser.ResponseContext ctx) {
             String evtVar = ctx.ID().getText();
 
             // create a new local parser scope for the response block
@@ -234,7 +234,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 stmts.add(stmt);
             }
 
-            return new PMLObligationResponse(evtVar, stmts);
+            return new ObligationResponse(evtVar, stmts);
         }
     }
 

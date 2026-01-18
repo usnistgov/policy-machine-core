@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.util.SamplePolicy.loadSamplePolicyFromPML;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,33 +10,19 @@ import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
-import gov.nist.csd.pm.core.pap.function.QueryFunction;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
-import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypher.internal.expressions.functions.E;
 
 public abstract class ObligationsModifierTest extends PAPTestInitializer {
 
@@ -51,7 +36,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             id("u1"),
             "obl1",
             eventPattern,
-            new PMLObligationResponse("evtCtx", List.of(
+            new ObligationResponse("evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
             )
             )
@@ -63,7 +48,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             id("u1"),
             "label2",
             eventPattern,
-            new PMLObligationResponse("evtCtx", List.of(
+            new ObligationResponse("evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
             ))
         );
@@ -74,7 +59,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             id("u1"),
             "label2",
             eventPattern,
-            new PMLObligationResponse("evtCtx", List.of(
+            new ObligationResponse("evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
             ))
         );
@@ -98,7 +83,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
         @Test
         void testAuthorNodeDoestNotExistException() throws PMException {
             assertThrows(NodeDoesNotExistException.class,
-                () -> pap.modify().obligations().createObligation(id("u1"), "test", eventPattern, new PMLObligationResponse("", List.of())));
+                () -> pap.modify().obligations().createObligation(id("u1"), "test", eventPattern, new ObligationResponse("", List.of())));
         }
 
         @Test
@@ -113,7 +98,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             assertThrows(ObligationNameExistsException.class,
                 () -> pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), new EventPattern(
                     new SubjectPattern(), new AnyOperationPattern()
-                ), new PMLObligationResponse("", List.of())));
+                ), new ObligationResponse("", List.of())));
 
             Obligation actual = pap.query().obligations().getObligation(obligation1.getName());
             assertEquals(obligation1, actual);

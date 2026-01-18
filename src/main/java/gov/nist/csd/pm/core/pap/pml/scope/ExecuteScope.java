@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ExecuteScope extends Scope<Object, Function<?, ?>> {
+public class ExecuteScope extends Scope<Object, Function<?>> {
 
     public ExecuteScope(PAP pap) throws PMException {
         super(pap, loadConstants(), loadFunctions(pap));
@@ -24,13 +24,13 @@ public class ExecuteScope extends Scope<Object, Function<?, ?>> {
     private ExecuteScope(PAP pap,
                         Map<String, Object> constants,
                         Map<String, Object> variables,
-                        Map<String, Function<?, ?>> functions,
-                        Scope<Object, Function<?, ?>> parentScope) {
+                        Map<String, Function<?>> functions,
+                        Scope<Object, Function<?>> parentScope) {
         super(pap, constants, variables, functions, parentScope);
     }
 
     @Override
-    public Scope<Object, Function<?, ?>> copy() {
+    public Scope<Object, Function<?>> copy() {
         return new ExecuteScope(
             this.getPap(),
             new HashMap<>(getConstants()),
@@ -41,9 +41,9 @@ public class ExecuteScope extends Scope<Object, Function<?, ?>> {
     }
 
     @Override
-    public Scope<Object, Function<?, ?>> copyBasicFunctionsOnly() {
-        Map<String, Function<?, ?>> basicOnlyFunctions = new HashMap<>();
-        for (Function<?, ?> function : getFunctions().values()) {
+    public Scope<Object, Function<?>> copyBasicFunctionsOnly() {
+        Map<String, Function<?>> basicOnlyFunctions = new HashMap<>();
+        for (Function<?> function : getFunctions().values()) {
             if (!(function instanceof BasicFunction<?> basicFunction)) {
                 continue;
             }
@@ -61,9 +61,9 @@ public class ExecuteScope extends Scope<Object, Function<?, ?>> {
     }
 
     @Override
-    public Scope<Object, Function<?, ?>> copyBasicAndQueryFunctionsOnly() {
-        Map<String, Function<?, ?>> filteredFunctions = new HashMap<>();
-        for (Function<?, ?> function : getFunctions().values()) {
+    public Scope<Object, Function<?>> copyBasicAndQueryFunctionsOnly() {
+        Map<String, Function<?>> filteredFunctions = new HashMap<>();
+        for (Function<?> function : getFunctions().values()) {
             if (function instanceof BasicFunction<?> || function instanceof QueryFunction<?>) {
                 filteredFunctions.put(function.getName(), function);
             }
@@ -87,14 +87,20 @@ public class ExecuteScope extends Scope<Object, Function<?, ?>> {
         return constants;
     }
 
-    private static Map<String, Function<?, ?>> loadFunctions(PAP pap) throws PMException {
+    private static Map<String, Function<?>> loadFunctions(PAP pap) throws PMException {
         // add pml operations and routines stored in PAP
-        Map<String, Function<?, ?>> functions = new HashMap<>(PMLBuiltinFunctions.builtinFunctions());
+        Map<String, Function<?>> functions = new HashMap<>(PMLBuiltinFunctions.builtinFunctions());
 
         // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();
         for (String opName : opNames) {
             Operation<?> operation = pap.query().operations().getAdminOperation(opName);
+            functions.put(opName, operation);
+        }
+
+        opNames = pap.query().operations().getResourceOperationNames();
+        for (String opName : opNames) {
+            Operation<?> operation = pap.query().operations().getResourceOperation(opName);
             functions.put(opName, operation);
         }
 

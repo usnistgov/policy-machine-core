@@ -1,11 +1,10 @@
 package gov.nist.csd.pm.core.pap.function;
 
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import java.util.List;
 
-public abstract non-sealed class Routine<R> extends Function<PAP, R> {
+public abstract non-sealed class Routine<R> extends Function<R> {
 
     public Routine(String name,
                    Type<R> returnType,

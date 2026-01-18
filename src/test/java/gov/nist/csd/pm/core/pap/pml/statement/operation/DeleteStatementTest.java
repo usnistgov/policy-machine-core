@@ -16,9 +16,8 @@ import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
-import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -46,7 +45,7 @@ class DeleteStatementTest {
         UserContext userContext = new TestUserContext("u1");
         pap.modify().obligations().createObligation(userContext.getUser(), "o1",
                 new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-                new PMLObligationResponse("e", List.of())
+                new ObligationResponse("e", List.of())
         );
         pap.modify().prohibitions().createProhibition("p1",
                                     new ProhibitionSubject(id("ua1")),

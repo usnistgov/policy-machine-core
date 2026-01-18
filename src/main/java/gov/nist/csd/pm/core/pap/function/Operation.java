@@ -20,7 +20,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
-public abstract sealed class Operation<R> extends Function<PAP, R> permits AdminOperation, ResourceOperation{
+public abstract sealed class Operation<R> extends Function<R> permits AdminOperation, ResourceOperation{
 
     public static final FormalParameter<String> NAME_PARAM = new FormalParameter<>("name", STRING_TYPE);
     public static final FormalParameter<List<String>> ARSET_PARAM = new FormalParameter<>("arset", ListType.of(STRING_TYPE));
@@ -61,8 +61,7 @@ public abstract sealed class Operation<R> extends Function<PAP, R> permits Admin
         }
     }
 
-    private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws
-                                                                                                          PMException {
+    private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws PMException {
         TargetContext targetCtx = new TargetContext(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
         nodeFormalParameter.getReqCap().check(userCtx, targetCtx, privs);

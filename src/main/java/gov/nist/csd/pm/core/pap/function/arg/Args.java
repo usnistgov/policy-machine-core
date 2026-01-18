@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
 
 public class Args {
 
-	public static Args of(Function<?, ?> function, Map<String, Object> actualArgs) {
+	public static Args of(Function<?> function, Map<String, Object> actualArgs) {
 		List<FormalParameter<?>> formalParameters = function.getFormalParameters();
 
 		Args args = new Args();
@@ -53,26 +53,6 @@ public class Args {
 
 	public <T> T get(FormalParameter<T> formalParameter) {
 		return formalParameter.toExpectedType(map.get(formalParameter));
-	}
-
-	public List<Long> getIdList(NodeNameListFormalParameter formalParameter, PAP pap) throws PMException {
-		List<String> names = formalParameter.toExpectedType(map.get(formalParameter));
-		List<Long> ids = new ArrayList<>();
-		for (String name : names) {
-			ids.add(pap.query().graph().getNodeId(name));
-		}
-
-		return ids;
-	}
-
-	public List<String> getNameList(NodeIdListFormalParameter formalParameter, PAP pap) throws PMException {
-		List<Long> ids = formalParameter.toExpectedType(map.get(formalParameter));
-		List<String> names = new ArrayList<>();
-		for (long id : ids) {
-			names.add(pap.query().graph().getNodeById(id).getName());
-		}
-
-		return names;
 	}
 
 	public Args putUnchecked(FormalParameter<?> formalParameter, Object value) {

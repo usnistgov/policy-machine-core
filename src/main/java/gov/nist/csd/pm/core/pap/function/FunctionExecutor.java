@@ -5,6 +5,6 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 
 public interface FunctionExecutor {
 
-    Object executeFunction(Function<?, ?> function, Args args) throws PMException;
+    Object executeFunction(Function<?> function, Args args) throws PMException;
 
 }

@@ -1,51 +1,33 @@
 package gov.nist.csd.pm.core.pap.pml.function.operation;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
-
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PMLResourceOperation extends ResourceOperation implements PMLFunction, PMLStatementSerializable {
+public abstract class PMLResourceOperation<T> extends ResourceOperation<T> implements PMLFunction {
 
+    private final Type<T> returnType;
     private final List<FormalParameter<?>> pmlFormalParameters;
     private final PMLOperationSignature signature;
-    private final PMLStatementBlock checks;
     private ExecutionContext ctx;
 
-    public PMLResourceOperation(String name, List<FormalParameter<?>> formalParameters, PMLStatementBlock checks) {
-        super(name, new ArrayList<>(formalParameters));
+    public PMLResourceOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters) {
+        super(name, returnType, new ArrayList<>(formalParameters));
 
+        this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;
-        this.signature = new PMLOperationSignature(name, VOID_TYPE, formalParameters, false);
-        this.checks = checks;
+        this.signature = new PMLOperationSignature(name, returnType, formalParameters, false);
     }
 
-    public PMLResourceOperation(String name) {
-        super(name, new ArrayList<>());
+    public PMLResourceOperation(String name, Type<T> returnType) {
+        super(name, returnType, new ArrayList<>());
 
+        this.returnType = returnType;
         this.pmlFormalParameters = new ArrayList<>();
-        this.signature = new PMLOperationSignature(name, VOID_TYPE, new ArrayList<>(), false);
-        this.checks = new PMLStatementBlock();
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        // perform default canExeute to check FormalParamter ReqCaps
-        super.canExecute(pap, userCtx, args);
-
-        // execute any check statements
-        ExecutionContext ctx = getCtx();
-        ctx.executeOperationStatements(checks.getStmts(), args);
+        this.signature = new PMLOperationSignature(name, returnType, new ArrayList<>(), false);
     }
 
     public List<FormalParameter<?>> getPmlFormalArgs() {
@@ -56,8 +38,8 @@ public class PMLResourceOperation extends ResourceOperation implements PMLFuncti
         return signature;
     }
 
-    public PMLStatementBlock getChecks() {
-        return checks;
+    public Type<T> getReturnType() {
+        return returnType;
     }
 
     public ExecutionContext getCtx() {
@@ -72,12 +54,4 @@ public class PMLResourceOperation extends ResourceOperation implements PMLFuncti
         this.ctx = ctx;
     }
 
-    @Override
-    public String toFormattedString(int indentLevel) {
-        return String.format(
-            "%s%s",
-            getSignature().toFormattedString(indentLevel),
-            checks.getStmts().isEmpty() ? "" : checks.toFormattedString(indentLevel)
-        );
-    }
 }

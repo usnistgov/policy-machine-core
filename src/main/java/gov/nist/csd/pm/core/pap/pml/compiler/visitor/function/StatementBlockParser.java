@@ -4,9 +4,11 @@ import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementBlockContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementBlockVisitor;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementBlockVisitor.Result;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -57,7 +59,6 @@ public class StatementBlockParser {
                                                                List<FormalParameter<?>> formalArgs) {
         // create a new scope for the function body
         VisitorContext localVisitorCtx = initLocalVisitorCtx(visitorCtx, formalArgs);
-
         StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
         StatementBlockVisitor.Result result = statementBlockVisitor.visitAdminOpStatementBlock(ctx);
 
@@ -83,18 +84,19 @@ public class StatementBlockParser {
         return result.stmts();
     }
 
-    public static PMLStatementBlock parseResourceOpCheckStatements(VisitorContext visitorCtx,
-                                                                   List<CheckStatementContext> checkStatementContexts, List<FormalParameter<?>> formalArgs) {
+    public static PMLStatementBlock parseResourceOpStatements(VisitorContext visitorCtx,
+                                                              ResourceOpStatementBlockContext ctx,
+                                                              Type<?> returnType,
+                                                              List<FormalParameter<?>> formalArgs) {
         VisitorContext localVisitorCtx = initLocalVisitorCtx(visitorCtx, formalArgs);
-        CheckStatementVisitor checkStatementBlockVisitor = new CheckStatementVisitor(localVisitorCtx);
+        StatementBlockVisitor statementBlockVisitor = new StatementBlockVisitor(localVisitorCtx, returnType);
+        Result result = statementBlockVisitor.visitResourceOpStatementBlock(ctx);
 
-        List<PMLStatement<?>> checkStatements = new ArrayList<>();
-        for (CheckStatementContext checkStatementContext : checkStatementContexts) {
-            CheckStatement checkStatement = checkStatementBlockVisitor.visitCheckStatement(checkStatementContext);
-            checkStatements.add(checkStatement);
+        if (!result.allPathsReturned() && !returnType.equals(new VoidType())) {
+            throw new PMLCompilationRuntimeException(ctx, "not all conditional paths return");
         }
 
-        return new PMLStatementBlock(checkStatements);
+        return result.stmts();
     }
 
     private static VisitorContext initLocalVisitorCtx(VisitorContext visitorCtx, List<FormalParameter<?>> formalArgs) {

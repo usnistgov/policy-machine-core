@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -67,12 +67,12 @@ class ObligationsModificationAdjudicatorTest {
     void createObligation() {
         assertDoesNotThrow(() -> ok.createObligation(id("u1"), "name",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-                        new PMLObligationResponse("e", List.of())
+                        new ObligationResponse("e", List.of())
 
         ));
         assertThrows(UnauthorizedException.class, () -> fail.createObligation(id("u1"), "name1",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-                        new PMLObligationResponse("e", List.of())
+                        new ObligationResponse("e", List.of())
         ));
     }
 
@@ -80,11 +80,11 @@ class ObligationsModificationAdjudicatorTest {
     void deleteObligation() throws PMException {
         ok.createObligation(id("u1"), "test",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-                        new PMLObligationResponse("e", List.of())
+                        new ObligationResponse("e", List.of())
         );
         ok.createObligation(id("u1"), "test2",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-                        new PMLObligationResponse("e", List.of())
+                        new ObligationResponse("e", List.of())
         );
         assertDoesNotThrow(() -> ok.deleteObligation("test"));
         assertThrows(UnauthorizedException.class, () -> fail.deleteObligation("test2"));

@@ -11,32 +11,23 @@ import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pap.function.QueryFunction;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
 import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 
 class CreateObligationStatementTest {
@@ -62,7 +53,7 @@ class CreateObligationStatementTest {
         CreateObligationStatement stmt = new CreateObligationStatement(
             new StringLiteralExpression("o1"),
             eventPattern,
-            new PMLObligationResponse(
+            new ObligationResponse(
                 "evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("pc2"))
             )
@@ -106,7 +97,7 @@ class CreateObligationStatementTest {
         CreateObligationStatement stmt1 = new CreateObligationStatement(
             new StringLiteralExpression("obl1"),
             eventPattern1,
-            new PMLObligationResponse(
+            new ObligationResponse(
                 "evtCtx",
                 List.of(new CreatePolicyClassStatement(new StringLiteralExpression("pc2")))
             )
@@ -115,7 +106,7 @@ class CreateObligationStatementTest {
         CreateObligationStatement stmt2 = new CreateObligationStatement(
             new StringLiteralExpression("obl2"),
             eventPattern1,
-            new PMLObligationResponse(
+            new ObligationResponse(
                 "evtCtx",
                 List.of(new CreatePolicyClassStatement(new StringLiteralExpression("pc3")))
             )

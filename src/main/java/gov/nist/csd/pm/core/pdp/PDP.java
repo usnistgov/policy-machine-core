@@ -91,17 +91,15 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public ResourceOperationResult adjudicateResourceOperation(UserContext user, String resourceOperation, Map<String, Object> rawAgs) throws PMException {
+    public Object adjudicateResourceOperation(UserContext user, String resourceOperation, Map<String, Object> rawAgs) throws PMException {
         if (!pap.query().operations().getResourceOperationNames().contains(resourceOperation)) {
             throw new OperationDoesNotExistException(resourceOperation);
         }
 
-        ResourceOperation op = pap.query().operations().getResourceOperation(resourceOperation);
+        ResourceOperation<?> op = pap.query().operations().getResourceOperation(resourceOperation);
         Args args = op.validateAndPrepareArgs(rawAgs);
 
-        runTx(user, tx -> executeOperation(user, tx, op, args));
-
-        return buildResourceOperationResult(args);
+        return runTx(user, tx -> executeOperation(user, tx, op, args));
     }
 
     @Override

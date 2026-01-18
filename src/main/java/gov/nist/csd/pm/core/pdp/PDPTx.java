@@ -52,7 +52,7 @@ public class PDPTx implements FunctionExecutor {
     }
 
     @Override
-    public Object executeFunction(Function<?, ?> function,
+    public Object executeFunction(Function<?> function,
                                  Args args) throws PMException {
         return this.txExecutor.executeFunction(function, args);
     }
@@ -150,17 +150,16 @@ public class PDPTx implements FunctionExecutor {
         }
 
         @Override
-        public Object executeFunction(Function<?, ?> function,
+        public Object executeFunction(Function<?> function,
                                      Args args) throws PMException {
-            return switch (function) {
-                case BasicFunction<?> basicFunction -> basicFunction.execute(null, args);
-                case QueryFunction<?> queryFunction -> queryFunction.execute(this.query(), args);
-                case Operation<?> operation -> {
-                    operation.canExecute(pap, userCtx, args);
-                    yield operation.execute(this, args);
-                }
-                case Routine<?> routine -> routine.execute(this, args);
-            };
+            if (function instanceof Routine<?> routine) {
+                return routine.execute(this, args);
+            } else if (function instanceof Operation<?> operation) {
+                operation.canExecute(pap, userCtx, args);
+                return operation.execute(pap, args);
+            }
+
+            return function.execute(pap, args);
         }
 
         @Override
@@ -230,7 +229,7 @@ public class PDPTx implements FunctionExecutor {
 
         public PDPExecutionContext(UserContext author,
                                    TxExecutor pdpTx,
-                                   Scope<Object, Function<?, ?>> scope) throws PMException {
+                                   Scope<Object, Function<?>> scope) throws PMException {
             super(author, pdpTx.pap, scope);
             this.pdpTx = pdpTx;
         }

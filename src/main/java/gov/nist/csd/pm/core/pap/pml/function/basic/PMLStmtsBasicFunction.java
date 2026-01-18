@@ -30,7 +30,7 @@ public class PMLStmtsBasicFunction<T> extends PMLBasicFunction<T> implements PML
     }
 
     @Override
-    public T execute(Void query, Args args) throws PMException {
+    protected T execute(Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         Object result = ctx.executeRoutineStatements(statements.getStmts(), args);

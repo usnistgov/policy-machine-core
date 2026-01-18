@@ -8,7 +8,6 @@ import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,11 +25,6 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
 
     public PMLStatementBlock getBody() {
         return body;
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        // enforcement done in operation body execution
     }
 
     @Override
@@ -58,10 +52,16 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PMLStmtsAdminOperation that)) return false;
-        if (!super.equals(o)) return false;
-	    return Objects.equals(body, that.body);
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PMLStmtsAdminOperation<?> that)) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        return Objects.equals(body, that.body);
     }
 
     @Override

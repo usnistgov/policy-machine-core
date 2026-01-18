@@ -14,7 +14,7 @@ import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -25,11 +25,11 @@ public class CreateObligationStatement extends OperationStatement {
 
     private final Expression<String> name;
     private final EventPattern eventPattern;
-    private final PMLObligationResponse response;
+    private final ObligationResponse response;
 
     public CreateObligationStatement(Expression<String> name,
                                      EventPattern eventPattern,
-                                     PMLObligationResponse response) {
+                                     ObligationResponse response) {
         super(new CreateObligationOp());
         this.name = name;
         this.eventPattern = eventPattern;
@@ -44,7 +44,7 @@ public class CreateObligationStatement extends OperationStatement {
         return eventPattern;
     }
 
-    public PMLObligationResponse getResponse() {
+    public ObligationResponse getResponse() {
         return response;
     }
 
@@ -105,14 +105,14 @@ public class CreateObligationStatement extends OperationStatement {
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         EventPattern event = obligation.getEventPattern();
         ObligationResponse response = obligation.getResponse();
-        if (!(response instanceof PMLObligationResponse pmlObligationResponse)) {
+        if (!(response instanceof ObligationResponse pmlObligationResponse)) {
             throw new IllegalStateException("cannot convert obligation " + obligation.getName() + " to PML because it does not have a PMLObligationResponse response");
         }
 
         return new CreateObligationStatement(
             new StringLiteralExpression(obligation.getName()),
             new EventPattern(event.getSubjectPattern(), event.getOperationPattern()),
-            new PMLObligationResponse(
+            new ObligationResponse(
                 pmlObligationResponse.getEventCtxVariable(),
                 pmlObligationResponse.getStatements()
             )

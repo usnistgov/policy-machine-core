@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.OPERATION_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -30,7 +30,7 @@ public class AdminOpDefinitionStatement extends OperationStatement implements Fu
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return new Args().put(OPERATION_PARAM, pmlStmtsOperation);
+        return new Args().put(ADMIN_OPERATION_PARAM, pmlStmtsOperation);
     }
 
     @Override

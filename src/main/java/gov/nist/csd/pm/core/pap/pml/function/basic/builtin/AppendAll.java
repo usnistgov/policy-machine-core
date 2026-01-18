@@ -24,7 +24,7 @@ public class AppendAll extends PMLBasicFunction<List<Object>> {
     }
 
     @Override
-    public List<Object> execute(Void v, Args args) throws PMException {
+    protected List<Object> execute(Args args) throws PMException {
         List<Object> valueArr = args.get(DST_PARAM);
         List<Object> srcValue = args.get(SRC_LIST_PARAM);
 

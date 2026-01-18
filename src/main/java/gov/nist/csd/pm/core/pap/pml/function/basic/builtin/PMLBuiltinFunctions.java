@@ -28,7 +28,7 @@ public class PMLBuiltinFunctions {
     private static final Name name = new Name();
     private static final Id id = new Id();
 
-    private static final Map<String, Function<?, ?>> BUILTIN_FUNCTIONS = new HashMap<>();
+    private static final Map<String, Function<?>> BUILTIN_FUNCTIONS = new HashMap<>();
 
     static {
         BUILTIN_FUNCTIONS.put(contains.getName(), contains);
@@ -52,7 +52,7 @@ public class PMLBuiltinFunctions {
         BUILTIN_FUNCTIONS.put(id.getName(), id);
     }
 
-    public static Map<String, Function<?, ?>> builtinFunctions() {
+    public static Map<String, Function<?>> builtinFunctions() {
         return new HashMap<>(BUILTIN_FUNCTIONS);
     }
 

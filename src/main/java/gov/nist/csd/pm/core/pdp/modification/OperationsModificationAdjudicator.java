@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pdp.modification;
 
 import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.OPERATION_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -62,7 +62,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     public void createAdminOperation(AdminOperation<?> operation) throws PMException {
         CreateAdminOperationOp op = new CreateAdminOperationOp();
         Args args = new Args()
-            .put(OPERATION_PARAM, operation);
+            .put(ADMIN_OPERATION_PARAM, operation);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);

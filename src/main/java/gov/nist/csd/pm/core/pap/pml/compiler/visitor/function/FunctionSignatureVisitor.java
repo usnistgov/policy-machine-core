@@ -63,6 +63,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
     @Override
     public PMLOperationSignature visitResourceOpSignature(ResourceOpSignatureContext ctx) {
         String funcName = ctx.ID().getText();
+        Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
 
@@ -70,7 +71,7 @@ public class FunctionSignatureVisitor extends PMLBaseVisitor<PMLFunctionSignatur
 
         PMLOperationSignature pmlOperationSignature = new PMLOperationSignature(
             funcName,
-            VOID_TYPE,
+            returnType,
             args,
             false
         );

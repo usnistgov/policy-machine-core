@@ -26,7 +26,7 @@ public class Contains extends PMLBasicFunction<Boolean> {
     }
 
     @Override
-    public Boolean execute(Void v, Args args) throws PMException {
+    protected Boolean execute(Args args) throws PMException {
         List<Object> valueArr = args.get(ARR_PARAM);
         Object element = args.get(ELEMENT_PARAM);
         return valueArr.contains(element);

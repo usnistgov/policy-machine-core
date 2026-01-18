@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.function;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
@@ -13,8 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract sealed class Function<T, R> implements Serializable
-    permits Operation, Routine, BasicFunction, QueryFunction {
+public abstract sealed class Function<R> implements Serializable
+    permits Operation, Routine, QueryFunction {
 
     private static final long serialVersionUID = 1L;
     protected final String name;
@@ -31,11 +32,11 @@ public abstract sealed class Function<T, R> implements Serializable
      * Execute the function with the given arguments and PAP object. This method allows for modification and querying of
      * the underlying policy.
      *
-     * @param t  The object to execute on.
+     * @param pap  The PAP object to execute on.
      * @param args The arguments passed to the function execution.
      * @return The function return value.
      */
-    public abstract R execute(T t, Args args) throws PMException;
+    public abstract R execute(PAP pap, Args args) throws PMException;
 
     /**
      * Convert the given map of raw args to an Arg object with type checking on arg values.
@@ -73,7 +74,7 @@ public abstract sealed class Function<T, R> implements Serializable
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Function<?, ?> function)) {
+        if (!(o instanceof Function<?> function)) {
             return false;
         }
         return Objects.equals(name, function.name) && Objects.equals(parameters, function.parameters);

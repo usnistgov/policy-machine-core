@@ -34,8 +34,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpress
 import gov.nist.csd.pm.core.pap.obligation.event.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.ProcessSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
-import gov.nist.csd.pm.core.pap.obligation.response.JavaObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -294,7 +293,7 @@ class EPPTest {
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
             policy.modify().obligations().createObligation(id("u1"), "test",
                 new EventPattern(new SubjectPattern(), new MatchesOperationPattern(CREATE_OBJECT_ATTRIBUTE)),
-                new PMLObligationResponse("evtCtx", List.of(
+                new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(
                         new StringLiteralExpression("o2"),
                         NodeType.O,
@@ -549,43 +548,6 @@ class EPPTest {
 
         PMLCompiler pmlCompiler = new PMLCompiler();
         assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
-    }
-
-    @Test
-    void testJavaObligationResponseExecutesOnPatternMatch() throws PMException {
-        MemoryPAP pap = new TestPAP();
-
-        PDP pdp = new PDP(pap);
-        EPP epp = new EPP(pdp, pap);
-        epp.subscribeTo(pdp);
-
-        String pml = """                
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                create oa "oa1" in ["pc1"]
-                
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
-                """;
-        pap.executePML(new TestUserContext("u1"), pml);
-
-        pap.modify().obligations().createObligation(id("u1"), "obligation",
-            new EventPattern(
-                new SubjectPattern(),
-                new MatchesOperationPattern("assign")
-            ),
-            new JavaObligationResponse() {
-
-                @Override
-                public void execute(PAP pap, UserContext author, EventContext evtCtx) throws PMException {
-                    pap.modify().graph().createPolicyClass("test");
-                }
-            }
-        );
-
-        pdp.runTx(new UserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
-        assertFalse(pap.query().graph().nodeExists("test"));
     }
 
     private MemoryPAP testPAP() throws PMException {

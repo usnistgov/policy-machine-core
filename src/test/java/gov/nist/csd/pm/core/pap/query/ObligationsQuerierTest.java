@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
@@ -28,7 +28,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                 new SubjectPattern(),
                 new MatchesOperationPattern("test_event")
             ),
-            new PMLObligationResponse("evtCtx", List.of(
+            new ObligationResponse("evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
             ))
         );
@@ -42,7 +42,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                 new SubjectPattern(),
                 new MatchesOperationPattern("test_event")
             ),
-            new PMLObligationResponse("evtCtx", List.of(
+            new ObligationResponse("evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
             ))
         );
@@ -56,7 +56,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
                 new SubjectPattern(),
                 new MatchesOperationPattern("test_event")
             ),
-            new PMLObligationResponse("evtCtx", List.of(
+            new ObligationResponse("evtCtx", List.of(
                 new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
             ))
         );

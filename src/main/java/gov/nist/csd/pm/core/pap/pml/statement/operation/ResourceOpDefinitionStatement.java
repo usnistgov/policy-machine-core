@@ -6,16 +6,16 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 public class ResourceOpDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
-    protected PMLResourceOperation pmlResourceOperation;
+    protected PMLStmtsResourceOperation<?> pmlResourceOperation;
 
-    public ResourceOpDefinitionStatement(PMLResourceOperation pmlResourceOperation) {
+    public ResourceOpDefinitionStatement(PMLStmtsResourceOperation<?> pmlResourceOperation) {
         super(new CreateResourceOperationOp());
 
         this.pmlResourceOperation = pmlResourceOperation;

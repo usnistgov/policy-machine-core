@@ -48,7 +48,7 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
     @Override
     public T execute(ExecutionContext ctx, PAP pap) throws PMException {
         ExecutionContext funcInvokeCtx = ctx.copy();
-        Function<?, ?> function = funcInvokeCtx.scope().getFunction(name);
+        Function<?> function = funcInvokeCtx.scope().getFunction(name);
 
         // ensure the function return type matches the expected return type
         Type<?> funcReturnType = function.getReturnType();
@@ -74,7 +74,7 @@ public class FunctionInvokeExpression<T> extends Expression<T> {
         return expectedReturnType.cast(result);
     }
 
-    private Args prepareArgExpressions(ExecutionContext ctx, PAP pap, Function<?, ?> function) throws PMException {
+    private Args prepareArgExpressions(ExecutionContext ctx, PAP pap, Function<?> function) throws PMException {
         List<FormalParameter<?>> formalParams = function.getFormalParameters();
 
         if (actualArgsList.size() != formalParams.size()) {

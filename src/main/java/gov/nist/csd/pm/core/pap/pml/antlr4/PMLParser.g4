@@ -87,7 +87,6 @@ onPattern: ON OPEN_PAREN argNames CLOSE_PAREN onPatternBlock? ;
 onPatternBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 argNames: ID (COMMA ID)*;
 
-
 // response
 response:
     DO OPEN_PAREN ID CLOSE_PAREN responseBlock;
@@ -132,6 +131,7 @@ deleteType:
     NODE #DeleteNode
     | ADMIN_OP #DeleteAdminOp
     | RESOURCE_OP #DeleteResourceOp
+    | FUNCTION #DeleteFunctionOp
     | OBLIGATION #DeleteObligation
     | PROHIBITION #DeleteProhibition ;
 
@@ -148,7 +148,7 @@ routineDefinitionStatement: routineSignature statementBlock ;
 basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
 
 adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN;
+resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
@@ -162,7 +162,12 @@ adminOpStatement:
   statement #BasicOrOperationAdminOpStatement
   | checkStatement #CheckAdminOpStatement
   ;
-resourceOpStatementBlock: OPEN_CURLY checkStatement* CLOSE_CURLY ;
+
+resourceOpStatementBlock: OPEN_CURLY resourceOpStatement* CLOSE_CURLY ;
+resourceOpStatement:
+  basicStatement #BasicResourceOpStatement
+  | checkStatement #CheckResourceOpStatement
+  ;
 
 formalParamList: (formalParam (COMMA formalParam)*)? ;
 formalParam: variableType ID;

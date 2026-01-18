@@ -8,7 +8,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.PMLObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -40,7 +40,7 @@ class CreateObligationStmtVisitorTest {
                         new SubjectPattern(),
                         new AnyOperationPattern()
                     ),
-                    new PMLObligationResponse("ctx", List.of())
+                    new ObligationResponse("ctx", List.of())
                 ),
                 stmt
         );

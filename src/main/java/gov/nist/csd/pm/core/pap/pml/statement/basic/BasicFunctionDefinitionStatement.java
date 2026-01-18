@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.core.pap.pml.statement.basic;
 
-import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.OPERATION_PARAM;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.BasicFunction;
@@ -19,9 +17,6 @@ import java.util.Objects;
 
 public class BasicFunctionDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
-    public static final FormalParameter<BasicFunction<?>> FUNCTION_PARAM =
-        new FormalParameter<>("function", new BasicFunctionType());
-
     private final PMLStmtsBasicFunction<?> function;
 
     public BasicFunctionDefinitionStatement(PMLStmtsBasicFunction<?> function) {
@@ -37,7 +32,7 @@ public class BasicFunctionDefinitionStatement extends OperationStatement impleme
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args()
-            .put(FUNCTION_PARAM, function);
+            .put(CreateAdminOperationOp.ADMIN_OPERATION_PARAM, function);
     }
 
     @Override

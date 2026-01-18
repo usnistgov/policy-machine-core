@@ -35,6 +35,8 @@ public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
                 new DeleteAdminOpStatement(nameExpr, ifExists);
             case PMLParser.DeleteResourceOpContext deleteResourceOpContext ->
                 new DeleteResourceOpStatement(nameExpr, ifExists);
+            case PMLParser.DeleteFunctionOpContext deleteFunctionOpContext ->
+                new DeleteAdminOpStatement(nameExpr, ifExists);
             case null, default ->
                 new DeleteObligationStatement(nameExpr, ifExists);
         };

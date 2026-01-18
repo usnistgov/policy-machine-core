@@ -8,8 +8,8 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLStmtsBasicFunction;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
@@ -21,7 +21,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStateme
 
 public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitionStatement> {
 
-    private FunctionSignatureVisitor functionSignatureVisitor;
+    private final FunctionSignatureVisitor functionSignatureVisitor;
 
     public FunctionDefinitionVisitor(VisitorContext visitorCtx, FunctionSignatureVisitor functionSignatureVisitor) {
         super(visitorCtx);
@@ -39,7 +39,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             signature.getFormalParameters()
         );
 
-        return new AdminOpDefinitionStatement(new PMLStmtsAdminOperation(
+        return new AdminOpDefinitionStatement(new PMLStmtsAdminOperation<>(
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalParameters(),
@@ -52,14 +52,16 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
         PMLOperationSignature resourceOpSignature =
             functionSignatureVisitor.visitResourceOpSignature(ctx.resourceOpSignature());
 
-        PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseResourceOpCheckStatements(
-            visitorCtx,
-            ctx.resourceOpStatementBlock().checkStatement(),
+        PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseResourceOpStatements(
+            visitorCtx.copyBasicAndQueryOnly(),
+            ctx.resourceOpStatementBlock(),
+            resourceOpSignature.getReturnType(),
             resourceOpSignature.getFormalParameters()
         );
 
-        return new ResourceOpDefinitionStatement(new PMLResourceOperation(
+        return new ResourceOpDefinitionStatement(new PMLStmtsResourceOperation<>(
             resourceOpSignature.getName(),
+            resourceOpSignature.getReturnType(),
             resourceOpSignature.getFormalParameters(),
             pmlStatementBlock
         ));
@@ -76,7 +78,7 @@ public class FunctionDefinitionVisitor extends PMLBaseVisitor<FunctionDefinition
             signature.getFormalParameters()
         );
 
-        return new RoutineDefinitionStatement(new PMLStmtsRoutine(
+        return new RoutineDefinitionStatement(new PMLStmtsRoutine<>(
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalParameters(),

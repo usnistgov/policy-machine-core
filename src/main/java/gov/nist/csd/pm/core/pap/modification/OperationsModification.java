@@ -3,6 +3,8 @@ package gov.nist.csd.pm.core.pap.modification;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.QueryFunction;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 
 /**

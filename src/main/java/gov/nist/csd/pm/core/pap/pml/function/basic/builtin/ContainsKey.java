@@ -30,7 +30,7 @@ public class ContainsKey extends PMLBasicFunction<Boolean> {
     }
 
     @Override
-    public Boolean execute(Void v, Args args) throws PMException {
+    protected Boolean execute(Args args) throws PMException {
         Map<Object, Object> valueMap = args.get(MAP_PARAM);
         Object element = args.get(KEY_PARAM);
         return valueMap.containsKey(element);

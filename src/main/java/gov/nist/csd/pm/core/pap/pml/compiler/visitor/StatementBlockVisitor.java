@@ -6,8 +6,12 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementBlockContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicOrOperationAdminOpStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckAdminOpStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OnPatternBlockContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementBlockContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -36,6 +40,28 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
             if (adminOpStatementContext instanceof BasicOrOperationAdminOpStatementContext basicOrOp) {
                 stmts.add(statementVisitor.visitStatement(basicOrOp.statement()));
             } else if (adminOpStatementContext instanceof CheckAdminOpStatementContext check){
+                stmts.add(statementVisitor.visitCheckStatement(check.checkStatement()));
+            }
+        }
+
+        try {
+            boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
+            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
+        } catch (PMException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+    }
+
+    @Override
+    public Result visitResourceOpStatementBlock(ResourceOpStatementBlockContext ctx) {
+        List<ResourceOpStatementContext> resourceOpStatement = ctx.resourceOpStatement();
+        List<PMLStatement<?>> stmts = new ArrayList<>();
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
+
+        for (ResourceOpStatementContext resourceOpStatementContext : resourceOpStatement) {
+            if (resourceOpStatementContext instanceof BasicResourceOpStatementContext basic) {
+                stmts.add(statementVisitor.visitBasicStatement(basic.basicStatement()));
+            } else if (resourceOpStatementContext instanceof CheckResourceOpStatementContext check){
                 stmts.add(statementVisitor.visitCheckStatement(check.checkStatement()));
             }
         }

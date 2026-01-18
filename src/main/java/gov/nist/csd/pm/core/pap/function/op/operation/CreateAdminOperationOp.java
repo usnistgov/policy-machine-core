@@ -15,13 +15,13 @@ import java.util.List;
 
 public class CreateAdminOperationOp extends AdminOperation<Void> {
 
-    public static final FormalParameter<AdminOperation<?>> OPERATION_PARAM = new FormalParameter<>("operation", new AdminOperationType());
+    public static final FormalParameter<AdminOperation<?>> ADMIN_OPERATION_PARAM = new FormalParameter<>("operation", new AdminOperationType());
 
     public CreateAdminOperationOp() {
         super(
                 "create_admin_operation",
             BasicTypes.VOID_TYPE,
-                List.of(OPERATION_PARAM)
+                List.of(ADMIN_OPERATION_PARAM)
         );
     }
 
@@ -32,7 +32,7 @@ public class CreateAdminOperationOp extends AdminOperation<Void> {
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        pap.modify().operations().createAdminOperation(args.get(OPERATION_PARAM));
+        pap.modify().operations().createAdminOperation(args.get(ADMIN_OPERATION_PARAM));
         return null;
     }
 }

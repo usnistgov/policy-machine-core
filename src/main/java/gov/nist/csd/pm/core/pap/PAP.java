@@ -129,13 +129,8 @@ public abstract class PAP implements FunctionExecutor, Transactional {
     }
 
     @Override
-    public Object executeFunction(Function<?, ?> function, Args args) throws PMException {
-        return switch (function) {
-            case BasicFunction<?> basicFunction -> basicFunction.execute(null, args);
-            case QueryFunction<?> queryFunction -> queryFunction.execute(this.query(), args);
-            case Operation<?> operation -> operation.execute(this, args);
-            case Routine<?> routine -> routine.execute(this, args);
-        };
+    public Object executeFunction(Function<?> function, Args args) throws PMException {
+        return function.execute(this, args);
     }
 
     /**

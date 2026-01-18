@@ -22,7 +22,7 @@ public class Env extends PMLBasicFunction<String> {
 	}
 
 	@Override
-	public String execute(Void v, Args args) throws PMException {
+	protected String execute(Args args) throws PMException {
 		return System.getenv(args.get(KEY_PARAM));
 	}
 }
