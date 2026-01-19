@@ -18,6 +18,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
+import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,7 +139,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         PMLStatement<?> lastStmt = statements.getLast();
         if (lastStmt instanceof ReturnStatement returnStatement) {
             if (!returnStatement.matchesReturnType(returnType)) {
-                throw new PMException("return statement \"" + returnStatement + "\" does not match return type " + returnType);
+                throw new PMException("return statement \"" + returnStatement + "\" does not match return type " + TypeStringer.toPMLString(returnType));
             }
 
             return true;
@@ -156,7 +157,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
                 }
 
                 if (!returnStatement.matchesReturnType(returnType)) {
-                    throw new PMException("return statement \"" + returnStatement + "\" does not match return type " + returnType);
+                    throw new PMException("return statement \"" + returnStatement + "\" does not match return type " + TypeStringer.toPMLString(returnType));
                 }
 
                 return true;

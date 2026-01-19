@@ -31,7 +31,7 @@ public class ReturnStatement extends BasicStatement<StatementResult> {
             return match.equals(new VoidType());
         }
 
-        return expr.getType().equals(match);
+        return expr.getType().isCastableTo(match);
     }
 
     @Override

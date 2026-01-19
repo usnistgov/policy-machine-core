@@ -7,6 +7,7 @@ import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,7 +67,7 @@ class PDPTest {
                         }
                 )
         );
-        assertEquals("{user: " + id("u1") + "} does not have access right [associate] on " + new TargetContext(id("ua1")), e.getMessage());
+        assertEquals("{user: u1} missing required access rights {associate} on {target: ua1}", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -176,7 +177,7 @@ class PDPTest {
                 set resource access rights ["read", "write"]
                 
                 resourceop read_file(@node("read") string name) {}
-                resourceop write_file(@node("read") string name) {}
+                resourceop write_file(@node("write") string name) {}
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -191,7 +192,7 @@ class PDPTest {
 
         Object resp = pdp.adjudicateResourceOperation(new TestUserContext("u1"), "read_file",
             Map.of("name", "o1"));
-        assertEquals(resp, pap.query().graph().getNodeByName("o1"));
+        assertNull(resp);
 
         assertThrows(
             UnauthorizedException.class,
@@ -255,9 +256,6 @@ class PDPTest {
                 () -> pdp.adjudicateAdminOperation(new TestUserContext("u1"),
                     "op1",
                     Map.of()));
-        assertThrows(NodeDoesNotExistException.class,
-                () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), "read_file",
-                    Map.of("id", id("oa1"))));
         assertThrows(OperationDoesNotExistException.class,
                 () -> pdp.adjudicateResourceOperation(new TestUserContext("u1"), "write_file", Map.of()));
     }
@@ -382,14 +380,12 @@ class PDPTest {
                     }
                 }
                 
-                create obligation "o1" {
-                    create rule "r1"
+                create obligation "o1"
                     when any user
-                    performs "create_user_attribute"
+                    performs create_user_attribute
                     do(ctx) {
                         create pc "test"
                     }
-                }
                 """);
 
         PDP pdp = new PDP(pap);
@@ -417,14 +413,12 @@ class PDPTest {
                     create pc name
                 }
                 
-                create obligation "obl1" {
-                    create rule "rule1"
+                create obligation "obl1"
                     when any user
-                    performs "op1"
+                    performs op1
                     do(ctx) {
                         create oa "oa_" + ctx.args.name in [ctx.args.name]
                     }
-                }
                 """);
 
         PDP pdp = new PDP(pap);

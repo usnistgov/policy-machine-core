@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,10 +18,12 @@ import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
+import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -34,6 +37,8 @@ class CreateObligationStatementTest {
 
     @Test
     void testSuccess() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addVariable("opnd1", new Variable("opnd1", STRING_TYPE, false));
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(),
             new MatchesOperationPattern(
@@ -43,7 +48,7 @@ class CreateObligationStatementTest {
                     "",
                     BOOLEAN_TYPE,
                     List.of(new NodeNameFormalParameter("opnd1")),
-                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), """
+                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), compileScope, """
                         return opnd1 == "oa1" || opnd1 == "oa2"
                         """))
                 )
@@ -78,6 +83,9 @@ class CreateObligationStatementTest {
 
     @Test
     void testToFormattedString() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addVariable("opnd1", new Variable("opnd1", STRING_TYPE, false));
+
         EventPattern eventPattern1 = new EventPattern(
             new SubjectPattern(),
             new MatchesOperationPattern(
@@ -87,7 +95,7 @@ class CreateObligationStatementTest {
                     "",
                     BOOLEAN_TYPE,
                     List.of(new NodeNameFormalParameter("opnd1")),
-                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), """
+                    new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), compileScope, """
                         return opnd1 == "oa1" || opnd1 == "oa2"
                         """))
                 )
@@ -121,23 +129,21 @@ class CreateObligationStatementTest {
                     }
                     do (evtCtx) {
                         create PC "pc2"
-                    }
                     }""",
             stmt1.toFormattedString(0)
         );
 
         assertEquals(
             """
-                    create obligation "obl1"
-                    when user "u1"
+                    create obligation "obl2"
+                    when any user
                     performs e1 on (opnd1) {
                         return opnd1 == "oa1" || opnd1 == "oa2"
                     }
                     do (evtCtx) {
                         create PC "pc3"
-                    }
-                    """,
-            stmt1.toFormattedString(0)
+                    }""",
+            stmt2.toFormattedString(0)
         );
     }
 
@@ -150,13 +156,16 @@ class CreateObligationStatementTest {
             
             associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
             
+            resourceop op1()
+            resourceop op2()
+            
             create obligation "o1"
                 when any user
-                performs any operation
+                performs op1
                 do(ctx) {
-                    create rule "rule2"
+                    create obligation "rule2"
                     when any user
-                    performs any operation
+                    performs op2
                     do(ctx2) {
                         create pc "pc2"
                     }
@@ -169,12 +178,12 @@ class CreateObligationStatementTest {
         EPP epp = new EPP(pdp, pap);
         epp.processEvent(new EventContext(
             new EventContextUser("u1"),
-            "test",
+            "op1",
             new HashMap<>()
         ));
         epp.processEvent(new EventContext(
             new EventContextUser("u1"),
-            "test",
+            "op2",
             new HashMap<>()
         ));
         assertTrue(pap.query().graph().nodeExists("pc2"));

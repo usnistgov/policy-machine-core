@@ -11,12 +11,14 @@ import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.QueryFunction;
+import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
 import java.util.Collection;
@@ -158,7 +160,9 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
             case Routine<?> routine -> new PMLRoutineSignature(
                 func.getName(), func.getReturnType(), func.getFormalParameters()
             );
-            default -> null;
+            case ResourceOperation<?> resourceOperation -> new PMLOperationSignature(
+                func.getName(), func.getReturnType(), func.getFormalParameters(), false
+            );
         };
     }
 }

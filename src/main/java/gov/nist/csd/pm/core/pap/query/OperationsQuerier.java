@@ -38,7 +38,7 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
             return pluginRegistry.getResourceOperation(operationName);
         }
 
-        if (!store.operations().getAdminOperationNames().contains(operationName)) {
+        if (!store.operations().getResourceOperationNames().contains(operationName)) {
             throw new OperationDoesNotExistException(operationName);
         }
 

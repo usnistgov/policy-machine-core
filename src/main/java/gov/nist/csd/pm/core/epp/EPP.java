@@ -45,7 +45,9 @@ public class EPP implements EventSubscriber {
 
     @Override
     public void processEvent(EventContext eventCtx) throws PMException {
-        Collection<Obligation> obligations = pap.query().obligations().getObligations();
+        // operate on a snapshot of the obligations so that if an obligation is added or removed in the response of
+        // a matched obligation, it does not get processed in this invocation
+        Collection<Obligation> obligations = new ArrayList<>(pap.query().obligations().getObligations());
         for (Obligation obligation : obligations) {
             long author = obligation.getAuthorId();
             UserContext authorCtx = new UserContext(author);
