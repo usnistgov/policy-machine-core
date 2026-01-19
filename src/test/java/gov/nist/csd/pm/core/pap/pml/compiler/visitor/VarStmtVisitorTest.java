@@ -13,8 +13,6 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.pml.scope.UnknownVariableInScopeException;
-import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

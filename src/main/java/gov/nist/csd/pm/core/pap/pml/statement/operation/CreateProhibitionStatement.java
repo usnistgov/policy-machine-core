@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.CONTAINERS_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.INTERSECTION_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.SUBJECT_PARAM;

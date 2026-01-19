@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.core.pap.function;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;

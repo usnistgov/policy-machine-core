@@ -16,7 +16,6 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationFormalParamListCont
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

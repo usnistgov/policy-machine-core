@@ -1,21 +1,19 @@
 package gov.nist.csd.pm.core.pdp.query;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_PROCESS_PROHIBITIONS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_PROHIBITIONS;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-
 import java.util.Collection;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_PROCESS_PROHIBITIONS;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_PROHIBITIONS;
 
 public class ProhibitionsQueryAdjudicator extends Adjudicator implements ProhibitionsQuery {
 

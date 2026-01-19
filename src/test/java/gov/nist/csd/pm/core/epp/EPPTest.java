@@ -23,9 +23,9 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
@@ -34,6 +34,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPatte
 import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.LogicalSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.ProcessSubjectPatternExpression;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
@@ -41,7 +42,6 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
-import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
@@ -56,7 +56,6 @@ import it.unimi.dsi.fastutil.longs.LongList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Test;
 
 class EPPTest {

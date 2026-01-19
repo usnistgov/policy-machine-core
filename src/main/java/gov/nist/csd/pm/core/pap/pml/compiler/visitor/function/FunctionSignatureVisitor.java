@@ -1,7 +1,5 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.function;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
-
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;

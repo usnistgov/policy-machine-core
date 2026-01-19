@@ -18,7 +18,6 @@ import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunctionSignature;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
 import java.util.Collection;

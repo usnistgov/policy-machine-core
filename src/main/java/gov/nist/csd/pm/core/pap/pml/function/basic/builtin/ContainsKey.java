@@ -5,14 +5,12 @@ import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction;
 import java.util.List;
 import java.util.Map;
-import org.apache.arrow.flatbuf.Bool;
 
 public class ContainsKey extends PMLBasicFunction<Boolean> {
 

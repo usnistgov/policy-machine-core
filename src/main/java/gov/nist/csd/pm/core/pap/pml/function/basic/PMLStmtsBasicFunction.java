@@ -1,15 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.function.basic;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.core.pap.pml.type.TypeResolver;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 import java.util.Objects;
 

@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionDefinitionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionSignatureVisitor;

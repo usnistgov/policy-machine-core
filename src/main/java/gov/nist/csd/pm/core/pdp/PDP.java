@@ -1,37 +1,26 @@
 package gov.nist.csd.pm.core.pdp;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
-import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.common.tx.TxRunner;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutine;
-import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.AccessAdjudication;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
-import gov.nist.csd.pm.core.pdp.adjudication.ResourceOperationResult;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
-
 import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PDP implements EventPublisher, AccessAdjudication {
 

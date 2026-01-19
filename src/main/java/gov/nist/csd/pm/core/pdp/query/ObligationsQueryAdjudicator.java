@@ -1,17 +1,16 @@
 package gov.nist.csd.pm.core.pdp.query;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-
 import java.util.ArrayList;
 import java.util.Collection;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
 
 public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
 

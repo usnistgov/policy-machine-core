@@ -5,16 +5,12 @@ import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementBlockContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementBlockVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementBlockVisitor.Result;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.CheckStatement;
-import java.util.ArrayList;
 import java.util.List;
 
 public class StatementBlockParser {
