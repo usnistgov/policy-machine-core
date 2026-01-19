@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -110,5 +111,35 @@ class OperationsModificationAdjudicatorTest {
 
         assertDoesNotThrow(() -> ok.deleteAdminOperation("op1"));
         assertThrows(UnauthorizedException.class, () -> fail.deleteAdminOperation("op1"));
+    }
+
+    @Test
+    void createAdminRoutine() throws PMException {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
+            @Override
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
+                return null;
+            }
+
+        };
+
+        assertDoesNotThrow(() -> ok.createAdminRoutine(routine1));
+        assertTrue(pap.query().operations().getAdminRoutineNames().contains("routine1"));
+        assertThrows(UnauthorizedException.class, () -> fail.createAdminRoutine(routine1));
+    }
+
+    @Test
+    void deleteAdminRoutine() throws PMException {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
+            @Override
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
+                return null;
+            }
+
+        };
+        ok.createAdminRoutine(routine1);
+
+        assertDoesNotThrow(() -> ok.deleteAdminRoutine("routine1"));
+        assertThrows(UnauthorizedException.class, () -> fail.deleteAdminRoutine("routine1"));
     }
 }

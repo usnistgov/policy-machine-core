@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
+public class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
 
     public MemoryObligationsStore(MemoryPolicy policy, MemoryTx tx, TxCmdTracker txCmdTracker) {
         super(policy, tx, txCmdTracker);

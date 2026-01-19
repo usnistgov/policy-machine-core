@@ -9,15 +9,11 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
-import gov.nist.csd.pm.core.pap.function.Operation;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.QueryFunction;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
-import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
@@ -60,7 +56,7 @@ public abstract class PAP implements FunctionExecutor, Transactional {
         this.querier = querier;
         this.modifier = modifier;
         this.policyStore = policyStore;
-        this.privilegeChecker = new PrivilegeChecker(querier.access());
+        this.privilegeChecker = new PrivilegeChecker(querier.access(), querier.graph());
         this.pluginRegistry = pluginRegistry;
 
         // verify admin policy
@@ -232,9 +228,9 @@ public abstract class PAP implements FunctionExecutor, Transactional {
 
         // ignore plugin registry ops and routines
         Collection<String> adminOperationNames = query().operations().getAdminOperationNames();
-        Collection<String> adminRoutineNames = query().routines().getAdminRoutineNames();
+        Collection<String> adminRoutineNames = query().operations().getAdminRoutineNames();
 
-        adminOperationNames.removeAll(pluginRegistry.getOperationNames());
+        adminOperationNames.removeAll(pluginRegistry.getAdminOperationNames());
         adminRoutineNames.removeAll(pluginRegistry.getRoutineNames());
 
         boolean adminOpsEmpty = adminOperationNames.isEmpty();

@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
@@ -33,7 +34,7 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public ResourceOperation getResourceOperation(String operationName) throws PMException {
+    public ResourceOperation<?> getResourceOperation(String operationName) throws PMException {
         return pap.query().operations().getResourceOperation(operationName);
     }
 
@@ -45,5 +46,20 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     @Override
     public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
         return pap.query().operations().getAdminOperation(operationName);
+    }
+
+    @Override
+    public Collection<String> getAdminRoutineNames() throws PMException {
+        return pap.query().operations().getAdminRoutineNames();
+    }
+
+    @Override
+    public Routine<?> getAdminRoutine(String routineName) throws PMException {
+        return pap.query().operations().getAdminRoutine(routineName);
+    }
+
+    @Override
+    public boolean operationExists(String operationName) throws PMException {
+        return pap.query().operations().operationExists(operationName);
     }
 }

@@ -175,8 +175,8 @@ class PDPTest {
         pap.executePML(new TestUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 
-                resourceop read_file(@node("read") string name)
-                resourceop write_file(@node("read") string name)
+                resourceop read_file(@node("read") string name) {}
+                resourceop write_file(@node("read") string name) {}
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -247,7 +247,7 @@ class PDPTest {
                 
                 set resource access rights ["read", "write"]
                 
-                resourceop read_file(@node("read") int64 id)
+                resourceop read_file(@node("read") int64 id) {}
 
                 """);
         PDP pdp = new PDP(pap);
@@ -274,7 +274,7 @@ class PDPTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
+        pap.modify().operations().createAdminRoutine(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));

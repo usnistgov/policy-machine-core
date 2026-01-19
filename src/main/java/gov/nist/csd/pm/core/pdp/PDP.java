@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
+import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
@@ -92,10 +93,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     @Override
     public Object adjudicateResourceOperation(UserContext user, String resourceOperation, Map<String, Object> rawAgs) throws PMException {
-        if (!pap.query().operations().getResourceOperationNames().contains(resourceOperation)) {
-            throw new OperationDoesNotExistException(resourceOperation);
-        }
-
         ResourceOperation<?> op = pap.query().operations().getResourceOperation(resourceOperation);
         Args args = op.validateAndPrepareArgs(rawAgs);
 
@@ -117,7 +114,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     public Object adjudicateAdminRoutine(UserContext user,
                                          String routineName,
                                          Map<String, Object> rawArgs) throws PMException {
-        Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
+        Routine<?> routine = pap.query().operations().getAdminRoutine(routineName);
         Args args = routine.validateAndPrepareArgs(rawArgs);
 
         return runTx(user, tx -> {
@@ -142,51 +139,9 @@ public class PDP implements EventPublisher, AccessAdjudication {
         });
     }
 
-    private ResourceOperationResult buildResourceOperationResult(Args args) throws PMException {
-        ResourceOperationResult resourceOperationResult = new ResourceOperationResult();
-
-        for (Entry<FormalParameter<?>, Object> arg : args.getMap().entrySet()) {
-            FormalParameter<?> param = arg.getKey();
-            Object value = arg.getValue();
-
-            GraphQuery graph = pap.query().graph();
-            List<Node> nodes = switch (param) {
-                case NodeIdFormalParameter nodeIdFormalParameter ->
-                    List.of(graph.getNodeById((long) value));
-                case NodeIdListFormalParameter nodeIdFormalParameter -> {
-                    List<Node> nodesFromIds = new ArrayList<>();
-                    for (long id : (List<Long>) value) {
-                        nodesFromIds.add(graph.getNodeById(id));
-                    }
-
-                    yield nodesFromIds;
-                }
-                case NodeNameFormalParameter nodeIdFormalParameter ->
-                    List.of(graph.getNodeByName((String) value));
-                case NodeNameListFormalParameter nodeIdFormalParameter -> {
-                    List<Node> nodesFromNames = new ArrayList<>();
-                    for (String name : (List<String>) value) {
-                        nodesFromNames.add(graph.getNodeByName(name));
-                    }
-
-                    yield nodesFromNames;
-                }
-                default -> null;
-            };
-
-            if (nodes == null) {
-                continue;
-            }
-
-            resourceOperationResult.addResult(param.getName(), nodes);
-        }
-
-        return resourceOperationResult;
-    }
-
     private Object executeOperation(UserContext user, PDPTx pdpTx, Operation<?> operation, Args args) throws PMException {
-        if (operation instanceof PMLAdminOperation) {
-            ((PMLAdminOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
+        if (operation instanceof PMLFunction) {
+            ((PMLFunction)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation

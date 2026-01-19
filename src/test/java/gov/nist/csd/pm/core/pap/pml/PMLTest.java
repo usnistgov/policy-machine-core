@@ -77,7 +77,7 @@ public class PMLTest {
         };
         pap.modify().operations().createAdminOperation(op1);
 
-        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
+        pap.modify().operations().createAdminRoutine(new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 pap.executeFunction(op1, args);

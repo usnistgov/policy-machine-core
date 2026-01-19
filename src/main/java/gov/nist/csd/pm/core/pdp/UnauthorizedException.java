@@ -1,40 +1,64 @@
 package gov.nist.csd.pm.core.pdp;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class UnauthorizedException extends PMException {
 
-    private final Explain explain;
+    public static UnauthorizedException of(GraphQuery graphQuery,
+                                           UserContext userContext,
+                                           TargetContext targetContext,
+                                           AccessRightSet has,
+                                           Collection<String> required) throws PMException {
+        String userStr = userString(graphQuery, userContext);
+        String targetStr = targetString(graphQuery, targetContext);
+        AccessRightSet missing = new AccessRightSet(required);
+        missing.removeAll(has);
 
-    public UnauthorizedException(Explain explain, UserContext user, String target, Collection<String> missingAccessRights) {
-        super(userString(user) + " does not have access right " + new ArrayList<>(missingAccessRights) + " on " + target);
-        this.explain = explain;
-    }
-
-    public UnauthorizedException(Explain explain, UserContext user, TargetContext target, Collection<String> missingAccessRights) {
-        super(userString(user) + " does not have access right " + new ArrayList<>(missingAccessRights) + " on " + target);
-        this.explain = explain;
-    }
-
-    public UnauthorizedException(UserContext user, TargetContext target, Collection<String> missingAccessRights) {
-        super(userString(user) + " does not have access right " + new ArrayList<>(missingAccessRights) + " on " + target);
-        this.explain = null;
-    }
-
-    public Explain getExplain() {
-        return explain;
-    }
-
-    private static String userString(UserContext user) {
-        if (user.isUserDefined()) {
-            return String.format("{user: %s%s}", user.getUser(), user.getProcess() != null ? ", process: " + user.getProcess() : "");
-        } else {
-            return String.format("{attrs: %s%s}", user.getAttributeIds(), user.getProcess() != null ? ", process: " + user.getProcess() : "");
+        if (required.isEmpty()) {
+            return new UnauthorizedException(userStr + " does not have any access rights on " + targetStr);
         }
+
+        return new UnauthorizedException(userStr + " missing required access rights " + missing + " on " + targetStr);
+    }
+
+    private static String userString(GraphQuery graphQuery, UserContext user) throws PMException {
+        if (user.isUserDefined()) {
+            String username = graphQuery.getNodeById(user.getUser()).getName();
+            return String.format("{user: %s%s}", username, user.getProcess() != null ? ", process: " + user.getProcess() : "");
+        } else {
+            List<String> attrsNames = new ArrayList<>();
+            for (long attrId : user.getAttributeIds()) {
+                String attrName = graphQuery.getNodeById(attrId).getName();
+                attrsNames.add(attrName);
+            }
+
+            return String.format("{user: [%s]%s}", String.join(", ", attrsNames), user.getProcess() != null ? ", process: " + user.getProcess() : "");
+        }
+    }
+
+    private static String targetString(GraphQuery graphQuery, TargetContext targetContext) throws PMException {
+        if (targetContext.isNode()) {
+            String username = graphQuery.getNodeById(targetContext.getTargetId()).getName();
+            return "{target: " + username + "}";
+        } else {
+            List<String> attrsNames = new ArrayList<>();
+            for (long attrId : targetContext.getAttributeIds()) {
+                String attrName = graphQuery.getNodeById(attrId).getName();
+                attrsNames.add(attrName);
+            }
+
+            return String.format("{target: [%s]}", String.join(", ", attrsNames));
+        }
+    }
+
+    private UnauthorizedException(String msg) {
+        super(msg);
     }
 }

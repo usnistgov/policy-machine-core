@@ -20,7 +20,7 @@ class RoutineDefinitionStatementTest {
                 }""";
         MemoryPAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), pml);
-        Routine<?> routine1 = pap.query().routines().getAdminRoutine("routine1");
+        Routine<?> routine1 = pap.query().operations().getAdminRoutine("routine1");
         assertEquals(pml, routine1.toString());
     }
 

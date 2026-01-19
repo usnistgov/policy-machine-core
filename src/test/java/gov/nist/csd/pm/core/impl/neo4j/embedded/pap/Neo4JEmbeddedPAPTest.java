@@ -11,7 +11,6 @@ import gov.nist.csd.pm.core.pap.modification.GraphModifierTest;
 import gov.nist.csd.pm.core.pap.modification.ObligationsModifierTest;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifierTest;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifierTest;
-import gov.nist.csd.pm.core.pap.modification.RoutinesModifierTest;
 import gov.nist.csd.pm.core.pap.query.AccessQuerierTest;
 import gov.nist.csd.pm.core.pap.query.GraphQuerierTest;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuerierTest;
@@ -163,17 +162,6 @@ class Neo4jEmbeddedProhibitionsModifierTest extends ProhibitionsModifierTest {
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 
-	@TempDir
-	private Path tempDir;
-
-	@Override
-	public PAP initializePAP() throws PMException {
-		return init(tempDir);
-	}
-}
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class Neo4jEmbeddedRoutinesModifierTest extends RoutinesModifierTest {
 	@TempDir
 	private Path tempDir;
 

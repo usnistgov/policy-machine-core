@@ -2,7 +2,9 @@ package gov.nist.csd.pm.core.pap.function.op;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.AccessQuerier;
+import gov.nist.csd.pm.core.pap.query.GraphQuerier;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -13,9 +15,11 @@ import java.util.List;
 public class PrivilegeChecker {
 
     private final AccessQuerier accessQuerier;
+    private final GraphQuerier graphQuerier;
 
-    public PrivilegeChecker(AccessQuerier accessQuerier) {
+    public PrivilegeChecker(AccessQuerier accessQuerier, GraphQuerier graphQuerier) {
         this.accessQuerier = accessQuerier;
+        this.graphQuerier = graphQuerier;
     }
 
     public void check(UserContext userCtx, TargetContext targetCtx, Collection<String> rightsToCheck) throws PMException {
@@ -52,9 +56,9 @@ public class PrivilegeChecker {
     }
 
     private void checkOrThrow(UserContext userCtx, TargetContext targetCtx, AccessRightSet computed,
-                              Collection<String> rightsToCheck) throws PMException {
-        if (!computed.containsAll(rightsToCheck) || (rightsToCheck.isEmpty() && computed.isEmpty())) {
-            throw new UnauthorizedException(null, userCtx, targetCtx, rightsToCheck);
+                              Collection<String> required) throws PMException {
+        if (!computed.containsAll(required) || (required.isEmpty() && computed.isEmpty())) {
+            throw UnauthorizedException.of(graphQuerier, userCtx, targetCtx, computed, required);
         }
     }
 }

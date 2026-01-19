@@ -11,7 +11,6 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     private final ProhibitionsQueryAdjudicator prohibitions;
     private final ObligationsQueryAdjudicator obligations;
     private final OperationsQueryAdjudicator operations;
-    private final RoutinesQueryAdjudicator routines;
     private final SelfAccessQueryAdjudicator selfAccess;
 
     public PolicyQueryAdjudicator(PAP pap, UserContext userCtx) {
@@ -20,7 +19,6 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
         this.prohibitions = new ProhibitionsQueryAdjudicator(pap, userCtx);
         this.obligations = new ObligationsQueryAdjudicator(pap, userCtx);
         this.operations = new OperationsQueryAdjudicator(pap, userCtx);
-        this.routines = new RoutinesQueryAdjudicator(pap, userCtx);
         this.selfAccess = new SelfAccessQueryAdjudicator(pap, userCtx);
     }
 
@@ -29,14 +27,12 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
                                   ProhibitionsQueryAdjudicator prohibitions,
                                   ObligationsQueryAdjudicator obligations,
                                   OperationsQueryAdjudicator operations,
-                                  RoutinesQueryAdjudicator routines,
                                   SelfAccessQueryAdjudicator selfAccess) {
         this.access = access;
         this.graph = graph;
         this.prohibitions = prohibitions;
         this.obligations = obligations;
         this.operations = operations;
-        this.routines = routines;
         this.selfAccess = selfAccess;
     }
 
@@ -67,11 +63,6 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     @Override
     public OperationsQueryAdjudicator operations() {
         return operations;
-    }
-
-    @Override
-    public RoutinesQueryAdjudicator routines() {
-        return routines;
     }
 
 }

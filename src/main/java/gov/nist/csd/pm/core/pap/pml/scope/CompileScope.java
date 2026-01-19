@@ -124,17 +124,16 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
         }
 
         // same for routines
-        Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
+        Collection<String> routineNames = pap.query().operations().getAdminRoutineNames();
         for (String routineName : routineNames) {
-            Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
+            Routine<?> routine = pap.query().operations().getAdminRoutine(routineName);
             functions.put(routineName, getFunctionSignature(routine));
         }
 
         // basic functions and query functions from plugin registry
-        List<String> basicFunctionNames = pap.plugins().getBasicFunctionNames();
-        for (String basicFunctionName : basicFunctionNames) {
-            BasicFunction<?> function = pap.plugins().getBasicFunction(basicFunctionName);
-            functions.put(basicFunctionName, getFunctionSignature(function));
+        List<BasicFunction<?>> basicFunctionNames = pap.plugins().getBasicFunctions();
+        for (BasicFunction<?> basicFunction : basicFunctionNames) {
+            functions.put(basicFunction.getName(), getFunctionSignature(basicFunction));
         }
 
         List<QueryFunction<?>> queryFunctionNames = pap.plugins().getQueryFunctions();

@@ -159,7 +159,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
 
             OnPatternContext onPatternContext = ctx.onPattern();
             if (onPatternContext == null) {
-                return new MatchesOperationPattern("opName");
+                return new MatchesOperationPattern(opName);
             }
 
             Set<String> argNames = onPatternContext.argNames().ID().stream().map(TerminalNode::getText).collect(Collectors.toSet());

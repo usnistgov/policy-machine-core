@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.pap.modification.GraphModifierTest;
 import gov.nist.csd.pm.core.pap.modification.ObligationsModifierTest;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifierTest;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifierTest;
-import gov.nist.csd.pm.core.pap.modification.RoutinesModifierTest;
 import gov.nist.csd.pm.core.pap.query.AccessQuerierTest;
 import gov.nist.csd.pm.core.pap.query.GraphQuerierTest;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuerierTest;
@@ -97,14 +96,6 @@ class MemoryProhibitionsModifierTest extends ProhibitionsModifierTest {
 
 class MemoryProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 
-    @Override
-    public PAP initializePAP() throws PMException {
-        return new MemoryPAP()
-                .withIdGenerator(new TestIdGenerator());
-    }
-}
-
-class MemoryRoutinesModifierTest extends RoutinesModifierTest {
     @Override
     public PAP initializePAP() throws PMException {
         return new MemoryPAP()

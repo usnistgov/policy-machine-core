@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +28,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void createResourceOperation(ResourceOperation operation) throws PMException {
+    public void createResourceOperation(ResourceOperation<?> operation) throws PMException {
         policy.resourceOps.put(operation.getName(), operation);
     }
 
@@ -69,5 +70,38 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     @Override
     public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
         return policy.adminOps.get(operationName);
+    }
+
+    @Override
+    public void createAdminRoutine(Routine<?> routine) throws PMException {
+        policy.routines.put(routine.getName(), routine);
+
+        txCmdTracker.trackOp(tx, new TxCmd.CreateAdminRoutine(routine));
+    }
+
+    @Override
+    public void deleteAdminRoutine(String name) throws PMException {
+        Routine<?> routine = policy.routines.get(name);
+
+        policy.routines.remove(name);
+
+        txCmdTracker.trackOp(tx, new TxCmd.DeleteAdminRoutine(routine));
+    }
+
+    @Override
+    public Collection<String> getAdminRoutineNames() throws PMException {
+        return new ArrayList<>(policy.routines.keySet());
+    }
+
+    @Override
+    public Routine<?> getAdminRoutine(String routineName) throws PMException {
+        return policy.routines.get(routineName);
+    }
+
+    @Override
+    public boolean operationExists(String operationName) throws PMException {
+        return policy.resourceOps.containsKey(operationName) ||
+            policy.adminOps.containsKey(operationName) ||
+            policy.routines.containsKey(operationName);
     }
 }

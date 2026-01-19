@@ -13,6 +13,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
@@ -92,10 +93,14 @@ public class FunctionTest {
         MemoryPAP memoryPAP = new TestPAP();
         memoryPAP.executePML(new UserContext(-1), pml);
 
-        PMLResourceOperation res1 = (PMLResourceOperation) memoryPAP.query().operations().getResourceOperation("res1");
+        PMLResourceOperation<?> res1 = (PMLResourceOperation<?>) memoryPAP.query().operations().getResourceOperation("res1");
         ExecutionContext u1 = memoryPAP.buildExecutionContext(new UserContext(id("u1")));
         res1.setCtx(u1);
-        assertThrows(UnauthorizedException.class, () -> res1.canExecute(memoryPAP, new UserContext(id("u1")), new Args()));
+        PDP pdp = new PDP(memoryPAP);
+        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id("u1")), pdpTx -> {
+            pdpTx.executeFunction(res1, new Args());
+            return null;
+        }));
     }
 
 }

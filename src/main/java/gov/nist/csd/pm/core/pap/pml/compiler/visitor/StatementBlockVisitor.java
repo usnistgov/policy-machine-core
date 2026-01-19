@@ -54,6 +54,10 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
 
     @Override
     public Result visitResourceOpStatementBlock(ResourceOpStatementBlockContext ctx) {
+        if (ctx == null) {
+            return new Result(true, new PMLStatementBlock());
+        }
+
         List<ResourceOpStatementContext> resourceOpStatement = ctx.resourceOpStatement();
         List<PMLStatement<?>> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);

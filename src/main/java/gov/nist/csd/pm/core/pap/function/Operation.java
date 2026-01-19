@@ -15,8 +15,10 @@ import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
+import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +66,19 @@ public abstract sealed class Operation<R> extends Function<R> permits AdminOpera
     private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws PMException {
         TargetContext targetCtx = new TargetContext(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-        nodeFormalParameter.getReqCap().check(userCtx, targetCtx, privs);
+        check(pap.query().graph(), userCtx, targetCtx, nodeFormalParameter.getReqCap(), privs);
+    }
+
+    private void check(GraphQuery graphQuery,
+                       UserContext user,
+                       TargetContext target,
+                       RequiredCapabilities reqCap,
+                       AccessRightSet userPrivileges) throws PMException {
+        AccessRightSet reqCaps = reqCap.getReqCaps();
+        if(userPrivileges.containsAll(reqCaps)) {
+            return;
+        }
+
+        throw UnauthorizedException.of(graphQuery, user, target, userPrivileges, reqCaps);
     }
 }

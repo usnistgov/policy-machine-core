@@ -41,20 +41,20 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
     void testGetAdminRoutineNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.modify().routines().createAdminRoutine(r1);
-        pap.modify().routines().createAdminRoutine(r2);
+        pap.modify().operations().createAdminRoutine(r1);
+        pap.modify().operations().createAdminRoutine(r2);
 
-        Collection<String> adminRoutineNames = pap.query().routines().getAdminRoutineNames();
+        Collection<String> adminRoutineNames = pap.query().operations().getAdminRoutineNames();
         assertEquals(new HashSet<>(adminRoutineNames), Set.of("r1", "r2", "deleteAllProjects"));
 
-        pap.plugins().registerRoutine(new Routine<>("r3", VOID_TYPE, List.of()) {
+        pap.plugins().registerRoutine(pap.query().operations(), new Routine<>("r3", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 
         });
-        adminRoutineNames = pap.query().routines().getAdminRoutineNames();
+        adminRoutineNames = pap.query().operations().getAdminRoutineNames();
         assertEquals(new HashSet<>(adminRoutineNames), Set.of("r1", "r2", "r3", "deleteAllProjects"));
     }
 
@@ -65,13 +65,13 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().routines().createAdminRoutine(r1);
+            pap.modify().operations().createAdminRoutine(r1);
 
-            Routine<?> actual = pap.query().routines().getAdminRoutine(r1.getName());
+            Routine<?> actual = pap.query().operations().getAdminRoutine(r1.getName());
             assertEquals(r1, actual);
 
-            pap.plugins().registerRoutine(r2);
-            actual = pap.query().routines().getAdminRoutine(r2.getName());
+            pap.plugins().registerRoutine(pap.query().operations(), r2);
+            actual = pap.query().operations().getAdminRoutine(r2.getName());
             assertEquals(r2, actual);
         }
 
@@ -79,7 +79,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         void testRoutineDoesNotExist() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            assertThrows(RoutineDoesNotExistException.class, () -> pap.query().routines().getAdminRoutine("r1"));
+            assertThrows(RoutineDoesNotExistException.class, () -> pap.query().operations().getAdminRoutine("r1"));
         }
 
     }

@@ -150,8 +150,7 @@ class CreateObligationStatementTest {
             
             associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
             
-            create obligation "o1" {
-                create rule "rule1"
+            create obligation "o1"
                 when any user
                 performs any operation
                 do(ctx) {
@@ -162,7 +161,6 @@ class CreateObligationStatementTest {
                         create pc "pc2"
                     }
                 }
-            }
             """;
         MemoryPAP pap = new TestPAP();
         pap.executePML(new UserContext(id("u1")), pml);

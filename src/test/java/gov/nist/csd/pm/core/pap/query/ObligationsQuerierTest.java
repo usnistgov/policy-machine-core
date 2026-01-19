@@ -79,12 +79,14 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             pap.modify().obligations().createObligation(obligation3.getAuthorId(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
 
             Collection<Obligation> obligations = pap.query().obligations().getObligations();
-            assertEquals(2, obligations.size());
+            assertEquals(3, obligations.size());
             for (Obligation obligation : obligations) {
                 if (obligation.getName().equals(obligation1.getName())) {
                     assertEquals(obligation1, obligation);
-                } else {
+                } else if (obligation.getName().equals(obligation2.getName())){
                     assertEquals(obligation2, obligation);
+                } else {
+                    assertEquals(obligation3, obligation);
                 }
             }
         }

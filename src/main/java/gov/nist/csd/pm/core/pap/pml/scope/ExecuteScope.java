@@ -110,9 +110,9 @@ public class ExecuteScope extends Scope<Object, Function<?>> {
         }
 
         // same for routines
-        Collection<String> routineNames = pap.query().routines().getAdminRoutineNames();
+        Collection<String> routineNames = pap.query().operations().getAdminRoutineNames();
         for (String routineName : routineNames) {
-            Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
+            Routine<?> routine = pap.query().operations().getAdminRoutine(routineName);
             functions.put(routineName, routine);
         }
 

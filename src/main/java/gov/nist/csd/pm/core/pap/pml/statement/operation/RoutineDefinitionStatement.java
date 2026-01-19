@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp.ROUTINE_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp.ROUTINE_PARAM;
 
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.routine.CreateAdminRoutineOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 
 import gov.nist.csd.pm.core.pap.pml.function.routine.PMLStmtsRoutine;

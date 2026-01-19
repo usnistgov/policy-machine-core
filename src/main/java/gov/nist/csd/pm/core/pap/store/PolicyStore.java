@@ -9,7 +9,6 @@ public interface PolicyStore extends Transactional {
     ProhibitionsStore prohibitions();
     ObligationsStore obligations();
     OperationsStore operations();
-    RoutinesStore routines();
 
     void reset() throws PMException;
 

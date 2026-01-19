@@ -6,7 +6,6 @@ import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import gov.nist.csd.pm.core.pap.store.ProhibitionsStore;
-import gov.nist.csd.pm.core.pap.store.RoutinesStore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -64,11 +63,6 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 	@Override
 	public OperationsStore operations() {
 		return new Neo4jEmbeddedOperationsStore(txHandler, classLoader);
-	}
-
-	@Override
-	public RoutinesStore routines() {
-		return new Neo4jEmbeddedRoutinesStore(txHandler, classLoader);
 	}
 
 	@Override

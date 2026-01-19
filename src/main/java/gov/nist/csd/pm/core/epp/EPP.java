@@ -24,7 +24,9 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.PDPTx;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -89,11 +91,14 @@ public class EPP implements EventSubscriber {
                               OnPattern onPattern) throws PMException {
         PMLStmtsQueryFunction<Boolean> matchFunc = onPattern.func();
 
-        // remove any args that are not defined as params
-        Set<String> paramNames = matchFunc.getFormalParameters().stream().map(FormalParameter::getName).collect(Collectors.toSet());
-        rawArgs.keySet().removeIf(argName -> !paramNames.contains(argName));
+        // need to pas only the args that the matching function expects which could be a subset of the
+        // params defined in the function and passed in rawArgs
+        List<FormalParameter<?>> formalParameters = matchFunc.getFormalParameters();
+        HashMap<String, Object> matchFuncArgs = new HashMap<>(rawArgs);
+        Set<String> paramNames = formalParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
+        matchFuncArgs.keySet().removeIf(argName -> !paramNames.contains(argName));
 
-        Args args = matchFunc.validateAndPrepareSubsetArgs(rawArgs);
+        Args args = matchFunc.validateAndPrepareSubsetArgs(matchFuncArgs);
 
         // first, check the user has any privileges on each node in the event context args - any privilege works
         checkAccessOnEventContextArgs(userCtx, args.getMap());

@@ -6,20 +6,17 @@ public class PolicyQuerier implements PolicyQuery {
     private final ProhibitionsQuerier prohibitionsQuerier;
     private final ObligationsQuerier obligationsQuerier;
     private final OperationsQuerier operationsQuerier;
-    private final RoutinesQuerier routinesQuerier;
     private final AccessQuerier accessQuerier;
 
     public PolicyQuerier(GraphQuerier graphQuerier,
                          ProhibitionsQuerier prohibitionsQuerier,
                          ObligationsQuerier obligationsQuerier,
                          OperationsQuerier operationsQuerier,
-                         RoutinesQuerier routinesQuerier,
                          AccessQuerier accessQuerier) {
         this.graphQuerier = graphQuerier;
         this.prohibitionsQuerier = prohibitionsQuerier;
         this.obligationsQuerier = obligationsQuerier;
         this.operationsQuerier = operationsQuerier;
-        this.routinesQuerier = routinesQuerier;
         this.accessQuerier = accessQuerier;
     }
 
@@ -48,8 +45,4 @@ public class PolicyQuerier implements PolicyQuery {
         return operationsQuerier;
     }
 
-    @Override
-    public RoutinesQuerier routines() {
-        return routinesQuerier;
-    }
 }

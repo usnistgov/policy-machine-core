@@ -71,8 +71,8 @@ public class PolicyEquals {
         assertEquals(aOps, bOps);
 
         // check routines
-        Collection<String> aRoutines = new HashSet<>(a.routines().getAdminRoutineNames());
-        Collection<String> bRoutines = new HashSet<>(b.routines().getAdminRoutineNames());
+        Collection<String> aRoutines = new HashSet<>(a.operations().getAdminRoutineNames());
+        Collection<String> bRoutines = new HashSet<>(b.operations().getAdminRoutineNames());
         assertEquals(aRoutines, bRoutines);
     }
 }

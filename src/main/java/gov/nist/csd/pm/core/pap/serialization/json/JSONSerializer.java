@@ -49,9 +49,9 @@ public class JSONSerializer implements PolicySerializer {
         // can only serialize if implements PMLStatementSerializer
         List<String> json = new ArrayList<>();
 
-        Collection<String> adminRoutineNames = policyQuery.routines().getAdminRoutineNames();
+        Collection<String> adminRoutineNames = policyQuery.operations().getAdminRoutineNames();
         for (String adminOperationName : adminRoutineNames) {
-            Routine<?> routine = policyQuery.routines().getAdminRoutine(adminOperationName);
+            Routine<?> routine = policyQuery.operations().getAdminRoutine(adminOperationName);
             if (routine instanceof PMLStatementSerializable pmlStatementSerializable) {
                 json.add(pmlStatementSerializable.toFormattedString(0));
             }

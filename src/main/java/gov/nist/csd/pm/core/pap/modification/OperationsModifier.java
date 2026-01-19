@@ -4,13 +4,14 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRigh
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
 
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
-import gov.nist.csd.pm.core.common.exception.OperationExistsException;
+import gov.nist.csd.pm.core.common.exception.FunctionExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class OperationsModifier extends Modifier implements OperationsModification {
@@ -30,9 +31,9 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     }
 
     @Override
-    public void createResourceOperation(ResourceOperation operation) throws PMException {
+    public void createResourceOperation(ResourceOperation<?> operation) throws PMException {
         if (operationExists(operation.getName())) {
-            throw new OperationExistsException(operation.getName());
+            throw new FunctionExistsException(operation.getName());
         }
 
         policyStore.operations().createResourceOperation(operation);
@@ -40,7 +41,9 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     @Override
     public void deleteResourceOperation(String operation) throws PMException {
-        if (!policyStore.operations().getAdminOperationNames().contains(operation)) {
+        if (pluginRegistry.pluginExists(operation)) {
+            throw new CannotDeletePluginOperationException(operation);
+        } else if (!policyStore.operations().operationExists(operation)) {
             return;
         }
 
@@ -50,7 +53,7 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     @Override
     public void createAdminOperation(AdminOperation<?> operation) throws PMException {
         if (operationExists(operation.getName())) {
-            throw new OperationExistsException(operation.getName());
+            throw new FunctionExistsException(operation.getName());
         }
 
         policyStore.operations().createAdminOperation(operation);
@@ -58,18 +61,33 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     @Override
     public void deleteAdminOperation(String operation) throws PMException {
-        if (pluginRegistry.getOperationNames().contains(operation)) {
-            pluginRegistry.removeOperation(operation);
-            return;
-        }
-
-        // return without error if the operation does not exist or is a built in admin op such as assign
-        if (AdminOperations.ADMIN_OP_NAMES.contains(operation)
-            || !policyStore.operations().getAdminOperationNames().contains(operation)) {
+        if (pluginRegistry.pluginExists(operation)) {
+            throw new CannotDeletePluginOperationException(operation);
+        } else if (!policyStore.operations().operationExists(operation)) {
             return;
         }
 
         policyStore.operations().deleteAdminOperation(operation);
+    }
+
+    @Override
+    public void createAdminRoutine(Routine<?> routine) throws PMException {
+        if (operationExists(routine.getName())) {
+            throw new FunctionExistsException(routine.getName());
+        }
+
+        policyStore.operations().createAdminRoutine(routine);
+    }
+
+    @Override
+    public void deleteAdminRoutine(String name) throws PMException {
+        if (pluginRegistry.pluginExists(name)) {
+            throw new CannotDeletePluginOperationException(name);
+        } else if (!policyStore.operations().operationExists(name)) {
+            return;
+        }
+
+        policyStore.operations().deleteAdminRoutine(name);
     }
 
     /**
@@ -89,7 +107,15 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     private boolean operationExists(String name) throws PMException {
         return AdminOperations.isAdminOperation(name)
             || policyStore.operations().getAdminOperationNames().contains(name)
-            || pluginRegistry.getOperationNames().contains(name)
-            || policyStore.operations().getResourceOperationNames().contains(name);
+            || pluginRegistry.pluginExists(name)
+            || policyStore.operations().getResourceOperationNames().contains(name)
+            || policyStore.operations().getAdminRoutineNames().contains(name);
+    }
+
+    static class CannotDeletePluginOperationException extends PMException {
+
+        public CannotDeletePluginOperationException(String name) {
+            super("cannot delete plugin operation " + name);
+        }
     }
 }

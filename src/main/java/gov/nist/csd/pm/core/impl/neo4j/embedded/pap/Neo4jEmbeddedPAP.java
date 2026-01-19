@@ -11,14 +11,12 @@ import gov.nist.csd.pm.core.pap.modification.ObligationsModifier;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifier;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifier;
-import gov.nist.csd.pm.core.pap.modification.RoutinesModifier;
 import gov.nist.csd.pm.core.pap.query.AccessQuerier;
 import gov.nist.csd.pm.core.pap.query.GraphQuerier;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuerier;
 import gov.nist.csd.pm.core.pap.query.OperationsQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerier;
-import gov.nist.csd.pm.core.pap.query.RoutinesQuerier;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class Neo4jEmbeddedPAP extends PAP {
@@ -57,8 +55,7 @@ public class Neo4jEmbeddedPAP extends PAP {
 			new GraphModifier(memoryPolicyStore, new RandomIdGenerator()),
 			new ProhibitionsModifier(memoryPolicyStore),
 			new ObligationsModifier(memoryPolicyStore),
-			new OperationsModifier(memoryPolicyStore, pluginRegistry),
-			new RoutinesModifier(memoryPolicyStore, pluginRegistry)
+			new OperationsModifier(memoryPolicyStore, pluginRegistry)
 		);
 
 		PolicyQuerier policyQuerier = new PolicyQuerier(
@@ -66,11 +63,10 @@ public class Neo4jEmbeddedPAP extends PAP {
 			new ProhibitionsQuerier(memoryPolicyStore),
 			new ObligationsQuerier(memoryPolicyStore),
 			new OperationsQuerier(memoryPolicyStore, pluginRegistry),
-			new RoutinesQuerier(memoryPolicyStore, pluginRegistry),
 			new AccessQuerier(memoryPolicyStore)
 		);
 
-		PrivilegeChecker privilegeChecker = new PrivilegeChecker(policyQuerier.access());
+		PrivilegeChecker privilegeChecker = new PrivilegeChecker(policyQuerier.access(), policyQuerier.graph());
 
 		return new Neo4jEmbeddedPAP(memoryPolicyStore, policyModifier, policyQuerier, privilegeChecker, pluginRegistry);
 	}

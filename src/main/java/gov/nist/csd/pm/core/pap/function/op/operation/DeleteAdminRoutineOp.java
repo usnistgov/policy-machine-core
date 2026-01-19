@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.pap.function.op.routine;
+package gov.nist.csd.pm.core.pap.function.op.operation;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_ADMIN_ROUTINE;
 
@@ -23,7 +23,7 @@ public class DeleteAdminRoutineOp extends AdminOperation<Void> {
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        pap.modify().routines().deleteAdminRoutine(args.get(NAME_PARAM));
+        pap.modify().operations().deleteAdminRoutine(args.get(NAME_PARAM));
         return null;
     }
 

@@ -27,6 +27,10 @@ public class PMLCompiler {
         return compilePMLWithScope(scope, input);
     }
 
+    public List<PMLStatement<?>> compilePML(PAP pap, CompileScope scope, String input) throws PMException {
+        return compilePMLWithScope(scope, input);
+    }
+
     private List<PMLStatement<?>> compilePMLWithScope(CompileScope scope, String input) throws PMException {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 

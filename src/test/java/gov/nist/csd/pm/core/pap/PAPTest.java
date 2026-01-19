@@ -171,8 +171,8 @@ public abstract class PAPTest extends PAPTestInitializer {
     }
 
     @Test
-    void testPluginRegistry() {
-        pap.plugins().registerOperation(new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+    void testPluginRegistry() throws PMException {
+        pap.plugins().registerAdminOperation(pap.query().operations(), new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -185,7 +185,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
         });
 
-        pap.plugins().registerRoutine(new Routine<>("routine1", VOID_TYPE, List.of()) {
+        pap.plugins().registerRoutine(pap.query().operations(), new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
@@ -193,13 +193,13 @@ public abstract class PAPTest extends PAPTestInitializer {
 
         });
 
-        assertTrue(pap.plugins().getOperationNames().contains("op1"));
+        assertTrue(pap.plugins().getAdminOperationNames().contains("op1"));
         assertTrue(pap.plugins().getRoutineNames().contains("routine1"));
     }
 
     @Test
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().registerOperation(new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        pap.plugins().registerAdminOperation(pap.query().operations(), new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;

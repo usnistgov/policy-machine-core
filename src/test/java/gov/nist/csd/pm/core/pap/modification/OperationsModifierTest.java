@@ -1,23 +1,31 @@
 package gov.nist.csd.pm.core.pap.modification;
 
+import static gov.nist.csd.pm.core.pap.PAPTest.ARG_A;
+import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_POLICY_CLASS;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
-import gov.nist.csd.pm.core.common.exception.OperationExistsException;
+import gov.nist.csd.pm.core.common.exception.FunctionExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.modification.OperationsModifier.CannotDeletePluginOperationException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.util.SamplePolicy;
+import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -67,14 +75,14 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testOperationExists() throws PMException {
             pap.modify().operations().createAdminOperation(testOp);
 
-            assertThrows(OperationExistsException.class,
+            assertThrows(FunctionExistsException.class,
                     () -> pap.modify().operations().createAdminOperation(new AssignOp()));
-            assertThrows(OperationExistsException.class,
+            assertThrows(FunctionExistsException.class,
                     () -> pap.modify().operations().createAdminOperation(testOp));
 
             pap.modify().operations().deleteAdminOperation(testOp.getName());
-            pap.plugins().registerOperation(testOp);
-            assertThrows(OperationExistsException.class,
+            pap.plugins().registerAdminOperation(pap.query().operations(), testOp);
+            assertThrows(FunctionExistsException.class,
                 () -> pap.modify().operations().createAdminOperation(testOp));
         }
     }
@@ -87,17 +95,143 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             pap.modify().operations().createAdminOperation(testOp);
             pap.modify().operations().deleteAdminOperation("test");
             assertDoesNotThrow(() -> pap.modify().operations().deleteAdminOperation("assign"));
-
-            pap.plugins().registerOperation(testOp);
-            assertTrue(pap.query().operations().getAdminOperationNames().contains(testOp.getName()));
-            pap.modify().operations().deleteAdminOperation(testOp.getName());
-            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation(testOp.getName()));
         }
 
         @Test
         void testCannotDeleteBuiltinOperation() {
             assertDoesNotThrow(() -> pap.modify().operations().deleteAdminOperation("assign"));
             assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation("assign"));
+        }
+    }
+
+    static Routine<Void> routine1 = new Routine<>(
+        "routine1",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
+    ) {
+        @Override
+        public Void execute(PAP pap, Args args) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine<Void> routine2 = new Routine<>(
+        "routine2",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
+    ) {
+        @Override
+        public Void execute(PAP pap, Args args) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine<Void> routine3 = new Routine<>(
+        "routine3",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
+    ) {
+        @Override
+        public Void execute(PAP pap, Args args) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine<Void> routine4 = new Routine<>(
+        "routine4",
+        VOID_TYPE,
+        List.of(ARG_A, ARG_B)
+    ) {
+        @Override
+        public Void execute(PAP pap, Args args) throws PMException {
+            return null;
+        }
+    };
+
+    @Nested
+    class CreateAdminRoutine {
+
+        @Test
+        void testSuccess() throws PMException, IOException {
+            SamplePolicy.loadSamplePolicyFromPML(pap);
+
+            pap.modify().operations().createAdminRoutine(routine1);
+
+            assertTrue(pap.query().operations().getAdminRoutineNames().contains("routine1"));
+        }
+
+        @Test
+        void testRoutineExists() throws PMException, IOException {
+            SamplePolicy.loadSamplePolicyFromPML(pap);
+
+            pap.modify().operations().createAdminRoutine(routine1);
+
+            assertThrows(FunctionExistsException.class, () -> {
+                pap.modify().operations().createAdminRoutine(routine1);
+            });
+
+            pap.modify().operations().deleteAdminOperation(routine1.getName());
+            pap.plugins().registerRoutine(pap.query().operations(), routine1);
+            assertThrows(FunctionExistsException.class,
+                () -> pap.modify().operations().createAdminRoutine(routine1));
+        }
+
+        @Test
+        void testTx() throws PMException, IOException {
+            SamplePolicy.loadSamplePolicyFromPML(pap);
+
+            pap.runTx(tx -> {
+                tx.modify().operations().createAdminRoutine(routine1);
+                tx.modify().operations().createAdminRoutine(routine2);
+            });
+
+            assertThrows(PMException.class, () -> pap.runTx(tx -> {
+                tx.modify().operations().createAdminRoutine(routine3);
+                tx.modify().operations().createAdminRoutine(routine4);
+
+                throw new PMException("");
+            }));
+
+            assertTrue(pap.query().operations().getAdminRoutineNames().containsAll(List.of("routine1", "routine2")));
+            assertFalse(pap.query().operations().getAdminRoutineNames().containsAll(List.of("routine3", "routine4")));
+        }
+    }
+
+    @Nested
+    class DeleteAdminRoutine {
+
+        @Test
+        void testSuccess() throws PMException, IOException {
+            SamplePolicy.loadSamplePolicyFromPML(pap);
+            pap.modify().operations().createAdminRoutine(routine1);
+
+            pap.modify().operations().deleteAdminRoutine("routine1");
+            assertFalse(pap.query().operations().getAdminRoutineNames().contains("routine1"));
+
+            pap.plugins().registerRoutine(pap.query().operations(), routine1);
+            assertTrue(pap.query().operations().getAdminRoutineNames().contains(routine1.getName()));
+            assertThrows(CannotDeletePluginOperationException.class, () ->
+                pap.modify().operations().deleteAdminRoutine(routine1.getName()));
+            assertDoesNotThrow(() -> pap.query().operations().getAdminRoutine(routine1.getName()));
+        }
+
+        @Test
+        void testTx() throws PMException, IOException {
+            SamplePolicy.loadSamplePolicyFromPML(pap);
+
+            pap.runTx(tx -> {
+                tx.modify().operations().createAdminRoutine(routine1);
+                tx.modify().operations().createAdminRoutine(routine2);
+            });
+
+            assertThrows(PMException.class, () -> pap.runTx(tx -> {
+                tx.modify().operations().deleteAdminRoutine("routine1");
+                tx.modify().operations().deleteAdminRoutine("routine2");
+
+                throw new PMException("");
+            }));
+
+            assertTrue(pap.query().operations().getAdminRoutineNames().containsAll(List.of("routine1", "routine2")));
         }
     }
 

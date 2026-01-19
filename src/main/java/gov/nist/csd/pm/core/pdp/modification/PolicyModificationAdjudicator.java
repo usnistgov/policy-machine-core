@@ -11,26 +11,22 @@ public class PolicyModificationAdjudicator implements PolicyModification {
     private final ProhibitionsModificationAdjudicator prohibitions;
     private final ObligationsModificationAdjudicator obligations;
     private final OperationsModificationAdjudicator operations;
-    private final RoutinesModificationAdjudicator routines;
 
     public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher) {
         this.graph = new GraphModificationAdjudicator(userCtx, pap, eventPublisher);
         this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap);
         this.obligations = new ObligationsModificationAdjudicator(userCtx, pap);
         this.operations = new OperationsModificationAdjudicator(userCtx, pap);
-        this.routines = new RoutinesModificationAdjudicator(userCtx, pap);
     }
 
     public PolicyModificationAdjudicator(GraphModificationAdjudicator graph,
                                          ProhibitionsModificationAdjudicator prohibitions,
                                          ObligationsModificationAdjudicator obligations,
-                                         OperationsModificationAdjudicator operations,
-                                         RoutinesModificationAdjudicator routines) {
+                                         OperationsModificationAdjudicator operations) {
         this.graph = graph;
         this.prohibitions = prohibitions;
         this.obligations = obligations;
         this.operations = operations;
-        this.routines = routines;
     }
 
     @Override
@@ -51,11 +47,6 @@ public class PolicyModificationAdjudicator implements PolicyModification {
     @Override
     public OperationsModificationAdjudicator operations() {
         return operations;
-    }
-
-    @Override
-    public RoutinesModificationAdjudicator routines() {
-        return routines;
     }
 
 }

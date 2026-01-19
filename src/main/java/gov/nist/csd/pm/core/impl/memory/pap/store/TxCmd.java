@@ -218,7 +218,7 @@ public abstract class TxCmd implements TxRollbackSupport {
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.routines().deleteAdminRoutine(routine.getName());
+            memoryPolicyStore.operations().deleteAdminRoutine(routine.getName());
         }
     }
 
@@ -232,7 +232,7 @@ public abstract class TxCmd implements TxRollbackSupport {
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.routines().createAdminRoutine(routine);
+            memoryPolicyStore.operations().createAdminRoutine(routine);
         }
     }
 }

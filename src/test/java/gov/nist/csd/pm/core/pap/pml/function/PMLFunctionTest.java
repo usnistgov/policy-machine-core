@@ -46,7 +46,7 @@ public class PMLFunctionTest {
         MemoryPAP memoryPAP = new MemoryPAP();
         PMLCompilationException e = assertThrows(PMLCompilationException.class,
             () -> memoryPAP.executePML(new UserContext(0), pml));
-        assertEquals("only PML basic functions (defined as 'function') allowed in basic statement block",
+        assertEquals("unknown function 'op1' in scope",
             e.getErrors().getFirst().errorMessage());
 
         String pml2 = """
@@ -61,7 +61,7 @@ public class PMLFunctionTest {
         MemoryPAP memoryPAP2 = new MemoryPAP();
         e = assertThrows(PMLCompilationException.class,
             () -> memoryPAP2.executePML(new UserContext(0), pml2));
-        assertEquals("only PML basic functions (defined as 'function') allowed in basic statement block",
+        assertEquals("unknown function 'rou1' in scope",
             e.getErrors().getFirst().errorMessage());
     }
 

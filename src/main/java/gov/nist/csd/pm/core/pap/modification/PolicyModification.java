@@ -25,9 +25,4 @@ public interface PolicyModification {
      */
     OperationsModification operations();
 
-    /**
-     * @return The RoutinesModification implementation.
-     */
-    RoutinesModification routines();
-
 }

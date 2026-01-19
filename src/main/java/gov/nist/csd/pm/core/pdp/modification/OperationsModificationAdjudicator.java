@@ -3,16 +3,20 @@ package gov.nist.csd.pm.core.pdp.modification;
 import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
+import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp.ROUTINE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;
+import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminRoutineOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.DeleteResourceOperationOp;
 import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
@@ -39,7 +43,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     }
 
     @Override
-    public void createResourceOperation(ResourceOperation operation) throws PMException {
+    public void createResourceOperation(ResourceOperation<?> operation) throws PMException {
         CreateResourceOperationOp op = new CreateResourceOperationOp();
         Args args = new Args()
             .put(CreateResourceOperationOp.OPERATION_PARAM, operation);
@@ -73,6 +77,26 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
         DeleteAdminOperationOp op = new DeleteAdminOperationOp();
         Args args = new Args()
             .put(NAME_PARAM, operation);
+
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+    }
+
+    @Override
+    public void createAdminRoutine(Routine<?> routine) throws PMException {
+        CreateAdminRoutineOp op = new CreateAdminRoutineOp();
+        Args args = new Args()
+            .put(ROUTINE_PARAM, routine);
+
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+    }
+
+    @Override
+    public void deleteAdminRoutine(String name) throws PMException {
+        DeleteAdminRoutineOp op = new DeleteAdminRoutineOp();
+        Args args = new Args()
+            .put(NAME_PARAM, name);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);

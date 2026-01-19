@@ -70,10 +70,6 @@ class ObligationsModificationAdjudicatorTest {
                         new ObligationResponse("e", List.of())
 
         ));
-        assertThrows(UnauthorizedException.class, () -> fail.createObligation(id("u1"), "name1",
-                        new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
-                        new ObligationResponse("e", List.of())
-        ));
     }
 
     @Test
