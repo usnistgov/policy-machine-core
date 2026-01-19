@@ -9,7 +9,9 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -40,34 +42,12 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     }
 
     @Override
-    public void deleteResourceOperation(String operation) throws PMException {
-        if (pluginRegistry.pluginExists(operation)) {
-            throw new CannotDeletePluginOperationException(operation);
-        } else if (!policyStore.operations().operationExists(operation)) {
-            return;
-        }
-
-        policyStore.operations().deleteResourceOperation(operation);
-    }
-
-    @Override
     public void createAdminOperation(AdminOperation<?> operation) throws PMException {
         if (operationExists(operation.getName())) {
             throw new FunctionExistsException(operation.getName());
         }
 
         policyStore.operations().createAdminOperation(operation);
-    }
-
-    @Override
-    public void deleteAdminOperation(String operation) throws PMException {
-        if (pluginRegistry.pluginExists(operation)) {
-            throw new CannotDeletePluginOperationException(operation);
-        } else if (!policyStore.operations().operationExists(operation)) {
-            return;
-        }
-
-        policyStore.operations().deleteAdminOperation(operation);
     }
 
     @Override
@@ -80,14 +60,32 @@ public class OperationsModifier extends Modifier implements OperationsModificati
     }
 
     @Override
-    public void deleteAdminRoutine(String name) throws PMException {
+    public void createQueryOperation(QueryOperation<?> operation) throws PMException {
+        if (operationExists(operation.getName())) {
+            throw new FunctionExistsException(operation.getName());
+        }
+
+        policyStore.operations().createQueryOperation(operation);
+    }
+
+    @Override
+    public void createBasicFunction(BasicFunction<?> function) throws PMException {
+        if (operationExists(function.getName())) {
+            throw new FunctionExistsException(function.getName());
+        }
+
+        policyStore.operations().createBasicFunction(function);
+    }
+
+    @Override
+    public void deleteOperation(String name) throws PMException {
         if (pluginRegistry.pluginExists(name)) {
             throw new CannotDeletePluginOperationException(name);
         } else if (!policyStore.operations().operationExists(name)) {
             return;
         }
 
-        policyStore.operations().deleteAdminRoutine(name);
+        policyStore.operations().deleteOperation(name);
     }
 
     /**

@@ -10,7 +10,7 @@ import gov.nist.csd.pm.core.pap.function.AdminOperation;
 import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.QueryFunction;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
@@ -137,8 +137,8 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
             functions.put(basicFunction.getName(), getFunctionSignature(basicFunction));
         }
 
-        List<QueryFunction<?>> queryFunctionNames = pap.plugins().getQueryFunctions();
-        for (QueryFunction<?> queryFunc : queryFunctionNames) {
+        List<QueryOperation<?>> queryOperationNames = pap.plugins().getQueryOperations();
+        for (QueryOperation<?> queryFunc : queryOperationNames) {
             functions.put(queryFunc.getName(), getFunctionSignature(queryFunc));
         }
 
@@ -150,7 +150,7 @@ public class CompileScope extends Scope<Variable, PMLFunctionSignature> {
             case BasicFunction<?> basicFunction -> new PMLBasicFunctionSignature(
                 func.getName(), func.getReturnType(), func.getFormalParameters()
             );
-            case QueryFunction<?> basicFunction -> new PMLQueryFunctionSignature(
+            case QueryOperation<?> basicFunction -> new PMLQueryFunctionSignature(
                 func.getName(), func.getReturnType(), func.getFormalParameters()
             );
             case AdminOperation<?> adminOperation -> new PMLOperationSignature(

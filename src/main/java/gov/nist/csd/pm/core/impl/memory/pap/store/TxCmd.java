@@ -1,10 +1,16 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
+import com.sun.xml.bind.v2.TODO;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
+import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import java.util.Collection;
@@ -222,17 +228,25 @@ public abstract class TxCmd implements TxRollbackSupport {
         }
     }
 
-    static class DeleteAdminRoutine extends TxCmd {
+    static class DeleteFunction extends TxCmd {
 
-        private final Routine<?> routine;
+        private final Function<?> function;
 
-        public DeleteAdminRoutine(Routine<?> routine) {
-            this.routine = routine;
+        public DeleteFunction(Function<?> function) {
+            this.function = function;
         }
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.operations().createAdminRoutine(routine);
+            MemoryOperationsStore opsStore = memoryPolicyStore.operations();
+            switch (function) {
+                case BasicFunction<?> basicFunction -> opsStore.createBasicFunction(basicFunction);
+                case AdminOperation<?> adminOperation -> opsStore.createAdminOperation(adminOperation);
+                case ResourceOperation<?> resourceOperation -> opsStore.createResourceOperation(resourceOperation);
+                case QueryOperation<?> queryOperation -> opsStore.createQueryOperation(queryOperation);
+                default -> throw new IllegalStateException("Unexpected value: " + function);
+                TODO
+            }
         }
     }
 }

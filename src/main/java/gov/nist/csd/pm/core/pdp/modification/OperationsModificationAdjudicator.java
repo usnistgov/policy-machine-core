@@ -9,6 +9,8 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
@@ -53,30 +55,10 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     }
 
     @Override
-    public void deleteResourceOperation(String operation) throws PMException {
-        DeleteResourceOperationOp op = new DeleteResourceOperationOp();
-        Args args = new Args()
-            .put(NAME_PARAM, operation);
-
-        op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
-    }
-
-    @Override
     public void createAdminOperation(AdminOperation<?> operation) throws PMException {
         CreateAdminOperationOp op = new CreateAdminOperationOp();
         Args args = new Args()
             .put(ADMIN_OPERATION_PARAM, operation);
-
-        op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
-    }
-
-    @Override
-    public void deleteAdminOperation(String operation) throws PMException {
-        DeleteAdminOperationOp op = new DeleteAdminOperationOp();
-        Args args = new Args()
-            .put(NAME_PARAM, operation);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
@@ -93,10 +75,30 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     }
 
     @Override
-    public void deleteAdminRoutine(String name) throws PMException {
-        DeleteAdminRoutineOp op = new DeleteAdminRoutineOp();
+    public void createQueryOperation(QueryOperation<?> operation) throws PMException {
+        CreateAdminRoutineOp op = new CreateAdminRoutineOp();
         Args args = new Args()
-            .put(NAME_PARAM, name);
+            .put(QUERY_PARAM, routine);
+
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+    }
+
+    @Override
+    public void createBasicFunction(BasicFunction<?> function) throws PMException {
+        CreateAdminRoutineOp op = new CreateAdminRoutineOp();
+        Args args = new Args()
+            .put(ROUTINE_PARAM, routine);
+
+        op.canExecute(pap, userCtx, args);
+        op.execute(pap, args);
+    }
+
+    @Override
+    public void deleteOperation(String name) throws PMException {
+        DeleteResourceOperationOp op = new DeleteResourceOperationOp();
+        Args args = new Args()
+            .put(NAME_PARAM, operation);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);

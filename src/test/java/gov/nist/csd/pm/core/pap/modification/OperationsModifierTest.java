@@ -198,7 +198,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
     }
 
     @Nested
-    class DeleteAdminRoutine {
+    class DeleteFunction {
 
         @Test
         void testSuccess() throws PMException, IOException {

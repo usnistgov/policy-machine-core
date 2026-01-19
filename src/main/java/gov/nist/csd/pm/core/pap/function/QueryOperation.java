@@ -8,11 +8,11 @@ import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
-public abstract non-sealed class QueryFunction<R> extends Function<R> {
+public abstract non-sealed class QueryOperation<R> extends Operation<R> {
 
-    public QueryFunction(String name,
-                         Type<R> returnType,
-                         List<FormalParameter<?>> parameters) {
+    public QueryOperation(String name,
+                          Type<R> returnType,
+                          List<FormalParameter<?>> parameters) {
         super(name, returnType, parameters);
     }
 

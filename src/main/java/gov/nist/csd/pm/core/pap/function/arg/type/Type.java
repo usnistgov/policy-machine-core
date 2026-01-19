@@ -13,7 +13,7 @@ import java.util.Map;
 public sealed abstract class Type<T> implements Serializable
     permits AdminOperationType, AnyType, BasicFunctionType, BooleanType, ContainerConditionType, EventPatternType,
     ListType, LongType, MapType, ObligationResponseType, ProhibitionSubjectArgType, ResourceOperationType, RoutineType,
-    StringType, VoidType {
+    StringType, VoidType, QueryOperationType {
 
     public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {

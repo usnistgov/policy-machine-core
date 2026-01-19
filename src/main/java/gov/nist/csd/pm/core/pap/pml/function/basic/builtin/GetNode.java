@@ -9,13 +9,13 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 import java.util.Map;
 
 
-public class GetNode extends PMLQueryFunction<Map<String, Object>> {
+public class GetNode extends PMLQueryOperation<Map<String, Object>> {
 
     public GetNode() {
         super(

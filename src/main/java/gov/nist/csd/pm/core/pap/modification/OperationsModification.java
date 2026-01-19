@@ -3,6 +3,8 @@ package gov.nist.csd.pm.core.pap.modification;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 
@@ -26,25 +28,11 @@ public interface OperationsModification {
     void createResourceOperation(ResourceOperation<?> operation) throws PMException;
 
     /**
-     * Delete the admin operation with the given name.
-     * @param operation The operation name.
-     * @throws PMException If there is an error in the PM.
-     */
-    void deleteResourceOperation(String operation) throws PMException;
-
-    /**
      * Create an administrative operation.
      * @param operation The operation to create.
      * @throws PMException If there is an error in the PM.
      */
     void createAdminOperation(AdminOperation<?> operation) throws PMException;
-
-    /**
-     * Delete the admin operation with the given name.
-     * @param operation The operation name.
-     * @throws PMException If there is an error in the PM.
-     */
-    void deleteAdminOperation(String operation) throws PMException;
 
     /**
      * Create a new administrative routine.
@@ -54,9 +42,23 @@ public interface OperationsModification {
     void createAdminRoutine(Routine<?> routine) throws PMException;
 
     /**
-     * Delete the admin routine with the given name.
-     * @param name The name of the admin routine to delete.
+     * Create a query operation.
+     * @param operation The query operation to create.
      * @throws PMException If there is an error in the PM.
      */
-    void deleteAdminRoutine(String name) throws PMException;
+    void createQueryOperation(QueryOperation<?> operation) throws PMException;
+
+    /**
+     * Create a basic function.
+     * @param function The basic function to create.
+     * @throws PMException If there is an error in the PM.
+     */
+    void createBasicFunction(BasicFunction<?> function) throws PMException;
+
+    /**
+     * Delete a resource, admin, routine, or query operation with the given name.
+     * @param name The name of the operation to delete.
+     * @throws PMException If there is an error in the PM.
+     */
+    void deleteOperation(String name) throws PMException;
 }

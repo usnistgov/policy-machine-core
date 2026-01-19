@@ -11,15 +11,15 @@ import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 import java.util.Objects;
 
-public class PMLStmtsQueryFunction<T> extends PMLQueryFunction<T> implements PMLStatementSerializable {
+public class PMLStmtsQueryOperation<T> extends PMLQueryOperation<T> implements PMLStatementSerializable {
 
     private ExecutionContext ctx;
     private PMLStatementBlock stmts;
 
-    public PMLStmtsQueryFunction(String operationName,
-                                 Type<T> returnType,
-                                 List<FormalParameter<?>> parameters,
-                                 PMLStatementBlock stmts) {
+    public PMLStmtsQueryOperation(String operationName,
+                                  Type<T> returnType,
+                                  List<FormalParameter<?>> parameters,
+                                  PMLStatementBlock stmts) {
         super(operationName, returnType, parameters);
         this.stmts = stmts;
     }
@@ -59,7 +59,7 @@ public class PMLStmtsQueryFunction<T> extends PMLQueryFunction<T> implements PML
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PMLStmtsQueryFunction<?> that)) {
+        if (!(o instanceof PMLStmtsQueryOperation<?> that)) {
             return false;
         }
         if (!super.equals(o)) {

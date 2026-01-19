@@ -5,12 +5,15 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.RoutineDoesNotExistException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.PluginRegistry;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class OperationsQuerier extends Querier implements OperationsQuery {
@@ -38,7 +41,7 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
             return pluginRegistry.getResourceOperation(operationName);
         }
 
-        if (!store.operations().getResourceOperationNames().contains(operationName)) {
+        if (!store.operations().operationExists(operationName)) {
             throw new OperationDoesNotExistException(operationName);
         }
 
@@ -58,7 +61,7 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
             return pluginRegistry.getAdminOperation(operationName);
         }
 
-        if (!store.operations().getAdminOperationNames().contains(operationName)) {
+        if (!store.operations().operationExists(operationName)) {
             throw new OperationDoesNotExistException(operationName);
         }
 
@@ -78,11 +81,51 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
             return pluginRegistry.getRoutine(routineName);
         }
 
-        if (!store.operations().getAdminRoutineNames().contains(routineName)) {
+        if (!store.operations().operationExists(routineName)) {
             throw new RoutineDoesNotExistException(routineName);
         }
 
         return store.operations().getAdminRoutine(routineName);
+    }
+
+    @Override
+    public Collection<String> getQueryOperationNames() throws PMException {
+        Collection<String> queryOpNames = new HashSet<>(store.operations().getQueryOperationNames());
+        queryOpNames.addAll(pluginRegistry.getQueryOperationNames());
+        return queryOpNames;
+    }
+
+    @Override
+    public QueryOperation<?> getQueryOperation(String name) throws PMException {
+        if (pluginRegistry.getRoutineNames().contains(name)) {
+            return pluginRegistry.getQueryOperation(name);
+        }
+
+        if (!store.operations().operationExists(name)) {
+            throw new OperationDoesNotExistException(name);
+        }
+
+        return store.operations().getQueryOperation(name);
+    }
+
+    @Override
+    public Collection<String> getBasicFunctionNames() throws PMException {
+        Collection<String> basicFuncNames = new HashSet<>(store.operations().getBasicFunctionNames());
+        basicFuncNames.addAll(pluginRegistry.getBasicFunctionNames());
+        return basicFuncNames;
+    }
+
+    @Override
+    public BasicFunction<?> getBasicFunction(String name) throws PMException {
+        if (pluginRegistry.getBasicFunctionNames().contains(name)) {
+            return pluginRegistry.getBasicFunction(name);
+        }
+
+        if (!store.operations().operationExists(name)) {
+            throw new OperationDoesNotExistException(name);
+        }
+
+        return store.operations().getBasicFunction(name);
     }
 
     @Override

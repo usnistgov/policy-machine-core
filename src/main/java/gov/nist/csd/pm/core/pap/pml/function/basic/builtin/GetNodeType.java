@@ -7,11 +7,11 @@ import static gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction.NODE_
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
-public class GetNodeType extends PMLQueryFunction<String> {
+public class GetNodeType extends PMLQueryOperation<String> {
 
     public GetNodeType() {
         super(

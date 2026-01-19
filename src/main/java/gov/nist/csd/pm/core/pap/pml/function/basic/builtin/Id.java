@@ -1,15 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.function.basic.builtin;
 
-import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.LONG_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
-public class Id extends PMLQueryFunction<Long> {
+public class Id extends PMLQueryOperation<Long> {
 
     public Id() {
         super(

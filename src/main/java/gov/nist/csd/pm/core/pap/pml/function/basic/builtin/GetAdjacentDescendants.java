@@ -9,13 +9,13 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class GetAdjacentDescendants extends PMLQueryFunction<List<String>> {
+public class GetAdjacentDescendants extends PMLQueryOperation<List<String>> {
 
     private static final Type<?> returnType = ListType.of(STRING_TYPE);
 

@@ -9,14 +9,14 @@ import java.util.List;
 public class PluginRegistry {
 
     private final List<BasicFunction<?>> basicFunctions;
-    private final List<QueryFunction<?>> queryFunctions;
+    private final List<QueryOperation<?>> queryOperations;
     private final List<AdminOperation<?>> adminOperations;
     private final List<ResourceOperation<?>> resourceOperations;
     private final List<Routine<?>> routines;
 
     public PluginRegistry() {
         basicFunctions = new ArrayList<>();
-        queryFunctions = new ArrayList<>();
+        queryOperations = new ArrayList<>();
         adminOperations = new ArrayList<>();
         resourceOperations = new ArrayList<>();
         routines = new ArrayList<>();
@@ -26,8 +26,8 @@ public class PluginRegistry {
         return basicFunctions;
     }
 
-    public List<QueryFunction<?>> getQueryFunctions() {
-        return queryFunctions;
+    public List<QueryOperation<?>> getQueryOperations() {
+        return queryOperations;
     }
 
     public List<AdminOperation<?>> getAdminOperations() {
@@ -52,10 +52,10 @@ public class PluginRegistry {
         return null;
     }
 
-    public QueryFunction<?> getQueryFunction(String name) {
-        for (QueryFunction<?> queryFunction : queryFunctions) {
-            if (queryFunction.getName().equals(name)) {
-                return queryFunction;
+    public QueryOperation<?> getQueryOperation(String name) {
+        for (QueryOperation<?> queryOperation : queryOperations) {
+            if (queryOperation.getName().equals(name)) {
+                return queryOperation;
             }
         }
 
@@ -101,13 +101,13 @@ public class PluginRegistry {
         basicFunctions.add(basicFunction);
     }
 
-    public void registerQueryFunction(OperationsQuery opQuery, QueryFunction<?> queryFunction) throws PMException {
-        boolean exists = opQuery.operationExists(queryFunction.getName());
+    public void registerQueryFunction(OperationsQuery opQuery, QueryOperation<?> queryOperation) throws PMException {
+        boolean exists = opQuery.operationExists(queryOperation.getName());
         if (exists) {
-            throw new FunctionExistsException(queryFunction.getName());
+            throw new FunctionExistsException(queryOperation.getName());
         }
 
-        queryFunctions.add(queryFunction);
+        queryOperations.add(queryOperation);
     }
 
     public void registerAdminOperation(OperationsQuery opQuery, AdminOperation<?> op) throws PMException {
@@ -141,8 +141,8 @@ public class PluginRegistry {
         basicFunctions.removeIf(op -> op.getName().equals(basicFunction.getName()));
     }
 
-    public void removeQueryFunction(QueryFunction<?> queryFunction) {
-        queryFunctions.removeIf(op -> op.getName().equals(queryFunction.getName()));
+    public void removeQueryFunction(QueryOperation<?> queryOperation) {
+        queryOperations.removeIf(op -> op.getName().equals(queryOperation.getName()));
     }
 
     public void removeAdminOperation(String opName) {
@@ -181,9 +181,9 @@ public class PluginRegistry {
             .toList();
     }
 
-    public List<String> getQueryFunctionNames() {
-        return queryFunctions.stream()
-            .map(QueryFunction::getName)
+    public List<String> getQueryOperationNames() {
+        return queryOperations.stream()
+            .map(QueryOperation::getName)
             .toList();
     }
 
@@ -193,8 +193,8 @@ public class PluginRegistry {
                 return true;
             }
         }
-        for (QueryFunction<?> queryFunction : queryFunctions) {
-            if (queryFunction.getName().equals(pluginName)) {
+        for (QueryOperation<?> queryOperation : queryOperations) {
+            if (queryOperation.getName().equals(pluginName)) {
                 return true;
             }
         }

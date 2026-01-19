@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.core.pap.obligation.event.operation;
 
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import java.util.Objects;
 import java.util.Set;
 
-public record OnPattern(Set<String> patternArgs, PMLStmtsQueryFunction<Boolean> func) implements PMLStatementSerializable {
+public record OnPattern(Set<String> patternArgs, PMLStmtsQueryOperation<Boolean> func) implements PMLStatementSerializable {
 
     @Override
     public String toFormattedString(int indentLevel) {

@@ -10,14 +10,14 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class Search extends PMLQueryFunction<List<Map<String, Object>>> {
+public class Search extends PMLQueryOperation<List<Map<String, Object>>> {
 
     public static final FormalParameter<String> TYPE_PARAM = new FormalParameter<>("type", STRING_TYPE);
     public static final FormalParameter<Map<String, String>> PROPERTIES_PARAM = new FormalParameter<>("properties", MapType.of(STRING_TYPE, STRING_TYPE));

@@ -10,12 +10,12 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
 
-public class HasPropertyValue extends PMLQueryFunction<Boolean> {
+public class HasPropertyValue extends PMLQueryOperation<Boolean> {
 
     public static final FormalParameter<String> VALUE_PARAM = new FormalParameter<>("value", STRING_TYPE);
 

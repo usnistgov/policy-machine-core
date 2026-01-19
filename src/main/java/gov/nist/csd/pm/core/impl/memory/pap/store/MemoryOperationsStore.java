@@ -2,12 +2,17 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.DeleteFunction;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 
@@ -33,18 +38,8 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void deleteResourceOperation(String operation) throws PMException {
-        policy.resourceOps.remove(operation);
-    }
-
-    @Override
     public void createAdminOperation(AdminOperation<?> operation) throws PMException {
         policy.adminOps.put(operation.getName(), operation);
-    }
-
-    @Override
-    public void deleteAdminOperation(String operation) throws PMException {
-        policy.adminOps.remove(operation);
     }
 
     @Override
@@ -58,7 +53,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public ResourceOperation getResourceOperation(String operationName) throws PMException {
+    public ResourceOperation<?> getResourceOperation(String operationName) throws PMException {
         return policy.resourceOps.get(operationName);
     }
 
@@ -80,12 +75,45 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void deleteAdminRoutine(String name) throws PMException {
-        Routine<?> routine = policy.routines.get(name);
+    public void createQueryOperation(QueryOperation<?> operation) throws PMException {
+        policy.queryOps.put(operation.getName(), operation);
 
-        policy.routines.remove(name);
+        txCmdTracker.trackOp(tx, new TxCmd.CreateQueryOperation(routine));
+    }
 
-        txCmdTracker.trackOp(tx, new TxCmd.DeleteAdminRoutine(routine));
+    @Override
+    public void createBasicFunction(BasicFunction<?> function) throws PMException {
+        policy.routines.put(function.getName(), function);
+
+        txCmdTracker.trackOp(tx, new TxCmd.CreateBasicFunction(function));
+    }
+
+    @Override
+    public void deleteOperation(String name) throws PMException {
+        Function<?> remove = policy.adminOps.remove(name);
+        if (remove == null) {
+            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+            return;
+        }
+        remove = policy.resourceOps.remove(name);
+        if (remove == null) {
+            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+            return;
+        }
+        remove = policy.routines.remove(name);
+        if (remove == null) {
+            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+            return;
+        }
+        remove = policy.basicFuncs.remove(name);
+        if (remove == null) {
+            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+            return;
+        }
+        remove = policy.queryOps.remove(name);
+        if (remove == null) {
+            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+        }
     }
 
     @Override
@@ -96,6 +124,26 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     @Override
     public Routine<?> getAdminRoutine(String routineName) throws PMException {
         return policy.routines.get(routineName);
+    }
+
+    @Override
+    public Collection<String> getQueryOperationNames() throws PMException {
+        return new ArrayList<>(policy.queryOps.keySet());
+    }
+
+    @Override
+    public QueryOperation<?> getQueryOperation(String name) throws PMException {
+        return policy.queryOps.get(name);
+    }
+
+    @Override
+    public Collection<String> getBasicFunctionNames() throws PMException {
+        return new ArrayList<>(policy.basicFuncs.keySet());
+    }
+
+    @Override
+    public BasicFunction<?> getBasicFunction(String name) throws PMException {
+        return policy.basicFuncs.get(name);
     }
 
     @Override

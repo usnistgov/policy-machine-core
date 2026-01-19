@@ -3,6 +3,9 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.Function;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import java.util.Collection;
@@ -65,6 +68,36 @@ public interface OperationsQuery {
      * @throws PMException If there is an error in the PM.
      */
     Routine<?> getAdminRoutine(String routineName) throws PMException;
+
+    /**
+     * Get the query operation names.
+     * @return A list of the query operation names.
+     * @throws PMException If there is an error in the PM.
+     */
+    Collection<String> getQueryOperationNames() throws PMException;
+
+    /**
+     * Get the query operation with the given name.
+     * @param name The query operation name.
+     * @return The QueryOperation object.
+     * @throws PMException If there is an error in the PM.
+     */
+    QueryOperation<?> getQueryOperation(String name) throws PMException;
+
+    /**
+     * Get the basic function names.
+     * @return A list of the basic function names.
+     * @throws PMException If there is an error in the PM.
+     */
+    Collection<String> getBasicFunctionNames() throws PMException;
+
+    /**
+     * Get the basic function with the given name.
+     * @param name The basic function name.
+     * @return The BasicFunction object.
+     * @throws PMException If there is an error in the PM.
+     */
+    BasicFunction<?> getBasicFunction(String name) throws PMException;
 
     /**
      * Returns true if the given name matches any resource operation, admin operation, or routine stored in the policy.

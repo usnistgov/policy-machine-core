@@ -31,7 +31,7 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownFunctionInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -194,7 +194,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                     opName,
                     new OnPattern(
                         argNames,
-                        new PMLStmtsQueryFunction<>(opName, BOOLEAN_TYPE, patternParams, pmlStatementBlock)
+                        new PMLStmtsQueryOperation<>(opName, BOOLEAN_TYPE, patternParams, pmlStatementBlock)
                     )
                 );
 

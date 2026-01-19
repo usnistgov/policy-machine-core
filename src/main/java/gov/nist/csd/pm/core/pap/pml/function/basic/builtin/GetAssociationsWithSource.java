@@ -10,14 +10,14 @@ import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class GetAssociationsWithSource extends PMLQueryFunction<List<Map<String, Object>>> {
+public class GetAssociationsWithSource extends PMLQueryOperation<List<Map<String, Object>>> {
 
     private static final Type<List<Map<String, Object>>> returnType = ListType.of(MapType.of(STRING_TYPE, ANY_TYPE));
 

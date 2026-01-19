@@ -7,7 +7,7 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.function.BasicFunction;
 import gov.nist.csd.pm.core.pap.function.Function;
 import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.QueryFunction;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
 import java.util.Collection;
@@ -64,7 +64,7 @@ public class ExecuteScope extends Scope<Object, Function<?>> {
     public Scope<Object, Function<?>> copyBasicAndQueryFunctionsOnly() {
         Map<String, Function<?>> filteredFunctions = new HashMap<>();
         for (Function<?> function : getFunctions().values()) {
-            if (function instanceof BasicFunction<?> || function instanceof QueryFunction<?>) {
+            if (function instanceof BasicFunction<?> || function instanceof QueryOperation<?>) {
                 filteredFunctions.put(function.getName(), function);
             }
         }
@@ -123,8 +123,8 @@ public class ExecuteScope extends Scope<Object, Function<?>> {
             functions.put(basicFunctionName, function);
         }
 
-        List<QueryFunction<?>> queryFunctionNames = pap.plugins().getQueryFunctions();
-        for (QueryFunction<?> queryFunc : queryFunctionNames) {
+        List<QueryOperation<?>> queryOperationNames = pap.plugins().getQueryOperations();
+        for (QueryOperation<?> queryFunc : queryOperationNames) {
             functions.put(queryFunc.getName(), queryFunc);
         }
 

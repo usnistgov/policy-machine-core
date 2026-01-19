@@ -5,6 +5,8 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.function.AdminOperation;
+import gov.nist.csd.pm.core.pap.function.BasicFunction;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.ResourceOperation;
 import gov.nist.csd.pm.core.pap.function.Routine;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
@@ -27,7 +29,9 @@ public class MemoryPolicy {
     protected Map<String, Collection<Prohibition>> processProhibitions;
     protected List<Obligation> obligations;
     protected Map<String, AdminOperation<?>> adminOps;
-    protected Map<String, ResourceOperation> resourceOps;
+    protected Map<String, ResourceOperation<?>> resourceOps;
+    protected Map<String, QueryOperation<?>> queryOps;
+    protected Map<String, BasicFunction<?>> basicFuncs;
     protected Map<String, Routine<?>> routines;
 
     public MemoryPolicy() {
@@ -44,6 +48,8 @@ public class MemoryPolicy {
         this.obligations = new ArrayList<>();
         this.adminOps = new HashMap<>();
         this.resourceOps = new HashMap<>();
+        this.queryOps = new HashMap<>();
+        this.basicFuncs = new HashMap<>();
         this.routines = new HashMap<>();
     }
 

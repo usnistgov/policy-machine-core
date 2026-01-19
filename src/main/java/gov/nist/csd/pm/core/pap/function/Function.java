@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract sealed class Function<R> implements Serializable
-    permits Operation, Routine, QueryFunction {
+    permits Operation, Routine {
 
     private static final long serialVersionUID = 1L;
     protected final String name;

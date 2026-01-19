@@ -5,7 +5,7 @@ import static gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunction.NODE_
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.pap.function.QueryFunction;
+import gov.nist.csd.pm.core.pap.function.QueryOperation;
 import gov.nist.csd.pm.core.pap.function.arg.Args;
 import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.function.arg.type.Type;
@@ -13,7 +13,7 @@ import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 import java.util.Map;
 
-public class GetNodeProperties extends QueryFunction<Map<String, String>> {
+public class GetNodeProperties extends QueryOperation<Map<String, String>> {
 
     private static final Type<Map<String, String>> returnType = MapType.of(STRING_TYPE, STRING_TYPE);
 

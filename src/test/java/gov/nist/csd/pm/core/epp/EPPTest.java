@@ -42,7 +42,7 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.function.operation.PMLAdminOperation;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryFunction;
+import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
@@ -774,7 +774,7 @@ class EPPTest {
             new MatchesOperationPattern(
                 "assign",
                 Set.of("ascendant"),
-                new PMLStmtsQueryFunction<>(
+                new PMLStmtsQueryOperation<>(
                     "",
                     BOOLEAN_TYPE,
                     List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
@@ -815,7 +815,7 @@ class EPPTest {
             new MatchesOperationPattern(
                 "e1",
                 Set.of("ascendant", "descendants"),
-                new PMLStmtsQueryFunction<>(
+                new PMLStmtsQueryOperation<>(
                     "",
                     BOOLEAN_TYPE,
                     List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
