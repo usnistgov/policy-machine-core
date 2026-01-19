@@ -38,7 +38,7 @@ public class PMLOperationSignature extends PMLFunctionSignature {
             String paramStr = "%s%s %s";
             String annotationStr = "";
             if (formalParameter instanceof NodeFormalParameter<?> nodeFormalParameter) {
-                AccessRightSet reqCaps = nodeFormalParameter.getReqCap().getReqCaps();
+                AccessRightSet reqCaps = nodeFormalParameter.getAccessRights().getReqCaps();
 
                 annotationStr = "@node" +
                     (!reqCaps.isEmpty() ?

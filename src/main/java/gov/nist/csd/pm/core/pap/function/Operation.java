@@ -66,7 +66,7 @@ public abstract sealed class Operation<R> extends Function<R> permits AdminOpera
     private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws PMException {
         TargetContext targetCtx = new TargetContext(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-        check(pap.query().graph(), userCtx, targetCtx, nodeFormalParameter.getReqCap(), privs);
+        check(pap.query().graph(), userCtx, targetCtx, nodeFormalParameter.getAccessRights(), privs);
     }
 
     private void check(GraphQuery graphQuery,

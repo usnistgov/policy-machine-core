@@ -7,24 +7,24 @@ import gov.nist.csd.pm.core.pap.function.arg.type.Type;
 public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>
 	permits NodeIdFormalParameter, NodeIdListFormalParameter, NodeNameFormalParameter, NodeNameListFormalParameter {
 
-	private RequiredCapabilities reqCap;
+	private RequiredCapabilities accessRights;
 
-	public NodeFormalParameter(String name, Type<T> type, RequiredCapabilities reqCap) {
+	public NodeFormalParameter(String name, Type<T> type, RequiredCapabilities accessRights) {
 		super(name, type);
-		this.reqCap = reqCap;
+		this.accessRights = accessRights;
 	}
 
-	public NodeFormalParameter(String name, Type<T> type, String ... reqCaps) {
+	public NodeFormalParameter(String name, Type<T> type, String ... accessRights) {
 		super(name, type);
-		this.reqCap = new RequiredCapabilities(reqCaps);
+		this.accessRights = new RequiredCapabilities(accessRights);
 	}
 
-	public RequiredCapabilities getReqCap() {
-		return reqCap;
+	public RequiredCapabilities getAccessRights() {
+		return accessRights;
 	}
 
-	public void setReqCap(RequiredCapabilities reqCap) {
-		this.reqCap = reqCap;
+	public void setAccessRights(RequiredCapabilities accessRights) {
+		this.accessRights = accessRights;
 	}
 
 
