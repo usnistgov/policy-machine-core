@@ -170,7 +170,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
                 pap.modify().operations().createAdminRoutine(routine1);
             });
 
-            pap.modify().operations().deleteAdminOperation(routine1.getName());
+            pap.modify().operations().deleteAdminRoutine(routine1.getName());
             pap.plugins().registerRoutine(pap.query().operations(), routine1);
             assertThrows(FunctionExistsException.class,
                 () -> pap.modify().operations().createAdminRoutine(routine1));
