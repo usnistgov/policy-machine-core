@@ -7,8 +7,8 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatemen
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLStmtsBasicOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLStmtsBasicOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLStmtsResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;

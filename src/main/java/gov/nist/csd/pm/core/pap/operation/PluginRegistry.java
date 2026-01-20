@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.operation;
 
-import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import java.util.ArrayList;

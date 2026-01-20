@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DeleteNodeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DeleteObligationContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DeleteOperationContext;
@@ -11,9 +10,9 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DeleteStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DeleteTypeContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteOperationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteNodeStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteObligationStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteOperationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteProhibitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteStatement;
 

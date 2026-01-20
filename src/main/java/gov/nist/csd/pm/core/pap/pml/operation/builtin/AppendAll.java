@@ -5,8 +5,8 @@ import static gov.nist.csd.pm.core.pap.pml.operation.builtin.Append.DST_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLBasicOperation;
 import java.util.List;
 

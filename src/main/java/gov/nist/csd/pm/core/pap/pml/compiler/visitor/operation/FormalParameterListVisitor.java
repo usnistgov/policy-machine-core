@@ -4,9 +4,9 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.LONG_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.pap.operation.RequiredCapabilities;
-import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;

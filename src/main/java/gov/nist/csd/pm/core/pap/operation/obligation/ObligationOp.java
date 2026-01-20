@@ -1,13 +1,13 @@
 package gov.nist.csd.pm.core.pap.operation.obligation;
 
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.arg.type.EventPatternType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ObligationResponseType;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import java.util.List;
 
 public abstract class ObligationOp extends AdminOperation<Void> {

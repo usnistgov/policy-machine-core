@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.pap.pml.operation.resource;
 
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
-import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;

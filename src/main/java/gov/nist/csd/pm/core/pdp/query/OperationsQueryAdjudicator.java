@@ -3,17 +3,11 @@ package gov.nist.csd.pm.core.pdp.query;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.BasicFunction;
 import gov.nist.csd.pm.core.pap.operation.Operation;
-import gov.nist.csd.pm.core.pap.operation.QueryOperation;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
-import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Adjudicate queries on operations. Because operations are not Policy Elements, there are no access checks on

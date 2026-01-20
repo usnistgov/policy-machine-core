@@ -18,7 +18,6 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationTyp
 import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinOperations;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CompileScope extends Scope<Variable, PMLOperationSignature> {
