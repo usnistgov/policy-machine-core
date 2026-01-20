@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import java.util.List;
 
 public class JSONResourceOperation {

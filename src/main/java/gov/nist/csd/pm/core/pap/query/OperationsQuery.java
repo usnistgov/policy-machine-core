@@ -2,12 +2,11 @@ package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.BasicFunction;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.QueryOperation;
-import gov.nist.csd.pm.core.pap.function.ResourceOperation;
-import gov.nist.csd.pm.core.pap.function.Routine;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.QueryOperation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
 import java.util.Collection;
 
 /**
@@ -23,16 +22,16 @@ public interface OperationsQuery {
     AccessRightSet getResourceAccessRights() throws PMException;
 
     /**
-     * Get the names of all admin operations.
-     * @return A collection of all the admin operation names.
+     * Get the names of all resource operations.
+     * @return A collection of all the resource operation names.
      * @throws PMException If there is an error in the PM.
      */
     Collection<String> getResourceOperationNames() throws PMException;
 
     /**
-     * Get the admin operation with the given name.
+     * Get the resource operation with the given name.
      * @param operationName The operation name.
-     * @return The Operation object.
+     * @return The ResourceOperation object.
      * @throws PMException If there is an error in the PM.
      */
     ResourceOperation<?> getResourceOperation(String operationName) throws PMException;

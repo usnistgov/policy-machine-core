@@ -35,14 +35,13 @@ public class Neo4jUtil {
 	public static final Label U_LABEL = Label.label("U");
 	public static final Label OBLIGATION_LABEL = Label.label("Obligation");
 	public static final Label RESOURCE_ARS_LABEL = Label.label("ResourceAccessRights");
-	public static final Label ADMIN_OPERATION_LABEL = Label.label("AdminOp");
-	public static final Label RESOURCE_OPERATION_LABEL = Label.label("ResourceOp");
-	public static final Label ADMIN_ROUTINE_LABEL = Label.label("AdminRoutine");
+	public static final Label OPERATION_LABEL = Label.label("AdminOp");
 	public static final Label PROHIBITION_LABEL = Label.label("Prohibition");
 	public static final Label PROCESS_LABEL = Label.label("Process");
 
 	public static final String ARSET_PROPERTY = "arset";
 	public static final String NAME_PROPERTY = "name";
+	public static final String OP_TYPE_PROPERTY = "op_type";
 	public static final String ID_PROPERTY = "id";
 	public static final String DATA_PROPERTY = "data";
 	public static final String COMPLEMENT_PROPERTY = "complement";

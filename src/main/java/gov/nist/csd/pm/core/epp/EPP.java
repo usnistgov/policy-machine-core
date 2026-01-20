@@ -5,12 +5,12 @@ import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeNameListFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
@@ -18,7 +18,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPatte
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OnPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -108,7 +108,7 @@ public class EPP implements EventSubscriber {
         // use the pdptx so that any calls to the querier have privilege checks
         ExecutionContext executionContext = pdpTx.buildExecutionContext(userCtx);
         matchFunc.setCtx(executionContext);
-        return (boolean) pdpTx.executeFunction(matchFunc, args);
+        return (boolean) pdpTx.executeOperation(matchFunc, args);
     }
 
     private void checkAccessOnEventContextArgs(UserContext userCtx,

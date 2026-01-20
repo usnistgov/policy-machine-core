@@ -1,29 +1,29 @@
 package gov.nist.csd.pm.core.pap.admin;
 
 import gov.nist.csd.pm.core.common.exception.AdminOperationDoesNotExistException;
-import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreatePolicyClassOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.DeassignOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.DeleteNodeOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.DissociateOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.SetNodePropertiesOp;
-import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
-import gov.nist.csd.pm.core.pap.function.op.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminRoutineOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.DeleteResourceOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreatePolicyClassOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.operation.graph.DeassignOp;
+import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
+import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
+import gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp;
+import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminRoutineOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateBasicFunctionOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateQueryOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateResourceOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.DeleteOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.SetResourceAccessRights;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.DeleteProhibitionOp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,32 +31,31 @@ import java.util.Set;
 public class AdminOperations {
 
     public static List<Operation<?>> ADMIN_OPERATIONS = List.of(
-            new AssignOp(),
-            new AssociateOp(),
-            new CreateObjectAttributeOp(),
-            new CreateObjectOp(),
-            new CreatePolicyClassOp(),
-            new CreateUserAttributeOp(),
-            new CreateUserOp(),
-            new DeassignOp(),
-            new DeleteNodeOp(),
-            new DissociateOp(),
-            new SetNodePropertiesOp(),
+        new AssignOp(),
+        new AssociateOp(),
+        new CreateObjectAttributeOp(),
+        new CreateObjectOp(),
+        new CreatePolicyClassOp(),
+        new CreateUserAttributeOp(),
+        new CreateUserOp(),
+        new DeassignOp(),
+        new DeleteNodeOp(),
+        new DissociateOp(),
+        new SetNodePropertiesOp(),
 
-            new CreateObligationOp(),
-            new DeleteObligationOp(),
+        new CreateObligationOp(),
+        new DeleteObligationOp(),
 
-            new CreateAdminOperationOp(),
-            new DeleteAdminOperationOp(),
-            new SetResourceAccessRights(),
-            new CreateResourceOperationOp(),
-            new DeleteResourceOperationOp(),
+        new SetResourceAccessRights(),
+        new CreateResourceOperationOp(),
+        new CreateAdminOperationOp(),
+        new CreateAdminRoutineOp(),
+        new CreateQueryOperationOp(),
+        new CreateBasicFunctionOp(),
+        new DeleteOperationOp(),
 
-            new CreateProhibitionOp(),
-            new DeleteProhibitionOp(),
-
-            new CreateAdminRoutineOp(),
-            new DeleteAdminRoutineOp()
+        new CreateProhibitionOp(),
+        new DeleteProhibitionOp()
     );
 
     public static Set<String> ADMIN_OP_NAMES = new HashSet<>(adminOperationNames());

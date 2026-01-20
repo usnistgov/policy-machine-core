@@ -1,14 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionDefinitionVisitor;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionSignatureVisitor;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOperationStatementContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationDefinitionVisitor;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationSignatureVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.basic.PMLBasicFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutineSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
@@ -53,7 +51,7 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
 
         for (PMLParser.StatementContext stmtCtx : ctx.statement()) {
             PMLParser.BasicStatementContext basicStatementContext = stmtCtx.basicStatement();
-            PMLParser.OperationStatementContext operationStatementContext = stmtCtx.operationStatement();
+            AdminOperationStatementContext operationStatementContext = stmtCtx.adminOperationStatement();
 
             if (basicStatementContext != null) {
                 if (basicStatementContext.basicFunctionDefinitionStatement() != null) {
@@ -83,7 +81,7 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
     private CompiledFunctions compileFunctions(List<PMLParser.AdminOpDefinitionStatementContext> operationCtxs,
                                                List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
                                                List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs) {
-        Map<String, PMLFunctionSignature> functionSignatures = new HashMap<>(visitorCtx.scope().getFunctions());
+        Map<String, PMLOperationSignature> functionSignatures = new HashMap<>(visitorCtx.scope().getOperations());
 
         // track the function definitions statements to be processed,
         // function signatures are compiled first in the event that one function calls another
@@ -92,7 +90,7 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
         Map<String, PMLParser.RoutineDefinitionStatementContext> validRoutineDefs = new HashMap<>();
         Map<String, PMLParser.BasicFunctionDefinitionStatementContext> validFunctionDefs = new HashMap<>();
 
-        FunctionSignatureVisitor signatureVisitor = new FunctionSignatureVisitor(visitorCtx, true);
+        OperationSignatureVisitor signatureVisitor = new OperationSignatureVisitor(visitorCtx, true);
 
         // operations
         for (PMLParser.AdminOpDefinitionStatementContext operationCtx : operationCtxs) {
@@ -102,25 +100,25 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
 
         // routines
         for (PMLParser.RoutineDefinitionStatementContext routineCtx : routineCtxs) {
-            PMLRoutineSignature signature = signatureVisitor.visitRoutineSignature(routineCtx.routineSignature());
+            PMLOperationSignature signature = signatureVisitor.visitRoutineSignature(routineCtx.routineSignature());
             processSignature(routineCtx, signature, functionSignatures, (ctx) -> validRoutineDefs.put(signature.getName(), routineCtx));
         }
 
         // functions
         for (PMLParser.BasicFunctionDefinitionStatementContext functionCtx : functionCtxs) {
-            PMLBasicFunctionSignature signature = signatureVisitor.visitBasicFunctionSignature(functionCtx.basicFunctionSignature());
+            PMLOperationSignature signature = signatureVisitor.visitBasicFunctionSignature(functionCtx.basicFunctionSignature());
             processSignature(functionCtx, signature, functionSignatures, (ctx) -> validFunctionDefs.put(signature.getName(), functionCtx));
         }
 
         // compile all function bodies now that all signatures are compiled -- do not add signatures to ctx again
         signatureVisitor.setAddToCtx(false);
-        FunctionDefinitionVisitor functionDefinitionVisitor = new FunctionDefinitionVisitor(visitorCtx, signatureVisitor);
+        OperationDefinitionVisitor operationDefinitionVisitor = new OperationDefinitionVisitor(visitorCtx, signatureVisitor);
         List<AdminOpDefinitionStatement> operations = compileFunctions(operationCtxs,
-            functionDefinitionVisitor::visitAdminOpDefinitionStatement);
+            operationDefinitionVisitor::visitAdminOpDefinitionStatement);
         List<RoutineDefinitionStatement> routines = compileFunctions(routineCtxs,
-            functionDefinitionVisitor::visitRoutineDefinitionStatement);
+            operationDefinitionVisitor::visitRoutineDefinitionStatement);
         List<BasicFunctionDefinitionStatement> basicFunctions = compileFunctions(functionCtxs,
-            functionDefinitionVisitor::visitBasicFunctionDefinitionStatement);
+            operationDefinitionVisitor::visitBasicFunctionDefinitionStatement);
 
         return new CompiledFunctions(operations, routines, basicFunctions);
     }
@@ -139,8 +137,8 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
     }
 
     private void processSignature(ParserRuleContext statementCtx,
-                                  PMLFunctionSignature signature,
-                                  Map<String, PMLFunctionSignature> functionSignatures,
+                                  PMLOperationSignature signature,
+                                  Map<String, PMLOperationSignature> functionSignatures,
                                   Consumer<ParserRuleContext> consumer) {
         // visit the signature which will add to the scope, if an error occurs, log it and continue
         try {

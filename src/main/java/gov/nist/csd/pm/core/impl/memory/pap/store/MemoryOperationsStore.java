@@ -2,17 +2,17 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.DeleteFunction;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.BasicFunction;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.QueryOperation;
-import gov.nist.csd.pm.core.pap.function.ResourceOperation;
-import gov.nist.csd.pm.core.pap.function.Routine;
+import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.CreateOperationTxCmd;
+import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.DeleteOperation;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.QueryOperation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 
@@ -71,48 +71,48 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     public void createAdminRoutine(Routine<?> routine) throws PMException {
         policy.routines.put(routine.getName(), routine);
 
-        txCmdTracker.trackOp(tx, new TxCmd.CreateAdminRoutine(routine));
+        txCmdTracker.trackOp(tx, new CreateOperationTxCmd(routine));
     }
 
     @Override
     public void createQueryOperation(QueryOperation<?> operation) throws PMException {
         policy.queryOps.put(operation.getName(), operation);
 
-        txCmdTracker.trackOp(tx, new TxCmd.CreateQueryOperation(routine));
+        txCmdTracker.trackOp(tx, new TxCmd.CreateOperationTxCmd(operation));
     }
 
     @Override
-    public void createBasicFunction(BasicFunction<?> function) throws PMException {
-        policy.routines.put(function.getName(), function);
+    public void createBasicFunction(BasicFunction<?> basic) throws PMException {
+        policy.basicFuncs.put(basic.getName(), basic);
 
-        txCmdTracker.trackOp(tx, new TxCmd.CreateBasicFunction(function));
+        txCmdTracker.trackOp(tx, new TxCmd.CreateOperationTxCmd(basic));
     }
 
     @Override
     public void deleteOperation(String name) throws PMException {
-        Function<?> remove = policy.adminOps.remove(name);
-        if (remove == null) {
-            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+        Operation<?> remove = policy.adminOps.remove(name);
+        if (remove != null) {
+            txCmdTracker.trackOp(tx, new DeleteOperation(remove));
             return;
         }
         remove = policy.resourceOps.remove(name);
-        if (remove == null) {
-            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+        if (remove != null) {
+            txCmdTracker.trackOp(tx, new DeleteOperation(remove));
             return;
         }
         remove = policy.routines.remove(name);
-        if (remove == null) {
-            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+        if (remove != null) {
+            txCmdTracker.trackOp(tx, new DeleteOperation(remove));
             return;
         }
         remove = policy.basicFuncs.remove(name);
-        if (remove == null) {
-            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+        if (remove != null) {
+            txCmdTracker.trackOp(tx, new DeleteOperation(remove));
             return;
         }
         remove = policy.queryOps.remove(name);
-        if (remove == null) {
-            txCmdTracker.trackOp(tx, new DeleteFunction(remove));
+        if (remove != null) {
+            txCmdTracker.trackOp(tx, new DeleteOperation(remove));
         }
     }
 
@@ -150,6 +150,8 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     public boolean operationExists(String operationName) throws PMException {
         return policy.resourceOps.containsKey(operationName) ||
             policy.adminOps.containsKey(operationName) ||
-            policy.routines.containsKey(operationName);
+            policy.routines.containsKey(operationName) ||
+            policy.basicFuncs.containsKey(operationName) ||
+            policy.queryOps.containsKey(operationName);
     }
 }

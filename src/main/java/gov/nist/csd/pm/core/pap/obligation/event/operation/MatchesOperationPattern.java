@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.pap.obligation.event.operation;
 
-import gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes;
+import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import java.util.HashSet;

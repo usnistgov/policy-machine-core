@@ -2,11 +2,11 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateResourceOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsResourceOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLStmtsResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
@@ -22,7 +22,7 @@ public class ResourceOpDefinitionStatement extends OperationStatement implements
     }
 
     @Override
-    public PMLFunctionSignature getSignature() {
+    public PMLOperationSignature getSignature() {
         return pmlResourceOperation.getSignature();
     }
 
@@ -37,7 +37,7 @@ public class ResourceOpDefinitionStatement extends OperationStatement implements
         VoidResult value = super.execute(ctx, pap);
 
         // add operation to scope
-        ctx.scope().addFunction(pmlResourceOperation.getName(), pmlResourceOperation);
+        ctx.scope().addOperation(pmlResourceOperation.getName(), pmlResourceOperation);
 
         return value;
     }

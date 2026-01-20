@@ -12,7 +12,7 @@ pml: (statement)* EOF ;
 
 statement:
     basicStatement
-    | operationStatement ;
+    | adminOperationStatement ;
 
 basicStatement: (
     variableAssignmentStatement
@@ -21,12 +21,12 @@ basicStatement: (
     | returnStatement
     | breakStatement
     | continueStatement
-    | functionInvokeStatement
+    | operationInvokeStatement
     | ifStatement
     | basicFunctionDefinitionStatement
 ) ;
 
-operationStatement: (
+adminOperationStatement: (
     createPolicyStatement
     | createNonPCStatement
     | createObligationStatement
@@ -41,6 +41,7 @@ operationStatement: (
     | adminOpDefinitionStatement
     | resourceOpDefinitionStatement
     | routineDefinitionStatement
+    | queryOpDefinitionStatement
 ) ;
 
 statementBlock: OPEN_CURLY statement* CLOSE_CURLY ;
@@ -129,11 +130,10 @@ deleteStatement:
     DELETE (IF_EXISTS)? deleteType expression ;
 deleteType:
     NODE #DeleteNode
-    | ADMIN_OP #DeleteAdminOp
-    | RESOURCE_OP #DeleteResourceOp
-    | FUNCTION #DeleteFunctionOp
     | OBLIGATION #DeleteObligation
-    | PROHIBITION #DeleteProhibition ;
+    | PROHIBITION #DeleteProhibition
+    | OPERATION #DeleteOperation
+    ;
 
 variableDeclarationStatement:
     VAR (varSpec | OPEN_PAREN (varSpec)* CLOSE_PAREN) #VarDeclaration
@@ -143,11 +143,13 @@ varSpec: ID ASSIGN_EQUALS expression;
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
 adminOpDefinitionStatement: adminOpSignature adminOpStatementBlock ;
-resourceOpDefinitionStatement: resourceOpSignature resourceOpStatementBlock? ;
+queryOpDefinitionStatement: queryOpSignature basicAndCheckStatementBlock ;
+resourceOpDefinitionStatement: resourceOpSignature basicAndCheckStatementBlock? ;
 routineDefinitionStatement: routineSignature statementBlock ;
 basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
 
 adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+queryOpSignature: QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
 resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
@@ -159,12 +161,12 @@ nodeArgAnnotation: NODE_ARG (OPEN_PAREN (stringLit (COMMA stringLit)*)? CLOSE_PA
 
 adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
 adminOpStatement:
-  statement #BasicOrOperationAdminOpStatement
+  statement #BasicOrAdminOpStatement
   | checkStatement #CheckAdminOpStatement
   ;
 
-resourceOpStatementBlock: OPEN_CURLY resourceOpStatement* CLOSE_CURLY ;
-resourceOpStatement:
+basicAndCheckStatementBlock: OPEN_CURLY basicAndCheckStatement* CLOSE_CURLY ;
+basicAndCheckStatement:
   basicStatement #BasicResourceOpStatement
   | checkStatement #CheckResourceOpStatement
   ;
@@ -178,7 +180,7 @@ checkStatement: CHECK ar=expression ON target=expression ;
 basicStatementBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 
 idArr: OPEN_BRACKET (ID (COMMA ID)*)? CLOSE_BRACKET ;
-functionInvokeStatement: functionInvoke;
+operationInvokeStatement: operationInvoke;
 
 foreachStatement: FOREACH key=ID (COMMA value=ID)? IN expression statementBlock ;
 breakStatement: BREAK ;
@@ -204,7 +206,7 @@ mapType: MAP OPEN_BRACKET keyType=variableType CLOSE_BRACKET valueType=variableT
 arrayType: OPEN_BRACKET CLOSE_BRACKET variableType ;
 
 expression:
-    functionInvoke #FunctionInvokeExpression
+    operationInvoke #OperationInvokeExpression
     | variableReference #VariableReferenceExpression
     | literal #LiteralExpression
     | EXCLAMATION expression #NegateExpression
@@ -234,15 +236,16 @@ index:
     OPEN_BRACKET key=expression CLOSE_BRACKET #BracketIndex
     | DOT key=idIndex #DotIndex;
 
-functionInvoke: ID functionInvokeArgs ;
-functionInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
+operationInvoke: ID operationInvokeArgs ;
+operationInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
 
 idIndex:
     ID
     | OPERATION
+    | QUERY
+    | FUNCTION
     | CHECK
     | ROUTINE
-    | FUNCTION
     | CREATE
     | DELETE
     | RULE

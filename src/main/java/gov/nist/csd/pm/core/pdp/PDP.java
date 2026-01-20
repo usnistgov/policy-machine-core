@@ -6,13 +6,13 @@ import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.tx.TxRunner;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.ResourceOperation;
-import gov.nist.csd.pm.core.pap.function.Routine;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunction;
-import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutine;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.AccessAdjudication;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
@@ -111,7 +111,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                 ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
             }
 
-            return tx.executeFunction(routine, args);
+            return tx.executeOperation(routine, args);
         });
     }
 
@@ -129,12 +129,12 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     private Object executeOperation(UserContext user, PDPTx pdpTx, Operation<?> operation, Args args) throws PMException {
-        if (operation instanceof PMLFunction) {
-            ((PMLFunction)operation).setCtx(pdpTx.buildExecutionContext(user));
+        if (operation instanceof PMLOperation) {
+            ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation
-        Object ret = pdpTx.executeFunction(operation, args);
+        Object ret = pdpTx.executeOperation(operation, args);
 
         // send to EPP
         publishEvent(EventContextUtil.buildEventContext(

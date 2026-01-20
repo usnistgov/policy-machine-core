@@ -1,21 +1,21 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp.CREATE_O_DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp.CREATE_U_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp.CREATE_O_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp.CREATE_U_DESCENDANTS_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeIdListFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectAttributeOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateObjectOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserAttributeOp;
-import gov.nist.csd.pm.core.pap.function.op.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.ArrayList;

@@ -1,0 +1,52 @@
+package gov.nist.csd.pm.core.pap.pml.operation.resource;
+
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class PMLResourceOperation<T> extends ResourceOperation<T> implements PMLOperation {
+
+    private final Type<T> returnType;
+    private final List<FormalParameter<?>> pmlFormalParameters;
+    private final PMLOperationSignature signature;
+    private ExecutionContext ctx;
+
+    public PMLResourceOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters) {
+        super(name, returnType, new ArrayList<>(formalParameters));
+
+        this.returnType = returnType;
+        this.pmlFormalParameters = formalParameters;
+        this.signature = new PMLOperationSignature(OperationType.RESOURCEOP, name, returnType, formalParameters);
+    }
+
+    public List<FormalParameter<?>> getPmlFormalArgs() {
+        return pmlFormalParameters;
+    }
+
+    public PMLOperationSignature getSignature() {
+        return signature;
+    }
+
+    public Type<T> getReturnType() {
+        return returnType;
+    }
+
+    public ExecutionContext getCtx() {
+        if (ctx == null) {
+            throw new IllegalArgumentException("execution context has not been set");
+        }
+
+        return ctx;
+    }
+
+    public void setCtx(ExecutionContext ctx) {
+        this.ctx = ctx;
+    }
+
+}

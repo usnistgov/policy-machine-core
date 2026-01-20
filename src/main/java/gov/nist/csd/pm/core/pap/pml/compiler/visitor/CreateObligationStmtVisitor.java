@@ -1,11 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
@@ -26,13 +26,13 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventPatternContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OnPatternContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationPatternFuncContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.StatementBlockParser;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.StatementBlockParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
-import gov.nist.csd.pm.core.pap.pml.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.scope.UnknownOperationInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
@@ -167,7 +167,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
             // get FormalParameters of the operation, keep only the ones defined in argNames
             List<FormalParameter<?>> patternParams = new ArrayList<>();
             try {
-                PMLFunctionSignature function = visitorCtx.scope().getFunction(opName);
+                PMLOperationSignature function = visitorCtx.scope().getOperation(opName);
 
                 List<FormalParameter<?>> formalParameters = function.getFormalParameters();
 
@@ -198,7 +198,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                     )
                 );
 
-            } catch (UnknownFunctionInScopeException e) {
+            } catch (UnknownOperationInScopeException e) {
                 throw new PMLCompilationRuntimeException(ctx, e.getMessage());
             }
         }

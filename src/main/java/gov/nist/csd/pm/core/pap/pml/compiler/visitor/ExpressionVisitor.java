@@ -1,15 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.arg.type.AnyType;
-import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.arg.type.AnyType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
@@ -18,11 +18,11 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DotIndexContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EqualsExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionListContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.IndexContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.Int64LiteralContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PlusExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.VariableReferenceContext;
@@ -33,7 +33,7 @@ import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.pml.expression.EqualsExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.expression.FunctionInvokeExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.OperationInvokeExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.LogicalExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.NegatedExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.ParenExpression;
@@ -46,8 +46,8 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.BracketIndexExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.DotIndexExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpression;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.scope.UnknownFunctionInScopeException;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.scope.UnknownOperationInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownVariableInScopeException;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
 import java.util.ArrayList;
@@ -111,14 +111,14 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return expression;
     }
 
-    public static <T> Expression<T> compileFunctionInvoke(VisitorContext visitorCtx,
-            FunctionInvokeContext ctx,
-            Type<T> expectedType) {
+    public static <T> Expression<T> compileOperationInvoke(VisitorContext visitorCtx,
+                                                           OperationInvokeContext ctx,
+                                                           Type<T> expectedType) {
         Objects.requireNonNull(visitorCtx);
         Objects.requireNonNull(ctx);
 
         ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
-        FunctionInvokeExpression<?> compiled = visitor.visitFunctionInvoke(ctx);
+        OperationInvokeExpression<?> compiled = visitor.visitOperationInvoke(ctx);
 
         try {
             return compiled.asType(expectedType);
@@ -154,17 +154,17 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     }
 
     @Override
-    public FunctionInvokeExpression<?> visitFunctionInvoke(FunctionInvokeContext ctx) {
+    public OperationInvokeExpression<?> visitOperationInvoke(OperationInvokeContext ctx) {
         String funcName = ctx.ID().getText();
 
-        PMLFunctionSignature function;
+        PMLOperationSignature function;
         try {
-            function = visitorCtx.scope().getFunction(funcName);
-        } catch (UnknownFunctionInScopeException e) {
+            function = visitorCtx.scope().getOperation(funcName);
+        } catch (UnknownOperationInScopeException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
 
-        PMLParser.FunctionInvokeArgsContext funcCallArgsCtx = ctx.functionInvokeArgs();
+        PMLParser.OperationInvokeArgsContext funcCallArgsCtx = ctx.operationInvokeArgs();
         List<ExpressionContext> argExpressions = new ArrayList<>();
         PMLParser.ExpressionListContext expressionListContext = funcCallArgsCtx.expressionList();
         if (expressionListContext != null) {
@@ -188,7 +188,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             args.add(expr);
         }
 
-        return new FunctionInvokeExpression<>(funcName, args, function.getReturnType());
+        return new OperationInvokeExpression<>(funcName, args, function.getReturnType());
     }
 
     @Override

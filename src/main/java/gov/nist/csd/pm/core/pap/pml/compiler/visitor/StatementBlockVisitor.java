@@ -1,17 +1,17 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementBlockContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicOrOperationAdminOpStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicAndCheckStatementBlockContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicAndCheckStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicOrAdminOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckAdminOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OnPatternBlockContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementBlockContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -38,7 +38,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
 
         for (AdminOpStatementContext adminOpStatementContext : adminOpStatementContexts) {
-            if (adminOpStatementContext instanceof BasicOrOperationAdminOpStatementContext basicOrOp) {
+            if (adminOpStatementContext instanceof BasicOrAdminOpStatementContext basicOrOp) {
                 stmts.add(statementVisitor.visitStatement(basicOrOp.statement()));
             } else if (adminOpStatementContext instanceof CheckAdminOpStatementContext check){
                 stmts.add(statementVisitor.visitCheckStatement(check.checkStatement()));
@@ -54,16 +54,16 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     }
 
     @Override
-    public Result visitResourceOpStatementBlock(ResourceOpStatementBlockContext ctx) {
+    public Result visitBasicAndCheckStatementBlock(BasicAndCheckStatementBlockContext ctx) {
         if (ctx == null) {
             return new Result(true, new PMLStatementBlock());
         }
 
-        List<ResourceOpStatementContext> resourceOpStatement = ctx.resourceOpStatement();
+        List<BasicAndCheckStatementContext> resourceOpStatement = ctx.basicAndCheckStatement();
         List<PMLStatement<?>> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
 
-        for (ResourceOpStatementContext resourceOpStatementContext : resourceOpStatement) {
+        for (BasicAndCheckStatementContext resourceOpStatementContext : resourceOpStatement) {
             if (resourceOpStatementContext instanceof BasicResourceOpStatementContext basic) {
                 stmts.add(statementVisitor.visitBasicStatement(basic.basicStatement()));
             } else if (resourceOpStatementContext instanceof CheckResourceOpStatementContext check){

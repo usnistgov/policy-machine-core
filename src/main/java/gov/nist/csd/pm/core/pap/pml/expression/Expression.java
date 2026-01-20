@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 

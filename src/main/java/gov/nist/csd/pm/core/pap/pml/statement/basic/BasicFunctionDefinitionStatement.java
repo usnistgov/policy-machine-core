@@ -2,11 +2,11 @@ package gov.nist.csd.pm.core.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateBasicFunctionOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.basic.PMLStmtsBasicFunction;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLStmtsBasicOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.OperationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
@@ -14,22 +14,22 @@ import java.util.Objects;
 
 public class BasicFunctionDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
 
-    private final PMLStmtsBasicFunction<?> function;
+    private final PMLStmtsBasicOperation<?> function;
 
-    public BasicFunctionDefinitionStatement(PMLStmtsBasicFunction<?> function) {
-        super(new CreateAdminOperationOp());
+    public BasicFunctionDefinitionStatement(PMLStmtsBasicOperation<?> function) {
+        super(new CreateBasicFunctionOp());
         this.function = function;
     }
 
     @Override
-    public PMLFunctionSignature getSignature() {
+    public PMLOperationSignature getSignature() {
         return function.getSignature();
     }
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args()
-            .put(CreateAdminOperationOp.ADMIN_OPERATION_PARAM, function);
+            .put(CreateBasicFunctionOp.BASIC_FUNCTION_PARAM, function);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class BasicFunctionDefinitionStatement extends OperationStatement impleme
         VoidResult value = super.execute(ctx, pap);
 
         // add function to context
-        ctx.scope().addFunction(function.getName(), function);
+        ctx.scope().addOperation(function.getName(), function);
 
         return value;
     }

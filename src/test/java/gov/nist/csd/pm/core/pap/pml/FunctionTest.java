@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLResourceOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -98,7 +98,7 @@ public class FunctionTest {
         res1.setCtx(u1);
         PDP pdp = new PDP(memoryPAP);
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id("u1")), pdpTx -> {
-            pdpTx.executeFunction(res1, new Args());
+            pdpTx.executeOperation(res1, new Args());
             return null;
         }));
     }

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.BasicTypes.VOID_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,9 +11,9 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.Routine;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -109,8 +109,8 @@ class OperationsModificationAdjudicatorTest {
         };
         ok.createAdminOperation(op1);
 
-        assertDoesNotThrow(() -> ok.deleteAdminOperation("op1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteAdminOperation("op1"));
+        assertDoesNotThrow(() -> ok.deleteOperation("op1"));
+        assertThrows(UnauthorizedException.class, () -> fail.deleteOperation("op1"));
     }
 
     @Test
@@ -126,20 +126,5 @@ class OperationsModificationAdjudicatorTest {
         assertDoesNotThrow(() -> ok.createAdminRoutine(routine1));
         assertTrue(pap.query().operations().getAdminRoutineNames().contains("routine1"));
         assertThrows(UnauthorizedException.class, () -> fail.createAdminRoutine(routine1));
-    }
-
-    @Test
-    void deleteAdminRoutine() throws PMException {
-        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
-            @Override
-            public Void execute(PAP pap, Args actualArgs) throws PMException {
-                return null;
-            }
-
-        };
-        ok.createAdminRoutine(routine1);
-
-        assertDoesNotThrow(() -> ok.deleteAdminRoutine("routine1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteAdminRoutine("routine1"));
     }
 }

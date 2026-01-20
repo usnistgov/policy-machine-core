@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.graph.AssignOp.ASSIGN_ASCENDANT_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.AssignOp.ASSIGN_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.AssignOp.ASSIGN_ASCENDANT_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.AssignOp.ASSIGN_DESCENDANTS_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.ArrayList;

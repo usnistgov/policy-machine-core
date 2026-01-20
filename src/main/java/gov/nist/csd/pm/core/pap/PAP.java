@@ -9,11 +9,11 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
-import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
+import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
+import gov.nist.csd.pm.core.pap.operation.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
@@ -33,7 +33,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class PAP implements FunctionExecutor, Transactional {
+public abstract class PAP implements OperationExecutor, Transactional {
 
     private final PolicyStore policyStore;
     private final PolicyModifier modifier;
@@ -125,8 +125,8 @@ public abstract class PAP implements FunctionExecutor, Transactional {
     }
 
     @Override
-    public Object executeFunction(Function<?> function, Args args) throws PMException {
-        return function.execute(this, args);
+    public Object executeOperation(Operation<?> operation, Args args) throws PMException {
+        return operation.execute(this, args);
     }
 
     /**

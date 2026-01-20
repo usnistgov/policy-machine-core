@@ -1,14 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
+
+import static gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLStmtsAdminOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class AdminOpDefinitionStatement extends OperationStatement implements Fu
     }
 
     @Override
-    public PMLFunctionSignature getSignature() {
+    public PMLOperationSignature getSignature() {
         return pmlStmtsOperation.getSignature();
     }
 
@@ -39,7 +40,7 @@ public class AdminOpDefinitionStatement extends OperationStatement implements Fu
         VoidResult value = super.execute(ctx, pap);
 
         // add operation to scope
-        ctx.scope().addFunction(pmlStmtsOperation.getName(), pmlStmtsOperation);
+        ctx.scope().addOperation(pmlStmtsOperation.getName(), pmlStmtsOperation);
 
         return value;
     }

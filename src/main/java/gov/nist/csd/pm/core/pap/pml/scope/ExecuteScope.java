@@ -4,18 +4,17 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.BasicFunction;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.QueryOperation;
-import gov.nist.csd.pm.core.pap.function.Routine;
-import gov.nist.csd.pm.core.pap.pml.function.basic.builtin.PMLBuiltinFunctions;
+import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.QueryOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinFunctions;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ExecuteScope extends Scope<Object, Function<?>> {
+public class ExecuteScope extends Scope<Object, Operation<?>> {
 
     public ExecuteScope(PAP pap) throws PMException {
         super(pap, loadConstants(), loadFunctions(pap));
@@ -24,27 +23,27 @@ public class ExecuteScope extends Scope<Object, Function<?>> {
     private ExecuteScope(PAP pap,
                         Map<String, Object> constants,
                         Map<String, Object> variables,
-                        Map<String, Function<?>> functions,
-                        Scope<Object, Function<?>> parentScope) {
+                        Map<String, Operation<?>> functions,
+                        Scope<Object, Operation<?>> parentScope) {
         super(pap, constants, variables, functions, parentScope);
     }
 
     @Override
-    public Scope<Object, Function<?>> copy() {
+    public Scope<Object, Operation<?>> copy() {
         return new ExecuteScope(
             this.getPap(),
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
-            new HashMap<>(getFunctions()),
+            new HashMap<>(getOperations()),
             getParentScope() != null ? getParentScope().copy() : null
         );
     }
 
     @Override
-    public Scope<Object, Function<?>> copyBasicFunctionsOnly() {
-        Map<String, Function<?>> basicOnlyFunctions = new HashMap<>();
-        for (Function<?> function : getFunctions().values()) {
-            if (!(function instanceof BasicFunction<?> basicFunction)) {
+    public Scope<Object, Operation<?>> copyBasicFunctionsOnly() {
+        Map<String, Operation<?>> basicOnlyFunctions = new HashMap<>();
+        for (Operation<?> operation : getOperations().values()) {
+            if (!(operation instanceof BasicFunction<?> basicFunction)) {
                 continue;
             }
 
@@ -61,9 +60,9 @@ public class ExecuteScope extends Scope<Object, Function<?>> {
     }
 
     @Override
-    public Scope<Object, Function<?>> copyBasicAndQueryFunctionsOnly() {
-        Map<String, Function<?>> filteredFunctions = new HashMap<>();
-        for (Function<?> function : getFunctions().values()) {
+    public Scope<Object, Operation<?>> copyBasicAndQueryFunctionsOnly() {
+        Map<String, Operation<?>> filteredFunctions = new HashMap<>();
+        for (Operation<?> function : getOperations().values()) {
             if (function instanceof BasicFunction<?> || function instanceof QueryOperation<?>) {
                 filteredFunctions.put(function.getName(), function);
             }
@@ -87,9 +86,9 @@ public class ExecuteScope extends Scope<Object, Function<?>> {
         return constants;
     }
 
-    private static Map<String, Function<?>> loadFunctions(PAP pap) throws PMException {
+    private static Map<String, Operation<?>> loadFunctions(PAP pap) throws PMException {
         // add pml operations and routines stored in PAP
-        Map<String, Function<?>> functions = new HashMap<>(PMLBuiltinFunctions.builtinFunctions());
+        Map<String, Operation<?>> functions = new HashMap<>(PMLBuiltinFunctions.builtinFunctions());
 
         // add custom operations from the PAP, could be PML or not PML based
         Collection<String> opNames = pap.query().operations().getAdminOperationNames();

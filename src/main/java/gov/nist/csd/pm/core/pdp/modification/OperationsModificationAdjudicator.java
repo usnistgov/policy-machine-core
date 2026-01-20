@@ -1,26 +1,26 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp.ROUTINE_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.operation.CreateAdminRoutineOp.ROUTINE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.AdminOperation;
-import gov.nist.csd.pm.core.pap.function.BasicFunction;
-import gov.nist.csd.pm.core.pap.function.QueryOperation;
-import gov.nist.csd.pm.core.pap.function.ResourceOperation;
-import gov.nist.csd.pm.core.pap.function.Routine;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateAdminRoutineOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.CreateResourceOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.DeleteAdminRoutineOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.DeleteResourceOperationOp;
-import gov.nist.csd.pm.core.pap.function.op.operation.SetResourceAccessRights;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.QueryOperation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminRoutineOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateBasicFunctionOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateQueryOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateResourceOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.DeleteOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
@@ -78,7 +78,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
     public void createQueryOperation(QueryOperation<?> operation) throws PMException {
         CreateAdminRoutineOp op = new CreateAdminRoutineOp();
         Args args = new Args()
-            .put(QUERY_PARAM, routine);
+            .put(CreateQueryOperationOp.QUERY_OPERATION_PARAM, operation);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
@@ -86,9 +86,9 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
 
     @Override
     public void createBasicFunction(BasicFunction<?> function) throws PMException {
-        CreateAdminRoutineOp op = new CreateAdminRoutineOp();
+        CreateBasicFunctionOp op = new CreateBasicFunctionOp();
         Args args = new Args()
-            .put(ROUTINE_PARAM, routine);
+            .put(CreateBasicFunctionOp.BASIC_FUNCTION_PARAM, function);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
@@ -96,9 +96,9 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
 
     @Override
     public void deleteOperation(String name) throws PMException {
-        DeleteResourceOperationOp op = new DeleteResourceOperationOp();
+        DeleteOperationOp op = new DeleteOperationOp();
         Args args = new Args()
-            .put(NAME_PARAM, operation);
+            .put(NAME_PARAM, name);
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);

@@ -9,11 +9,10 @@ import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.FunctionExecutor;
-import gov.nist.csd.pm.core.pap.function.Operation;
-import gov.nist.csd.pm.core.pap.function.Routine;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -32,7 +31,7 @@ import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
 
-public class PDPTx implements FunctionExecutor {
+public class PDPTx implements OperationExecutor {
 
     private final TxExecutor txExecutor;
 
@@ -49,9 +48,9 @@ public class PDPTx implements FunctionExecutor {
     }
 
     @Override
-    public Object executeFunction(Function<?> function,
-                                 Args args) throws PMException {
-        return this.txExecutor.executeFunction(function, args);
+    public Object executeOperation(Operation<?> operation,
+                                   Args args) throws PMException {
+        return this.txExecutor.executeOperation(operation, args);
     }
 
     /**
@@ -147,16 +146,9 @@ public class PDPTx implements FunctionExecutor {
         }
 
         @Override
-        public Object executeFunction(Function<?> function,
-                                     Args args) throws PMException {
-            if (function instanceof Routine<?> routine) {
-                return routine.execute(this, args);
-            } else if (function instanceof Operation<?> operation) {
-                operation.canExecute(pap, userCtx, args);
-                return operation.execute(pap, args);
-            }
-
-            return function.execute(pap, args);
+        public Object executeOperation(Operation<?> operation, Args args) throws PMException {
+            operation.canExecute(pap, userCtx, args);
+            return operation.execute(pap, args);
         }
 
         @Override
@@ -226,7 +218,7 @@ public class PDPTx implements FunctionExecutor {
 
         public PDPExecutionContext(UserContext author,
                                    TxExecutor pdpTx,
-                                   Scope<Object, Function<?>> scope) throws PMException {
+                                   Scope<Object, Operation<?>> scope) throws PMException {
             super(author, pdpTx.pap, scope);
             this.pdpTx = pdpTx;
         }

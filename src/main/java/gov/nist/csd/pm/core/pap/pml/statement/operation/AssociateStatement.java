@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.Operation.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp.ASSOCIATE_TARGET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp.ASSOCIATE_UA_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_TARGET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_UA_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;

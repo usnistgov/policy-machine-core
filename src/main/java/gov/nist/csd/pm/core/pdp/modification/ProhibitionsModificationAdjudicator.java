@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.CONTAINERS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.INTERSECTION_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.prohibition.ProhibitionOp.SUBJECT_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.CONTAINERS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.INTERSECTION_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.SUBJECT_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -12,9 +12,9 @@ import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.CreateProhibitionOp;
-import gov.nist.csd.pm.core.pap.function.op.prohibition.DeleteProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.DeleteProhibitionOp;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;

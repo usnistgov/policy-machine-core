@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.compiler;
 
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.obligation.event.operation;
 
-import gov.nist.csd.pm.core.pap.pml.function.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import java.util.Objects;
 import java.util.Set;

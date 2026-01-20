@@ -12,6 +12,7 @@ CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';
 OPERATION: 'operation';
+QUERY: 'query';
 
 CREATE : 'create' ;
 DELETE : 'delete' ;

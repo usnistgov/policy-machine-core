@@ -2,8 +2,8 @@ package gov.nist.csd.pm.core.pap.pml.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.Function;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -20,7 +20,7 @@ import java.util.Objects;
 public class ExecutionContext implements Serializable {
 
     protected final UserContext author;
-    protected final Scope<Object, Function<?>> scope;
+    protected final Scope<Object, Operation<?>> scope;
     protected final PAP pap;
 
     public ExecutionContext(UserContext author, PAP pap) throws PMException {
@@ -29,7 +29,7 @@ public class ExecutionContext implements Serializable {
         this.pap = pap;
     }
 
-    public ExecutionContext(UserContext author, PAP pap, Scope<Object, Function<?>> scope) throws PMException {
+    public ExecutionContext(UserContext author, PAP pap, Scope<Object, Operation<?>> scope) throws PMException {
         this.author = author;
         this.scope = scope;
         this.pap = pap;
@@ -39,7 +39,7 @@ public class ExecutionContext implements Serializable {
         return author;
     }
 
-    public Scope<Object, Function<?>> scope() {
+    public Scope<Object, Operation<?>> scope() {
         return scope;
     }
 
