@@ -147,6 +147,10 @@ public class PDPTx implements OperationExecutor {
 
         @Override
         public Object executeOperation(Operation<?> operation, Args args) throws PMException {
+            if (operation instanceof Routine<?> routine) {
+                return routine.execute(this, args);
+            }
+
             operation.canExecute(pap, userCtx, args);
             return operation.execute(pap, args);
         }

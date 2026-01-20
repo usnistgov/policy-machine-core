@@ -237,13 +237,7 @@ public abstract class TxCmd implements TxRollbackSupport {
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
             MemoryOperationsStore opsStore = memoryPolicyStore.operations();
-            switch (operation) {
-                case BasicFunction<?> basicFunction -> opsStore.createBasicFunction(basicFunction);
-                case AdminOperation<?> adminOperation -> opsStore.createAdminOperation(adminOperation);
-                case ResourceOperation<?> resourceOperation -> opsStore.createResourceOperation(resourceOperation);
-                case QueryOperation<?> queryOperation -> opsStore.createQueryOperation(queryOperation);
-                case Routine<?> routine -> opsStore.createAdminRoutine(routine);
-            }
+            opsStore.createOperation(operation);
         }
     }
 }

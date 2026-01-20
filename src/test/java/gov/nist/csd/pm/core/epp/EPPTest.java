@@ -43,6 +43,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
@@ -100,7 +101,7 @@ class EPPTest {
             }
         };
 
-        pap.modify().operations().createAdminOperation(op2);
+        pap.modify().operations().createOperation(op2);
 
         pap.executePML(u1, """
             create obligation "obl2"
@@ -341,7 +342,7 @@ class EPPTest {
 
         };
 
-        pap.modify().operations().createAdminOperation(pmlAdminOperation);
+        pap.modify().operations().createOperation(pmlAdminOperation);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
@@ -774,7 +775,7 @@ class EPPTest {
             new MatchesOperationPattern(
                 "assign",
                 Set.of("ascendant"),
-                new PMLStmtsQueryOperation<>(
+                new PMLStmtsRoutine<>(
                     "",
                     BOOLEAN_TYPE,
                     List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
@@ -815,7 +816,7 @@ class EPPTest {
             new MatchesOperationPattern(
                 "e1",
                 Set.of("ascendant", "descendants"),
-                new PMLStmtsQueryOperation<>(
+                new PMLStmtsRoutine<>(
                     "",
                     BOOLEAN_TYPE,
                     List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),

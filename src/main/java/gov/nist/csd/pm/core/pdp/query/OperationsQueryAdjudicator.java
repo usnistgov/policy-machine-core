@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
@@ -32,53 +33,18 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public Collection<String> getResourceOperationNames() throws PMException {
-        return pap.query().operations().getResourceOperationNames();
+    public Collection<Operation<?>> getOperations() throws PMException {
+        return pap.query().operations().getOperations();
     }
 
     @Override
-    public ResourceOperation<?> getResourceOperation(String operationName) throws PMException {
-        return pap.query().operations().getResourceOperation(operationName);
+    public Collection<String> getOperationNames() throws PMException {
+        return pap.query().operations().getOperationNames();
     }
 
     @Override
-    public Collection<String> getAdminOperationNames() throws PMException {
-        return pap.query().operations().getAdminOperationNames();
-    }
-
-    @Override
-    public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
-        return pap.query().operations().getAdminOperation(operationName);
-    }
-
-    @Override
-    public Collection<String> getAdminRoutineNames() throws PMException {
-        return pap.query().operations().getAdminRoutineNames();
-    }
-
-    @Override
-    public Routine<?> getAdminRoutine(String routineName) throws PMException {
-        return pap.query().operations().getAdminRoutine(routineName);
-    }
-
-    @Override
-    public Collection<String> getQueryOperationNames() throws PMException {
-        return pap.query().operations().getQueryOperationNames();
-    }
-
-    @Override
-    public QueryOperation<?> getQueryOperation(String name) throws PMException {
-        return pap.query().operations().getQueryOperation(name);
-    }
-
-    @Override
-    public Collection<String> getBasicFunctionNames() throws PMException {
-        return pap.plugins().getBasicFunctionNames();
-    }
-
-    @Override
-    public BasicFunction<?> getBasicFunction(String name) throws PMException {
-        return pap.query().operations().getBasicFunction(name);
+    public Operation<?> getOperation(String name) throws PMException {
+        return pap.query().operations().getOperation(name);
     }
 
     @Override

@@ -13,7 +13,11 @@ import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.BasicFunction;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.QueryOperation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
@@ -39,44 +43,36 @@ public class JSONSerializer implements PolicySerializer {
             buildGraphJSON(policyQuery),
             buildProhibitionsJSON(policyQuery),
             buildObligationsJSON(policyQuery),
-            buildResourceOperations(policyQuery),
-            buildOperationsJSON(policyQuery),
-            buildRoutinesJSON(policyQuery)
+            buildOperationsJSON(policyQuery)
         );
     }
 
-    private List<String> buildRoutinesJSON(PolicyQuery policyQuery) throws PMException {
-        // can only serialize if implements PMLStatementSerializer
-        List<String> json = new ArrayList<>();
+    private JSONOperations buildOperationsJSON(PolicyQuery policyQuery) throws PMException {
+        List<String> admin = new ArrayList<>();
+        List<String> resource = new ArrayList<>();
+        List<String> routine = new ArrayList<>();
+        List<String> query = new ArrayList<>();
+        List<String> basic = new ArrayList<>();
 
-        Collection<String> adminRoutineNames = policyQuery.operations().getAdminRoutineNames();
-        for (String adminOperationName : adminRoutineNames) {
-            Routine<?> routine = policyQuery.operations().getAdminRoutine(adminOperationName);
-            if (routine instanceof PMLStatementSerializable pmlStatementSerializable) {
-                json.add(pmlStatementSerializable.toFormattedString(0));
+        Collection<Operation<?>> operations = policyQuery.operations().getOperations();
+        for (Operation<?> operation : operations) {
+            // can only serialize if implements PMLStatementSerializer
+            if (!(operation instanceof PMLStatementSerializable serializableOp)) {
+                continue;
+            }
+
+            switch (operation) {
+                case AdminOperation<?> o -> admin.add(serializableOp.toFormattedString(0));
+                case BasicFunction<?> o -> basic.add(serializableOp.toFormattedString(0));
+                case QueryOperation<?> o -> query.add(serializableOp.toFormattedString(0));
+                case ResourceOperation<?> o -> resource.add(serializableOp.toFormattedString(0));
+                case Routine<?> o -> routine.add(serializableOp.toFormattedString(0));
             }
         }
 
-        return json.isEmpty() ? null : json;
-    }
+        JSONOperations jsonOperations = new JSONOperations(admin, resource, routine, query, basic);
 
-    private List<JSONResourceOperation> buildResourceOperations(PolicyQuery policyQuery) {
-        return null;
-    }
-
-    private List<String> buildOperationsJSON(PolicyQuery policyQuery) throws PMException {
-        // can only serialize if implements PMLStatementSerializer
-        List<String> json = new ArrayList<>();
-
-        Collection<String> adminOperationNames = policyQuery.operations().getAdminOperationNames();
-        for (String adminOperationName : adminOperationNames) {
-            Operation<?> operation = policyQuery.operations().getAdminOperation(adminOperationName);
-            if (operation instanceof PMLStatementSerializable pmlStatementSerializable) {
-                json.add(pmlStatementSerializable.toFormattedString(0));
-            }
-        }
-
-        return json.isEmpty() ? null : json;
+        return jsonOperations.getAll().isEmpty() ? null : jsonOperations;
     }
 
     private List<JSONObligation> buildObligationsJSON(PolicyQuery policyQuery) throws PMException {

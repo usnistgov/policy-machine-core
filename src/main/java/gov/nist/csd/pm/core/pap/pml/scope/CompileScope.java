@@ -15,7 +15,7 @@ import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
-import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinFunctions;
+import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinOperations;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -94,62 +94,25 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
     }
 
     private static Map<String, PMLOperationSignature> loadFunctions(PAP pap) throws PMException {
-        Map<String, PMLOperationSignature> functions = new HashMap<>();
+        Map<String, PMLOperationSignature> operationSignatures = new HashMap<>();
 
         // add builtin operations and routines stored in PAP
-        Map<String, Operation<?>> builtinFuncs = PMLBuiltinFunctions.builtinFunctions();
+        Map<String, Operation<?>> builtinFuncs = PMLBuiltinOperations.builtinOperations();
         builtinFuncs.values().forEach(f -> {
-            functions.put(f.getName(), getFunctionSignature(f));
+            operationSignatures.put(f.getName(), getFunctionSignature(f));
         });
+
+        Collection<Operation<?>> operations = pap.query().operations().getOperations();
+        for (Operation<?> op : operations) {
+            operationSignatures.put(op.getName(), getFunctionSignature(op));
+        }
 
         // add admin ops
         for (Operation<?> adminOperation : AdminOperations.ADMIN_OPERATIONS) {
-            functions.put(adminOperation.getName(), getFunctionSignature(adminOperation));
+            operationSignatures.put(adminOperation.getName(), getFunctionSignature(adminOperation));
         }
 
-        // add custom operations from the PAP, could be PML or not PML based
-        Collection<String> opNames = pap.query().operations().getAdminOperationNames();
-        for (String opName : opNames) {
-            Operation<?> operation = pap.query().operations().getAdminOperation(opName);
-            functions.put(opName, getFunctionSignature(operation));
-        }
-
-        opNames = pap.query().operations().getResourceOperationNames();
-        for (String opName : opNames) {
-            Operation<?> operation = pap.query().operations().getResourceOperation(opName);
-            functions.put(opName, getFunctionSignature(operation));
-        }
-
-        opNames = pap.query().operations().getAdminRoutineNames();
-        for (String opName : opNames) {
-            Routine<?> operation = pap.query().operations().getAdminRoutine(opName);
-            functions.put(opName, getFunctionSignature(operation));
-        }
-
-        opNames = pap.query().operations().getQueryOperationNames();
-        for (String opName : opNames) {
-            QueryOperation<?> operation = pap.query().operations().getQueryOperation(opName);
-            functions.put(opName, getFunctionSignature(operation));
-        }
-
-        opNames = pap.query().operations().getBasicFunctionNames();
-        for (String opName : opNames) {
-            BasicFunction<?> operation = pap.query().operations().getBasicFunction(opName);
-            functions.put(opName, getFunctionSignature(operation));
-        }
-
-        // basic functions and query functions from plugin registry
-        List<BasicFunction<?>> basicFunctionNames = pap.plugins().getBasicFunctions();
-        for (BasicFunction<?> basicFunction : basicFunctionNames) {
-            functions.put(basicFunction.getName(), getFunctionSignature(basicFunction));
-        }
-
-        List<QueryOperation<?>> queryOperationNames = pap.plugins().getQueryOperations();
-        for (QueryOperation<?> queryFunc : queryOperationNames) {
-            functions.put(queryFunc.getName(), getFunctionSignature(queryFunc));
-        }
-
-        return functions;
+        return operationSignatures;
     }
 
     private static PMLOperationSignature getFunctionSignature(Operation<?> func) {

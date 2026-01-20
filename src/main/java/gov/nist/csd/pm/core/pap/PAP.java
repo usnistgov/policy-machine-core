@@ -32,6 +32,7 @@ import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class PAP implements OperationExecutor, Transactional {
 
@@ -226,21 +227,21 @@ public abstract class PAP implements OperationExecutor, Transactional {
         // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
 
-        // ignore plugin registry ops and routines
-        Collection<String> adminOperationNames = query().operations().getAdminOperationNames();
-        Collection<String> adminRoutineNames = query().operations().getAdminRoutineNames();
+        // ignore plugin registry ops
+        Collection<String> operationNames = query().operations()
+            .getOperations()
+            .stream()
+            .map(Operation::getName)
+            .collect(Collectors.toSet());
 
-        adminOperationNames.removeAll(pluginRegistry.getAdminOperationNames());
-        adminRoutineNames.removeAll(pluginRegistry.getRoutineNames());
+        operationNames.removeAll(pluginRegistry.getOperationsList().stream().map(Operation::getName).toList());
 
-        boolean adminOpsEmpty = adminOperationNames.isEmpty();
-        boolean routinesEmpty = adminRoutineNames.isEmpty();
+        boolean opsEmpty = operationNames.isEmpty();
 
         return nodes.isEmpty()
             && prohibitionsEmpty
             && obligationsEmpty
             && resOpsEmpty
-            && adminOpsEmpty
-            && routinesEmpty;
+            && opsEmpty;
     }
 }

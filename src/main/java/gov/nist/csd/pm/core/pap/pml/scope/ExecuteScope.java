@@ -8,7 +8,7 @@ import gov.nist.csd.pm.core.pap.operation.BasicFunction;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
-import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinFunctions;
+import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinOperations;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class ExecuteScope extends Scope<Object, Operation<?>> {
 
     public ExecuteScope(PAP pap) throws PMException {
-        super(pap, loadConstants(), loadFunctions(pap));
+        super(pap, loadConstants(), loadOperations(pap));
     }
 
     private ExecuteScope(PAP pap,
@@ -86,47 +86,15 @@ public class ExecuteScope extends Scope<Object, Operation<?>> {
         return constants;
     }
 
-    private static Map<String, Operation<?>> loadFunctions(PAP pap) throws PMException {
+    private static Map<String, Operation<?>> loadOperations(PAP pap) throws PMException {
         // add pml operations and routines stored in PAP
-        Map<String, Operation<?>> functions = new HashMap<>(PMLBuiltinFunctions.builtinFunctions());
+        Map<String, Operation<?>> operationsMap = new HashMap<>(PMLBuiltinOperations.builtinOperations());
 
-        // add custom operations from the PAP, could be PML or not PML based
-        Collection<String> opNames = pap.query().operations().getAdminOperationNames();
-        for (String opName : opNames) {
-            Operation<?> operation = pap.query().operations().getAdminOperation(opName);
-            functions.put(opName, operation);
+        Collection<Operation<?>> operations = pap.query().operations().getOperations();
+        for (Operation<?> operation : operations) {
+            operationsMap.put(operation.getName(), operation);
         }
 
-        opNames = pap.query().operations().getResourceOperationNames();
-        for (String opName : opNames) {
-            Operation<?> operation = pap.query().operations().getResourceOperation(opName);
-            functions.put(opName, operation);
-        }
-
-        // admin ops
-        for (Operation<?> adminOperation : AdminOperations.ADMIN_OPERATIONS) {
-            functions.put(adminOperation.getName(), adminOperation);
-        }
-
-        // same for routines
-        Collection<String> routineNames = pap.query().operations().getAdminRoutineNames();
-        for (String routineName : routineNames) {
-            Routine<?> routine = pap.query().operations().getAdminRoutine(routineName);
-            functions.put(routineName, routine);
-        }
-
-        // basic functions and query funcs from plugin registry
-        List<String> basicFunctionNames = pap.plugins().getBasicFunctionNames();
-        for (String basicFunctionName : basicFunctionNames) {
-            BasicFunction<?> function = pap.plugins().getBasicFunction(basicFunctionName);
-            functions.put(basicFunctionName, function);
-        }
-
-        List<QueryOperation<?>> queryOperationNames = pap.plugins().getQueryOperations();
-        for (QueryOperation<?> queryFunc : queryOperationNames) {
-            functions.put(queryFunc.getName(), queryFunc);
-        }
-
-        return functions;
+        return operationsMap;
     }
 }

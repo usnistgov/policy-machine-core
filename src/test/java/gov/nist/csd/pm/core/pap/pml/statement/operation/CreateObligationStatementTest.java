@@ -23,6 +23,7 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -44,7 +45,7 @@ class CreateObligationStatementTest {
             new MatchesOperationPattern(
                 "e1",
                 Set.of("opnd1"),
-                new PMLStmtsQueryOperation<>(
+                new PMLStmtsRoutine<>(
                     "",
                     BOOLEAN_TYPE,
                     List.of(new NodeNameFormalParameter("opnd1")),
@@ -91,7 +92,7 @@ class CreateObligationStatementTest {
             new MatchesOperationPattern(
                 "e1",
                 Set.of("opnd1"),
-                new PMLStmtsQueryOperation<>(
+                new PMLStmtsRoutine<>(
                     "",
                     BOOLEAN_TYPE,
                     List.of(new NodeNameFormalParameter("opnd1")),

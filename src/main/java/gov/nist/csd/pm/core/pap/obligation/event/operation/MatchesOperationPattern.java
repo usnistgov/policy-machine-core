@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pap.obligation.event.operation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import java.util.HashSet;
@@ -20,7 +21,7 @@ public final class MatchesOperationPattern extends OperationPattern {
         this.onPattern = onPattern;
     }
 
-    public MatchesOperationPattern(String opName, Set<String> argNames, PMLStmtsQueryOperation<Boolean> func) {
+    public MatchesOperationPattern(String opName, Set<String> argNames, PMLStmtsRoutine<Boolean> func) {
         this.opName = opName;
         this.onPattern = new OnPattern(argNames, func);
     }
@@ -29,7 +30,7 @@ public final class MatchesOperationPattern extends OperationPattern {
         this.opName = opName;
         this.onPattern = new OnPattern(
             new HashSet<>(),
-            new PMLStmtsQueryOperation<>("", BasicTypes.BOOLEAN_TYPE, List.of(), new PMLStatementBlock(List.of(
+            new PMLStmtsRoutine<>("", BasicTypes.BOOLEAN_TYPE, List.of(), new PMLStatementBlock(List.of(
                 new ReturnStatement(new BoolLiteralExpression(true))
             ))));
     }

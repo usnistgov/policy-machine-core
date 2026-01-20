@@ -50,21 +50,16 @@ public class JSONDeserializer implements PolicyDeserializer {
             obligations = new ArrayList<>();
         }
 
-        List<String> operations = jsonPolicy.getAdminOperations();
+        JSONOperations operations = jsonPolicy.getOperations();
         if (operations == null) {
-            operations = new ArrayList<>();
-        }
-
-        List<String> routines = jsonPolicy.getRoutines();
-        if (routines == null) {
-            routines = new ArrayList<>();
+            operations = new JSONOperations();
         }
 
         pap.modify().operations().setResourceAccessRights(resourceOperations);
         createGraph(pap, graph);
         createProhibitions(pap, prohibitions);
         createOperations(pap, operations);
-        createRoutines(pap, routines);
+        // do obligations last in case they reference operations
         createObligations(pap, obligations);
     }
 
@@ -87,23 +82,17 @@ public class JSONDeserializer implements PolicyDeserializer {
         }
     }
 
-    private void createOperations(PAP pap, List<String> operations) throws PMException {
+    private void createOperations(PAP pap, JSONOperations operations) throws PMException {
+        List<String> all = operations.getAll();
+
+        // combine all operation strings into a single PML block that will be executed
+        // this will ensure any operation dependencies are resolved
         String pml = "";
-        for (String operation : operations) {
+        for (String operation : all) {
             pml += operation + "\n";
         }
 
-        // author doesnt matter when executing create operation statements
-        pap.executePML(new UserContext(0), pml);
-    }
-
-    private void createRoutines(PAP pap, List<String> routines) throws PMException {
-        String pml = "";
-        for (String routine : routines) {
-            pml += routine + "\n";
-        }
-
-        // author doesnt matter when executing create routine statements
+        // author doesnt matter when executing create operation statements, only obligations
         pap.executePML(new UserContext(0), pml);
     }
 

@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.operation.operation.CreateAdminRoutineOp.ROUTINE_PARAM;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminRoutineOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
@@ -17,8 +15,8 @@ public class RoutineDefinitionStatement extends OperationStatement implements Fu
 
     protected PMLStmtsRoutine<?> pmlStmtsRoutine;
 
-    public RoutineDefinitionStatement(PMLStmtsRoutine pmlStmtsRoutine) {
-        super(new CreateAdminRoutineOp());
+    public RoutineDefinitionStatement(PMLStmtsRoutine<?> pmlStmtsRoutine) {
+        super(new CreateOperationOp());
 
         this.pmlStmtsRoutine = pmlStmtsRoutine;
     }
@@ -31,7 +29,7 @@ public class RoutineDefinitionStatement extends OperationStatement implements Fu
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args()
-            .put(ROUTINE_PARAM, pmlStmtsRoutine);
+            .put(CreateOperationOp.OPERATION_PARAM, pmlStmtsRoutine);
     }
 
     @Override

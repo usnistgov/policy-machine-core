@@ -4,8 +4,8 @@ import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
@@ -28,11 +28,7 @@ public class MemoryPolicy {
     protected Map<Long, Collection<Prohibition>> nodeProhibitions;
     protected Map<String, Collection<Prohibition>> processProhibitions;
     protected List<Obligation> obligations;
-    protected Map<String, AdminOperation<?>> adminOps;
-    protected Map<String, ResourceOperation<?>> resourceOps;
-    protected Map<String, QueryOperation<?>> queryOps;
-    protected Map<String, BasicFunction<?>> basicFuncs;
-    protected Map<String, Routine<?>> routines;
+    protected Map<String, Operation<?>> operations;
 
     public MemoryPolicy() {
         reset();
@@ -46,11 +42,7 @@ public class MemoryPolicy {
         this.nodeProhibitions = new HashMap<>();
         this.processProhibitions = new HashMap<>();
         this.obligations = new ArrayList<>();
-        this.adminOps = new HashMap<>();
-        this.resourceOps = new HashMap<>();
-        this.queryOps = new HashMap<>();
-        this.basicFuncs = new HashMap<>();
-        this.routines = new HashMap<>();
+        this.operations = new HashMap<>();
     }
 
     public void addNode(Vertex vertex) {

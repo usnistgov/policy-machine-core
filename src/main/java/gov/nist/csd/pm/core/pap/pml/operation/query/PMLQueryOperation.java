@@ -22,7 +22,7 @@ public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements 
 
         this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;
-        this.signature = new PMLOperationSignature(OperationType.ADMINOP, name, returnType, formalParameters);
+        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, formalParameters);
     }
 
     public PMLQueryOperation(String name, Type<T> returnType) {
@@ -30,7 +30,7 @@ public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements 
 
         this.returnType = returnType;
         this.pmlFormalParameters = new ArrayList<>();
-        this.signature = new PMLOperationSignature(OperationType.ADMINOP, name, returnType, new ArrayList<>());
+        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, new ArrayList<>());
     }
 
     public List<FormalParameter<?>> getPmlFormalArgs() {

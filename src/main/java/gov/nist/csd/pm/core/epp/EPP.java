@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.OnPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -90,7 +91,7 @@ public class EPP implements EventSubscriber {
                               PDPTx pdpTx,
                               Map<String, Object> rawArgs,
                               OnPattern onPattern) throws PMException {
-        PMLStmtsQueryOperation<Boolean> matchFunc = onPattern.func();
+        PMLStmtsRoutine<Boolean> matchFunc = onPattern.func();
 
         // need to pas only the args that the matching function expects which could be a subset of the
         // params defined in the function and passed in rawArgs

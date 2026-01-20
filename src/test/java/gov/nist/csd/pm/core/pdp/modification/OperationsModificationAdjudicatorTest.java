@@ -88,9 +88,9 @@ class OperationsModificationAdjudicatorTest {
 
         };
 
-        assertDoesNotThrow(() -> ok.createAdminOperation(op1));
-        assertTrue(pap.query().operations().getAdminOperationNames().contains("op1"));
-        assertThrows(UnauthorizedException.class, () -> fail.createAdminOperation(op1));
+        assertDoesNotThrow(() -> ok.createOperation(op1));
+        assertTrue(pap.query().operations().getOperations().contains(op1));
+        assertThrows(UnauthorizedException.class, () -> fail.createOperation(op1));
     }
 
     @Test
@@ -107,7 +107,7 @@ class OperationsModificationAdjudicatorTest {
             }
 
         };
-        ok.createAdminOperation(op1);
+        ok.createOperation(op1);
 
         assertDoesNotThrow(() -> ok.deleteOperation("op1"));
         assertThrows(UnauthorizedException.class, () -> fail.deleteOperation("op1"));
@@ -123,8 +123,8 @@ class OperationsModificationAdjudicatorTest {
 
         };
 
-        assertDoesNotThrow(() -> ok.createAdminRoutine(routine1));
-        assertTrue(pap.query().operations().getAdminRoutineNames().contains("routine1"));
-        assertThrows(UnauthorizedException.class, () -> fail.createAdminRoutine(routine1));
+        assertDoesNotThrow(() -> ok.createOperation(routine1));
+        assertTrue(pap.query().operations().getOperations().contains(routine1));
+        assertThrows(UnauthorizedException.class, () -> fail.createOperation(routine1));
     }
 }

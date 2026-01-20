@@ -1,219 +1,87 @@
 package gov.nist.csd.pm.core.pap.operation;
 
-import gov.nist.csd.pm.core.common.exception.FunctionExistsException;
+import gov.nist.csd.pm.core.common.exception.OperationExistsException;
+import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * A registry for storing Operations in memory.
+ */
 public class PluginRegistry {
 
-    private final List<BasicFunction<?>> basicFunctions;
-    private final List<QueryOperation<?>> queryOperations;
-    private final List<AdminOperation<?>> adminOperations;
-    private final List<ResourceOperation<?>> resourceOperations;
-    private final List<Routine<?>> routines;
+    private final Map<String, Operation<?>> operations;
 
     public PluginRegistry() {
-        basicFunctions = new ArrayList<>();
-        queryOperations = new ArrayList<>();
-        adminOperations = new ArrayList<>();
-        resourceOperations = new ArrayList<>();
-        routines = new ArrayList<>();
+        operations = new HashMap<>();
     }
 
-    public List<BasicFunction<?>> getBasicFunctions() {
-        return basicFunctions;
+    /**
+     * Get all operations as a map.
+     * @return A Map of all operations indexed by name.
+     */
+    public Map<String, Operation<?>> getOperations() {
+        return operations;
     }
 
-    public List<QueryOperation<?>> getQueryOperations() {
-        return queryOperations;
+    /**
+     * Get all operations as a list.
+     * @return A List of all the Operation objects.
+     */
+    public List<Operation<?>> getOperationsList() {
+        return new ArrayList<>(operations.values());
     }
 
-    public List<AdminOperation<?>> getAdminOperations() {
-        return adminOperations;
-    }
-
-    public List<ResourceOperation<?>> getResourceOperations() {
-        return resourceOperations;
-    }
-
-    public List<Routine<?>> getRoutines() {
-        return routines;
-    }
-
-    public BasicFunction<?> getBasicFunction(String name) {
-        for (BasicFunction<?> basicFunction : basicFunctions) {
-            if (basicFunction.getName().equals(name)) {
-                return basicFunction;
-            }
+    /**
+     * Get the Operation with the given name.
+     * @param name The name of the operation.
+     * @return The Operation object.
+     * @throws OperationDoesNotExistException If the operation does not exist.
+     */
+    public Operation<?> getOperation(String name) throws OperationDoesNotExistException {
+        Operation<?> operation = operations.get(name);
+        if (operation == null) {
+            throw new OperationDoesNotExistException(name);
         }
 
-        return null;
+        return operation;
     }
 
-    public QueryOperation<?> getQueryOperation(String name) {
-        for (QueryOperation<?> queryOperation : queryOperations) {
-            if (queryOperation.getName().equals(name)) {
-                return queryOperation;
-            }
-        }
-
-        return null;
-    }
-
-    public AdminOperation<?> getAdminOperation(String name) {
-        for (AdminOperation<?> op : adminOperations) {
-            if (op.getName().equals(name)) {
-                return op;
-            }
-        }
-
-        return null;
-    }
-
-    public ResourceOperation<?> getResourceOperation(String name) {
-        for (ResourceOperation<?> op : resourceOperations) {
-            if (op.getName().equals(name)) {
-                return op;
-            }
-        }
-
-        return null;
-    }
-
-    public Routine<?> getRoutine(String name) {
-        for (Routine<?> routine : routines) {
-            if (routine.getName().equals(name)) {
-                return routine;
-            }
-        }
-
-        return null;
-    }
-
-    public void registerBasicFunction(OperationsQuery opQuery, BasicFunction<?> basicFunction) throws PMException {
-        boolean exists = opQuery.operationExists(basicFunction.getName());
+    /**
+     * Add an operation to the registry. The name cannot conflict with an existing operation in the policy
+     * or the registry.
+     * @param opQuery An OperationsQuery implementation to check for name conflict with operations stored in the policy.
+     * @param operation The operation to add.
+     * @throws PMException If there is an error checking if the operation exists or if the name does conflict
+     */
+    public void addOperation(OperationsQuery opQuery, Operation<?> operation) throws PMException {
+        String name = operation.getName();
+        boolean exists = opQuery.operationExists(name) || pluginExists(name);
         if (exists) {
-            throw new FunctionExistsException(basicFunction.getName());
+            throw new OperationExistsException(name);
         }
 
-        basicFunctions.add(basicFunction);
+        operations.put(name, operation);
     }
 
-    public void registerQueryFunction(OperationsQuery opQuery, QueryOperation<?> queryOperation) throws PMException {
-        boolean exists = opQuery.operationExists(queryOperation.getName());
-        if (exists) {
-            throw new FunctionExistsException(queryOperation.getName());
-        }
-
-        queryOperations.add(queryOperation);
+    /**
+     * Remove the operation with the given name from the registry.
+     * @param name The name of the operation to remove.
+     */
+    public void removeOperation(String name) {
+        operations.remove(name);
     }
 
-    public void registerAdminOperation(OperationsQuery opQuery, AdminOperation<?> op) throws PMException {
-        boolean exists = opQuery.operationExists(op.getName());
-        if (exists) {
-            throw new FunctionExistsException(op.getName());
-        }
-
-        adminOperations.add(op);
-    }
-
-    public void registerResourceOperation(OperationsQuery opQuery, ResourceOperation<?> op) throws PMException {
-        boolean exists = opQuery.operationExists(op.getName());
-        if (exists) {
-            throw new FunctionExistsException(op.getName());
-        }
-
-        resourceOperations.add(op);
-    }
-
-    public void registerRoutine(OperationsQuery opQuery, Routine<?> routine) throws PMException {
-        boolean exists = opQuery.operationExists(routine.getName());
-        if (exists) {
-            throw new FunctionExistsException(routine.getName());
-        }
-
-        routines.add(routine);
-    }
-
-    public void removeBasicFunction(BasicFunction<?> basicFunction) {
-        basicFunctions.removeIf(op -> op.getName().equals(basicFunction.getName()));
-    }
-
-    public void removeQueryFunction(QueryOperation<?> queryOperation) {
-        queryOperations.removeIf(op -> op.getName().equals(queryOperation.getName()));
-    }
-
-    public void removeAdminOperation(String opName) {
-        adminOperations.removeIf(op -> op.getName().equals(opName));
-    }
-
-    public void removeResourceOperation(String opName) {
-        resourceOperations.removeIf(op -> op.getName().equals(opName));
-    }
-
-    public void removeRoutine(String routineName) {
-        routines.removeIf(routine -> routine.getName().equals(routineName));
-    }
-
-    public List<String> getAdminOperationNames() {
-        return adminOperations.stream()
-            .map(Operation::getName)
-            .toList();
-    }
-
-    public List<String> getResourceOperationNames() {
-        return resourceOperations.stream()
-            .map(Operation::getName)
-            .toList();
-    }
-
-    public List<String> getRoutineNames() {
-        return routines.stream()
-            .map(Routine::getName)
-            .toList();
-    }
-
-    public List<String> getBasicFunctionNames() {
-        return basicFunctions.stream()
-            .map(BasicFunction::getName)
-            .toList();
-    }
-
-    public List<String> getQueryOperationNames() {
-        return queryOperations.stream()
-            .map(QueryOperation::getName)
-            .toList();
-    }
-
+    /**
+     * Returns true if a plugin operation with the given name exists.
+     * @param pluginName The name of the plugin.
+     * @return True if the plugin exists, false if not.
+     */
     public boolean pluginExists(String pluginName) {
-        for (BasicFunction<?> basicFunction : basicFunctions) {
-            if (basicFunction.getName().equals(pluginName)) {
-                return true;
-            }
-        }
-        for (QueryOperation<?> queryOperation : queryOperations) {
-            if (queryOperation.getName().equals(pluginName)) {
-                return true;
-            }
-        }
-        for (AdminOperation<?> operation : adminOperations) {
-            if (operation.getName().equals(pluginName)) {
-                return true;
-            }
-        }
-        for (ResourceOperation<?> operation : resourceOperations) {
-            if (operation.getName().equals(pluginName)) {
-                return true;
-            }
-        }
-        for (Routine<?> routine : routines) {
-            if (routine.getName().equals(pluginName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return operations.containsKey(pluginName);
     }
 }

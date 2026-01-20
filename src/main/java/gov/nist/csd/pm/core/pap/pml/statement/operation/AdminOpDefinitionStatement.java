@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 
-import static gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp.ADMIN_OPERATION_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp.OPERATION_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
@@ -19,7 +19,7 @@ public class AdminOpDefinitionStatement extends OperationStatement implements Fu
     protected PMLStmtsAdminOperation<?> pmlStmtsOperation;
 
     public AdminOpDefinitionStatement(PMLStmtsAdminOperation<?> pmlStmtsOperation) {
-        super(new CreateAdminOperationOp());
+        super(new CreateOperationOp());
 
         this.pmlStmtsOperation = pmlStmtsOperation;
     }
@@ -31,7 +31,7 @@ public class AdminOpDefinitionStatement extends OperationStatement implements Fu
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return new Args().put(ADMIN_OPERATION_PARAM, pmlStmtsOperation);
+        return new Args().put(OPERATION_PARAM, pmlStmtsOperation);
     }
 
     @Override

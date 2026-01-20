@@ -31,7 +31,7 @@ class PMLOperationWrapperTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        operations.createAdminOperation(new AdminOperation<>("op1", STRING_TYPE, List.of(a)) {
+        operations.createOperation(new AdminOperation<>("op1", STRING_TYPE, List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
@@ -42,7 +42,7 @@ class PMLOperationWrapperTest {
 
         });
 
-        operations.createAdminOperation(new AdminOperation<>("op2", STRING_TYPE, List.of(a)) {
+        operations.createOperation(new AdminOperation<>("op2", STRING_TYPE, List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 
@@ -53,7 +53,7 @@ class PMLOperationWrapperTest {
 
         });
 
-        operations.createAdminOperation(new AdminOperation<>("op3", STRING_TYPE, List.of(a)) {
+        operations.createOperation(new AdminOperation<>("op3", STRING_TYPE, List.of(a)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) {}
 

@@ -270,7 +270,7 @@ class PDPTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().operations().createAdminRoutine(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
+        pap.modify().operations().createOperation(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));

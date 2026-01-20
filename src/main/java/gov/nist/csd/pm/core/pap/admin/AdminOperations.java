@@ -15,11 +15,7 @@ import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminOperationOp;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateAdminRoutineOp;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateBasicFunctionOp;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateQueryOperationOp;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateResourceOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.DeleteOperationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.SetResourceAccessRights;
 import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
@@ -47,11 +43,7 @@ public class AdminOperations {
         new DeleteObligationOp(),
 
         new SetResourceAccessRights(),
-        new CreateResourceOperationOp(),
-        new CreateAdminOperationOp(),
-        new CreateAdminRoutineOp(),
-        new CreateQueryOperationOp(),
-        new CreateBasicFunctionOp(),
+        new CreateOperationOp(),
         new DeleteOperationOp(),
 
         new CreateProhibitionOp(),

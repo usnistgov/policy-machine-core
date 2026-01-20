@@ -16,7 +16,7 @@ public class DeleteOperationStatement extends DeleteStatement{
 
     @Override
     public boolean exists(PAP pap, String name) throws PMException {
-        return pap.query().operations().getAdminOperationNames().contains(name);
+        return pap.query().operations().operationExists(name);
     }
 
     @Override

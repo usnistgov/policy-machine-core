@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.statement.basic;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateBasicFunctionOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLStmtsBasicOperation;
@@ -17,7 +17,7 @@ public class BasicFunctionDefinitionStatement extends OperationStatement impleme
     private final PMLStmtsBasicOperation<?> function;
 
     public BasicFunctionDefinitionStatement(PMLStmtsBasicOperation<?> function) {
-        super(new CreateBasicFunctionOp());
+        super(new CreateOperationOp());
         this.function = function;
     }
 
@@ -29,7 +29,7 @@ public class BasicFunctionDefinitionStatement extends OperationStatement impleme
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args()
-            .put(CreateBasicFunctionOp.BASIC_FUNCTION_PARAM, function);
+            .put(CreateOperationOp.OPERATION_PARAM, function);
     }
 
     @Override

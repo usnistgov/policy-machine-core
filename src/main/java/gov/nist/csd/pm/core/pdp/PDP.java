@@ -82,7 +82,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     @Override
     public Object adjudicateResourceOperation(UserContext user, String resourceOperation, Map<String, Object> rawAgs) throws PMException {
-        ResourceOperation<?> op = pap.query().operations().getResourceOperation(resourceOperation);
+        Operation<?> op = pap.query().operations().getOperation(resourceOperation);
         Args args = op.validateAndPrepareArgs(rawAgs);
 
         return runTx(user, tx -> executeOperation(user, tx, op, args));
@@ -93,7 +93,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
                                            String operation,
                                            Map<String, Object> rawArgs) throws
                                                                      PMException {
-        AdminOperation<?> adminOperation = pap.query().operations().getAdminOperation(operation);
+        Operation<?> adminOperation = pap.query().operations().getOperation(operation);
         Args args = adminOperation.validateAndPrepareArgs(rawArgs);
 
         return runTx(user, tx -> executeOperation(user, tx, adminOperation, args));
@@ -103,11 +103,11 @@ public class PDP implements EventPublisher, AccessAdjudication {
     public Object adjudicateAdminRoutine(UserContext user,
                                          String routineName,
                                          Map<String, Object> rawArgs) throws PMException {
-        Routine<?> routine = pap.query().operations().getAdminRoutine(routineName);
+        Operation<?> routine = pap.query().operations().getOperation(routineName);
         Args args = routine.validateAndPrepareArgs(rawArgs);
 
         return runTx(user, tx -> {
-            if (routine instanceof PMLRoutine) {
+            if (routine instanceof PMLOperation) {
                 ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
             }
 
@@ -119,7 +119,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     public void adjudicateAdminRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
         runTx(user, tx -> {
             for (OperationRequest request : operationRequests) {
-                AdminOperation<?> op = pap.query().operations().getAdminOperation(request.op());
+                Operation<?> op = pap.query().operations().getOperation(request.op());
                 Args args = op.validateAndPrepareArgs(request.args());
                 executeOperation(user, tx, op, args);
             }

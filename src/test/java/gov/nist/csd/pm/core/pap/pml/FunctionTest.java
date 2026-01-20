@@ -93,7 +93,7 @@ public class FunctionTest {
         MemoryPAP memoryPAP = new TestPAP();
         memoryPAP.executePML(new UserContext(-1), pml);
 
-        PMLResourceOperation<?> res1 = (PMLResourceOperation<?>) memoryPAP.query().operations().getResourceOperation("res1");
+        PMLResourceOperation<?> res1 = (PMLResourceOperation<?>) memoryPAP.query().operations().getOperation("res1");
         ExecutionContext u1 = memoryPAP.buildExecutionContext(new UserContext(id("u1")));
         res1.setCtx(u1);
         PDP pdp = new PDP(memoryPAP);

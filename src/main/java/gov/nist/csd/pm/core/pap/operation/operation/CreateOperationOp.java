@@ -1,38 +1,40 @@
 package gov.nist.csd.pm.core.pap.operation.operation;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_ADMIN_OPERATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OPERATION;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.arg.type.AdminOperationType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
-public class CreateAdminOperationOp extends AdminOperation<Void> {
+public class CreateOperationOp extends AdminOperation<Void>  {
 
-    public static final FormalParameter<AdminOperation<?>> ADMIN_OPERATION_PARAM = new FormalParameter<>("operation", new AdminOperationType());
+    public static final FormalParameter<Operation<?>> OPERATION_PARAM = new FormalParameter<>("operation", new AdminOperationType());
 
-    public CreateAdminOperationOp() {
+    public CreateOperationOp() {
         super(
-                "create_admin_operation",
+            "create_operation",
             BasicTypes.VOID_TYPE,
-                List.of(ADMIN_OPERATION_PARAM)
+            List.of(OPERATION_PARAM)
         );
     }
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), CREATE_ADMIN_OPERATION);
+        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), CREATE_OPERATION);
     }
 
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
-        pap.modify().operations().createAdminOperation(args.get(ADMIN_OPERATION_PARAM));
+        pap.modify().operations().createOperation(args.get(OPERATION_PARAM));
         return null;
     }
+
 }

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
-import gov.nist.csd.pm.core.common.exception.FunctionExistsException;
+import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -66,24 +66,24 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testSuccess() throws PMException {
-            pap.modify().operations().createAdminOperation(testOp);
+            pap.modify().operations().createOperation(testOp);
 
-            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation("assign"));
+            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getOperation("assign"));
         }
 
         @Test
         void testOperationExists() throws PMException {
-            pap.modify().operations().createAdminOperation(testOp);
+            pap.modify().operations().createOperation(testOp);
 
-            assertThrows(FunctionExistsException.class,
-                    () -> pap.modify().operations().createAdminOperation(new AssignOp()));
-            assertThrows(FunctionExistsException.class,
-                    () -> pap.modify().operations().createAdminOperation(testOp));
+            assertThrows(OperationExistsException.class,
+                    () -> pap.modify().operations().createOperation(new AssignOp()));
+            assertThrows(OperationExistsException.class,
+                    () -> pap.modify().operations().createOperation(testOp));
 
             pap.modify().operations().deleteOperation(testOp.getName());
-            pap.plugins().registerAdminOperation(pap.query().operations(), testOp);
-            assertThrows(FunctionExistsException.class,
-                () -> pap.modify().operations().createAdminOperation(testOp));
+            pap.plugins().addOperation(pap.query().operations(), testOp);
+            assertThrows(OperationExistsException.class,
+                () -> pap.modify().operations().createOperation(testOp));
         }
     }
 
@@ -138,25 +138,25 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().operations().createAdminRoutine(routine1);
+            pap.modify().operations().createOperation(routine1);
 
-            assertTrue(pap.query().operations().getAdminRoutineNames().contains("routine1"));
+            assertTrue(pap.query().operations().getOperations().contains(routine1));
         }
 
         @Test
         void testRoutineExists() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().operations().createAdminRoutine(routine1);
+            pap.modify().operations().createOperation(routine1);
 
-            assertThrows(FunctionExistsException.class, () -> {
-                pap.modify().operations().createAdminRoutine(routine1);
+            assertThrows(OperationExistsException.class, () -> {
+                pap.modify().operations().createOperation(routine1);
             });
 
             pap.modify().operations().deleteOperation(routine1.getName());
-            pap.plugins().registerRoutine(pap.query().operations(), routine1);
-            assertThrows(FunctionExistsException.class,
-                () -> pap.modify().operations().createAdminRoutine(routine1));
+            pap.plugins().addOperation(pap.query().operations(), routine1);
+            assertThrows(OperationExistsException.class,
+                () -> pap.modify().operations().createOperation(routine1));
         }
 
         @Test
@@ -164,19 +164,20 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.modify().operations().createAdminRoutine(routine1);
-                tx.modify().operations().createAdminRoutine(routine2);
+                tx.modify().operations().createOperation(routine1);
+                tx.modify().operations().createOperation(routine2);
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.modify().operations().createAdminRoutine(routine3);
-                tx.modify().operations().createAdminRoutine(routine4);
+                tx.modify().operations().createOperation(routine3);
+                tx.modify().operations().createOperation(routine4);
 
                 throw new PMException("");
             }));
 
-            assertTrue(pap.query().operations().getAdminRoutineNames().containsAll(List.of("routine1", "routine2")));
-            assertFalse(pap.query().operations().getAdminRoutineNames().containsAll(List.of("routine3", "routine4")));
+            assertTrue(pap.query().operations().getOperations().containsAll(List.of(routine1, routine2)));
+            assertFalse(pap.query().operations().getOperations().contains(routine3));
+            assertFalse(pap.query().operations().getOperations().contains(routine4));
         }
     }
 
@@ -186,16 +187,16 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
-            pap.modify().operations().createAdminRoutine(routine1);
+            pap.modify().operations().createOperation(routine1);
 
             pap.modify().operations().deleteOperation("routine1");
-            assertFalse(pap.query().operations().getAdminRoutineNames().contains("routine1"));
+            assertFalse(pap.query().operations().getOperations().contains(routine1));
 
-            pap.plugins().registerRoutine(pap.query().operations(), routine1);
-            assertTrue(pap.query().operations().getAdminRoutineNames().contains(routine1.getName()));
+            pap.plugins().addOperation(pap.query().operations(), routine1);
+            assertTrue(pap.query().operations().getOperations().contains(routine1));
             assertThrows(CannotDeletePluginOperationException.class, () ->
                 pap.modify().operations().deleteOperation(routine1.getName()));
-            assertDoesNotThrow(() -> pap.query().operations().getAdminRoutine(routine1.getName()));
+            assertDoesNotThrow(() -> pap.query().operations().getOperation(routine1.getName()));
         }
 
         @Test
@@ -203,8 +204,8 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.modify().operations().createAdminRoutine(routine1);
-                tx.modify().operations().createAdminRoutine(routine2);
+                tx.modify().operations().createOperation(routine1);
+                tx.modify().operations().createOperation(routine2);
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
@@ -214,13 +215,13 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
                 throw new PMException("");
             }));
 
-            assertTrue(pap.query().operations().getAdminRoutineNames().containsAll(List.of("routine1", "routine2")));
+            assertTrue(pap.query().operations().getOperations().containsAll(List.of(routine1, routine2)));
         }
 
         @Test
         void testCannotDeleteBuiltinOperation() {
             assertDoesNotThrow(() -> pap.modify().operations().deleteOperation("assign"));
-            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation("assign"));
+            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getOperation("assign"));
         }
     }
 }

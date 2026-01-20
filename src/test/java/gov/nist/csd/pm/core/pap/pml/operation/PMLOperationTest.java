@@ -22,7 +22,7 @@ public class PMLOperationTest {
         MemoryPAP memoryPAP = new MemoryPAP();
         memoryPAP.executePML(new UserContext(0), pml);
 
-        assertTrue(memoryPAP.query().operations().getBasicFunctionNames().contains("test"));
+        assertTrue(memoryPAP.query().operations().getOperationNames().contains("test"));
 
         pml = """
             create PC test()

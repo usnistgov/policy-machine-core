@@ -56,10 +56,7 @@ public class AdminAccessRights {
 
     // operations
     public static final String SET_RESOURCE_ACCESS_RIGHTS = "set_resource_access_rights";
-    public static final String CREATE_ADMIN_OPERATION = "create_admin_operation";
-    public static final String CREATE_RESOURCE_OPERATION = "create_resource_operation";
-    public static final String CREATE_QUERY_OPERATION = "create_query_operation";
-    public static final String CREATE_BASIC_FUNCTION = "create_basic_function";
+    public static final String CREATE_OPERATION = "create_operation";
     public static final String DELETE_OPERATION = "delete_operation";
 
 
@@ -145,10 +142,7 @@ public class AdminAccessRights {
 
     public static final Set<String> ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET = Set.of(
         SET_RESOURCE_ACCESS_RIGHTS,
-        CREATE_ADMIN_OPERATION,
-        CREATE_RESOURCE_OPERATION,
-        CREATE_QUERY_OPERATION,
-        CREATE_BASIC_FUNCTION,
+        CREATE_OPERATION,
         DELETE_OPERATION
     );
 

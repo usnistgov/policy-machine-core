@@ -3,38 +3,25 @@ package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_LABEL;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OP_TYPE_PROPERTY;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_ARS_LABEL;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deserialize;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.BasicFunction;
 import gov.nist.csd.pm.core.pap.operation.Operation;
-import gov.nist.csd.pm.core.pap.operation.QueryOperation;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
-import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 
 public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
-	private enum OpTypeProperty {
-		ADMIN,
-		RESOURCE,
-		ROUTINE,
-		QUERY,
-		FUNCTION
-	}
-
-	private static final String RESOURCE_ACCESS_RIGHTS_NODE_NAME = "resource_operations";
+	private static final String RESOURCE_ACCESS_RIGHTS_NODE_NAME = "resource_access_rights";
 	private final TxHandler txHandler;
 	private ClassLoader classLoader;
 
@@ -59,28 +46,14 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public void createResourceOperation(ResourceOperation<?> operation) throws PMException {
-		createOp(operation, OpTypeProperty.RESOURCE);
-	}
+	public void createOperation(Operation<?> operation) throws PMException {
+		String hex = Neo4jUtil.serialize(operation);
 
-	@Override
-	public void createAdminOperation(AdminOperation<?> operation) throws PMException {
-		createOp(operation, OpTypeProperty.ADMIN);
-	}
-
-	@Override
-	public void createAdminRoutine(Routine<?> routine) throws PMException {
-		createOp(routine, OpTypeProperty.ROUTINE);
-	}
-
-	@Override
-	public void createQueryOperation(QueryOperation<?> operation) throws PMException {
-		createOp(operation, OpTypeProperty.QUERY);
-	}
-
-	@Override
-	public void createBasicFunction(BasicFunction<?> function) throws PMException {
-		createOp(function, OpTypeProperty.FUNCTION);
+		txHandler.runTx(tx -> {
+			Node node = tx.createNode(OPERATION_LABEL);
+			node.setProperty(NAME_PROPERTY, operation.getName());
+			node.setProperty(DATA_PROPERTY, hex);
+		});
 	}
 
 	@Override
@@ -113,53 +86,43 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public Collection<String> getResourceOperationNames() throws PMException {
-		return getOpNames(OpTypeProperty.RESOURCE);
+	public Collection<Operation<?>> getOperations() throws PMException {
+		List<Operation<?>> operations = new ArrayList<>();
+
+		txHandler.runTx(tx -> {
+			ResourceIterator<Node> nodes = tx.findNodes(OPERATION_LABEL);
+			if (nodes == null) {
+				return;
+			}
+
+			while (nodes.hasNext()) {
+				Node next = nodes.next();
+				operations.add((Operation<?>) deserialize(next.getProperty(DATA_PROPERTY).toString(), classLoader));
+			}
+		});
+
+		return operations;
 	}
 
 	@Override
-	public ResourceOperation<?> getResourceOperation(String operationName) throws PMException {
-		return getOp(operationName);
+	public Collection<String> getOperationNames() throws PMException {
+		return getOperations().stream().map(Operation::getName).toList();
 	}
 
 	@Override
-	public Collection<String> getAdminOperationNames() throws PMException {
-		return getOpNames(OpTypeProperty.ADMIN);
-	}
+	public Operation<?> getOperation(String name) throws PMException {
+		AtomicReference<Operation<?>> operation = new AtomicReference<>();
 
-	@Override
-	public AdminOperation<?> getAdminOperation(String operationName) throws PMException {
-		return getOp(operationName);
-	}
+		txHandler.runTx(tx -> {
+			Node node = tx.findNode(OPERATION_LABEL, NAME_PROPERTY, name);
+			if (node == null) {
+				return;
+			}
 
-	@Override
-	public Collection<String> getAdminRoutineNames() throws PMException {
-		return getOpNames(OpTypeProperty.ROUTINE);
-	}
+			operation.set((Operation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
+		});
 
-	@Override
-	public Routine<?> getAdminRoutine(String routineName) throws PMException {
-		return getOp(routineName);
-	}
-
-	@Override
-	public Collection<String> getQueryOperationNames() throws PMException {
-		return getOpNames(OpTypeProperty.QUERY);
-	}
-
-	@Override
-	public QueryOperation<?> getQueryOperation(String name) throws PMException {
-		return getOp(name);
-	}
-
-	@Override
-	public Collection<String> getBasicFunctionNames() throws PMException {
-		return getOpNames(OpTypeProperty.FUNCTION);
-	}
-
-	@Override
-	public BasicFunction<?> getBasicFunction(String name) throws PMException {
-		return getOp(name);
+		return operation.get();
 	}
 
 	@Override
@@ -188,46 +151,5 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	@Override
 	public void rollback() throws PMException {
 
-	}
-
-	private void createOp(Operation<?> op, OpTypeProperty opTypeProperty) throws PMException {
-		String hex = Neo4jUtil.serialize(op);
-
-		txHandler.runTx(tx -> {
-			Node node = tx.createNode(OPERATION_LABEL);
-			node.setProperty(NAME_PROPERTY, op.getName());
-			node.setProperty(OP_TYPE_PROPERTY, opTypeProperty.name());
-			node.setProperty(DATA_PROPERTY, hex);
-		});
-	}
-
-	private List<String> getOpNames(OpTypeProperty opTypeProperty) throws PMException {
-		List<String> operationNames = new ArrayList<>();
-
-		txHandler.runTx(tx -> {
-			ResourceIterator<Node> nodes = tx.findNodes(OPERATION_LABEL, OP_TYPE_PROPERTY, opTypeProperty.name());
-
-			while (nodes.hasNext()) {
-				Node node = nodes.next();
-				operationNames.add(node.getProperty(NAME_PROPERTY).toString());
-			}
-		});
-
-		return operationNames;
-	}
-
-	private <T extends Operation<?>> T getOp(String name) throws PMException {
-		AtomicReference<T> op = new AtomicReference<>();
-
-		txHandler.runTx(tx -> {
-			Node node = tx.findNode(OPERATION_LABEL, NAME_PROPERTY, name);
-			if (node == null) {
-				return;
-			}
-
-			op.set((T) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
-		});
-
-		return op.get();
 	}
 }

@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
@@ -21,39 +22,11 @@ public interface OperationsModification {
     void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException;
 
     /**
-     * Create a resource operation.
+     * Create an operation.
      * @param operation The operation to create.
      * @throws PMException If there is an error in the PM.
      */
-    void createResourceOperation(ResourceOperation<?> operation) throws PMException;
-
-    /**
-     * Create an administrative operation.
-     * @param operation The operation to create.
-     * @throws PMException If there is an error in the PM.
-     */
-    void createAdminOperation(AdminOperation<?> operation) throws PMException;
-
-    /**
-     * Create a new administrative routine.
-     * @param routine The routine to create.
-     * @throws PMException If there is an error in the PM.
-     */
-    void createAdminRoutine(Routine<?> routine) throws PMException;
-
-    /**
-     * Create a query operation.
-     * @param operation The query operation to create.
-     * @throws PMException If there is an error in the PM.
-     */
-    void createQueryOperation(QueryOperation<?> operation) throws PMException;
-
-    /**
-     * Create a basic function.
-     * @param function The basic function to create.
-     * @throws PMException If there is an error in the PM.
-     */
-    void createBasicFunction(BasicFunction<?> function) throws PMException;
+    void createOperation(Operation<?> operation) throws PMException;
 
     /**
      * Delete a resource, admin, routine, or query operation with the given name.

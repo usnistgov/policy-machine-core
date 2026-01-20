@@ -67,13 +67,13 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
     void testGetAdminOperationNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.modify().operations().createAdminOperation(op1);
-        pap.modify().operations().createAdminOperation(op2);
+        pap.modify().operations().createOperation(op1);
+        pap.modify().operations().createOperation(op2);
 
-        Collection<String> adminOperationNames = pap.query().operations().getAdminOperationNames();
+        Collection<String> adminOperationNames = pap.query().operations().getOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
 
-        pap.plugins().registerAdminOperation(pap.query().operations(), new AdminOperation<>("op3", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(pap.query().operations(), new AdminOperation<>("op3", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
@@ -85,7 +85,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
             }
         });
 
-        adminOperationNames = pap.query().operations().getAdminOperationNames();
+        adminOperationNames = pap.query().operations().getOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2", "op3")));
     }
 
@@ -96,13 +96,13 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().operations().createAdminOperation(op1);
+            pap.modify().operations().createOperation(op1);
 
-            Operation<?> actual = pap.query().operations().getAdminOperation(op1.getName());
+            Operation<?> actual = pap.query().operations().getOperation(op1.getName());
             assertEquals(op1, actual);
 
-            pap.plugins().registerAdminOperation(pap.query().operations(), op2);
-            actual = pap.query().operations().getAdminOperation(op2.getName());
+            pap.plugins().addOperation(pap.query().operations(), op2);
+            actual = pap.query().operations().getOperation(op2.getName());
             assertEquals(op2, actual);
         }
 
@@ -110,7 +110,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         void testOperationDoesNotExist() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getAdminOperation("op1"));
+            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getOperation("op1"));
         }
 
     }

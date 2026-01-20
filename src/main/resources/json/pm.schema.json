@@ -4,7 +4,7 @@
     "title": "Policy Machine JSON Schema",
     "type": "object",
     "properties": {
-        "resourceOperations": {
+        "resourceAccessRights": {
             "type": "array",
             "items": {
                 "type": "string"
@@ -59,16 +59,40 @@
             }
         },
         "operations": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "routines": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
+            "type": "object",
+            "properties": {
+                "admin": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "resource": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "routine": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "query": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "basic": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
         }
     },
     "$defs": {

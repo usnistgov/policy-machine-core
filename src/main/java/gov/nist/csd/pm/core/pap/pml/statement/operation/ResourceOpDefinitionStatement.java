@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.operation.CreateResourceOperationOp;
+import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLStmtsResourceOperation;
@@ -16,7 +16,7 @@ public class ResourceOpDefinitionStatement extends OperationStatement implements
     protected PMLStmtsResourceOperation<?> pmlResourceOperation;
 
     public ResourceOpDefinitionStatement(PMLStmtsResourceOperation<?> pmlResourceOperation) {
-        super(new CreateResourceOperationOp());
+        super(new CreateOperationOp());
 
         this.pmlResourceOperation = pmlResourceOperation;
     }
@@ -28,7 +28,7 @@ public class ResourceOpDefinitionStatement extends OperationStatement implements
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        return new Args().put(CreateResourceOperationOp.OPERATION_PARAM, pmlResourceOperation);
+        return new Args().put(CreateOperationOp.OPERATION_PARAM, pmlResourceOperation);
     }
 
     @Override

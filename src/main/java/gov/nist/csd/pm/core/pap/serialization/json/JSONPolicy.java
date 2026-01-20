@@ -11,24 +11,18 @@ public class JSONPolicy {
     private JSONGraph graph;
     private List<JSONProhibition> prohibitions;
     private List<JSONObligation> obligations;
-    private List<JSONResourceOperation> resourceOperations;
-    private List<String> adminOperations;
-    private List<String> routines;
+    private JSONOperations operations;
 
     public JSONPolicy(AccessRightSet resourceAccessRights,
                       JSONGraph graph,
                       List<JSONProhibition> prohibitions,
                       List<JSONObligation> obligations,
-                      List<JSONResourceOperation> resourceOperations,
-                      List<String> adminOperations,
-                      List<String> routines) {
+                      JSONOperations operations) {
         this.resourceAccessRights = resourceAccessRights;
         this.graph = graph;
         this.prohibitions = prohibitions;
         this.obligations = obligations;
-        this.resourceOperations = resourceOperations;
-        this.adminOperations = adminOperations;
-        this.routines = routines;
+        this.operations = operations;
     }
 
     public AccessRightSet getResourceAccessRights() {
@@ -59,32 +53,16 @@ public class JSONPolicy {
         return obligations;
     }
 
-    public List<JSONResourceOperation> getResourceOperations() {
-        return resourceOperations;
-    }
-
-    public void setResourceOperations(List<JSONResourceOperation> resourceOperations) {
-        this.resourceOperations = resourceOperations;
-    }
-
     public void setObligations(List<JSONObligation> obligations) {
         this.obligations = obligations;
     }
 
-    public List<String> getAdminOperations() {
-        return adminOperations;
+    public JSONOperations getOperations() {
+        return operations;
     }
 
-    public void setAdminOperations(List<String> adminOperations) {
-        this.adminOperations = adminOperations;
-    }
-
-    public List<String> getRoutines() {
-        return routines;
-    }
-
-    public void setRoutines(List<String> routines) {
-        this.routines = routines;
+    public void setOperations(JSONOperations operations) {
+        this.operations = operations;
     }
 
     @Override

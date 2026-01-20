@@ -89,7 +89,7 @@ class OperationInvokeExpressionTest {
         );
 
         PAP pap = new TestPAP();
-        pap.modify().operations().createAdminOperation(voidFunc);
+        pap.modify().operations().createOperation(voidFunc);
         ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
         Object value = e.execute(executionContext, new MemoryPAP());
         assertNull(value);
@@ -158,7 +158,7 @@ class OperationInvokeExpressionTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size(), visitorContext.errorLog().getErrors().toString());
 
         PAP pap = new TestPAP();
-        pap.modify().operations().createAdminOperation(stringFunc);
+        pap.modify().operations().createOperation(stringFunc);
         ExecutionContext executionContext =
                 new ExecutionContext(
                         new UserContext(0),

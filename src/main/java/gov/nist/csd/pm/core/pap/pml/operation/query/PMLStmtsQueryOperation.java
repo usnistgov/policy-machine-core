@@ -38,7 +38,11 @@ public class PMLStmtsQueryOperation<T> extends PMLQueryOperation<T> implements P
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return stmts.toFormattedString(indentLevel);
+        return String.format(
+            "%s%s",
+            getSignature().toFormattedString(indentLevel),
+            stmts.toFormattedString(indentLevel)
+        );
     }
 
     @Override

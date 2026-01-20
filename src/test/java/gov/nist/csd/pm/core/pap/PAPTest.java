@@ -89,7 +89,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         try {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.modify().operations().createAdminOperation(op);
+            pap.modify().operations().createOperation(op);
 
             pap.executePML(new UserContext(id("u1")), "create ua \"ua4\" in [\"Location\"]\ntestFunc()");
             assertTrue(pap.query().graph().nodeExists("ua4"));
@@ -172,7 +172,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testPluginRegistry() throws PMException {
-        pap.plugins().registerAdminOperation(pap.query().operations(), new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -183,23 +183,25 @@ public abstract class PAPTest extends PAPTestInitializer {
                 return null;
             }
 
-        });
+        };
+        pap.plugins().addOperation(pap.query().operations(), op1);
 
-        pap.plugins().registerRoutine(pap.query().operations(), new Routine<>("routine1", VOID_TYPE, List.of()) {
+        Routine<Void> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
             }
 
-        });
+        };
+        pap.plugins().addOperation(pap.query().operations(), routine1);
 
-        assertTrue(pap.plugins().getAdminOperationNames().contains("op1"));
-        assertTrue(pap.plugins().getRoutineNames().contains("routine1"));
+        assertTrue(pap.plugins().getOperationsList().contains(op1));
+        assertTrue(pap.plugins().getOperationsList().contains(routine1));
     }
 
     @Test
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().registerAdminOperation(pap.query().operations(), new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(pap.query().operations(), new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
