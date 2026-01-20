@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.pap.operation.op;
+package gov.nist.csd.pm.core.pap.operation;
 
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
