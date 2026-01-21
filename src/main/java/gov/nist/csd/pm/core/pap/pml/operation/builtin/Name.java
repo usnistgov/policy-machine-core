@@ -11,20 +11,20 @@ import java.util.List;
 
 public class Name extends PMLQueryOperation<String> {
 
-    public static final NodeIdFormalParameter NODE_PARAM =
+    public static final NodeIdFormalParameter NODE_ID_PARAM =
         new NodeIdFormalParameter("id");
 
     public Name() {
         super(
             "name",
             STRING_TYPE,
-            List.of(NODE_PARAM)
+            List.of(NODE_ID_PARAM)
         );
     }
 
     @Override
     public String execute(PolicyQuery query, Args args) throws PMException {
-        long id = args.get(NODE_PARAM);
+        long id = args.get(NODE_ID_PARAM);
         return query.graph().getNodeById(id).getName();
     }
 }

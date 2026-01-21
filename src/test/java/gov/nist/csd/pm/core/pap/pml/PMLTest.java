@@ -331,4 +331,23 @@ public class PMLTest {
             e.getErrors().getFirst().errorMessage()
         );
     }
+
+    @Test
+    void testPMLBlockReturnWithDifferentReturnTypes() throws PMException {
+        String pml = """
+            if nodeExists("a") {
+                return "a"
+            }
+            
+            return true
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        Object o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        assertEquals(o, true);
+
+        pap.modify().graph().createPolicyClass("a");
+        o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        assertEquals(o, "a");
+
+    }
 }
