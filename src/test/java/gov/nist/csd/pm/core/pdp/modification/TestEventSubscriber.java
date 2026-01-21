@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
 

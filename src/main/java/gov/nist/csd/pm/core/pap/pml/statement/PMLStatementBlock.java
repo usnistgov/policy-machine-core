@@ -2,10 +2,9 @@ package gov.nist.csd.pm.core.pap.pml.statement;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

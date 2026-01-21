@@ -1,17 +1,24 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp.CREATE_O_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp.CREATE_U_DESCENDANTS_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.graph.*;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,33 +40,19 @@ public class CreateNonPCStatement extends OperationStatement {
         String name = nameExpr.execute(ctx, pap);
         List<String> inList = inExpr.execute(ctx, pap);
 
-        // convert desc node names to IDs
-        LongArrayList descIds = new LongArrayList();
+        List<Long> descIds = new ArrayList<>();
         for (String parentName : inList) {
             descIds.add(pap.query().graph().getNodeByName(parentName).getId());
         }
 
         return new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, descIds);
+            .put(getDescendantsFormalParam(nodeType), descIds);
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        String nodeTypeStr;
-        if (nodeType == NodeType.OA) {
-            nodeTypeStr = "OA";
-        } else if (nodeType == NodeType.UA) {
-            nodeTypeStr = "UA";
-        } else if (nodeType == NodeType.O) {
-            nodeTypeStr = "O";
-        } else if (nodeType == NodeType.U) {
-            nodeTypeStr = "U";
-        } else {
-            nodeTypeStr = nodeType.toString();
-        }
-
-        return indent(indentLevel) + String.format("create %s %s in %s", nodeTypeStr, nameExpr, inExpr);
+        return indent(indentLevel) + String.format("create %s %s in %s", nodeType.toString(), nameExpr, inExpr);
     }
 
     @Override
@@ -76,7 +69,7 @@ public class CreateNonPCStatement extends OperationStatement {
         return Objects.hash(nodeType, nameExpr, inExpr);
     }
 
-    private static CreateNodeOp getOpFromType(NodeType type) {
+    private static Operation<Long> getOpFromType(NodeType type) {
         return switch (type) {
             case OA -> new CreateObjectAttributeOp();
             case O -> new CreateObjectOp();
@@ -84,4 +77,14 @@ public class CreateNonPCStatement extends OperationStatement {
             default -> new CreateUserOp();
         };
     }
+
+    private static NodeIdListFormalParameter getDescendantsFormalParam(NodeType type) {
+        return switch (type) {
+            case OA -> CREATE_OA_DESCENDANTS_PARAM;
+            case O -> CREATE_O_DESCENDANTS_PARAM;
+            case UA -> CREATE_UA_DESCENDANTS_PARAM;
+            default -> CREATE_U_DESCENDANTS_PARAM;
+        };
+    }
+
 } 

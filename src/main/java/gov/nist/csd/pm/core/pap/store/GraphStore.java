@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
-
 import java.util.Collection;
 import java.util.Map;
 

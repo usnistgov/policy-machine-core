@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
@@ -13,8 +13,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ShortDeclarationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableDeclarationStatement;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,17 +68,18 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
         Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         VariableAssignmentStatement stmt = new VariableAssignmentStatement(
-                varName,
-                ctx.PLUS() != null,
-                expr
+            varName,
+            ctx.PLUS() != null,
+            expr
         );
 
         try {
-           if (visitorCtx.scope().getVariable(varName).isConst()) {
+            if (visitorCtx.scope().getVariable(varName).isConst()) {
                 throw new PMLCompilationRuntimeException(ctx, "cannot reassign const variable");
             }
 
-            // don't need to update variable since the name and type are the only thing that matter during compilation
+            // update the variable in scope
+            visitorCtx.scope().updateVariable(varName, new Variable(varName, expr.getType(), false));
         } catch (PMLScopeException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }

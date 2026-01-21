@@ -1,4 +1,4 @@
-set resource operations ["read", "write", "delete_project", "delete_readme"]
+set resource access rights ["read", "write", "delete_project", "delete_readme"]
 
 create pc "RBAC"
 
@@ -40,27 +40,20 @@ routine deleteAllProjects(string locProjectOA) {
     }
 }
 
-operation deleteReadme(@node string projectReadme) {
-    check "delete_readme" on [projectReadme]
-} {
+adminop deleteReadme(@node("delete_readme") string projectReadme) {
     delete node projectReadme
 }
 
-operation deleteProject(@node string projectName) {
-    check "delete_project" on [projectName]
-} {
+adminop deleteProject(@node("delete_project") string projectName) {
     delete node projectName
 }
 
-operation createProject(string projectName, @node string locProjectAttr) {
-   check "assign_to" on ["project"]
-   check "assign_to" on [locProjectAttr]
-} {
-    create oa projectName in ["project", locProjectAttr]
-    create o projectName + " README" in [projectName]
+adminop createProject(string projectName, @node("assign_to") string locProjectAttr) {
+   create oa projectName in ["project", locProjectAttr]
+   create o projectName + " README" in [projectName]
 }
 
-operation createProjectAdmin(string projectName) {
+adminop createProjectAdmin(string projectName) {
     uaName := projectName + " admin"
     create UA uaName in ["writer"]
     associate uaName and projectName with ["*"]
@@ -71,24 +64,20 @@ operation createProjectAdmin(string projectName) {
     on union of {projectName: false}
 }
 
-create obligation "create us project admin" {
-    create rule "us project"
+create obligation "create us project admin"
     when any user
-    performs "createProject"
-    on {
-        locProjectAttr: "US project"
+    performs createProject on (locProjectAttr) {
+      return locProjectAttr == "US project"
     }
     do(ctx) {
         createProjectAdmin(ctx.args.projectName)
     }
 
-    create rule "eu project"
+create obligation "create eu project admin"
     when any user
-    performs "createProject"
-    on {
-        locProjectAttr: "EU project"
+    performs createProject on (locProjectAttr) {
+        return locProjectAttr == "EU project"
     }
     do(ctx) {
         createProjectAdmin(ctx.args.projectName)
     }
-}

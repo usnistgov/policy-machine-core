@@ -1,41 +1,26 @@
 package gov.nist.csd.pm.core.pap.obligation;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Obligation implements Serializable {
 
     private long authorId;
     private String name;
-    private List<Rule> rules;
+    private EventPattern eventPattern;
+    private ObligationResponse response;
 
     public Obligation() {
     }
 
-    public Obligation(long authorId, String name) {
+    public Obligation(long authorId, String name, EventPattern eventPattern, ObligationResponse response) {
         this.authorId = authorId;
         this.name = name;
-        this.rules = new ArrayList<>();
-    }
-
-    public Obligation(long authorId, String name, List<Rule> rules) {
-        this.authorId = authorId;
-        this.name = name;
-        this.rules = rules;
-    }
-
-    public Obligation addRule(String name, EventPattern eventPattern, ObligationResponse obligationResponse) {
-        rules.add(new Rule(name, eventPattern, obligationResponse));
-        return this;
-    }
-
-    public void deleteRule(String name) {
-        rules.removeIf(rule -> rule.getName().equals(name));
+        this.eventPattern = eventPattern;
+        this.response = response;
     }
 
     public long getAuthorId() {
@@ -54,44 +39,41 @@ public class Obligation implements Serializable {
         this.name = name;
     }
 
-    public List<Rule> getRules() {
-        return rules;
+    public EventPattern getEventPattern() {
+        return eventPattern;
     }
 
-    public Rule getRule(String ruleName) {
-        for (Rule rule : rules) {
-            if (rule.getName().equals(ruleName)) {
-                return rule;
-            }
-        }
-
-        return null;
+    public void setEventPattern(EventPattern eventPattern) {
+        this.eventPattern = eventPattern;
     }
 
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
+    public ObligationResponse getResponse() {
+        return response;
     }
 
-    public Obligation addRule(Rule rule) {
-        this.rules.add(rule);
-        return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Obligation that = (Obligation) o;
-        return Objects.equals(authorId, that.authorId) && Objects.equals(name, that.name) && Objects.equals(rules, that.rules);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(authorId, name, rules);
+    public void setResponse(ObligationResponse response) {
+        this.response = response;
     }
 
     @Override
     public String toString() {
         return CreateObligationStatement.fromObligation(this).toFormattedString(0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Obligation that)) {
+            return false;
+        }
+        return authorId == that.authorId && Objects.equals(name, that.name) && Objects.equals(
+            eventPattern, that.eventPattern) && Objects.equals(response, that.response);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(authorId, name, eventPattern, response);
     }
 }

@@ -1,27 +1,38 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.type.*;
-import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.operation.arg.type.AnyType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.*;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class AnyTypeErrorHandlingTest {
 
@@ -72,7 +83,7 @@ public class AnyTypeErrorHandlingTest {
     
     @Test
     void testVariableWithObjectType() throws PMException {
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         visitorContext.scope().addVariable("objVar", new Variable("objVar", ANY_TYPE, false));
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression("objVar");
@@ -129,7 +140,7 @@ public class AnyTypeErrorHandlingTest {
         
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(pml);
         
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> mapExpr = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE, ANY_TYPE));
         
         Map<?, ?> result = (Map<?, ?>) mapExpr.execute(executionContext, pap);

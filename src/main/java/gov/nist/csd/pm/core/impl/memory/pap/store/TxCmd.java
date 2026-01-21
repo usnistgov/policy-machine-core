@@ -4,10 +4,9 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
-
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import java.util.Collection;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public abstract class TxCmd implements TxRollbackSupport {
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.operations().setResourceOperations(oldAccessRights);
+            memoryPolicyStore.operations().setResourceAccessRights(oldAccessRights);
         }
     }
 
@@ -203,36 +202,37 @@ public abstract class TxCmd implements TxRollbackSupport {
             memoryPolicyStore.obligations().createObligation(
                     obligationToDelete.getAuthorId(),
                     obligationToDelete.getName(),
-                    obligationToDelete.getRules()
+                    obligationToDelete.getEventPattern(),
+                    obligationToDelete.getResponse()
             );
         }
     }
 
-    static class CreateAdminRoutine extends TxCmd {
+    static class CreateOperationTxCmd extends TxCmd {
+        private final Operation<?> operation;
 
-        private final Routine<?> routine;
-
-        public CreateAdminRoutine(Routine<?> routine) {
-            this.routine = routine;
+        public CreateOperationTxCmd(Operation<?> operation) {
+            this.operation = operation;
         }
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.routines().deleteAdminRoutine(routine.getName());
+            memoryPolicyStore.operations().deleteOperation(operation.getName());
         }
     }
 
-    static class DeleteAdminRoutine extends TxCmd {
+    static class DeleteOperation extends TxCmd {
 
-        private final Routine<?> routine;
+        private final Operation<?> operation;
 
-        public DeleteAdminRoutine(Routine<?> routine) {
-            this.routine = routine;
+        public DeleteOperation(Operation<?> operation) {
+            this.operation = operation;
         }
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.routines().createAdminRoutine(routine);
+            MemoryOperationsStore opsStore = memoryPolicyStore.operations();
+            opsStore.createOperation(operation);
         }
     }
 }

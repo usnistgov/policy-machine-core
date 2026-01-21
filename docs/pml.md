@@ -1,437 +1,735 @@
-See PML [lexer](src/main/java/gov/nist/csd/pm/core/pap/pml/antlr4/PMLLexer.g4) and [grammar](src/main/java/gov/nist/csd/pm/core/pap/pml/antlr4/PMLParser.g4) for full documentation and details. The below ANTLR4 definitions have been slightly modified for readability.  
+# Policy Machine Language (PML) Reference
 
-## Execution
+PML (Policy Machine Language) is a domain-specific language for defining and managing NGAC access control policies in 
+the Policy Machine. This document provides a complete reference for PML syntax and semantics. For an example, see [Example](#example)
 
-- Variables cannot be referenced from inside operations and routines.
-- A user context is needed when executing PML. This is **only** used for obligations to define the user to execute the response on behalf of in the EPP.
-	- This user must exist before any obligation is created.
+---
+## Table of Contents
 
-```java  
-String pml = "...";  
-pap.executePML(new UserContext(userId), pml);
-```  
+1. [Basic Elements](#basic-elements)
+2. [Types](#types)
+3. [Literals](#literals)
+4. [Expressions](#expressions)
+5. [Variables](#variables)
+6. [Control Flow Statements](#control-flow-statements)
+7. [Policy Modification Statements](#policy-modification-statements)
+8. [Operation Definitions](#operation-definitions)
+9. [Builtin Operations](#builtin-operations)
+10. [Example](#example)
 
-- Any operations and routines will be stored in the policy store.
-- All [admin policy nodes](/src/main/java/gov/nist/csd/pm/core/pap/admin/AdminPolicyNode.java) will be defined as constants during compilation and execution.  
+---
 
-  - PM_ADMIN_PC: The PM_ADMIN policy class node.
-  - PM_ADMIN_BASE_OA: The PM_ADMIN base OA that holds all other OA nodes.
-  - PM_ADMIN_POLICY_CLASSES: Used to determine user access to create and interact with PC nodes.
-  - PM_ADMIN_OBLIGATIONS: Used to determine user access to create and interact with obligations with an "any user" event pattern subject.
-  - PM_ADMIN_PROHIBITIONS: Used to determine user access to process prohibitions and container compelemnt conditions.
-  - PM_ADMIN_OPERATIONS: Used to determine user access to operations.
-  - PM_ADMIN_ROUTINES: Used to determine user access to routines.
+## Basic Elements
 
-## Basics  
-  
-The syntax for basic PML statements is based on [Golang]([https://github.com/antlr/grammars-v4/tree/master/golang](https://github.com/antlr/grammars-v4/tree/master/golang "https://github.com/antlr/grammars-v4/tree/master/golang"))  
+### Comments
 
-### Comments  
-  
-```  
-// this is line comment  
-  
-/*  
-  this is a block comment  
-*/  
-```  
-### Identifiers  
-  
-```  
-ID: [a-zA-Z0-9_]+;  
-```  
-### Data Types  
-  
-```antlr4  
-variableType:  
-string 
-| bool 
-| []variableType  
-| map[variableType]variableType 
-| any ;  
-```  
-  
-The `any` type will compile without error regardless of expected type. However, during execution if the evaluated type does not match the expected, an error will occur.   
-### Expressions  
-  
-Expressions are the fundamental way to define values in PML statements. Each expression has a **type**. Some statements will only support expressions of a certain type.  
-#### Literal  
-  
-```  
-literal:  
-stringLiteral
-| boolLiteral
-| mapLiteral
-| arrayLiteral ;  
-  
-stringLiteral: '"' (~["\\\r\n] | EscapeSequence)* '"' ;  
-boolLiteral: (true | false) ;  
-mapLiteral: '{' expression: expression (',' expression: expression)* '}' ;  
-arrayLiteral: '[' expression (',' expression)* ']' ;  
-  
-fragment EscapeSequence
- : '\\' [btnfr"'\\]
- | '\\' ([0-3]? [0-7])? [0-7] 
- | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit  
- ;  
- 
-fragment HexDigits  
- : HexDigit ((HexDigit | '_')* HexDigit)? 
- ;  
-  
-fragment HexDigit   
- : [0-9a-fA-F]  
- ;  
-  
-```  
-  
-- Array elements are expressions  
-- Map key and value elements are expressions  
-#### Logical  
-  
-```  
-expression ('&&' | '||') expression  
-```  
-#### Parenthesis  
-  
-```  
-(expression)  
-```  
-#### Equals  
-  
-```  
-expression ('==' | '!=') expression  
-```  
-#### String Concatenation  
-  
-```  
-expression + expression  
-```  
-  
-Only string expressions are supported.  
-  
-#### Negation  
-  
-```  
-!expression  
-```  
-  
-The negation expression when evaluated will only affect the result if the expression is a boolean expression. For example if the expression evaluates to true, the negated expression will evaluate to false. For any other type, the negation is ignored.  
-#### Variable Reference  
-  
-```  
-variableReference:  
-ID
-| variableReference index;  
-  
-index:  
-'[' expression ']' #BracketNotation  
-| '.' ID;  
-```  
-  
-`RefByIndex` requires the `variableReference` to be of type `map`. To use the `DotNotation` the variable must be map with string keys.
-  
-#### Operation or routine invoke  
-```  
-ID '(' (expression (',' expression)*)? ')'  
-```  
-  
-### Variable Declaration  
+```pml
+// Single-line comment
 
-#### Variables  
-  
-```  
-'var' ID = expression  
-ID := expression  
-```  
-#### Group Declaration  
-  
-```  
-'var ('  
-(ID '=' expression)*  
-')'  
-```  
-#### Variable Reassignment  
-  
-```  
-ID '=' expression  
-```  
-  
-The variable to be reassigned must already exist.  
-#### Variable Addition Reassignment  
-  
-```  
-ID '+=' expression  
-```  
-  
-The variable must already exist AND be of type **string**.  
-### If  
-  
-```  
-'if' expression '{' statement* '}'  
-('else if' expression '{' statement* '}' )*  
-('else' '{' statement* '}' )?  
-```  
-
-- `expression` is a **bool** expression.  
-  
-### Foreach  
-  
-Use `break` and `continue` to short circuit  
-  
-```  
-'foreach' ID (',' ID)? 'in' expression '{' statement* '}' ;  
-```  
-
-- `expression` is a **[]any** or **map[any]any** expression.  
-
-#### Array  
-  
-```  
-foreach x in ["a", "b", "c"] {  
-...  
-}  
-```  
-  
-`x` will hold the current element in the array during iteration.  
-  
-#### Map  
-  
-```  
-foreach x, y in {"key1": "value1", "key2": "value2"} {  
-...  
-}  
-```  
-  
-`x` will hold the current key in the map during iteration.  
-`y` will hold the current value in the map during iteration.  
-  
-### Operations and Routines  
-  
-```  
-('operation' | 'routine' | 'function') ID '(' ('@node'? variableType ID (',' '@node'? variableType ID)*)? ')' variableType? '{' checkStatement* '}' '{' statement* '}' ;    
-```  
-
-- `@node` denotes if the arg is a **node arg** (represents a node or array of nodes).
-
-#### CheckStatement
-Check if a user has an access right on a node or array of nodes. The first expression is the access right the second is the node or array of nodes. This statement will only take affect in an **Operation**, not a routine.
-```
-check expression on expression
+/*
+ * Multi-line
+ * comment
+ */
 ```
 
-- First `expression` is a **string** expression (access right).
-- Second `expression` is a **[]string** expression (nodes).
-  
-#### Example  
-  
-Function that returns a `string`.  
-  
-```  
-operation op1(a string, b []string, c map[string]string) string {  
-	check "assign" on a
-	check "assign_to" on b
-}  {
-	/*
-		pml statements
-	*/
+### Identifiers
+
+Identifiers start with a letter or underscore, followed by any combination of letters, digits, or underscores:
+
+```
+ID := [a-zA-Z_][a-zA-Z0-9_]*
+```
+
+### Keywords
+
+Reserved keywords cannot be used as identifiers.
+
+```
+adminop, resourceop, query, routine, function
+create, delete, if exists
+rule, when, performs, on, in, do, any, ascendant of
+intersection, inter, union, process
+set resource access rights, assign, deassign, from, set properties, of, to
+associate, and, with, dissociate
+deny, prohibition, obligation, access rights
+PC, OA, UA, U, O, user, node
+break, default, map, else, const, if, range, continue, foreach, return, var
+string, bool, void, array, int64
+true, false
+check, @node
+```
+
+### Whitespace
+
+Whitespace (spaces, tabs, newlines) is ignored except as a token separator.
+
+---
+
+## Types
+
+PML is a dynamically-typed language with the following supported types:
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `string` | UTF-8 text string | `"hello"` |
+| `bool` | Boolean value | `true`, `false` |
+| `int64` | 64-bit signed integer | `42`, `-10` |
+| `[]T` | Array of type T | `["a", "b"]` |
+| `map[K]V` | Map from key type K to value type V | `{"key": "value"}` |
+| `any` | Dynamic type (matches any type) | - |
+
+### Type Inference
+
+- **Array type inference**: When an array literal contains elements of mixed types, the element type becomes `any`.
+- **Map type inference**: When a map literal contains keys or values of mixed types, the respective type becomes `any`.
+- **Type casting**: Types can be implicitly cast to `any`, and `any` can be cast to specific types at runtime.
+
+---
+
+## Literals
+
+### String Literals
+
+Strings are enclosed in double quotes with escape sequence support:
+
+```pml
+"hello world"
+```
+
+### Integer Literals
+
+64-bit signed integers in decimal notation.
+
+```pml
+0
+42
+-100
+9223372036854775807     // max int64
+```
+
+### Boolean Literals
+
+```pml
+true
+false
+```
+
+### Array Literals
+
+Arrays are ordered collections of elements:
+
+```pml
+[]                      // empty array
+["a", "b", "c"]         // []string
+[1, 2, 3]               // []int64
+["mixed", 42, true]     // []any
+```
+
+### Map Literals
+
+Maps are key-value collections:
+
+```pml
+{}                              // empty map
+{"name": "Alice", "age": "30"}  // map[string]string
+{1: "one", 2: "two"}            // map[int64]string
+```
+
+---
+
+## Expressions
+
+Expressions produce values and can be composed using operators.
+
+### Variable References
+
+Access a variable's value by its name:
+
+```pml
+myVar
+```
+
+### Index Expressions
+
+Access elements in maps.
+
+```pml
+myMap["key"]            // bracket index
+myMap.key               // dot index (string keys only)
+```
+
+### Operation Invocation
+
+Call operations with arguments. The argument types must match those of the operation's defined formal parameters.
+
+```pml
+operationName(arg1, arg2, arg3)
+```
+
+### Arithmetic Expressions
+
+String concatenation using the `+` operator.
+
+```pml
+"Hello, " + name + "!"
+```
+
+### Comparison Expressions
+
+```pml
+a == b          // equality
+a != b          // inequality
+```
+
+### Logical Expressions
+
+```pml
+a && b          // logical AND
+a || b          // logical OR
+!a              // logical NOT
+```
+
+### Parenthesized Expressions
+
+Group expressions to control evaluation order:
+
+```pml
+(a + b) == c
+!(x && y)
+```
+
+---
+
+## Variables
+
+### Variable Declaration with `var`
+
+Declare one or more variables with initial values.
+
+```pml
+// Single declaration
+var x = "hello"
+
+// Multiple declarations
+var (
+    x = "hello"
+    y = 42
+    z = ["a", "b"]
+)
+```
+
+### Short Declaration
+
+Shorthand for declaring and initializing a variable. Type is inferred from the value.
+
+```pml
+x := "hello"
+```
+
+### Variable Assignment
+
+Assign a new value to an existing variable. PML is dynamically typed.
+
+```pml
+x = "new value"
+```
+
+### Compound Assignment
+
+Append to a string variable.
+
+```pml
+x += " appended"
+```
+
+---
+
+## Control Flow Statements
+
+### If Statement
+
+Conditional execution with optional else-if and else branches.
+
+```pml
+if condition {
+    // statements
 }
-```  
-  
-## Policy Statements  
-  
-### Create Policy Class  
-  
-Create a policy class node with the given **name**.  
-  
-```  
-'create PC' name=expression
-```  
 
-- `name` is a **string** expression.  
+if condition {
+    // statements
+} else {
+    // statements
+}
 
-### Create Non Policy Class Nodes  
-  
-Create a node of type object attribute, user attribute, object, or user and assign it to a set of existing nodes. Types can also be expressed using their short version: pc, ua, oa, u, o.
-  
-```  
-'create' ('OA' | 'UA' | 'O' | 'U') name=expression   
-'in' assignTo=expression   
-```  
-
-- `name` is a **string** expression.
-- `assignTo` is a **[]string** expression.  
-  
-### Set Node Properties  
-  
-Set the properties for a node. This will overwrite any existing properties.  
-  
-```  
-'set properties of' name=expression 'to' properties=expression  
-```  
-
-- `name` is a **string** expression.
-- `properties` is a **map[string]string** expression.  
-  
-### Assign  
-  
-Assign a node to a set of nodes.  
-  
-```  
-'assign' childNode=expression 'to' parentNodes=expression  
-```  
-
-- `childNode` is a **string** expression.
-- `parentNodes` is a **[]string** expression.  
-  
-### Deassign  
-  
-Deassign a node from a set of nodes.  
-  
-```  
-'deassign' childNode=expression 'from' parentNodes=expression  
-```  
-
-- `childNode` is a **string** expression.
-- `parentNodes` is a **[]string** expression.  
-  
-### Associate  
-  
-Create an association between two nodes with an access right set.  
-  
-```  
-'associate' ua=expression 'and' target=expression 'with' accessRights=expression  
-```  
-
-- `ua` is a **string** expression.
-- `target` is a **string** expression.
-- `accessRights` is a **[]string** expression.  
-  
-### Dissociate  
-  
-Delete an association.  
-  
-```  
-'dissociate' ua=expression 'and' target=expression  
-```  
-
-- `ua` is a **string** expression.
-- `target` is a **string** expression.  
-
-### Set Resource Operations
-
-Set the resource operations for the policy.
-
-```
-'set resource operations' accessRights=expression
+if condition1 {
+    // statements
+} else if condition2 {
+    // statements
+} else {
+    // statements
+}
 ```
 
-- `accessRights` is a **[]string** expression.
-  
-### Create Prohibition  
-  
-Create a new prohibition.  
-  
-```  
-'create prohibition' name=expression   
-'deny' ('U' | 'UA' | 'process') subject=expression   
-'access rights' accessRights=expression   
-'on' ('intersection'|'union') 'of' containers=expression ;  
-```  
+### Foreach Statement
 
-- `name` is a **string** expression.
-- `subject` is a **string** expression.
-- `accessRights` is a **[]string** expression.
-- `containers` is a **[]string** expression. Complement containers are specified using a [negation expression](#negation), where the negated expression is a **string**. For example, `!"oa1"`  
-  
+Iterate over arrays or maps.
+
+```pml
+// Iterate over array elements
+foreach element in myArray {
+    // element contains each array item
+}
+
+// Iterate over map keys
+foreach key in myMap {
+    // key contains each map key
+}
+
+// Iterate over map key-value pairs
+foreach key, value in myMap {
+    // key contains the map key
+    // value contains the map value
+}
+```
+
+### Break Statement
+
+Exit the innermost loop.
+
+```pml
+foreach item in items {
+    if item == "stop" {
+        break
+    }
+}
+```
+
+### Continue Statement
+
+Skip to the next iteration.
+
+```pml
+foreach item in items {
+    if item == "skip" {
+        continue
+    }
+	
+	// process item
+}
+```
+
+### Return Statement
+
+Return a value from an operation or a PML block.
+
+```pml
+return value
+return              // void return
+```
+
+---
+
+## Admin Operation Statements
+
+### Set Resource Access Rights
+
+Define the set of valid resource access rights:
+
+```pml
+set resource access rights ["read", "write", "execute"]
+```
+
+### Create Policy Class
+
+Create a new policy class.
+
+```pml
+create PC "pc1"
+```
+
+### Create Nodes
+
+Create user attributes (UA), object attributes (OA), users (U), or objects (O). These nodes must have at least one descendant provided in the `in` array.
+
+```pml
+create UA "ua1" in ["pc1"]
+create OA "oa1" in ["pc1"]
+create U "u1" in ["ua1", "ua2"]
+create O "o1" in ["oa1"]
+```
+
+### Delete Nodes
+
+Delete a node.
+
+```pml
+delete node "nodeName"
+delete if exists node "nodeName"    // no error if node doesn't exist
+```
+
+### Set Node Properties
+
+Set properties on a node.
+
+```pml
+set properties of "nodeName" to {"key1": "value1", "key2": "value2"}
+```
+
+### Assign
+
+Create assignment.
+
+```pml
+assign "childNode" to ["parentNode1", "parentNode2"]
+```
+
+### Deassign
+
+Delete assignment:
+
+```pml
+deassign "childNode" from ["parentNode1", "parentNode2"]
+```
+### Associate
+
+Create an association.
+
+```pml
+associate "ua1" and "oa1" with ["read", "write"]
+```
+
+### Dissociate
+
+```pml
+dissociate "ua1" and "oa1"
+```
+
+### Create Prohibition
+
+Create a prohibition with:
+- a name
+- a user, user attribute, or process
+- a set of access rights
+- a intersection or union of container conditions
+
+```pml
+create prohibition "UserProhibition"
+deny U "u1" 
+access rights ["write", "delete"]
+on intersection of {"container1": false, "container2": true}
+
+create prohibition "UAProhibition"
+deny UA "ua1"
+access rights ["write"]
+on union of {"container1": false}
+
+create prohibition "ProcessProhibition"
+deny process "123"
+access rights ["execute"]
+on intersection of {"container": false}
+```
+
+### Delete Prohibition
+
+Delete a prohibition by name.
+
+```pml
+delete prohibition "ProhibitionName"
+delete if exists prohibition "ProhibitionName"
+```
 ### Create Obligation
-  
-Create new obligation. The author of the obligation will be the user that compiles and executes the PML.  
-  
-```  
-createObligationStatement:  
-    'create obligation' name=expression '{' createRuleStatement* '}';  
-createRuleStatement:  
-    'create rule' ruleName=expression  
-    'when' subjectPattern  
-    'performs' operationPattern  
-    ('on' argPattern)?  
-    response ;  
-  
-// subject  
-subjectPattern:  
-    'any user' #AnyUserPattern  
-    | 'user' subjectPatternExpression #UserPattern;  
-  
-subjectPatternExpression:  
-    basicSubjectPatternExpr  
-    | '!' subjectPatternExpression  
-    | '(' subjectPatternExpression ')'  
-    | left=subjectPatternExpression ('&&' | '||') right=subjectPatternExpression ;  
-  
-basicSubjectPatternExpr:  
-    'in' stringLit  // contained in
-    | stringLit // equals
-    | 'process' stringLit ;  
-  
-// operation  
-operationPattern:  
-    'any operation'  
-    | stringLit ;  
-  
-// args  
-argPattern: '{' (argPatternElement (',' argPatternElement)*)? '}' ;  
-argPatternElement: key=ID ':' (single=argPatternExpression | multiple=argPatternExpressionArray);  
-  
-argPatternExpressionArray: '[' argPatternExpression (',' argPatternExpression)* ']' ;  
-  
-argPatternExpression:  
-     basicArgPatternExpr  
-     | '!' argPatternExpression  
-     | '(' argPatternExpression ')'  
-     | left=argPatternExpression ('&&' | '||') right=argPatternExpression ;  
-  
-basicArgPatternExpr:  
-    'any'  
-    | 'in' stringLit // contained in  
-    | stringLit // equals ;  
-  
-// response  
-response:  
-    'do (' ID ')' responseBlock;  
-responseBlock:  
-    '{' responseStatement* '}' ;  
-responseStatement:  
-    statement  
-    | createRuleStatement  
-    | deleteRuleStatement ;
-```  
 
-- `name` is a **string** expression.
-- `ruleName` is a **string** expression.
-- arg pattern expressions can only be defined for node args of the given operation. Any non node args (i.e. access rights) will be ignored.
-- if an event context arg is an array of nodes and
-	- the arg expression is a single expression, the single expression will only need to match one element in the array
-	- the arg expression is multiple expressions, each expression will be compared to the array as if it was a single expression
-  
-### Delete Node/Prohibition/Obligation  
-  
-Delete a node, prohibition, or obligation.  
-  
-```  
-'delete'  
-('PC' | 'OA' | 'UA' | 'O' | 'U' | 'obligation' | 'prohibition') expression  
-```  
+Create a new obligation.
 
-- `expression` is a **string** expression.  
-  
-### Delete Obligation Rule  
-  
-Delete a rule from an obligation. Can only be called from an obligation response block.
-  
-```  
-'delete rule' ruleName=expression 'from obligation' obligationName=expression ;  
-```  
+```pml
+create obligation "ObligationName"
+when <subject_pattern>
+performs <operation_pattern>
+do (eventCtx) {
+    // response statements
+}
+```
 
-- `ruleName` is a **string** expression.
-- `obligationName` is a **string** expression.
+#### Subject Patterns
+
+Define the obligation subject pattern using 4 available patterns: `any user`, `<username>`, `in <user attribute name>`, `process <process>`.
+
+```pml
+when any user           // any user
+when user "u1"          // a user
+when user in "ua1"      // any user ascendant of a user attribute
+when user process "123" // a process
+```
+
+**Logical operators** can be used to define the subject pattern.
+
+```pml
+when user "u1" || "u2"           // u1 or u2   
+when user in "ua1" && !"u2"      // user ascendant of ua1 AND not u2
+when user (in "ua1" || in "ua2") // user ascendant of ua1 OR ua2
+```
+
+#### Operation Patterns
+
+Define the operation(s) that trigger the obligation. See [Query Operation](#query-operation).
+
+```pml
+performs any operation                       // any operation
+
+performs assign                              // specific operation
+
+performs assign on (ascendant, descendants) { // with argument matching
+	// this is an anonymous query operation that uses the provided args from the matched operation defined above
+	// this query op should return a bool value to indicate if the evnt matches or not.
+	// Example:
+	
+	ascName := name(ascendant)
+	descs := getAdjacentDescendants(ascname)
+	return contains(descs, "oa1")
+}
+```
+
+When specifying `on (args)`, the argument names must match formal parameters of the operation. The block must return a `bool` value.
+
+#### Response Block
+
+The obligation response is defined in the `do` block. The event context variable is a `map[string]any` with the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user` | `string` | The name of the user that triggered the event |
+| `process` | `string` | The process identifier (if present, else "") |
+| `opName` | `string` | The name of the operation that was performed |
+| `args` | `map[string]any` | The arguments passed to the operation |
+
+```pml
+do (evt) {
+    userName := evt.user
+    operationName := evt.opName
+    operationArgs := evt.args
+    
+	// any PML statement    
+}
+```
+
+### Delete Obligation
+
+```pml
+delete obligation "ObligationName"
+delete if exists obligation "ObligationName"
+```
+
+---
+
+## Operation Definitions
+
+### Formal Parameters
+
+```pml
+(string a, int64 b, []string c, map[string]bool d)
+```
+
+### Node Argument Annotation
+
+The `@node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
+
+**Note:** 
+- The `@node` annotation can only be used in `adminop`, `resourceop`, and `query` operations.
+- Only formal parameters of type `int64`, `int64[]`, `string`, `string[]` can use the `@node` annotation.
+
+```pml
+resourceop delete_file(@node string filename) {
+    check ["delete"] on [filename]
+    delete node filename
+}
+```
+
+With required capabilities:
+
+```pml
+resourceop delete_file(@node("delete") string filename) { }
+```
+
+### Check Statement
+
+To customize the authorization check for an operation, use the `check` statement. The `check` statement is executed in the body of the operation and checks if the invoking user has all access rights on each target node. Execution will be halted and roledback if a check statement fails. **Note:** The `check` statement can only be used in `adminop`, `resourceop`, and `query` operations.
+
+```pml
+check ["read", "write"] on ["targetNode1", "targetNode2"]
+```
+
+### Return Types
+
+Operations can declare a return type. If the return type is omitted the return type will be `void`.
+
+```pml
+query test() int64 {
+    return 42
+}
+
+adminop test(string name) string {
+    create OA name in ["Objects"]
+    return name
+}
+
+adminop test(string name) {
+    return
+}
+```
+
+### Operation Types
+
+| Type              | Keyword      | Allowed Statements                                    | Check Statement |
+| ----------------- | ------------ |-------------------------------------------------------| --------------- |
+| Admin Operation   | `adminop`    | All statements                                        | Yes             |
+| Resource Operation | `resourceop` | Basic statements; functions and query operations only | Yes             |
+| Query Operation   | `query`      | Basic statements; functions and query operations only | Yes             |
+| Routine           | `routine`    | All statements                                        | No              |
+| Function     | `function`   | Basic statements; functions only                      | No              |
+
+### Admin Operation
+
+Admin operations modify the policy.
+
+```pml
+adminop create_new_user(string username) {  
+    check ["assign_to"] on ["users"]        
+    
+    create u username in ["users"]  
+    create oa username + " home" in ["user homes"]    
+    create oa username + " inbox" in ["user inboxes"]
+}
+```
+
+### Resource Operation
+
+Resource operations denote an operation on a resource (object). Optionally, return data to the caller.
+
+```pml
+resourceop read_file(@node("read") string filename) { }
+
+resourceop read_file(@node("read") string filename) { 
+	return getNode(filename)
+}
+```
+
+### Query Operation
+
+Query operations are read-only operations using the PolicyQuery interface.
+
+```pml
+query query1(string a) []string {
+    return getAdjacentAscendants(a)
+}
+```
+
+### Routine
+
+Routines are a series of operations, with access checks on each statement rather than the routine itself or its args.
+
+```pml
+routine routine1(string a) {
+    create oa "oa1" in [a]
+    create oa "oa2" in [a]
+    create o "o1" in ["oa1", "oa2"]
+}
+```
+
+### Function
+
+Functions use only basic statements and can only call other functions. These are utility operations to persist often used processes
+that do not access policy information.
+
+```pml
+function formatName(string first, string last) string {
+    return first + " " + last
+}
+```
+
+---
+
+## Builtin Operations
+
+PML provides built-in functions and query operations.
+
+### Functions
+
+| Operation | Signature | Description |
+|-----------|-----------|-------------|
+| `contains` | `contains([]any arr, any element) bool` | Check if array contains element |
+| `containsKey` | `containsKey(map[any]any m, any key) bool` | Check if map contains key |
+| `append` | `append([]any arr, any element) []any` | Append element to array |
+| `appendAll` | `appendAll([]any arr, []any elements) []any` | Append all elements to array |
+| `env` | `env(string varName) string` | Get environment variable value |
+
+### Query Operations
+
+| Operation                   | Signature                                                          | Description                            |
+| --------------------------- | ------------------------------------------------------------------ | -------------------------------------- |
+| `nodeExists`                | `nodeExists(string name) bool`                                     | Check if node exists                   |
+| `getNode`                   | `getNode(string name) map[string]any`                              | Get node name, type and properties     |
+| `getNodeType`               | `getNodeType(string name) string`                                  | Get node type (PC, UA, OA, U, O)       |
+| `getNodeProperties`         | `getNodeProperties(string name) map[string]string`                 | Get node properties                    |
+| `hasPropertyKey`            | `hasPropertyKey(string nodeName, string key) bool`                 | Check if node has property key         |
+| `hasPropertyValue`          | `hasPropertyValue(string nodeName, string key, string value) bool` | Check if node has property with value  |
+| `search`                    | `search(string type, map[string]string props) []map[string]any`    | Search nodes by type and properties    |
+| `getAdjacentAscendants`     | `getAdjacentAscendants(string nodeName) []string`                  | Get adjacent ascendant nodes           |
+| `getAdjacentDescendants`    | `getAdjacentDescendants(string nodeName) []string`                 | Get adjecent descendant nodes          |
+| `getAssociationsWithSource` | `getAssociationsWithSource(string ua) []map[string]any`            | Get associations with ua as the source |
+| `getAssociationsWithTarget` | `getAssociationsWithTarget(string target) []map[string]any`        | Get associations target as the target  |
+| `name`                      | `name(long id) string`                                             | Get the name of the node with the ID   |
+| `id`                        | `id(string name) int64`                                            | Get the ID of the node with the name   |
+
+---
+
+## Example
+
+```pml
+// set resource access rights  
+set resource access rights ["read", "write"]  
+  
+// create initial graph config  
+create pc "pc1"  
+create ua "users" in ["pc1"]  
+create ua "admin" in ["pc1"]  
+// the admin_user will be created automatically during bootstrapping 
+assign "admin_user" to ["admin"]  
+associate "admin" and "users" with ["assign_to"]  
+  
+create oa "user homes" in ["pc1"]  
+create oa "user inboxes" in ["pc1"]  
+associate "admin" and "user homes" with ["*"]  
+associate "admin" and "user inboxes" with ["*"]  
+  
+// prohibit the admin user from reading inboxes  
+create prohibition "deny admin on user inboxes"  
+deny u "admin"  
+access rights ["read"]  
+on union of {"user inboxes": false}  
+  
+// create resource operation to read a file  
+resourceop read_file(@node("read") string name) { }  
+  
+// create a custom administration operation  
+adminop create_new_user(string username) {  
+    check ["assign_to"] on ["users"]   
+         
+    create u username in ["users"]  
+    create oa username + " home" in ["user homes"]    
+    create oa username + " inbox" in ["user inboxes"]
+}  
+  
+// - create an obligation on the custom admin operation that when ever a user is created, add an object to their  
+// inbox titled "hello " + username  
+// - obligations require the use of PML to define responses, so they may be serialized  
+// - obligations require an author which we will set as the admin user since they are allowed to perform the  
+// operations in the response  
+create obligation "o1"  
+when any user  
+performs create_new_user  
+do(ctx) {  
+    objName := "welcome " + ctx.args.username    
+    inboxName := ctx.args.username + " inbox"    
+    create o objName in [inboxName]
+}
+```

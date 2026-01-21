@@ -1,29 +1,32 @@
 package gov.nist.csd.pm.core.pap.pml;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.arg.FormalParameter;
-import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
-import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class PMLTest {
 
@@ -47,14 +50,14 @@ public class PMLTest {
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
-        Operation<?> op1 = new Operation<>("op1", List.of(ARGA, ARGB, ARGC)) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
             }
 
             @Override
-            public Object execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 String a = actualArgs.get(ARGA);
                 List<String> b = actualArgs.get(ARGB);
                 Map<String, String> c = actualArgs.get(ARGC);
@@ -74,12 +77,12 @@ public class PMLTest {
             }
 
         };
-        pap.modify().operations().createAdminOperation(op1);
+        pap.modify().operations().createOperation(op1);
 
-        pap.modify().routines().createAdminRoutine(new Routine<>("routine1", List.of(ARGA, ARGB, ARGC)) {
+        pap.modify().operations().createOperation(new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
-                pap.executeAdminFunction(op1, args.toMap());
+            public Void execute(PAP pap, Args args) throws PMException {
+                pap.executeOperation(op1, args);
 
                 return null;
             }
@@ -133,9 +136,8 @@ public class PMLTest {
                 access rights ["assign"]
                 on union of {PM_ADMIN_BASE_OA: false}
                 
-                operation op1(string a, []string b, map[string]string c) {
-                    check "assign" on [PM_ADMIN_BASE_OA]
-                } {
+                adminop op1(string a, []string b, map[string]string c) {
+                    check ["assign"] on [PM_ADMIN_BASE_OA]
                     create pc "1" + a
                 
                     foreach x in b {
@@ -154,7 +156,7 @@ public class PMLTest {
                 """);
 
         PDP pdp = new PDP(pap);
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(
             new TestUserContext("u1"),
             "op1",
             Map.of(
@@ -171,7 +173,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(new UserContext(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserContext(id("u2")),
             "op1",
             Map.of(
                 ARGA.getName(), "a",
@@ -180,7 +182,7 @@ public class PMLTest {
             )
         ));
 
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(new TestUserContext("u1"),
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(new TestUserContext("u1"),
             "op1",
             Map.of(
                 ARGA.getName(), "1",
@@ -196,12 +198,224 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(new UserContext(id("u2")), "op1",
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserContext(id("u2")), "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
                 ARGC.getName(), Map.of("4", "5", "6", "7")
             )
         ));
+    }
+
+    /*
+     - test retunr {} with return type
+     - test return in root PML with value and withou -- without value in if
+     - test reasingemtn of variable value type
+     */
+
+    @Test
+    void testEmptyValueIsCorrectlyAssignedTheOperationReturnType() throws PMException {
+        String pml = """
+            adminop op1() map[string]string {
+                return {}
+            }
+            
+            adminop op2(map[string]string a) {}
+            
+            adminop op3() []string {
+                return []
+            }
+            
+            adminop op4([]string a) {}
+            
+            op2(op1())
+            op4(op3())
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+
+        String pml2 = """
+            adminop op1() map[string]string {
+                return {}
+            }
+            
+            adminop op2(string a) {}
+            
+            op2(op1())
+            """;
+        MemoryPAP pap2 = new MemoryPAP();
+        assertThrows(PMLCompilationException.class, () -> pap2.executePML(new UserContext(-1), pml2));
+    }
+
+    @Test
+    void testReassignmentOfVariableType() throws PMException {
+        String pml = """
+            adminop op1() map[string]string {
+                return {}
+            }
+            
+            adminop op2(string s) {}
+            
+            a := op1()
+            a = "test"
+            op2(a)
+            
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+    }
+
+    @Test
+    void testReturnValueFromRootPMLInIfStatement() throws PMException {
+        String pml = """
+            adminop op1(string a) string {
+                return a
+            }
+            
+            if op1("a") == "a" {
+                return "a"
+            }
+            
+            return "b"
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        Object o = pap.executePML(new UserContext(-1), pml);
+        assertEquals(o, "a");
+    }
+
+    @Test
+    void testObligationMatchingFuncHasBasicAndQueryOperationsOnly() throws PMException {
+        String pml = """
+            adminop test() string { return "test" }
+            
+            create obligation "o1"
+            when any user
+            performs test on () {
+                a := getAdjacentAscendants("123")
+                b := test()
+            }
+            do(ctx) {
+                create pc "pc1"
+            }
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        PMLCompilationException e = assertThrows(
+            PMLCompilationException.class,
+            () -> pap.executePML(new UserContext(-1), pml)
+        );
+        assertEquals(
+            "unknown operation 'test' in scope",
+            e.getErrors().getFirst().errorMessage()
+        );
+    }
+
+    @Test
+    void testQueryDefinitionStmt() throws PMException {
+        String pml = """
+            create pc "123"
+            
+            adminop test() string { return "test" }
+            
+            query q1() string {
+                n := getNode("123")
+                return test()
+            }
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        PMLCompilationException e = assertThrows(
+            PMLCompilationException.class,
+            () -> pap.executePML(new UserContext(-1), pml)
+        );
+        assertEquals(
+            "unknown operation 'test' in scope",
+            e.getErrors().getFirst().errorMessage()
+        );
+    }
+
+    @Test
+    void testPMLBlockReturnWithDifferentReturnTypes() throws PMException {
+        String pml = """
+            if nodeExists("a") {
+                return "a"
+            }
+            
+            return true
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        Object o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        assertEquals(o, true);
+
+        pap.modify().graph().createPolicyClass("a");
+        o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        assertEquals(o, "a");
+    }
+
+    @Test
+    void testUsingKeywordsAsMapKeys() {
+        String pml = """
+                m := {}
+                x := [
+                    m.test,
+                    m.operation,
+                    m.check,
+                    m.routine,
+                    m.function,
+                    m.create,
+                    m.delete,
+                    m.rule,
+                    m.when,
+                    m.performs,
+                    m.on,
+                    m.in,
+                    m.do,
+                    m.any,
+                    m.intersection,
+                    m.union,
+                    m.process,
+                    m.assign,
+                    m.deassign,
+                    m.from,
+                    m.of,
+                    m.to,
+                    m.associate,
+                    m.and,
+                    m.with,
+                    m.dissociate,
+                    m.deny,
+                    m.prohibition,
+                    m.obligation,
+                    m.node,
+                    m.user,
+                    m.pc,
+                    m.oa,
+                    m.ua,
+                    m.o,
+                    m.u,
+                    m.break,
+                    m.default,
+                    m.map,
+                    m.else,
+                    m.const,
+                    m.if,
+                    m.range,
+                    m.continue,
+                    m.foreach,
+                    m.return,
+                    m.var,
+                    m.string,
+                    m.bool,
+                    m.void,
+                    m.array,
+                    m.nil,
+                    m.true,
+                    m.false,
+                    m.adminop,
+                    m.resourceop,
+                    m.query
+                ]
+                """;
+
+        PMLCompiler pmlCompiler = new PMLCompiler();
+        assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
     }
 }

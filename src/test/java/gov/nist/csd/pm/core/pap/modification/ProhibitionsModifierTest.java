@@ -1,6 +1,15 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import gov.nist.csd.pm.core.common.exception.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.ProhibitionExistsException;
+import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
@@ -9,14 +18,11 @@ import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
 
@@ -58,7 +64,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         void testProhibitionContainerDoesNotExistException() throws PMException {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
             assertThrows(
                     NodeDoesNotExistException.class,
                     () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
@@ -72,7 +78,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
                     true,
@@ -151,7 +157,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
             pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
                     true, List.of(

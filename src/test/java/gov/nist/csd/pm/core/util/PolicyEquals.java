@@ -1,19 +1,19 @@
 package gov.nist.csd.pm.core.util;
 
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-
 import java.util.Collection;
 import java.util.HashSet;
-
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Set;
 
 public class PolicyEquals {
 
@@ -56,23 +56,18 @@ public class PolicyEquals {
         assertEquals(aProhibitions, bProhibitions);
 
         // check obligations
-        Collection<Obligation> aObligations = new HashSet<>(a.obligations().getObligations());
-        Collection<Obligation> bObligations = new HashSet<>(b.obligations().getObligations());
+        Set<Obligation> aObligations = new HashSet<>(a.obligations().getObligations());
+        Set<Obligation> bObligations = new HashSet<>(b.obligations().getObligations());
 
         assertEquals(aObligations, bObligations);
 
         // check operations
-        AccessRightSet aResOps = a.operations().getResourceOperations();
-        AccessRightSet bResOps = b.operations().getResourceOperations();
+        AccessRightSet aResOps = a.operations().getResourceAccessRights();
+        AccessRightSet bResOps = b.operations().getResourceAccessRights();
         assertEquals(aResOps, bResOps);
 
-        Collection<String> aOps = new HashSet<>(a.operations().getAdminOperationNames());
-        Collection<String> bOps = new HashSet<>(b.operations().getAdminOperationNames());
+        Collection<String> aOps = new HashSet<>(a.operations().getOperationNames());
+        Collection<String> bOps = new HashSet<>(b.operations().getOperationNames());
         assertEquals(aOps, bOps);
-
-        // check routines
-        Collection<String> aRoutines = new HashSet<>(a.routines().getAdminRoutineNames());
-        Collection<String> bRoutines = new HashSet<>(b.routines().getAdminRoutineNames());
-        assertEquals(aRoutines, bRoutines);
     }
 }

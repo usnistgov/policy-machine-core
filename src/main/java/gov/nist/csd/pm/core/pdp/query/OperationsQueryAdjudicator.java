@@ -2,15 +2,11 @@ package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-
 import java.util.Collection;
 
 /**
@@ -26,17 +22,27 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     }
 
     @Override
-    public AccessRightSet getResourceOperations() throws PMException {
-        return pap.query().operations().getResourceOperations();
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return pap.query().operations().getResourceAccessRights();
     }
 
     @Override
-    public Collection<String> getAdminOperationNames() throws PMException {
-        return pap.query().operations().getAdminOperationNames();
+    public Collection<Operation<?>> getOperations() throws PMException {
+        return pap.query().operations().getOperations();
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
-        return pap.query().operations().getAdminOperation(operationName);
+    public Collection<String> getOperationNames() throws PMException {
+        return pap.query().operations().getOperationNames();
+    }
+
+    @Override
+    public Operation<?> getOperation(String name) throws PMException {
+        return pap.query().operations().getOperation(name);
+    }
+
+    @Override
+    public boolean operationExists(String operationName) throws PMException {
+        return pap.query().operations().operationExists(operationName);
     }
 }

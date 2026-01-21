@@ -3,17 +3,16 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class OperationsQuerier extends Querier implements OperationsQuery {
 
-    private PluginRegistry pluginRegistry;
+    private final PluginRegistry pluginRegistry;
 
     public OperationsQuerier(PolicyStore store, PluginRegistry pluginRegistry) {
         super(store);
@@ -21,27 +20,39 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     @Override
-    public AccessRightSet getResourceOperations() throws PMException {
-        return store.operations().getResourceOperations();
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return store.operations().getResourceAccessRights();
     }
 
     @Override
-    public Collection<String> getAdminOperationNames() throws PMException {
-        Set<String> adminOperationNames = new HashSet<>(store.operations().getAdminOperationNames());
-        adminOperationNames.addAll(pluginRegistry.getOperationNames());
-        return adminOperationNames;
+    public Collection<Operation<?>> getOperations() throws PMException {
+        List<Operation<?>> operations = new ArrayList<>(store.operations().getOperations());
+        operations.addAll(pluginRegistry.getOperationsList());
+        return operations;
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
-        if (pluginRegistry.getOperationNames().contains(operationName)) {
-            return pluginRegistry.getOperation(operationName);
+    public Collection<String> getOperationNames() throws PMException {
+        List<String> operationNames = new ArrayList<>(store.operations().getOperationNames());
+        operationNames.addAll(pluginRegistry.getOperations().keySet());
+        return operationNames;
+    }
+
+    @Override
+    public Operation<?> getOperation(String name) throws PMException {
+        if (pluginRegistry.pluginExists(name)) {
+            return pluginRegistry.getOperation(name);
         }
 
-        if (!store.operations().getAdminOperationNames().contains(operationName)) {
-            throw new OperationDoesNotExistException(operationName);
+        if (!store.operations().operationExists(name)) {
+            throw new OperationDoesNotExistException(name);
         }
 
-        return store.operations().getAdminOperation(operationName);
+        return store.operations().getOperation(name);
+    }
+
+    @Override
+    public boolean operationExists(String operationName) throws PMException {
+        return pluginRegistry.pluginExists(operationName) || store.operations().operationExists(operationName);
     }
 }

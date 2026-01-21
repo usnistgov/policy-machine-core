@@ -1,20 +1,26 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.O;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
-
 import gov.nist.csd.pm.core.pap.serialization.json.JSONProhibition.JSONSubject;
-import java.util.*;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JSONDeserializer implements PolicyDeserializer {
 
@@ -24,7 +30,7 @@ public class JSONDeserializer implements PolicyDeserializer {
         JSONPolicy jsonPolicy = gson.fromJson(input, new TypeToken<JSONPolicy>() {}.getType());
 
         // account for the json schema allowing null properties
-        AccessRightSet resourceOperations = jsonPolicy.getResourceOperations();
+        AccessRightSet resourceOperations = jsonPolicy.getResourceAccessRights();
         if (resourceOperations == null) {
             resourceOperations = new AccessRightSet();
         }
@@ -44,21 +50,16 @@ public class JSONDeserializer implements PolicyDeserializer {
             obligations = new ArrayList<>();
         }
 
-        List<String> operations = jsonPolicy.getOperations();
+        JSONOperations operations = jsonPolicy.getOperations();
         if (operations == null) {
-            operations = new ArrayList<>();
+            operations = new JSONOperations();
         }
 
-        List<String> routines = jsonPolicy.getRoutines();
-        if (routines == null) {
-            routines = new ArrayList<>();
-        }
-
-        pap.modify().operations().setResourceOperations(resourceOperations);
+        pap.modify().operations().setResourceAccessRights(resourceOperations);
         createGraph(pap, graph);
         createProhibitions(pap, prohibitions);
         createOperations(pap, operations);
-        createRoutines(pap, routines);
+        // do obligations last in case they reference operations
         createObligations(pap, obligations);
     }
 
@@ -81,23 +82,17 @@ public class JSONDeserializer implements PolicyDeserializer {
         }
     }
 
-    private void createOperations(PAP pap, List<String> operations) throws PMException {
+    private void createOperations(PAP pap, JSONOperations operations) throws PMException {
+        List<String> all = operations.getAll();
+
+        // combine all operation strings into a single PML block that will be executed
+        // this will ensure any operation dependencies are resolved
         String pml = "";
-        for (String operation : operations) {
+        for (String operation : all) {
             pml += operation + "\n";
         }
 
-        // author doesnt matter when executing create operation statements
-        pap.executePML(new UserContext(0), pml);
-    }
-
-    private void createRoutines(PAP pap, List<String> routines) throws PMException {
-        String pml = "";
-        for (String routine : routines) {
-            pml += routine + "\n";
-        }
-
-        // author doesnt matter when executing create routine statements
+        // author doesnt matter when executing create operation statements, only obligations
         pap.executePML(new UserContext(0), pml);
     }
 

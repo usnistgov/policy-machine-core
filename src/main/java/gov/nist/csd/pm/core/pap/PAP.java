@@ -1,22 +1,27 @@
 package gov.nist.csd.pm.core.pap;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.AdminFunction;
-import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.tx.Transactional;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
+import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
+import gov.nist.csd.pm.core.pap.operation.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
+import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -24,13 +29,12 @@ import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import java.util.*;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-
-public abstract class PAP implements AdminFunctionExecutor, Transactional {
+public abstract class PAP implements OperationExecutor, Transactional {
 
     private final PolicyStore policyStore;
     private final PolicyModifier modifier;
@@ -53,7 +57,7 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         this.querier = querier;
         this.modifier = modifier;
         this.policyStore = policyStore;
-        this.privilegeChecker = new PrivilegeChecker(querier.access());
+        this.privilegeChecker = new PrivilegeChecker(querier.access(), querier.graph());
         this.pluginRegistry = pluginRegistry;
 
         // verify admin policy
@@ -122,8 +126,8 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
     }
 
     @Override
-    public <R> R executeAdminFunction(AdminFunction<R> adminFunction, Map<String, Object> args) throws PMException {
-        return adminFunction.execute(this, adminFunction.validateAndPrepareArgs(args));
+    public Object executeOperation(Operation<?> operation, Args args) throws PMException {
+        return operation.execute(this, args);
     }
 
     /**
@@ -162,14 +166,17 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
         commit();
     }
 
-    public void executePML(UserContext author, String input) throws PMException {
-        PMLCompiler pmlCompiler = new PMLCompiler();
-
-        List<PMLStatement<?>> compiledPML = pmlCompiler.compilePML(this, input);
+    public Object executePML(UserContext author, String input) throws PMException {
+        List<PMLStatement<?>> compiledPML = compilePML(input);
 
         ExecutionContext ctx = new ExecutionContext(author, this);
+        StatementResult statementResult = ctx.executeStatements(compiledPML, new Args());
 
-        ctx.executeStatements(compiledPML, new Args());
+        if (statementResult instanceof ReturnResult returnResult) {
+            return returnResult.getValue();
+        }
+
+        return null;
     }
 
     public List<PMLStatement<?>> compilePML(String input) throws PMException {
@@ -215,26 +222,26 @@ public abstract class PAP implements AdminFunctionExecutor, Transactional {
 
         boolean prohibitionsEmpty = query().prohibitions().getProhibitions().isEmpty();
         boolean obligationsEmpty = query().obligations().getObligations().isEmpty();
-        boolean resOpsEmpty = query().operations().getResourceOperations().isEmpty();
+        boolean resOpsEmpty = query().operations().getResourceAccessRights().isEmpty();
 
         // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
 
-        // ignore plugin registry ops and routines
-        Collection<String> adminOperationNames = query().operations().getAdminOperationNames();
-        Collection<String> adminRoutineNames = query().routines().getAdminRoutineNames();
+        // ignore plugin registry ops
+        Collection<String> operationNames = query().operations()
+            .getOperations()
+            .stream()
+            .map(Operation::getName)
+            .collect(Collectors.toSet());
 
-        adminOperationNames.removeAll(pluginRegistry.getOperationNames());
-        adminRoutineNames.removeAll(pluginRegistry.getRoutineNames());
+        operationNames.removeAll(pluginRegistry.getOperationsList().stream().map(Operation::getName).toList());
 
-        boolean adminOpsEmpty = adminOperationNames.isEmpty();
-        boolean routinesEmpty = adminRoutineNames.isEmpty();
+        boolean opsEmpty = operationNames.isEmpty();
 
         return nodes.isEmpty()
             && prohibitionsEmpty
             && obligationsEmpty
             && resOpsEmpty
-            && adminOpsEmpty
-            && routinesEmpty;
+            && opsEmpty;
     }
 }

@@ -8,13 +8,22 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.neo4j.graphdb.*;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.ResourceIterable;
 
 public class Neo4jUtil {
 
@@ -25,9 +34,8 @@ public class Neo4jUtil {
 	public static final Label O_LABEL = Label.label("O");
 	public static final Label U_LABEL = Label.label("U");
 	public static final Label OBLIGATION_LABEL = Label.label("Obligation");
-	public static final Label RESOURCE_OPERATIONS_LABEL = Label.label("ResourceOps");
-	public static final Label ADMIN_OPERATION_LABEL = Label.label("AdminOp");
-	public static final Label ADMIN_ROUTINE_LABEL = Label.label("AdminRoutine");
+	public static final Label RESOURCE_ARS_LABEL = Label.label("ResourceAccessRights");
+	public static final Label OPERATION_LABEL = Label.label("AdminOp");
 	public static final Label PROHIBITION_LABEL = Label.label("Prohibition");
 	public static final Label PROCESS_LABEL = Label.label("Process");
 

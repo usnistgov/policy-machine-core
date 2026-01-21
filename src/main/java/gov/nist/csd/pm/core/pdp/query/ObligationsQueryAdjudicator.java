@@ -1,18 +1,16 @@
 package gov.nist.csd.pm.core.pdp.query;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-
 import java.util.ArrayList;
 import java.util.Collection;
-
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.checkObligationRulePrivileges;
 
 public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
 
@@ -45,7 +43,8 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     @Override
     public Obligation getObligation(String name) throws PMException {
         Obligation obligation = pap.query().obligations().getObligation(name);
-        checkObligationRulePrivileges(pap, userCtx, obligation.getRules(), QUERY_OBLIGATIONS, QUERY_OBLIGATIONS);
+
+        pap.privilegeChecker().check(userCtx, obligation.getAuthorId(), QUERY_OBLIGATIONS);
 
         return obligation;
     }
@@ -61,7 +60,8 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     private Collection<Obligation> filterObligations(Collection<Obligation> obligations) {
         obligations.removeIf(obligation -> {
             try {
-                checkObligationRulePrivileges(pap, userCtx, obligation.getRules(), QUERY_OBLIGATIONS, QUERY_OBLIGATIONS);
+                pap.privilegeChecker().check(userCtx, obligation.getAuthorId(), QUERY_OBLIGATIONS);
+
                 return false;
             } catch (UnauthorizedException e) {
                 return true;

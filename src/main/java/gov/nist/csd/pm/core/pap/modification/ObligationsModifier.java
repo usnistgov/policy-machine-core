@@ -3,13 +3,9 @@ package gov.nist.csd.pm.core.pap.modification;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
-import gov.nist.csd.pm.core.pap.pml.pattern.Pattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.arg.ArgPatternExpression;
-
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-import java.util.*;
 
 public class ObligationsModifier extends Modifier implements ObligationsModification {
 
@@ -18,10 +14,13 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     }
 
     @Override
-    public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
-        checkCreateInput(authorId, name, rules);
+    public void createObligation(long authorId,
+                                 String name,
+                                 EventPattern eventPattern,
+                                 ObligationResponse response) throws PMException {
+        checkCreateInput(authorId, name);
 
-        policyStore.obligations().createObligation(authorId, name, new ArrayList<>(rules));
+        policyStore.obligations().createObligation(authorId, name, eventPattern, response);
     }
 
     @Override
@@ -38,16 +37,14 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
      *
      * @param author The author of the obligation.
      * @param name   The name of the obligation.
-     * @param rules  The rules of the obligation.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected void checkCreateInput(long author, String name, Collection<Rule> rules) throws PMException {
+    protected void checkCreateInput(long author, String name) throws PMException {
         if (policyStore.obligations().obligationExists(name)) {
             throw new ObligationNameExistsException(name);
         }
 
         checkAuthorExists(author);
-        checkEventPatternAttributesExist(rules);
     }
 
     /**
@@ -65,23 +62,6 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     private void checkAuthorExists(long author) throws PMException {
         if (!policyStore.graph().nodeExists(author)) {
             throw new NodeDoesNotExistException(author);
-        }
-    }
-
-    private void checkEventPatternAttributesExist(Collection<Rule> rules) throws PMException {
-        for (Rule rule : rules) {
-            EventPattern event = rule.getEventPattern();
-
-            // check subject pattern
-            Pattern pattern = event.getSubjectPattern();
-            pattern.checkReferencedNodesExist(policyStore.graph());
-
-            // check arg patterns
-            for (Map.Entry<String, List<ArgPatternExpression>> argPattern : event.getArgPatterns().entrySet()) {
-                for (ArgPatternExpression argPatternExpression : argPattern.getValue()) {
-                    argPatternExpression.checkReferencedNodesExist(policyStore.graph());
-                }
-            }
         }
     }
 }

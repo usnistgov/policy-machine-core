@@ -1,18 +1,17 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TARGET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.UA_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_TARGET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_UA_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -43,8 +42,8 @@ public class AssociateStatement extends OperationStatement {
         long targetId = graph.getNodeByName(targetName).getId();
 
         return new Args()
-            .put(UA_PARAM, uaId)
-            .put(TARGET_PARAM, targetId)
+            .put(ASSOCIATE_UA_PARAM, uaId)
+            .put(ASSOCIATE_TARGET_PARAM, targetId)
             .put(ARSET_PARAM, new ArrayList<>(accessRightSet));
     }
 

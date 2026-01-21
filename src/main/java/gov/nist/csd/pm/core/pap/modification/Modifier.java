@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.tx.Transactional;
-import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 abstract class Modifier implements Transactional {

@@ -4,11 +4,15 @@ lexer grammar PMLLexer;
 package gov.nist.csd.pm.core.pap.pml.antlr;
 }
 
-OPERATION: 'operation';
-NODE_PARAM: '@node';
+ADMIN_OP: 'adminop';
+RESOURCE_OP: 'resourceop';
+NODE_ARG: '@node';
+NODE: 'node';
 CHECK: 'check';
 ROUTINE: 'routine';
 FUNCTION: 'function';
+OPERATION: 'operation';
+QUERY: 'query';
 
 CREATE : 'create' ;
 DELETE : 'delete' ;
@@ -28,7 +32,7 @@ INTERSECTION: 'intersection' | 'inter';
 UNION: 'union' ;
 PROCESS: 'process';
 
-SET_RESOURCE_OPERATIONS: 'set resource operations';
+SET_RESOURCE_ACCESS_RIGHTS: 'set resource access rights';
 ASSIGN: 'assign' ;
 DEASSIGN: 'deassign' ;
 FROM: 'from' ;
@@ -50,7 +54,6 @@ UA : UA_FRAG ;
 U: U_FRAG;
 O: O_FRAG;
 
-NODE: 'node' ;
 USER: 'user' ;
 
 // Keywords
@@ -70,6 +73,7 @@ STRING_TYPE            : 'string' ;
 BOOL_TYPE              : 'bool' ;
 VOID_TYPE              : 'void' ;
 ARRAY_TYPE             : 'array' ;
+INT64_TYPE             : 'int64' ;
 
 NIL_LIT                : 'nil';
 
@@ -78,7 +82,7 @@ TRUE:   'true';
 FALSE:  'false';
 
 
-ID             : [a-zA-Z0-9_]+;
+ID             : [a-zA-Z_][a-zA-Z0-9_]*;
 
 // Punctuation
 
@@ -116,6 +120,10 @@ PLUS                    : '+';
 // String literals
 
 DOUBLE_QUOTE_STRING     : '"' (~["\\\r\n] | EscapeSequence)* '"';
+
+// int64 literal
+
+INT64_DECIMAL           : [-]? [0-9]+ ;
 
 // Hidden tokens
 // WS:                 [ \t]+ -> channel(HIDDEN);

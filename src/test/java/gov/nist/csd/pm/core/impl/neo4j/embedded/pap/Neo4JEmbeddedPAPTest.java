@@ -1,10 +1,16 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap;
 
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.Neo4jTestInitializer.init;
+import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jEmbeddedPolicyStore;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTest;
-import gov.nist.csd.pm.core.pap.modification.*;
+import gov.nist.csd.pm.core.pap.modification.GraphModifierTest;
+import gov.nist.csd.pm.core.pap.modification.ObligationsModifierTest;
+import gov.nist.csd.pm.core.pap.modification.OperationsModifierTest;
+import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifierTest;
 import gov.nist.csd.pm.core.pap.query.AccessQuerierTest;
 import gov.nist.csd.pm.core.pap.query.GraphQuerierTest;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuerierTest;
@@ -19,9 +25,6 @@ import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.Neo4jTestInitializer.init;
-import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
 class Neo4jTestInitializer {
 
@@ -159,17 +162,6 @@ class Neo4jEmbeddedProhibitionsModifierTest extends ProhibitionsModifierTest {
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Neo4jEmbeddedProhibitionsQuerierTest extends ProhibitionsQuerierTest {
 
-	@TempDir
-	private Path tempDir;
-
-	@Override
-	public PAP initializePAP() throws PMException {
-		return init(tempDir);
-	}
-}
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class Neo4jEmbeddedRoutinesModifierTest extends RoutinesModifierTest {
 	@TempDir
 	private Path tempDir;
 

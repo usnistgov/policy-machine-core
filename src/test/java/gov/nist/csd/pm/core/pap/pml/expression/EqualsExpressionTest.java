@@ -1,5 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -10,15 +15,9 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EqualsExpressionTest {
 
@@ -28,7 +27,7 @@ class EqualsExpressionTest {
                 """
                 "a" == "a"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -53,7 +52,7 @@ class EqualsExpressionTest {
                 """
                 "a" != "a"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -76,7 +75,7 @@ class EqualsExpressionTest {
                 """
                 ["a", "b"] == ["a", "b"]
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -96,7 +95,7 @@ class EqualsExpressionTest {
                 """
                 ["a", "b"] == ["b", "a"]
                 """);
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -119,7 +118,7 @@ class EqualsExpressionTest {
                 """
                 ["a", "b"] != ["a", "b"]
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -142,7 +141,7 @@ class EqualsExpressionTest {
                 """
                 true == true
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -162,7 +161,7 @@ class EqualsExpressionTest {
                 """
                 true == false
                 """);
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -185,7 +184,7 @@ class EqualsExpressionTest {
                 """
                 true != true
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -208,7 +207,7 @@ class EqualsExpressionTest {
                 """
                 {"a": "a", "b": "b"} == {"a": "a", "b": "b"}
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -228,7 +227,7 @@ class EqualsExpressionTest {
                 """
                 {"a": "a", "b": "b"} == {"a": "a", "b": "c"}
                 """);
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -251,7 +250,7 @@ class EqualsExpressionTest {
                 """
                 {"a": "a", "b": "b"} != {"a": "a", "b": "b"}
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -274,7 +273,7 @@ class EqualsExpressionTest {
                 """
                 ("a" + "b") == ("a" + "b")
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -302,7 +301,7 @@ class EqualsExpressionTest {
                 """
                 ("a" + "b") == ("a" + "c")
                 """);
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -333,7 +332,7 @@ class EqualsExpressionTest {
                 """
                 ("a" + "b") == (true)
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 

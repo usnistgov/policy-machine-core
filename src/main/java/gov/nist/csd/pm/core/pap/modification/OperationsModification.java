@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 
 /**
  * Methods to manage NGAC resource and administrative operations.
@@ -11,23 +11,22 @@ public interface OperationsModification {
 
     /**
      * Set the resource access rights for the policy.
-     * @param resourceOperations The operations to set as the resource operations.
+     * @param resourceAccessRights The operations to set as the resource operations.
      * @throws PMException If there is an error in the PM.
      */
-    void setResourceOperations(AccessRightSet resourceOperations) throws PMException;
+    void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException;
 
     /**
-     * Create an administrative operation.
+     * Create an operation.
      * @param operation The operation to create.
      * @throws PMException If there is an error in the PM.
      */
-    void createAdminOperation(Operation<?> operation) throws PMException;
+    void createOperation(Operation<?> operation) throws PMException;
 
     /**
-     * Delete the admin operation with the given name.
-     * @param operation The operation name.
+     * Delete a resource, admin, routine, or query operation with the given name.
+     * @param name The name of the operation to delete.
      * @throws PMException If there is an error in the PM.
      */
-    void deleteAdminOperation(String operation) throws PMException;
-
+    void deleteOperation(String name) throws PMException;
 }

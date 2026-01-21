@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
 import java.util.List;
 
 public class MemoryPolicyStore implements PolicyStore {
@@ -15,7 +14,6 @@ public class MemoryPolicyStore implements PolicyStore {
     private final MemoryProhibitionsStore prohibitions;
     private final MemoryObligationsStore obligations;
     private final MemoryOperationsStore operations;
-    private final MemoryRoutinesStore routines;
 
     public MemoryPolicyStore() {
         this.policy = new MemoryPolicy();
@@ -26,7 +24,6 @@ public class MemoryPolicyStore implements PolicyStore {
         this.prohibitions = new MemoryProhibitionsStore(policy, tx, txCmdTracker);
         this.obligations = new MemoryObligationsStore(policy, tx, txCmdTracker);
         this.operations = new MemoryOperationsStore(policy, tx, txCmdTracker);
-        this.routines = new MemoryRoutinesStore(policy, tx, txCmdTracker);
     }
 
     @Override
@@ -47,11 +44,6 @@ public class MemoryPolicyStore implements PolicyStore {
     @Override
     public MemoryOperationsStore operations() {
         return operations;
-    }
-
-    @Override
-    public MemoryRoutinesStore routines() {
-        return routines;
     }
 
     @Override

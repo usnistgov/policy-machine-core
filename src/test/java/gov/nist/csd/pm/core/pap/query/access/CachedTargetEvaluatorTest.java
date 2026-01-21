@@ -1,7 +1,10 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
@@ -30,7 +33,7 @@ class CachedTargetEvaluatorTest {
     @BeforeEach
     void setUp() throws PMException {
         String pml = """
-            set resource operations ["read", "write"]
+            set resource access rights ["read", "write"]
             
             create pc "pc1"
             create pc "pc2"

@@ -1,17 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.AUTHOR_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.EVENT_PATTERN_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.obligation.DeleteObligationOp;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import java.util.ArrayList;
 
 public class DeleteObligationStatement extends DeleteStatement {
 
@@ -26,9 +24,8 @@ public class DeleteObligationStatement extends DeleteStatement {
         Obligation obligation = pap.query().obligations().getObligation(name);
 
         return new Args()
-            .put(AUTHOR_PARAM, obligation.getAuthorId())
             .put(NAME_PARAM, obligation.getName())
-            .put(RULES_PARAM, new ArrayList<>(obligation.getRules()));
+            .put(EVENT_PATTERN_PARAM, obligation.getEventPattern());
     }
 
     @Override

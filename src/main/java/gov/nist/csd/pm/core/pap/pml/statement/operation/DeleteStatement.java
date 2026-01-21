@@ -2,14 +2,11 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
-import org.checkerframework.checker.units.qual.A;
 
 public abstract class DeleteStatement extends OperationStatement {
 
@@ -68,6 +65,7 @@ public abstract class DeleteStatement extends OperationStatement {
         switch (type) {
             case PROHIBITION -> typeStr = "prohibition";
             case OBLIGATION -> typeStr = "obligation";
+            case OPERATION -> typeStr = "operation";
             case NODE -> typeStr = "node";
         }
         typeStr = (ifExists ? "if exists " : "") + typeStr;
@@ -94,6 +92,7 @@ public abstract class DeleteStatement extends OperationStatement {
     public enum Type {
         NODE,
         PROHIBITION,
-        OBLIGATION
+        OBLIGATION,
+        OPERATION,
     }
 }

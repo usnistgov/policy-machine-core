@@ -29,9 +29,4 @@ public interface PolicyQuery {
      * @return The OperationsQuery implementation.
      */
     OperationsQuery operations();
-
-    /**
-     * @return The RoutinesQuery implementation.
-     */
-    RoutinesQuery routines();
 }

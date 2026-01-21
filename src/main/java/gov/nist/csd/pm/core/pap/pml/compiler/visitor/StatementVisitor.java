@@ -1,10 +1,12 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.CheckStatementVisitor;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionDefinitionVisitor;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.function.FunctionSignatureVisitor;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.CheckStatementVisitor;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationDefinitionVisitor;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationSignatureVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 
@@ -60,18 +62,13 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitSetResourceOperationsStatement(PMLParser.SetResourceOperationsStatementContext ctx) {
-        return new SetResourceOperationsStmtVisitor(visitorCtx).visitSetResourceOperationsStatement(ctx);
+    public PMLStatement<?> visitSetResourceAccessRightsStatement(PMLParser.SetResourceAccessRightsStatementContext ctx) {
+        return new SetResourceAccessRightsStmtVisitor(visitorCtx).visitSetResourceAccessRightsStatement(ctx);
     }
 
     @Override
     public PMLStatement<?> visitDeleteStatement(PMLParser.DeleteStatementContext ctx) {
         return new DeleteStmtVisitor(visitorCtx).visitDeleteStatement(ctx);
-    }
-
-    @Override
-    public PMLStatement<?> visitDeleteRuleStatement(PMLParser.DeleteRuleStatementContext ctx) {
-        return new DeleteRuleStmtVisitor(visitorCtx).visitDeleteRuleStatement(ctx);
     }
 
     @Override
@@ -90,28 +87,43 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitOperationDefinitionStatement(PMLParser.OperationDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitOperationDefinitionStatement(ctx);
+    public PMLStatement<?> visitAdminOpDefinitionStatement(PMLParser.AdminOpDefinitionStatementContext ctx) {
+        return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
+            .visitAdminOpDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement<?> visitResourceOpDefinitionStatement(ResourceOpDefinitionStatementContext ctx) {
+        return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
+            .visitResourceOpDefinitionStatement(ctx);
     }
 
     @Override
     public PMLStatement<?> visitRoutineDefinitionStatement(PMLParser.RoutineDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitRoutineDefinitionStatement(ctx);
+        return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
+            .visitRoutineDefinitionStatement(ctx);
     }
 
     @Override
-    public PMLStatement<?> visitBasicFunctionDefinitionStatement(BasicFunctionDefinitionStatementContext ctx) {
-        return new FunctionDefinitionVisitor(visitorCtx, new FunctionSignatureVisitor(visitorCtx, true)).visitBasicFunctionDefinitionStatement(ctx);
+    public PMLStatement<?> visitFunctionDefinitionStatement(FunctionDefinitionStatementContext ctx) {
+        return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
+            .visitFunctionDefinitionStatement(ctx);
+    }
+
+    @Override
+    public PMLStatement<?> visitQueryOpDefinitionStatement(QueryOpDefinitionStatementContext ctx) {
+        return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
+            .visitQueryOpDefinitionStatement(ctx);
     }
 
     @Override
     public PMLStatement<?> visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
-        return new FunctionReturnStmtVisitor(visitorCtx).visitReturnStatement(ctx);
+        return new OperationReturnStmtVisitor(visitorCtx).visitReturnStatement(ctx);
     }
 
     @Override
-    public PMLStatement<?> visitFunctionInvokeStatement(PMLParser.FunctionInvokeStatementContext ctx) {
-        return new FunctionInvokeStmtVisitor(visitorCtx).visitFunctionInvokeStatement(ctx);
+    public PMLStatement<?> visitOperationInvokeStatement(PMLParser.OperationInvokeStatementContext ctx) {
+        return new OperationInvokeStmtVisitor(visitorCtx).visitOperationInvokeStatement(ctx);
     }
 
     @Override

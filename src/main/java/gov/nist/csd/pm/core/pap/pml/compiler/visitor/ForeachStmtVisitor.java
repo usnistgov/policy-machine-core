@@ -1,22 +1,18 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 
-
-
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
-import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.scope.PMLScopeException;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
-
-
+import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
 import java.util.ArrayList;
 import java.util.List;
 

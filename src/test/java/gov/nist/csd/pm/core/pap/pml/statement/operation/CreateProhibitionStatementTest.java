@@ -1,6 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
@@ -9,7 +18,6 @@ import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
@@ -17,13 +25,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
 
 class CreateProhibitionStatementTest {
 
@@ -42,7 +43,7 @@ class CreateProhibitionStatementTest {
         );
 
         PAP pap = new TestPAP();
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc2");
         pap.modify().graph().createUserAttribute("ua2", ids("pc2"));
         pap.modify().graph().createUser("u2", ids("ua2"));

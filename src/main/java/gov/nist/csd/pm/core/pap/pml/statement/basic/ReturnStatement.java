@@ -2,11 +2,10 @@ package gov.nist.csd.pm.core.pap.pml.statement.basic;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.type.Type;
-import gov.nist.csd.pm.core.pap.function.arg.type.VoidType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
+import gov.nist.csd.pm.core.pap.operation.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-
 import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public class ReturnStatement extends BasicStatement<StatementResult> {
             return match.equals(new VoidType());
         }
 
-        return expr.getType().equals(match);
+        return expr.getType().isCastableTo(match);
     }
 
     @Override

@@ -259,6 +259,6 @@ public class AccessQuerier extends Querier implements AccessQuery {
         TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
         // resolve the permissions
-        return resolvePrivileges(userDagResult, targetDagResult, store.operations().getResourceOperations());
+        return resolvePrivileges(userDagResult, targetDagResult, store.operations().getResourceAccessRights());
     }
 }

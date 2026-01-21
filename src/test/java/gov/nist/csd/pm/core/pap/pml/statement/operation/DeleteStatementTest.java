@@ -1,31 +1,31 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.pattern.OperationPattern;
-import gov.nist.csd.pm.core.pap.pml.pattern.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.List;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class DeleteStatementTest {
 
@@ -36,18 +36,17 @@ class DeleteStatementTest {
         DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteralExpression("o1"), false);
 
         PAP pap = new TestPAP();
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createUser("u1", ids("ua1"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
         UserContext userContext = new TestUserContext("u1");
-        pap.modify().obligations().createObligation(userContext.getUser(), "o1", List.of(new Rule(
-                "rule1",
-                new EventPattern(new SubjectPattern(), new OperationPattern("e1")),
-                new PMLObligationResponse("e", List.of())
-        )));
+        pap.modify().obligations().createObligation(userContext.getUser(), "o1",
+                new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
+                new ObligationResponse("e", List.of())
+        );
         pap.modify().prohibitions().createProhibition("p1",
                                     new ProhibitionSubject(id("ua1")),
 		        new AccessRightSet("read"),

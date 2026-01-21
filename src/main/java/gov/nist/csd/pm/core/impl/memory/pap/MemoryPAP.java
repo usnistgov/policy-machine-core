@@ -2,23 +2,21 @@ package gov.nist.csd.pm.core.impl.memory.pap;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.store.MemoryPolicyStore;
-import gov.nist.csd.pm.core.pap.function.PluginRegistry;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.core.pap.modification.GraphModifier;
 import gov.nist.csd.pm.core.pap.modification.ObligationsModifier;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifier;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
+import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifier;
+import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
+import gov.nist.csd.pm.core.pap.operation.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.query.AccessQuerier;
 import gov.nist.csd.pm.core.pap.query.GraphQuerier;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuerier;
 import gov.nist.csd.pm.core.pap.query.OperationsQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
-import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifier;
-import gov.nist.csd.pm.core.pap.modification.RoutinesModifier;
-import gov.nist.csd.pm.core.pap.id.RandomIdGenerator;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerier;
-import gov.nist.csd.pm.core.pap.query.RoutinesQuerier;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class MemoryPAP extends PAP {
@@ -64,8 +62,7 @@ public class MemoryPAP extends PAP {
             new GraphModifier(memoryPolicyStore, new RandomIdGenerator()),
             new ProhibitionsModifier(memoryPolicyStore),
             new ObligationsModifier(memoryPolicyStore),
-            new OperationsModifier(memoryPolicyStore, pluginRegistry),
-            new RoutinesModifier(memoryPolicyStore, pluginRegistry)
+            new OperationsModifier(memoryPolicyStore, pluginRegistry)
         );
 
         PolicyQuerier policyQuerier = new PolicyQuerier(
@@ -73,11 +70,10 @@ public class MemoryPAP extends PAP {
             new ProhibitionsQuerier(memoryPolicyStore),
             new ObligationsQuerier(memoryPolicyStore),
             new OperationsQuerier(memoryPolicyStore, pluginRegistry),
-            new RoutinesQuerier(memoryPolicyStore, pluginRegistry),
             new AccessQuerier(memoryPolicyStore)
         );
 
-        PrivilegeChecker privilegeChecker = new PrivilegeChecker(policyQuerier.access());
+        PrivilegeChecker privilegeChecker = new PrivilegeChecker(policyQuerier.access(), policyQuerier.graph());
 
         return new MemoryPAP(memoryPolicyStore, policyModifier, policyQuerier, privilegeChecker, pluginRegistry);
     }

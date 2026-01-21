@@ -1,16 +1,21 @@
 package gov.nist.csd.pm.core.pdp;
 
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DESERIALIZE_POLICY;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.RESET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SERIALIZE_POLICY;
+
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.AdminFunctionExecutor;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.AdminFunction;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.scope.ExecuteScope;
@@ -24,16 +29,12 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
+import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
 import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
-
 import java.util.List;
-import java.util.Map;
-import org.checkerframework.checker.units.qual.A;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
-
-public class PDPTx implements AdminFunctionExecutor {
+public class PDPTx implements OperationExecutor {
 
     private final TxExecutor txExecutor;
 
@@ -49,32 +50,66 @@ public class PDPTx implements AdminFunctionExecutor {
         return this.txExecutor.query();
     }
 
+    @Override
+    public Object executeOperation(Operation<?> operation,
+                                   Args args) throws PMException {
+        return this.txExecutor.executeOperation(operation, args);
+    }
+
+    /**
+     * Builds a PML execution context for the given user.
+     * @param userCtx The user context to build the execution context for.
+     * @throws PMException If an exception occurs building the context.
+     */
     public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
         return new PDPExecutionContext(userCtx, this.txExecutor);
     }
 
-    @Override
-    public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
-                                                      Map<String, Object> argsMap) throws PMException {
-        return this.txExecutor.executeAdminFunction(adminFunction, argsMap);
+    /**
+     * Execute a PML string. If the PML returns a value with a "return ..." statement, that value will be returned.
+     * If there is not return in the PML, then this method will return null.
+     * @param input The input PML string.
+     * @return The value returned by the PML, null if there is none.
+     * @throws PMException If an exception occurs compiling or executing the PML.
+     */
+    public Object executePML(String input) throws PMException {
+        return txExecutor.executePML(input);
     }
 
-    public void executePML(String input) throws PMException {
-        txExecutor.executePML(input);
-    }
-
+    /**
+     * Resets the current policy state.
+     * @throws PMException If an exception occurs while resetting the policy.
+     */
     public void reset() throws PMException {
         txExecutor.reset();
     }
 
+    /**
+     * Serialize the current policy state using the provided serializer.
+     * @param serializer The PolicySerialize used to serialize the policy.
+     * @return The String representation of the policy.
+     * @throws PMException If an exception occurs while serializing the policy.
+     */
     public String serialize(PolicySerializer serializer) throws PMException {
         return txExecutor.serialize(serializer);
     }
 
+    /**
+     * Deserialize the provided input string with the provided PolicyDeserializer.
+     * @param input The input string.
+     * @param policyDeserializer The PolicyDeserializer used to deserialize the provided string.
+     * @throws PMException If an exception occurs while deserializing the policy.
+     */
     public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
         txExecutor.deserialize(input, policyDeserializer);
     }
 
+    /**
+     * Execute the given obligation response using the provided event context.
+     * @param eventCtx The EventContext.
+     * @param response The obligation response to execute.
+     * @throws PMException If an exception occurs while executing the obligation response.
+     */
     public void executeObligationResponse(EventContext eventCtx, ObligationResponse response) throws PMException {
         response.execute(txExecutor, txExecutor.userCtx, eventCtx);
     }
@@ -114,18 +149,28 @@ public class PDPTx implements AdminFunctionExecutor {
         }
 
         @Override
-        public <R> R executeAdminFunction(AdminFunction<R> adminFunction,
-                                                          Map<String, Object> argsMap) throws PMException {
-            Args args = adminFunction.validateAndPrepareArgs(argsMap);
-
-            if (adminFunction instanceof Routine<R> routine) {
+        public Object executeOperation(Operation<?> operation, Args args) throws PMException {
+            if (operation instanceof Routine<?> routine) {
                 return routine.execute(this, args);
-            } else if (adminFunction instanceof Operation<R> operation) {
-                operation.canExecute(pap, userCtx, args);
-                return operation.execute(pap, args);
             }
 
-            return adminFunction.execute(pap, args);
+            // check if user can execute the operation
+            operation.canExecute(pap, userCtx, args);
+
+            // execute the operation
+            Object result = operation.execute(pap, args);
+
+            // if the operation is an Admin or Resource operation publish the event for EPPs
+            if (operation instanceof AdminOperation<?> || operation instanceof ResourceOperation<?>) {
+                eventPublisher.publishEvent(EventContextUtil.buildEventContext(
+                    pap,
+                    userCtx,
+                    operation.getName(),
+                    args
+                ));
+            }
+
+            return result;
         }
 
         @Override
@@ -149,16 +194,22 @@ public class PDPTx implements AdminFunctionExecutor {
             pap.deserialize(input, policyDeserializer);
         }
 
-        public void executePML(String input) throws PMException {
+        public Object executePML(String input) throws PMException {
             PMLCompiler pmlCompiler = new PMLCompiler();
             List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pap, input);
 
-            buildExecutionContext(userCtx)
+            StatementResult statementResult = buildExecutionContext(userCtx)
                 .executeStatements(stmts, new Args());
+
+            if (statementResult instanceof ReturnResult returnResult) {
+                return returnResult.getValue();
+            }
+
+            return null;
         }
 
         @Override
-        public void executePML(UserContext author, String input) throws PMException {
+        public Object executePML(UserContext author, String input) throws PMException {
             throw new PMException("not supported by PDPTx, use executePML(String input) instead");
         }
 
@@ -189,7 +240,7 @@ public class PDPTx implements AdminFunctionExecutor {
 
         public PDPExecutionContext(UserContext author,
                                    TxExecutor pdpTx,
-                                   Scope<Object, AdminFunction<?>> scope) throws PMException {
+                                   Scope<Object, Operation<?>> scope) throws PMException {
             super(author, pdpTx.pap, scope);
             this.pdpTx = pdpTx;
         }

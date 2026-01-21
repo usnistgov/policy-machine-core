@@ -2,9 +2,9 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.DeleteOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -15,39 +15,52 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public void setResourceOperations(AccessRightSet accessRightSet) throws PMException {
-        AccessRightSet old = new AccessRightSet(policy.resourceOperations);
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
+        AccessRightSet old = new AccessRightSet(policy.resourceAccessRights);
 
-        policy.resourceOperations = accessRightSet;
+        policy.resourceAccessRights = resourceAccessRights;
 
-        txCmdTracker.trackOp(tx, new TxCmd.SetResourceOperationsTxCmd(
-                old,
-                accessRightSet)
-        );
+        txCmdTracker.trackOp(tx, new TxCmd.SetResourceOperationsTxCmd(old, resourceAccessRights));
     }
 
     @Override
-    public void createAdminOperation(Operation<?> operation) throws PMException {
+    public void createOperation(Operation<?> operation) throws PMException {
         policy.operations.put(operation.getName(), operation);
+        txCmdTracker.trackOp(tx, new TxCmd.CreateOperationTxCmd(operation));
     }
 
     @Override
-    public void deleteAdminOperation(String operation) throws PMException {
-        policy.operations.remove(operation);
+    public AccessRightSet getResourceAccessRights() throws PMException {
+        return policy.resourceAccessRights;
     }
 
     @Override
-    public AccessRightSet getResourceOperations() throws PMException {
-        return policy.resourceOperations;
+    public Collection<Operation<?>> getOperations() throws PMException {
+        return new ArrayList<>(policy.operations.values());
     }
 
     @Override
-    public Collection<String> getAdminOperationNames() throws PMException {
+    public Collection<String> getOperationNames() throws PMException {
         return new ArrayList<>(policy.operations.keySet());
     }
 
     @Override
-    public Operation<?> getAdminOperation(String operationName) throws PMException {
-        return policy.operations.get(operationName);
+    public Operation<?> getOperation(String name) throws PMException {
+        return policy.operations.get(name);
+    }
+
+    @Override
+    public void deleteOperation(String name) throws PMException {
+        Operation<?> remove = policy.operations.remove(name);
+        if (remove == null) {
+            return;
+        }
+
+        txCmdTracker.trackOp(tx, new DeleteOperation(remove));
+    }
+
+    @Override
+    public boolean operationExists(String operationName) throws PMException {
+        return policy.operations.containsKey(operationName);
     }
 }

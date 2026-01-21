@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

@@ -1,7 +1,43 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_GRAPH_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_QUERY_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSIGN;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_POLICY_CLASS;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DESERIALIZE_POLICY;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.RESET;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SERIALIZE_POLICY;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_GRAPH;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_OBLIGATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_OPERATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_PROHIBITION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_ROUTINE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_GRAPH;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_OBLIGATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_OPERATION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_PROHIBITION;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_ROUTINE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WILDCARD_MAP;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
@@ -9,12 +45,13 @@ import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.*;
 
 class AccessRightResolverTest {
 

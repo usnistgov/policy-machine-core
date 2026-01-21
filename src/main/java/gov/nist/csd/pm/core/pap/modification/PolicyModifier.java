@@ -11,18 +11,15 @@ public class PolicyModifier implements PolicyModification {
     private final ProhibitionsModifier prohibitionsModifier;
     private final ObligationsModifier obligationsModifier;
     private final OperationsModifier operationsModifier;
-    private final RoutinesModifier routinesModifier;
 
     public PolicyModifier(GraphModifier graphModifier,
                           ProhibitionsModifier prohibitionsModifier,
                           ObligationsModifier obligationsModifier,
-                          OperationsModifier operationsModifier,
-                          RoutinesModifier routinesModifier) {
+                          OperationsModifier operationsModifier) {
         this.graphModifier = graphModifier;
         this.prohibitionsModifier = prohibitionsModifier;
         this.obligationsModifier = obligationsModifier;
         this.operationsModifier = operationsModifier;
-        this.routinesModifier = routinesModifier;
     }
 
     public void setIdGenerator(IdGenerator idGenerator) {
@@ -47,11 +44,6 @@ public class PolicyModifier implements PolicyModification {
     @Override
     public OperationsModifier operations() {
         return operationsModifier;
-    }
-
-    @Override
-    public RoutinesModifier routines() {
-        return routinesModifier;
     }
 
 }

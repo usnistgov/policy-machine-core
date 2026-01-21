@@ -3,38 +3,34 @@ package gov.nist.csd.pm.core.pap.serialization.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-
 import java.util.List;
 
 public class JSONPolicy {
 
-    private AccessRightSet resourceOperations;
+    private AccessRightSet resourceAccessRights;
     private JSONGraph graph;
     private List<JSONProhibition> prohibitions;
     private List<JSONObligation> obligations;
-    private List<String> operations;
-    private List<String> routines;
+    private JSONOperations operations;
 
-    public JSONPolicy(AccessRightSet resourceOperations,
+    public JSONPolicy(AccessRightSet resourceAccessRights,
                       JSONGraph graph,
                       List<JSONProhibition> prohibitions,
                       List<JSONObligation> obligations,
-                      List<String> operations,
-                      List<String> routines) {
-        this.resourceOperations = resourceOperations;
+                      JSONOperations operations) {
+        this.resourceAccessRights = resourceAccessRights;
         this.graph = graph;
         this.prohibitions = prohibitions;
         this.obligations = obligations;
         this.operations = operations;
-        this.routines = routines;
     }
 
-    public AccessRightSet getResourceOperations() {
-        return resourceOperations;
+    public AccessRightSet getResourceAccessRights() {
+        return resourceAccessRights;
     }
 
-    public void setResourceOperations(AccessRightSet resourceOperations) {
-        this.resourceOperations = resourceOperations;
+    public void setResourceAccessRights(AccessRightSet resourceAccessRights) {
+        this.resourceAccessRights = resourceAccessRights;
     }
 
     public JSONGraph getGraph() {
@@ -61,20 +57,12 @@ public class JSONPolicy {
         this.obligations = obligations;
     }
 
-    public List<String> getOperations() {
+    public JSONOperations getOperations() {
         return operations;
     }
 
-    public void setOperations(List<String> operations) {
+    public void setOperations(JSONOperations operations) {
         this.operations = operations;
-    }
-
-    public List<String> getRoutines() {
-        return routines;
-    }
-
-    public void setRoutines(List<String> routines) {
-        this.routines = routines;
     }
 
     @Override

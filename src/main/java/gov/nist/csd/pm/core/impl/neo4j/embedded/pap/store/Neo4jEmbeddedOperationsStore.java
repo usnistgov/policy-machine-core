@@ -1,23 +1,26 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_ARS_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deserialize;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
 
 public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
-	private static final String RESOURCE_OPERATIONS_NODE_NAME = "resource_operations";
+	private static final String RESOURCE_ACCESS_RIGHTS_NODE_NAME = "resource_access_rights";
 	private final TxHandler txHandler;
 	private ClassLoader classLoader;
 
@@ -27,14 +30,14 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public void setResourceOperations(AccessRightSet resourceOperations) throws PMException {
-		String[] opsArr = resourceOperations.toArray(String[]::new);
+	public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
+		String[] opsArr = resourceAccessRights.toArray(String[]::new);
 
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(RESOURCE_OPERATIONS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			Node node = tx.findNode(RESOURCE_ARS_LABEL, NAME_PROPERTY, RESOURCE_ACCESS_RIGHTS_NODE_NAME);
 			if (node == null) {
-				node = tx.createNode(RESOURCE_OPERATIONS_LABEL);
-				node.setProperty(NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+				node = tx.createNode(RESOURCE_ARS_LABEL);
+				node.setProperty(NAME_PROPERTY, RESOURCE_ACCESS_RIGHTS_NODE_NAME);
 			}
 
 			node.setProperty(DATA_PROPERTY, opsArr);
@@ -42,20 +45,20 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public void createAdminOperation(Operation<?> operation) throws PMException {
+	public void createOperation(Operation<?> operation) throws PMException {
 		String hex = Neo4jUtil.serialize(operation);
 
 		txHandler.runTx(tx -> {
-			Node node = tx.createNode(ADMIN_OPERATION_LABEL);
+			Node node = tx.createNode(OPERATION_LABEL);
 			node.setProperty(NAME_PROPERTY, operation.getName());
 			node.setProperty(DATA_PROPERTY, hex);
 		});
 	}
 
 	@Override
-	public void deleteAdminOperation(String operation) throws PMException {
+	public void deleteOperation(String name) throws PMException {
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(ADMIN_OPERATION_LABEL, NAME_PROPERTY, operation);
+			Node node = tx.findNode(OPERATION_LABEL, NAME_PROPERTY, name);
 			if (node == null) {
 				return;
 			}
@@ -65,11 +68,11 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public AccessRightSet getResourceOperations() throws PMException {
+	public AccessRightSet getResourceAccessRights() throws PMException {
 		AccessRightSet resourceOperations = new AccessRightSet();
 
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(RESOURCE_OPERATIONS_LABEL, NAME_PROPERTY, RESOURCE_OPERATIONS_NODE_NAME);
+			Node node = tx.findNode(RESOURCE_ARS_LABEL, NAME_PROPERTY, RESOURCE_ACCESS_RIGHTS_NODE_NAME);
 			if (node == null) {
 				return;
 			}
@@ -82,36 +85,56 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public Collection<String> getAdminOperationNames() throws PMException {
-		List<String> operationNames = new ArrayList<>();
+	public Collection<Operation<?>> getOperations() throws PMException {
+		List<Operation<?>> operations = new ArrayList<>();
 
 		txHandler.runTx(tx -> {
-			ResourceIterator<Node> nodes = tx.findNodes(ADMIN_OPERATION_LABEL);
+			ResourceIterator<Node> nodes = tx.findNodes(OPERATION_LABEL);
+			if (nodes == null) {
+				return;
+			}
 
 			while (nodes.hasNext()) {
-				Node node = nodes.next();
-				operationNames.add(node.getProperty(NAME_PROPERTY).toString());
+				Node next = nodes.next();
+				operations.add((Operation<?>) deserialize(next.getProperty(DATA_PROPERTY).toString(), classLoader));
 			}
 		});
 
-		return operationNames;
+		return operations;
 	}
 
 	@Override
-	public Operation<?> getAdminOperation(String operationName) throws PMException {
+	public Collection<String> getOperationNames() throws PMException {
+		return getOperations().stream().map(Operation::getName).toList();
+	}
+
+	@Override
+	public Operation<?> getOperation(String name) throws PMException {
 		AtomicReference<Operation<?>> operation = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
-			Node node = tx.findNode(ADMIN_OPERATION_LABEL, NAME_PROPERTY, operationName);
+			Node node = tx.findNode(OPERATION_LABEL, NAME_PROPERTY, name);
 			if (node == null) {
 				return;
 			}
 
-			Operation<?> op = (Operation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader);
-			operation.set(op);
+			operation.set((Operation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
 		});
 
 		return operation.get();
+	}
+
+	@Override
+	public boolean operationExists(String operationName) throws PMException {
+		AtomicReference<Boolean> opExists = new AtomicReference<>();
+
+		txHandler.runTx(tx -> {
+			boolean exists = tx.findNode(OPERATION_LABEL, NAME_PROPERTY, operationName) != null;
+
+			opExists.set(exists);
+		});
+
+		return opExists.get();
 	}
 
 	@Override

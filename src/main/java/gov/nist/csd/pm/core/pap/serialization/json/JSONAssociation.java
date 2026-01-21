@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-
 import java.util.Objects;
 
 public class JSONAssociation {

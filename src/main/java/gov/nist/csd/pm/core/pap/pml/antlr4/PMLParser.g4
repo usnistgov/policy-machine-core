@@ -12,7 +12,7 @@ pml: (statement)* EOF ;
 
 statement:
     basicStatement
-    | operationStatement ;
+    | adminOperationStatement ;
 
 basicStatement: (
     variableAssignmentStatement
@@ -21,12 +21,12 @@ basicStatement: (
     | returnStatement
     | breakStatement
     | continueStatement
-    | functionInvokeStatement
+    | operationInvokeStatement
     | ifStatement
-    | basicFunctionDefinitionStatement
+    | functionDefinitionStatement
 ) ;
 
-operationStatement: (
+adminOperationStatement: (
     createPolicyStatement
     | createNonPCStatement
     | createObligationStatement
@@ -36,11 +36,12 @@ operationStatement: (
     | deassignStatement
     | associateStatement
     | dissociateStatement
-    | setResourceOperationsStatement
+    | setResourceAccessRightsStatement
     | deleteStatement
-    | deleteRuleStatement
-    | operationDefinitionStatement
+    | adminOpDefinitionStatement
+    | resourceOpDefinitionStatement
     | routineDefinitionStatement
+    | queryOpDefinitionStatement
 ) ;
 
 statementBlock: OPEN_CURLY statement* CLOSE_CURLY ;
@@ -54,13 +55,14 @@ nonPCNodeType:
     (OA | UA | O | U) ;
 
 createObligationStatement:
-    CREATE OBLIGATION expression OPEN_CURLY createRuleStatement* CLOSE_CURLY;
-createRuleStatement:
-    CREATE RULE ruleName=expression
-    WHEN subjectPattern
-    PERFORMS operationPattern
-    (ON argPattern)?
+    CREATE OBLIGATION name=expression
+    eventPattern
     response ;
+
+eventPattern:
+  WHEN subjectPattern
+  PERFORMS operationPattern
+  ;
 
 // subject
 subjectPattern:
@@ -81,34 +83,16 @@ basicSubjectPatternExpr:
 // operation
 operationPattern:
     ANY OPERATION #AnyOperation
-    | stringLit #IDOperation ;
-
-// args
-argPattern: OPEN_CURLY (argPatternElement (COMMA argPatternElement)*)? CLOSE_CURLY ;
-argPatternElement: key=ID COLON (single=argPatternExpression | multiple=argPatternExpressionArray);
-
-argPatternExpressionArray: OPEN_BRACKET argPatternExpression (COMMA argPatternExpression)* CLOSE_BRACKET ;
-
-argPatternExpression:
-     basicArgPatternExpr #BasicArgPatternExpression
-     | EXCLAMATION argPatternExpression #NegateArgPatternExpression
-     | OPEN_PAREN argPatternExpression CLOSE_PAREN #ParenArgPatternExpression
-     | left=argPatternExpression (LOGICAL_AND | LOGICAL_OR) right=argPatternExpression #LogicalArgPatternExpression ;
-
-basicArgPatternExpr:
-    ANY #AnyPolicyElement
-    | IN stringLit #InPolicyElement
-    | stringLit #PolicyElement ;
+    | (opName=ID onPattern?) #OperationPatternFunc ;
+onPattern: ON OPEN_PAREN argNames? CLOSE_PAREN onPatternBlock? ;
+onPatternBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
+argNames: ID (COMMA ID)*;
 
 // response
 response:
     DO OPEN_PAREN ID CLOSE_PAREN responseBlock;
 responseBlock:
-    OPEN_CURLY responseStatement* CLOSE_CURLY ;
-responseStatement:
-    statement
-    | createRuleStatement
-    | deleteRuleStatement ;
+    OPEN_CURLY statement* CLOSE_CURLY ;
 
 createProhibitionStatement:
     CREATE PROHIBITION name=expression
@@ -139,18 +123,17 @@ associateStatement:
 dissociateStatement:
     DISSOCIATE ua=expression AND target=expression ;
 
-setResourceOperationsStatement:
-    SET_RESOURCE_OPERATIONS accessRightsArr=expression;
+setResourceAccessRightsStatement:
+    SET_RESOURCE_ACCESS_RIGHTS accessRightsArr=expression;
 
 deleteStatement:
     DELETE (IF_EXISTS)? deleteType expression ;
 deleteType:
     NODE #DeleteNode
     | OBLIGATION #DeleteObligation
-    | PROHIBITION #DeleteProhibition ;
-
-deleteRuleStatement:
-    DELETE RULE ruleName=expression FROM OBLIGATION obligationName=expression ;
+    | PROHIBITION #DeleteProhibition
+    | OPERATION #DeleteOperation
+    ;
 
 variableDeclarationStatement:
     VAR (varSpec | OPEN_PAREN (varSpec)* CLOSE_PAREN) #VarDeclaration
@@ -159,26 +142,45 @@ varSpec: ID ASSIGN_EQUALS expression;
 
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
-operationDefinitionStatement: operationSignature checkStatementBlock? statementBlock ;
-routineDefinitionStatement: routineSignature checkStatementBlock? statementBlock ;
-basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
+adminOpDefinitionStatement: adminOpSignature adminOpStatementBlock ;
+queryOpDefinitionStatement: queryOpSignature basicAndCheckStatementBlock ;
+resourceOpDefinitionStatement: resourceOpSignature basicAndCheckStatementBlock? ;
+routineDefinitionStatement: routineSignature statementBlock ;
+functionDefinitionStatement: functionSignature basicStatementBlock ;
 
-operationSignature: OPERATION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+queryOpSignature: QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
-basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+
+operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
+operationFormalParam: nodeArgAnnotation? variableType ID reqCap=stringArrayLit?;
+
+nodeArgAnnotation: NODE_ARG (OPEN_PAREN (stringLit (COMMA stringLit)*)? CLOSE_PAREN)? ;
+
+adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
+adminOpStatement:
+  statement #BasicOrAdminOpStatement
+  | checkStatement #CheckAdminOpStatement
+  ;
+
+basicAndCheckStatementBlock: OPEN_CURLY basicAndCheckStatement* CLOSE_CURLY ;
+basicAndCheckStatement:
+  basicStatement #BasicResourceOpStatement
+  | checkStatement #CheckResourceOpStatement
+  ;
 
 formalParamList: (formalParam (COMMA formalParam)*)? ;
-formalParam: NODE_PARAM? variableType ID;
+formalParam: variableType ID;
 
 returnStatement: RETURN expression?;
 
 checkStatement: CHECK ar=expression ON target=expression ;
-checkStatementBlock: OPEN_CURLY checkStatement* CLOSE_CURLY ;
-
 basicStatementBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 
 idArr: OPEN_BRACKET (ID (COMMA ID)*)? CLOSE_BRACKET ;
-functionInvokeStatement: functionInvoke;
+operationInvokeStatement: operationInvoke;
 
 foreachStatement: FOREACH key=ID (COMMA value=ID)? IN expression statementBlock ;
 breakStatement: BREAK ;
@@ -196,6 +198,7 @@ elseStatement:
 variableType:
     STRING_TYPE #StringType
     | BOOL_TYPE #BooleanType
+    | INT64_TYPE #Int64Type
     | arrayType #ArrayVarType
     | mapType #MapVarType
     | ANY #AnyType ;
@@ -203,7 +206,7 @@ mapType: MAP OPEN_BRACKET keyType=variableType CLOSE_BRACKET valueType=variableT
 arrayType: OPEN_BRACKET CLOSE_BRACKET variableType ;
 
 expression:
-    functionInvoke #FunctionInvokeExpression
+    operationInvoke #OperationInvokeExpression
     | variableReference #VariableReferenceExpression
     | literal #LiteralExpression
     | EXCLAMATION expression #NegateExpression
@@ -215,9 +218,11 @@ expressionList: expression (COMMA expression)* ;
 
 literal:
     stringLit #StringLiteral
+    | int64Lit #Int64Literal
     | boolLit #BoolLiteral
     | arrayLit #ArrayLiteral
     | mapLit #MapLiteral;
+int64Lit: INT64_DECIMAL ;
 stringLit: DOUBLE_QUOTE_STRING;
 boolLit: TRUE | FALSE;
 arrayLit: OPEN_BRACKET expressionList? CLOSE_BRACKET ;
@@ -231,15 +236,18 @@ index:
     OPEN_BRACKET key=expression CLOSE_BRACKET #BracketIndex
     | DOT key=idIndex #DotIndex;
 
-functionInvoke: ID functionInvokeArgs ;
-functionInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
+operationInvoke: ID operationInvokeArgs ;
+operationInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
 
 idIndex:
     ID
     | OPERATION
+    | ADMIN_OP
+    | RESOURCE_OP
+    | QUERY
+    | FUNCTION
     | CHECK
     | ROUTINE
-    | FUNCTION
     | CREATE
     | DELETE
     | RULE
@@ -264,8 +272,8 @@ idIndex:
     | DENY
     | PROHIBITION
     | OBLIGATION
-    | NODE
     | USER
+    | NODE
     | PC
     | OA
     | UA

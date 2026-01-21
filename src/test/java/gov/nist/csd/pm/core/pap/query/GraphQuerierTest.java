@@ -1,5 +1,15 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -9,18 +19,12 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 public abstract class GraphQuerierTest extends PAPTestInitializer {
 
@@ -174,7 +178,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void testSuccess() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
             long pc1 = pap.modify().graph().createPolicyClass("pc1");
             long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
             long oa2 = pap.modify().graph().createObjectAttribute("oa2", List.of(pc1));
@@ -211,7 +215,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
 
         @Test
         void Success() throws PMException {
-            pap.modify().operations().setResourceOperations(new AccessRightSet("read", "write"));
+            pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
             long pc1 = pap.modify().graph().createPolicyClass("pc1");
             long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
             long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
@@ -241,7 +245,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     void testGetAttributeDescendants() throws PMException {
         String pml =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
@@ -267,7 +271,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testGetPolicyClassDescendants() throws PMException {
         String pml = """
-                      set resource operations ["read", "write"]
+                      set resource access rights ["read", "write"]
                       create pc "pc1"
                       create oa "oa1" in ["pc1"]
                       create oa "oa2" in ["oa1"]
@@ -293,7 +297,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testIsAscendant() throws PMException {
         String pml = """
-                      set resource operations ["read", "write"]
+                      set resource access rights ["read", "write"]
                       create pc "pc1"
                       create oa "oa1" in ["pc1"]
                       create oa "oa2" in ["oa1"]
@@ -322,7 +326,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     @Test
     void testIsDescendant() throws PMException {
         String pml = """
-                      set resource operations ["read", "write"]
+                      set resource access rights ["read", "write"]
                       create pc "pc1"
                       create oa "oa1" in ["pc1"]
                       create oa "oa2" in ["oa1"]
@@ -352,7 +356,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     void testGetAscendantSubgraph() throws PMException {
         String pml =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
@@ -392,7 +396,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
     void testGetDescendantSubgraph() throws PMException {
         String pml =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]

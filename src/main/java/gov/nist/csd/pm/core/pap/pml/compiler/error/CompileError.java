@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.error;
 
 import gov.nist.csd.pm.core.pap.pml.compiler.Position;
+import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
-
-import java.util.Objects;
 
 public record CompileError(Position position, String errorMessage) {
 

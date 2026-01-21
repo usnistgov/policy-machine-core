@@ -10,7 +10,6 @@ import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.dag.ShortCircuit;
 import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

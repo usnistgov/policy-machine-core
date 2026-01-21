@@ -3,23 +3,31 @@ package gov.nist.csd.pm.core.pap.pml.context;
 import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.ErrorLog;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
+import java.util.List;
+import java.util.Objects;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ListTokenSource;
 
-import java.util.List;
-import java.util.Objects;
+public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLOperationSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
 
-public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLFunctionSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
-
-    public VisitorContext(Scope<Variable, PMLFunctionSignature> scope) {
+    public VisitorContext(CompileScope scope) {
         this(new CommonTokenStream(new ListTokenSource(List.of())), scope, new ErrorLog(), new PMLErrorHandler());
     }
 
     public VisitorContext copy() {
         // want to persist the error tracker and tokens
         return new VisitorContext(this.tokens, scope.copy(), this.errorLog, this.pmlErrorHandler);
+    }
+
+    public VisitorContext copyFunctionsAndQueriesOnly() {
+        return new VisitorContext(this.tokens, scope.copyFunctionsAndQueriesOnly(), this.errorLog, this.pmlErrorHandler);
+    }
+
+    public VisitorContext copyFunctionsOnly() {
+        return new VisitorContext(this.tokens, scope.copyFunctionsOnly(), this.errorLog, this.pmlErrorHandler);
     }
 
     @Override

@@ -1,5 +1,9 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
+import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.computeSatisfiedProhibitions;
+import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolveDeniedAccessRights;
+import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolvePrivileges;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
@@ -9,12 +13,18 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.explain.*;
+import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
+import gov.nist.csd.pm.core.pap.query.model.explain.ExplainAssociation;
+import gov.nist.csd.pm.core.pap.query.model.explain.ExplainNode;
+import gov.nist.csd.pm.core.pap.query.model.explain.Path;
+import gov.nist.csd.pm.core.pap.query.model.explain.PolicyClassExplain;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Explainer {
 
@@ -37,7 +47,7 @@ public class Explainer {
 		TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
 		// resolve privs and prohibitions
-		AccessRightSet priv = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceOperations());
+		AccessRightSet priv = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
 		AccessRightSet deniedPriv = resolveDeniedAccessRights(userDagResult, targetDagResult);
 		List<Prohibition> prohibitions = computeSatisfiedProhibitions(userDagResult, targetDagResult);
 

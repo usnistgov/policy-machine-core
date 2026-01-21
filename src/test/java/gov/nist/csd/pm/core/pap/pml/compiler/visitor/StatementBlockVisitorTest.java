@@ -1,35 +1,32 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.pml.scope.Scope;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.TestPMLParser.toStatementBlockCtx;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.TestPMLParser.toStatementBlockCtx;
-import static org.junit.jupiter.api.Assertions.*;
-
 class StatementBlockVisitorTest {
 
-    private static Scope<Variable, PMLFunctionSignature> testGlobalScope;
+    private static CompileScope testGlobalScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testGlobalScope = new CompileScope();
+        testGlobalScope = new CompileScope(new MemoryPAP());
     }
 
     @Test
-    void testFunctionInBlockOk() {
+    void testOperationInBlockOk() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
                 """
                 {
-                    operation f1() {}
+                    adminop f1() {}
                 }
                 """
         );

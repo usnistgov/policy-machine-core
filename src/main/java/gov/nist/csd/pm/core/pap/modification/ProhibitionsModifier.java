@@ -1,18 +1,17 @@
 package gov.nist.csd.pm.core.pap.modification;
 
+import static gov.nist.csd.pm.core.pap.modification.GraphModifier.checkAccessRightsValid;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.common.exception.ProhibitionContainerDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionExistsException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionSubjectDoesNotExistException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-
+import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import static gov.nist.csd.pm.core.pap.modification.GraphModifier.checkAccessRightsValid;
 
 public class ProhibitionsModifier extends Modifier implements ProhibitionsModification {
 
@@ -53,7 +52,7 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
         }
 
         // check the prohibition parameters are valid
-        checkAccessRightsValid(policyStore.operations().getResourceOperations(), accessRightSet);
+        checkAccessRightsValid(policyStore.operations().getResourceAccessRights(), accessRightSet);
         checkProhibitionSubjectExists(subject);
         checkProhibitionContainersExist(containerConditions);
     }

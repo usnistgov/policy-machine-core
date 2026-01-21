@@ -2,10 +2,9 @@ package gov.nist.csd.pm.core.pap.pml.exception;
 
 import gov.nist.csd.pm.core.pap.pml.compiler.Position;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class PMLCompilationRuntimeException extends RuntimeException {
 

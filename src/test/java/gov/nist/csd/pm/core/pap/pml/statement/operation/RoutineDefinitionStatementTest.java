@@ -1,29 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class RoutineDefinitionStatementTest {
-
-    @Test
-    void testOperationSignatureDoesNotThrowExceptionButIsIgnored() throws PMException {
-        String pml = """
-                routine routine1(@node string a) {
-                    check "assign" on [a]
-                } {
-                
-                }
-                """;
-        MemoryPAP pap = new TestPAP();
-        assertDoesNotThrow(() -> pap.executePML(new TestUserContext("u1"), pml));
-    }
 
     @Test
     void testSuccess() throws PMException {
@@ -34,7 +20,7 @@ class RoutineDefinitionStatementTest {
                 }""";
         MemoryPAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), pml);
-        Routine<?> routine1 = pap.query().routines().getAdminRoutine("routine1");
+        Routine<?> routine1 = (Routine<?>) pap.query().operations().getOperation("routine1");
         assertEquals(pml, routine1.toString());
     }
 

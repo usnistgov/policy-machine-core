@@ -1,36 +1,58 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
+
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class Scope<V, F> implements Serializable {
+public abstract class Scope<V, F> implements Serializable {
 
+    private PAP pap;
     private Map<String, V> constants;
     private Map<String, V> variables;
-    private Map<String, F> functions;
+    private Map<String, F> operations;
     private Scope<V, F> parentScope;
 
-    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, F> functions, Scope<V, F> parentScope) {
+    public Scope(PAP pap, Map<String, V> constants, Map<String, F> operations) throws PMException {
+        this.pap = pap;
         this.constants = constants;
-        this.variables = variables;
-        this.functions = functions;
+        this.variables = new HashMap<>();
+        this.operations = operations;
+    }
+
+    public Scope(PAP pap, Map<String, V> constants, Map<String, F> operations, Scope<V, F> parentScope) throws PMException {
+        this.pap = pap;
+        this.constants = constants;
+        this.variables = new HashMap<>();
+        this.operations = operations;
         this.parentScope = parentScope;
     }
 
-    public Scope(Map<String, V> constants, Map<String, V> variables, Map<String, F> functions) {
+    protected Scope(PAP pap,
+                  Map<String, V> constants,
+                  Map<String, V> variables,
+                  Map<String, F> operations,
+                  Scope<V, F> parentScope) {
+        this.pap = pap;
         this.constants = constants;
         this.variables = variables;
-        this.functions = functions;
-        this.parentScope = null;
+        this.operations = operations;
+        this.parentScope = parentScope;
     }
 
-    public Scope() {
-        this.constants = new HashMap<>();
-        this.variables = new HashMap<>();
-        this.functions = new HashMap<>();
-        this.parentScope = null;
+    public abstract Scope<V, F> copy();
+    public abstract Scope<V, F> copyFunctionsOnly();
+    public abstract Scope<V, F> copyFunctionsAndQueriesOnly();
+
+    public PAP getPap() {
+        return pap;
+    }
+
+    public void setPap(PAP pap) {
+        this.pap = pap;
     }
 
     public Map<String, V> getConstants() {
@@ -49,12 +71,12 @@ public class Scope<V, F> implements Serializable {
         this.variables = variables;
     }
 
-    public Map<String, F> getFunctions() {
-        return functions;
+    public Map<String, F> getOperations() {
+        return operations;
     }
 
-    public void setFunctions(Map<String, F> functions) {
-        this.functions = functions;
+    public void setOperations(Map<String, F> operations) {
+        this.operations = operations;
     }
 
     public Scope<V, F> getParentScope() {
@@ -65,34 +87,25 @@ public class Scope<V, F> implements Serializable {
         this.parentScope = parentScope;
     }
 
-    public Scope<V, F> copy() {
-        return new Scope<>(
-                new HashMap<>(this.constants),
-                new HashMap<>(this.variables),
-                new HashMap<>(this.functions),
-                this.parentScope != null ? this.parentScope.copy() : null
-        );
-    }
-
-    public F getFunction(String name) throws UnknownFunctionInScopeException {
-        F function = functions.get(name);
-        if (function == null) {
-            throw new UnknownFunctionInScopeException(name);
+    public F getOperation(String name) throws UnknownOperationInScopeException {
+        F operation = operations.get(name);
+        if (operation == null) {
+            throw new UnknownOperationInScopeException(name);
         }
 
-        return function;
+        return operation;
     }
 
-    public boolean functionExists(String name) {
-        return functions.containsKey(name);
+    public boolean operationExists(String name) {
+        return operations.containsKey(name);
     }
 
-    public void addFunction(String name, F f) throws FunctionAlreadyDefinedInScopeException {
-        if (parentHasFunction(name) || functions.containsKey(name)) {
-            throw new FunctionAlreadyDefinedInScopeException(name);
+    public void addOperation(String name, F f) throws OperationAlreadyDefinedInScopeException {
+        if (parentHasOperation(name) || operations.containsKey(name)) {
+            throw new OperationAlreadyDefinedInScopeException(name);
         }
 
-        functions.put(name, f);
+        operations.put(name, f);
     }
 
     public V getVariable(String name) throws UnknownVariableInScopeException {
@@ -135,26 +148,28 @@ public class Scope<V, F> implements Serializable {
         }
     }
 
-    private boolean parentHasVariable(String name) {
-        return parentScope != null && parentScope.variables.containsKey(name);
-    }
-
-    private boolean parentHasFunction(String name) {
-        return parentScope != null && parentScope.functions.containsKey(name);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Scope<?, ?> scope)) return false;
-	    return Objects.equals(constants, scope.constants) && Objects.equals(
-                variables,
-                scope.variables
-        ) && Objects.equals(functions, scope.functions) && Objects.equals(parentScope, scope.parentScope);
+        return Objects.equals(constants, scope.constants) && Objects.equals(
+            variables,
+            scope.variables
+        ) && Objects.equals(operations, scope.operations) && Objects.equals(parentScope, scope.parentScope);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(constants, variables, functions, parentScope);
+        return Objects.hash(constants, variables, operations, parentScope);
     }
+
+    private boolean parentHasVariable(String name) {
+        return parentScope != null && parentScope.variables.containsKey(name);
+    }
+
+    private boolean parentHasOperation(String name) {
+        return parentScope != null && parentScope.operations.containsKey(name);
+    }
+
+
 }

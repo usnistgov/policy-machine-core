@@ -1,7 +1,14 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.*;
+import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.common.graph.dag.Propagator;
+import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
+import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
+import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
@@ -13,11 +20,13 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-
-import java.util.*;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
-import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TargetEvaluator {
 
@@ -126,7 +135,7 @@ public class TargetEvaluator {
 		return AccessRightResolver.resolvePrivileges(
 			userDagResult,
 			adminTargetResult,
-			policyStore.operations().getResourceOperations()
+			policyStore.operations().getResourceAccessRights()
 		);
 	}
 

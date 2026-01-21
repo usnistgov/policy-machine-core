@@ -1,14 +1,8 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NODE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.ASCENDANT_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.PROPERTIES_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TARGET_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.TYPE_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.graph.GraphOp.UA_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.PROPERTIES_PARAM;
 import static gov.nist.csd.pm.core.pdp.event.EventContextUtil.buildEventContext;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
@@ -18,14 +12,23 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.Properties;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.op.graph.*;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
+import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreatePolicyClassOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp;
+import gov.nist.csd.pm.core.pap.operation.graph.DeassignOp;
+import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
+import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
+import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -56,7 +59,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserAttributeOp op = new CreateUserAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -66,7 +69,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectAttributeOp op = new CreateObjectAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -76,7 +79,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectOp op = new CreateObjectOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectOp.CREATE_O_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -86,7 +89,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserOp op = new CreateUserOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserOp.CREATE_U_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -95,7 +98,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         SetNodePropertiesOp op = new SetNodePropertiesOp();
         Args args = new Args()
-            .put(NODE_PARAM, id)
+            .put(SetNodePropertiesOp.SET_NODE_PROPS_NODE_ID_PARAM, id)
             .put(PROPERTIES_PARAM, new Properties(properties));
 
         executeOp(op, args);
@@ -104,13 +107,13 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     @Override
     public void deleteNode(long id) throws PMException {
         Node node = pap.query().graph().getNodeById(id);
-        LongArrayList descendants = new LongArrayList(pap.query().graph().getAdjacentDescendants(id));
+        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(id);
 
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = new Args()
-            .put(NODE_PARAM, id)
-            .put(TYPE_PARAM, node.getType().toString())
-            .put(DESCENDANTS_PARAM, descendants);
+            .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, id)
+            .put(Operation.TYPE_PARAM, node.getType().toString())
+            .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         // build event context before executing or else the node will not exist when the util
         // tries to convert the id to the name
@@ -123,8 +126,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void assign(long ascId, Collection<Long> descendants) throws PMException {
         AssignOp op = new AssignOp();
         Args args = new Args()
-            .put(ASCENDANT_PARAM, ascId)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(AssignOp.ASSIGN_ASCENDANT_PARAM,ascId)
+            .put(AssignOp.ASSIGN_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         executeOp(op, args);
     }
@@ -133,8 +136,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         DeassignOp op = new DeassignOp();
         Args args = new Args()
-            .put(ASCENDANT_PARAM, ascendant)
-            .put(DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(DeassignOp.DEASSIGN_ASCENDANT_PARAM, ascendant)
+            .put(DeassignOp.DEASSIGN_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         executeOp(op, args);
     }
@@ -143,8 +146,8 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         AssociateOp op = new AssociateOp();
         Args args = new Args()
-            .put(UA_PARAM, ua)
-            .put(TARGET_PARAM, target)
+            .put(AssociateOp.ASSOCIATE_UA_PARAM, ua)
+            .put(AssociateOp.ASSOCIATE_TARGET_PARAM, target)
             .put(ARSET_PARAM, new ArrayList<>(accessRights));
 
         executeOp(op, args);
@@ -154,20 +157,20 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     public void dissociate(long ua, long target) throws PMException {
         DissociateOp op = new DissociateOp();
         Args args = new Args()
-            .put(UA_PARAM, ua)
-            .put(TARGET_PARAM, target);
+            .put(DissociateOp.DISSOCIATE_UA_PARAM, ua)
+            .put(DissociateOp.DISSOCIATE_TARGET_PARAM, target);
 
         executeOp(op, args);
     }
 
-    private <R> void executeOp(Operation<R> op, Args args, EventContext eventContext) throws PMException {
+    private <R> void executeOp(AdminOperation<R> op, Args args, EventContext eventContext) throws PMException {
         op.canExecute(pap, userCtx, args);
         op.execute(pap, args);
 
         eventPublisher.publishEvent(eventContext);
     }
 
-    private <R> R executeOp(Operation<R> op, Args args) throws PMException {
+    private <R> R executeOp(AdminOperation<R> op, Args args) throws PMException {
         op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 

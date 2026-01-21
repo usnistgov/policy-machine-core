@@ -1,6 +1,14 @@
 package gov.nist.csd.pm.core.pap.pml.statement;
 
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -8,19 +16,11 @@ import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpres
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class ForeachStatementTest {
 
@@ -145,7 +145,7 @@ class ForeachStatementTest {
         String pml = """
                 f1()
                 
-                operation f1() {
+                adminop f1() {
                     foreach x in ["1", "2", "3"] {
                         if x == "2" {
                             return
@@ -164,7 +164,7 @@ class ForeachStatementTest {
         pml = """
                 f1()
                 
-                operation f1() {
+                adminop f1() {
                     foreach x, y in {"1": "1", "2": "2"} {
                         if x == "2" {
                             return

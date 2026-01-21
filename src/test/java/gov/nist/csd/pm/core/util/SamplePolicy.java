@@ -1,17 +1,16 @@
 package gov.nist.csd.pm.core.util;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONDeserializer;
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import org.apache.commons.io.IOUtils;
 
 
 public class SamplePolicy {

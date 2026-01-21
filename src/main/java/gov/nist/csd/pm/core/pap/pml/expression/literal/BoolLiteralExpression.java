@@ -1,10 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.expression.literal;
 
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.type.BooleanType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.BooleanType;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;

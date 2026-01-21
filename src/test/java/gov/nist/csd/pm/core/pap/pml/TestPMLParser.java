@@ -2,8 +2,6 @@ package gov.nist.csd.pm.core.pap.pml;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PmlContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StatementContext;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -80,7 +78,10 @@ public class TestPMLParser {
             return (T) parser.arrayLit();
         } else if (ruleClass == PMLParser.MapLiteralContext.class) {
             return (T) parser.mapLit();
+        } else if (ruleClass == PMLParser.OperationFormalParamListContext.class) {
+            return (T) parser.operationFormalParamList();
         } else {
+
             throw new IllegalArgumentException("Unsupported parser rule class: " + ruleClass.getName());
         }
     }

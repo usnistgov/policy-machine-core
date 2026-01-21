@@ -3,22 +3,22 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
+public class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
 
     public MemoryObligationsStore(MemoryPolicy policy, MemoryTx tx, TxCmdTracker txCmdTracker) {
         super(policy, tx, txCmdTracker);
     }
 
     @Override
-    public void createObligation(long authorId, String name, List<Rule> rules) throws PMException {
-        Obligation obligation = new Obligation(authorId, name, rules.stream().toList());
+    public void createObligation(long authorId, String name, EventPattern eventPattern, ObligationResponse response) throws PMException {
+        Obligation obligation = new Obligation(authorId, name, eventPattern, response);
 
         policy.obligations.add(obligation);
 

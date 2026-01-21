@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -11,17 +10,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class CheckStatement extends PMLStatement<VoidResult> {
-    private final Expression<String> arsExpr;
+    private final Expression<List<String>> arsExpr;
     private final Expression<List<String>> targetExpr;
 
-    public CheckStatement(Expression<String> arsExpr, Expression<List<String>> targetExpr) {
+    public CheckStatement(Expression<List<String>> arsExpr, Expression<List<String>> targetExpr) {
         this.arsExpr = arsExpr;
         this.targetExpr = targetExpr;
     }
 
     @Override
     public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
-        String ars = arsExpr.execute(ctx, pap);
+        List<String> ars = arsExpr.execute(ctx, pap);
         List<String> targets = targetExpr.execute(ctx, pap);
 
         for (String target : targets) {

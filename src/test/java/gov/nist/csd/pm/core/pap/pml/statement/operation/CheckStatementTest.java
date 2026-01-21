@@ -1,10 +1,15 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
-
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -12,14 +17,10 @@ import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
 
 class CheckStatementTest {
 
@@ -46,28 +47,39 @@ class CheckStatementTest {
         ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
+        ), false);
+
+        // check empty checks for any
+        testCheck(ctx, pap, new CheckStatement(
+            ArrayLiteralExpression.of(new ArrayList<>(), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
         ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-            new StringLiteralExpression("assign"),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
+        ), true);
+
+        testCheck(ctx, pap, new CheckStatement(
+            ArrayLiteralExpression.of(new ArrayList<>(), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
     }
@@ -83,13 +95,12 @@ class CheckStatementTest {
     @Test
     void testOperationInCheck() throws PMException {
         String pml = """
-                operation testOp() string {
+                adminop testOp() string {
                     return PM_ADMIN_BASE_OA
                 }
                 
-                operation op1() {
-                    check "assign" on [testOp()]
-                } {
+                adminop op1() {
+                    check ["assign"] on [testOp()]
                     create PC "pc2"
                 }
                 
@@ -104,7 +115,7 @@ class CheckStatementTest {
         pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
+        pdp.adjudicateOperation(new TestUserContext("u1"), "op1", Map.of());
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
     }

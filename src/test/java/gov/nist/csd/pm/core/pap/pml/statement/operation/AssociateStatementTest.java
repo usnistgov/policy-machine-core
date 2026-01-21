@@ -1,6 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
@@ -10,11 +15,6 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AssociateStatementTest {
 
@@ -27,7 +27,7 @@ class AssociateStatementTest {
         );
 
         PAP pap = new TestPAP();
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createUserAttribute("u1", ids("pc1"));

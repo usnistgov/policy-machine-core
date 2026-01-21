@@ -1,5 +1,5 @@
 {
-  "resourceOperations": [
+  "resourceAccessRights": [
     "read",
     "delete_readme",
     "delete_project",
@@ -195,16 +195,23 @@
     {
       "author": 14,
       "name": "create us project admin",
-      "pml": "create obligation \"create us project admin\" {\n    create rule \"us project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"US project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n    create rule \"eu project\"\n    when any user\n    performs \"createProject\"\n    on {\n        locProjectAttr: \"EU project\"\n    }\n    do (ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }\n\n}"
+      "pml": "create obligation \"create us project admin\"\n    when any user\n    performs createProject on (locProjectAttr) {\n      return locProjectAttr == \"US project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
+    },
+    {
+      "author": 14,
+      "name": "create eu project admin",
+      "pml": "create obligation \"create eu project admin\"\n    when any user\n    performs createProject on (locProjectAttr) {\n        return locProjectAttr == \"EU project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
     }
   ],
-  "operations": [
-    "operation deleteProject(@node string projectName) {\n    check \"delete_project\" on [projectName]\n} {\n    delete node projectName\n}",
-    "operation createProject(string projectName, @node string locProjectAttr) {\n    check \"assign_to\" on [\"project\"]\n    check \"assign_to\" on [locProjectAttr]\n} {\n    create OA projectName in [\"project\", locProjectAttr]\n    create O projectName + \" README\" in [projectName]\n}",
-    "operation deleteReadme(@node string projectReadme) {\n    check \"delete_readme\" on [projectReadme]\n} {\n    delete node projectReadme\n}",
-    "operation createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName and projectName with [\"*\"]\n    create prohibition \"deny admin delete README\"\n      deny UA uaName\n      access rights [\"delete_readme\"]\n      on union of {projectName:false}\n}"
-  ],
-  "routines": [
-    "routine deleteAllProjects(string locProjectOA) {\n    foreach project in getAdjacentAscendants(locProjectOA) {\n        deleteReadme(project + \" README\")\n        deleteProject(project)\n    }\n}"
-  ]
+  "operations": {
+    "admin":  [
+      "adminop deleteReadme(@node(\"delete_readme\") string projectReadme) {\n    delete node projectReadme\n}",
+      "adminop deleteProject(@node(\"delete_project\") string projectName) {\n    delete node projectName\n}",
+      "adminop createProject(string projectName, @node(\"assign_to\") string locProjectAttr) {\n   create oa projectName in [\"project\", locProjectAttr]\n   create o projectName + \" README\" in [projectName]\n}",
+      "adminop createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName and projectName with [\"*\"]\n\n    create prohibition \"deny admin delete README\"\n    deny UA uaName\n    access rights [\"delete_readme\"]\n    on union of {projectName: false}\n}"
+    ],
+    "routines": [
+      "routine deleteAllProjects(string locProjectOA) {\n    foreach project in getAdjacentAscendants(locProjectOA) {\n        deleteReadme(project + \" README\")\n        deleteProject(project)\n    }\n}"
+    ]
+  }
 }

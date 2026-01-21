@@ -1,5 +1,13 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.ANY;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.O;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
+import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
+import static gov.nist.csd.pm.core.common.graph.node.Properties.WILDCARD;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -10,12 +18,12 @@ import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static gov.nist.csd.pm.core.common.graph.node.NodeType.*;
-import static gov.nist.csd.pm.core.common.graph.node.Properties.WILDCARD;
 
 public class MemoryGraphStore extends MemoryStore implements GraphStore {
 

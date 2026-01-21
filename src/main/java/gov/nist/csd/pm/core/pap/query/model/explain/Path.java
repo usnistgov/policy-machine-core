@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.query.model.explain;
 
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

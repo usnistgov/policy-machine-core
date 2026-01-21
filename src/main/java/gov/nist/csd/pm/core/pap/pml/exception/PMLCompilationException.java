@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.pml.exception;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.compiler.error.ErrorLog;
-
 import java.util.ArrayList;
 import java.util.List;
 

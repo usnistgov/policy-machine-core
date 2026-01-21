@@ -4,53 +4,22 @@ import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.arg.IdNodeFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.ListIdNodeFormalParameter;
-import gov.nist.csd.pm.core.pap.function.op.arg.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class EventContextUtil {
 
+    /**
+     * Util method to build an EventContext object given information about an operation. The provided userCtx will either
+     * have a user node ID or a list of attribute IDs. These IDs will be converted into their corresponding names.
+     * @param pap The PAP object.
+     * @param userCtx The user that executed the operation.
+     * @param opName The operation name.
+     * @param args The args passed to the operation.
+     * @return The EventContext object.
+     * @throws PMException If there is an exception converting the operation to an EventContext.
+     */
     public static EventContext buildEventContext(PAP pap, UserContext userCtx, String opName, Args args) throws PMException {
-        return new EventContext(EventContextUser.fromUserContext(userCtx, pap), opName, resolveNodeArgNames(pap, args));
+        return new EventContext(EventContextUser.fromUserContext(userCtx, pap), opName, args.toMap());
     }
-
-    private static Map<String, Object> resolveNodeArgNames(PAP pap, Args actualArgs) {
-        Map<String, Object> args = new HashMap<>();
-
-        actualArgs.foreach((formalArg, value) -> {
-            // if the arg is a node arg than we need to convert the node IDs to names for the EPP pattern checking
-            switch (formalArg) {
-                case IdNodeFormalParameter idNodeFormalArg ->
-                    args.put(idNodeFormalArg.getName(), resolveNodeArgName(pap, actualArgs.get(idNodeFormalArg)));
-
-                case ListIdNodeFormalParameter listIdNodeFormalArg -> {
-                    List<Long> ids = actualArgs.get(listIdNodeFormalArg);
-                    List<String> names = ids.stream()
-                        .map(id -> resolveNodeArgName(pap, id))
-                        .collect(Collectors.toList());
-                    args.put(listIdNodeFormalArg.getName(), names);
-                }
-
-                // if not a node arg, add as is
-                default -> args.put(formalArg.getName(), value);
-            }
-        });
-
-        return args;
-    }
-
-    private static String resolveNodeArgName(PAP pap, long id) {
-        try {
-            return pap.query().graph().getNodeById(id).getName();
-        } catch (PMException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

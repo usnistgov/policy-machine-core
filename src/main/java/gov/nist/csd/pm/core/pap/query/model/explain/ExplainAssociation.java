@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pap.query.model.explain;
 import com.google.gson.GsonBuilder;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;

@@ -1,20 +1,20 @@
 package gov.nist.csd.pm.core.pdp;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 class PMLBootstrapperTest {
 
@@ -24,7 +24,7 @@ class PMLBootstrapperTest {
         PDP pdp = new PDP(pap);
 
         String input = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -39,14 +39,14 @@ class PMLBootstrapperTest {
                 routine1()
                 """;
 
-        Operation<?> op1 = new Operation<>("op1", List.of()) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
             }
 
             @Override
-            public Object execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("op1");
 
                 return null;
@@ -54,17 +54,17 @@ class PMLBootstrapperTest {
 
         };
 
-        Routine<?> routine1 = new Routine<>("routine1", List.of()) {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
-            public Object execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("routine1");
                 return null;
             }
 
         };
 
-        pap.plugins().registerOperation(op1);
-        pap.plugins().registerRoutine(routine1);
+        pap.plugins().addOperation(pap.query().operations(), op1);
+        pap.plugins().addOperation(pap.query().operations(), routine1);
 
         pdp.bootstrap(new PMLBootstrapper("u1", input));
 

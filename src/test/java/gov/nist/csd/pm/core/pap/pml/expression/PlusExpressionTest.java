@@ -1,6 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.expression;
 
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
@@ -11,14 +15,8 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-
-
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PlusExpressionTest {
 
@@ -28,7 +26,7 @@ class PlusExpressionTest {
                 """
                 "a" + "b"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> expression = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -51,7 +49,7 @@ class PlusExpressionTest {
                 """
                 "a" + "b" + "c"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression expression = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
@@ -74,7 +72,7 @@ class PlusExpressionTest {
                 """
                 "a" + "b" + ["c"]
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
                 () -> ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE)

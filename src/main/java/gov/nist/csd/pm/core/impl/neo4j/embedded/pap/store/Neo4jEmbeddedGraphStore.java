@@ -1,5 +1,18 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ARSET_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ASSIGNMENT_RELATIONSHIP_TYPE;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ASSOCIATION_RELATIONSHIP_TYPE;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ID_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NODE_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OA_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PC_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_SUBJECT_REL_TYPE;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.UA_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.getNodeType;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.typeToLabel;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
@@ -8,16 +21,22 @@ import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import org.neo4j.graphdb.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Traverser;
 import org.neo4j.graphdb.traversal.Uniqueness;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.*;
 
 public class Neo4jEmbeddedGraphStore implements GraphStore {
 

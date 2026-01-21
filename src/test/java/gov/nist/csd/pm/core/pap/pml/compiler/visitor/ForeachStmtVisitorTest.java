@@ -1,35 +1,32 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
-import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.core.pap.pml.function.PMLFunctionSignature;
-import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.pml.scope.Scope;
-import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
 import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
 import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
+import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
+import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 class ForeachStmtVisitorTest {
 
-    private static Scope<Variable, PMLFunctionSignature> testScope;
+    private static CompileScope testScope;
 
     @BeforeAll
     static void setup() throws PMException {
-        testScope = new CompileScope();
+        testScope = new CompileScope(new MemoryPAP());
     }
 
     @Test
@@ -39,7 +36,7 @@ class ForeachStmtVisitorTest {
                 foreach x in ["a", "b"] {}
                 """);
         VisitorContext visitorCtx = new VisitorContext(testScope);
-        PMLStatement stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
+        PMLStatement<?> stmt = new ForeachStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new ForeachStatement("x", null, buildArrayLiteral("a", "b"), List.of()).toString(),

@@ -1,18 +1,17 @@
 package gov.nist.csd.pm.core.impl.memory.pap.dag;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.dag.BreadthFirstGraphWalker;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.util.TestPAP;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.dag.BreadthFirstGraphWalker;
+import gov.nist.csd.pm.core.util.TestPAP;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class BreadthFirstGraphWalkerTest {
 

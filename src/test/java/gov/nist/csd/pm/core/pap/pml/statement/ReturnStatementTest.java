@@ -12,11 +12,11 @@ class ReturnStatementTest {
     @Test
     void testReturnValueIsUnwrapped() throws PMException {
         String pml = """
-                operation f1() string {
+                adminop f1() string {
                     return f2()
                 }
                 
-                operation f2() string {
+                adminop f2() string {
                     return "test"
                 }
                 

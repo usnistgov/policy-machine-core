@@ -1,8 +1,17 @@
 package gov.nist.csd.pm.core.pap.pml.expression.literal;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.type.ListType;
-import gov.nist.csd.pm.core.pap.function.arg.type.MapType;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
@@ -10,21 +19,10 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.BOOLEAN_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.ANY_TYPE;
-import static gov.nist.csd.pm.core.pap.function.arg.type.Type.STRING_TYPE;
-
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
-import static gov.nist.csd.pm.core.pap.pml.PMLUtil.buildMapLiteral;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 class LiteralVisitorTest {
 
@@ -34,7 +32,7 @@ class LiteralVisitorTest {
                 """
                 "test"
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<String> literal = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -55,7 +53,7 @@ class LiteralVisitorTest {
                 """
                 true
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -76,7 +74,7 @@ class LiteralVisitorTest {
                 """
                 ["a", ["b"]]
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(ANY_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -98,7 +96,7 @@ class LiteralVisitorTest {
                 """
                 ["a", "b"]
                 """);
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         literal = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -120,7 +118,7 @@ class LiteralVisitorTest {
                 """
                 ["a", b]
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         PMLCompilationRuntimeException e = assertThrows(
                 PMLCompilationRuntimeException.class,
@@ -143,7 +141,7 @@ class LiteralVisitorTest {
                     "b": "b1"
                 }
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression literal = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(STRING_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -168,7 +166,7 @@ class LiteralVisitorTest {
                     "b": ["b1"]
                 }
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx);
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -196,7 +194,7 @@ class LiteralVisitorTest {
                     ["b"]: "b1"
                 }
                 """);
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> literal = ExpressionVisitor.compile(visitorContext, ctx, MapType.of(ANY_TYPE, STRING_TYPE));
 
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -218,7 +216,7 @@ class LiteralVisitorTest {
     void testEmptyLiterals() throws PMException {
         PMLParser.ExpressionContext stringCtx = TestPMLParser.parseExpression(
                 "\"\"");
-        VisitorContext visitorContext = new VisitorContext(new CompileScope());
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression<?> literal = ExpressionVisitor.compile(visitorContext, stringCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
@@ -228,7 +226,7 @@ class LiteralVisitorTest {
 
         PMLParser.ExpressionContext arrayCtx = TestPMLParser.parseExpression(
                 "[]");
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression arrayLiteral = ExpressionVisitor.compile(visitorContext, arrayCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(
@@ -238,7 +236,7 @@ class LiteralVisitorTest {
 
         PMLParser.ExpressionContext mapCtx = TestPMLParser.parseExpression(
                 "{}");
-        visitorContext = new VisitorContext(new CompileScope());
+        visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
         Expression mapLiteral = ExpressionVisitor.compile(visitorContext, mapCtx);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertEquals(

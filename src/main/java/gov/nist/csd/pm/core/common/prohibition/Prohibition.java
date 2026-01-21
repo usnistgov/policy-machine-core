@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.common.prohibition;
 
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;

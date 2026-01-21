@@ -1,25 +1,22 @@
 package gov.nist.csd.pm.core.pdp;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
-import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.common.tx.TxRunner;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.routine.Routine;
-import gov.nist.csd.pm.core.pap.pml.function.operation.PMLOperation;
-import gov.nist.csd.pm.core.pap.pml.function.routine.PMLRoutine;
+import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.AccessAdjudication;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
-
-import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PDP implements EventPublisher, AccessAdjudication {
 
@@ -80,77 +77,33 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     @Override
-    public Node adjudicateResourceOperation(UserContext user, long policyElementId, String resourceOperation) throws PMException {
-        if (!pap.query().operations().getResourceOperations().contains(resourceOperation)) {
-            throw new OperationDoesNotExistException(resourceOperation);
-        }
+    public Object adjudicateOperation(UserContext user, String resourceOperation, Map<String, Object> rawAgs) throws PMException {
+        Operation<?> op = pap.query().operations().getOperation(resourceOperation);
+        Args args = op.validateAndPrepareArgs(rawAgs);
 
-        pap.privilegeChecker().check(user, policyElementId, resourceOperation);
-
-        Node node = pap.query().graph().getNodeById(policyElementId);
-
-        publishEvent(new EventContext(
-            EventContextUser.fromUserContext(user, pap),
-            resourceOperation,
-            Map.of("target", node.getName())
-        ));
-
-        return node;
+        return runTx(user, tx -> executeOperation(user, tx, op, args));
     }
 
     @Override
-    public Object adjudicateAdminOperation(UserContext user,
-                                           String operation,
-                                           Map<String, Object> args) throws
-                                                                     PMException {
-        return runTx(user, tx -> executeOperation(user, tx, operation, args));
-    }
-
-    @Override
-    public Object adjudicateAdminRoutine(UserContext user,
-                                         String routineName,
-                                         Map<String, Object> args) throws PMException {
-        Routine<?> routine = pap.query().routines().getAdminRoutine(routineName);
-
-        return runTx(user, tx -> {
-            if (routine instanceof PMLRoutine) {
-                ((PMLRoutine) routine).setCtx(tx.buildExecutionContext(user));
-            }
-
-            return tx.executeAdminFunction(routine, args);
-        });
-    }
-
-    @Override
-    public void adjudicateAdminRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
+    public void adjudicateRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
         runTx(user, tx -> {
             for (OperationRequest request : operationRequests) {
-                executeOperation(user, tx, request.op(), request.args());
+                Operation<?> op = pap.query().operations().getOperation(request.op());
+                Args args = op.validateAndPrepareArgs(request.args());
+                executeOperation(user, tx, op, args);
             }
 
             return null;
         });
     }
 
-    private Object executeOperation(UserContext user, PDPTx pdpTx, String op, Map<String, Object> actualArgs) throws PMException {
-        Operation<?> operation = pap.query().operations().getAdminOperation(op);
-
+    private Object executeOperation(UserContext user, PDPTx pdpTx, Operation<?> operation, Args args) throws PMException {
         if (operation instanceof PMLOperation) {
             ((PMLOperation)operation).setCtx(pdpTx.buildExecutionContext(user));
         }
 
         // execute operation
-        Object ret = pdpTx.executeAdminFunction(operation, actualArgs);
-
-        // send to EPP
-        publishEvent(EventContextUtil.buildEventContext(
-            pap,
-            user,
-            operation.getName(),
-            operation.validateAndPrepareArgs(actualArgs)
-        ));
-
-        return ret;
+        return pdpTx.executeOperation(operation, args);
     }
 
 }

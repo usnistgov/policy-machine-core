@@ -1,120 +1,120 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.function.op.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.AUTHOR_PARAM;
-import static gov.nist.csd.pm.core.pap.function.op.obligation.ObligationOp.RULES_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.AUTHOR_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.EVENT_PATTERN_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.OBLIGATION_RESPONSE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.obligation.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.ObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.PMLObligationResponse;
-import gov.nist.csd.pm.core.pap.obligation.Rule;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.function.op.obligation.CreateObligationOp;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import java.util.ArrayList;
-import java.util.List;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import java.util.Objects;
 
 public class CreateObligationStatement extends OperationStatement {
 
     private final Expression<String> name;
-    private final List<CreateRuleStatement> ruleStmts;
+    private final EventPattern eventPattern;
+    private final ObligationResponse response;
 
-    public CreateObligationStatement(Expression<String> name, List<CreateRuleStatement> ruleStmts) {
+    public CreateObligationStatement(Expression<String> name,
+                                     EventPattern eventPattern,
+                                     ObligationResponse response) {
         super(new CreateObligationOp());
         this.name = name;
-        this.ruleStmts = ruleStmts;
+        this.eventPattern = eventPattern;
+        this.response = response;
     }
 
     public Expression<String> getName() {
         return name;
     }
 
-    public List<CreateRuleStatement> getRuleStmts() {
-        return ruleStmts;
+    public EventPattern getEventPattern() {
+        return eventPattern;
+    }
+
+    public ObligationResponse getResponse() {
+        return response;
     }
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap);
 
-        // execute the create rule statements and add to obligation
-        List<Rule> rules = new ArrayList<>();
-        for (CreateRuleStatement createRuleStmt : ruleStmts) {
-            Rule rule = createRuleStmt.execute(ctx, pap);
-            rules.add(rule);
-        }
-
         return new Args()
             .put(AUTHOR_PARAM, ctx.author().getUser())
             .put(NAME_PARAM, nameStr)
-            .put(RULES_PARAM, new ArrayList<>(rules));
+            .put(EVENT_PATTERN_PARAM, eventPattern)
+            .put(OBLIGATION_RESPONSE_PARAM, response);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof CreateObligationStatement that))
+        }
+        if (!(o instanceof CreateObligationStatement that)) {
             return false;
-        return Objects.equals(name, that.name) && Objects.equals(ruleStmts, that.ruleStmts);
+        }
+
+        return Objects.equals(name, that.name) && Objects.equals(eventPattern, that.eventPattern)
+            && Objects.equals(response, that.response);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, ruleStmts);
+        return Objects.hash(name, eventPattern, response);
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        StringBuilder sb = new StringBuilder();
-        for (CreateRuleStatement createRuleStatement : ruleStmts) {
-            sb.append(createRuleStatement.toFormattedString(indentLevel+1)).append("\n\n");
-        }
+        PMLStatementBlock block = new PMLStatementBlock(response.getStatements());
 
-        String indent = indent(indentLevel);
         return String.format(
             """
-            %screate obligation %s {
-            %s%s}""", indent, name, sb, indent);
-    }
-
-    public static CreateObligationStatement fromObligation(Obligation obligation) {
-        return new CreateObligationStatement(
-            new StringLiteralExpression(obligation.getName()),
-            createRuleStatementsFromObligation(obligation.getRules())
+            create obligation %s
+            when %s
+            performs %s
+            do (%s) %s""",
+            name,
+            subjectPatternToString(indentLevel, eventPattern.getSubjectPattern()),
+            operationPatternToString(indentLevel, eventPattern.getOperationPattern()),
+            response.getEventCtxVariable(), block.toFormattedString(indentLevel)
         );
     }
 
-    private static List<CreateRuleStatement> createRuleStatementsFromObligation(List<Rule> rules) {
-        List<CreateRuleStatement> createRuleStatements = new ArrayList<>();
+    private String subjectPatternToString(int indentLevel, SubjectPattern subjectPattern) {
+        return subjectPattern.toFormattedString(indentLevel);
+    }
 
-        for (Rule rule : rules) {
-            EventPattern event = rule.getEventPattern();
-            ObligationResponse response = rule.getResponse();
-            if (!(response instanceof PMLObligationResponse pmlObligationResponse)) {
-                throw new IllegalStateException("cannot convert rule " + rule.getName() + " to PML because it has a JavaObligationResponse");
-            }
+    private String operationPatternToString(int indentLevel, OperationPattern operationPattern) {
+        return operationPattern.toFormattedString(indentLevel);
+    }
 
-            CreateRuleStatement createRuleStatement = new CreateRuleStatement(
-                new StringLiteralExpression(rule.getName()),
-                event.getSubjectPattern(),
-                event.getOperationPattern(),
-                event.getArgPatterns(),
-                new CreateRuleStatement.ResponseBlock(
-                    pmlObligationResponse.getEventCtxVariable(),
-                    pmlObligationResponse.getStatements()
-                )
-            );
-
-            createRuleStatements.add(createRuleStatement);
+    public static CreateObligationStatement fromObligation(Obligation obligation) {
+        EventPattern event = obligation.getEventPattern();
+        ObligationResponse response = obligation.getResponse();
+        if (!(response instanceof ObligationResponse pmlObligationResponse)) {
+            throw new IllegalStateException("cannot convert obligation " + obligation.getName() + " to PML because it does not have a PMLObligationResponse response");
         }
 
-        return createRuleStatements;
+        return new CreateObligationStatement(
+            new StringLiteralExpression(obligation.getName()),
+            new EventPattern(event.getSubjectPattern(), event.getOperationPattern()),
+            new ObligationResponse(
+                pmlObligationResponse.getEventCtxVariable(),
+                pmlObligationResponse.getStatements()
+            )
+        );
     }
 }

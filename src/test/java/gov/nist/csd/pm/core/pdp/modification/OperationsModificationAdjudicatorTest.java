@@ -1,11 +1,19 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.pap.function.arg.Args;
-import gov.nist.csd.pm.core.pap.function.op.Operation;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -14,9 +22,6 @@ import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
 
 class OperationsModificationAdjudicatorTest {
 
@@ -62,15 +67,15 @@ class OperationsModificationAdjudicatorTest {
 
 
     @Test
-    void setResourceOperations() throws PMException {
-        assertDoesNotThrow(() -> ok.setResourceOperations(new AccessRightSet("read")));
-        assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceOperations());
-        assertThrows(UnauthorizedException.class, () -> fail.setResourceOperations(new AccessRightSet("read")));
+    void setResourceAccessRights() throws PMException {
+        assertDoesNotThrow(() -> ok.setResourceAccessRights(new AccessRightSet("read")));
+        assertEquals(new AccessRightSet("read"), pap.query().operations().getResourceAccessRights());
+        assertThrows(UnauthorizedException.class, () -> fail.setResourceAccessRights(new AccessRightSet("read")));
     }
 
     @Test
     void createAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1", List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -83,14 +88,14 @@ class OperationsModificationAdjudicatorTest {
 
         };
 
-        assertDoesNotThrow(() -> ok.createAdminOperation(op1));
-        assertTrue(pap.query().operations().getAdminOperationNames().contains("op1"));
-        assertThrows(UnauthorizedException.class, () -> fail.createAdminOperation(op1));
+        assertDoesNotThrow(() -> ok.createOperation(op1));
+        assertTrue(pap.query().operations().getOperations().contains(op1));
+        assertThrows(UnauthorizedException.class, () -> fail.createOperation(op1));
     }
 
     @Test
     void deleteAdminOperation() throws PMException {
-        Operation<Void> op1 = new Operation<>("op1", List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
 
@@ -102,9 +107,24 @@ class OperationsModificationAdjudicatorTest {
             }
 
         };
-        ok.createAdminOperation(op1);
+        ok.createOperation(op1);
 
-        assertDoesNotThrow(() -> ok.deleteAdminOperation("op1"));
-        assertThrows(UnauthorizedException.class, () -> fail.deleteAdminOperation("op1"));
+        assertDoesNotThrow(() -> ok.deleteOperation("op1"));
+        assertThrows(UnauthorizedException.class, () -> fail.deleteOperation("op1"));
+    }
+
+    @Test
+    void createAdminRoutine() throws PMException {
+        Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
+            @Override
+            public Void execute(PAP pap, Args actualArgs) throws PMException {
+                return null;
+            }
+
+        };
+
+        assertDoesNotThrow(() -> ok.createOperation(routine1));
+        assertTrue(pap.query().operations().getOperations().contains(routine1));
+        assertThrows(UnauthorizedException.class, () -> fail.createOperation(routine1));
     }
 }

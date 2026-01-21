@@ -1,5 +1,13 @@
 package gov.nist.csd.pm.core.pap.pml;
 
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
@@ -7,13 +15,8 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collection;
-
-import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class ExecutionTest {
 
@@ -23,7 +26,7 @@ public class ExecutionTest {
 
         String input =
                 """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 
                 create PC "pc1"
                 
@@ -333,9 +336,9 @@ public class ExecutionTest {
     }
 
     @Test
-    void testFunction() throws PMException {
+    void testOperation() throws PMException {
         String input = """
-                operation testFunc(any x) {
+                adminop testFunc(any x) {
                     create PC x
                 }
                 
@@ -348,7 +351,7 @@ public class ExecutionTest {
         assertTrue(pap.query().graph().nodeExists("pc1"));
 
         String input1 = """
-                operation testFunc(any x) {
+                adminop testFunc(any x) {
                     create ua "ua1" in x
                 }
                 
@@ -363,7 +366,7 @@ public class ExecutionTest {
         PAP pap2 = new TestPAP();
         String input2 = """
                 x := "hello"
-                operation testFunc() {
+                adminop testFunc() {
                     create PC x + " world"
                 }
                 
@@ -394,12 +397,12 @@ public class ExecutionTest {
     @Test
     void testArrayWithLiteral() throws PMException {
         String input = """
-                set resource operations ["read", "write"]
+                set resource access rights ["read", "write"]
                 """;
          PAP pap = new TestPAP();
         
         pap.executePML(new TestUserContext("u1"), input);
-        assertTrue(pap.query().operations().getResourceOperations().contains("read"));
+        assertTrue(pap.query().operations().getResourceAccessRights().contains("read"));
 
         String input1 = """
                 set resource operations [["read", "write"], ["exec"]]
@@ -421,7 +424,7 @@ public class ExecutionTest {
     void testDeleteProhibition() throws PMException {
          PAP pap = new TestPAP();
         
-        pap.modify().operations().setResourceOperations(new AccessRightSet("read"));
+        pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
@@ -449,7 +452,7 @@ public class ExecutionTest {
     @Test
     void testReturnValue() throws PMException {
         String pml = """
-                operation testFunc(string s) string {
+                adminop testFunc(string s) string {
                     return s
                 }
                 
@@ -463,9 +466,9 @@ public class ExecutionTest {
     }
 
     @Test
-    void testOverwriteFunctionArg() throws PMException {
+    void testOverwriteOperationArg() throws PMException {
         String pml = """
-                operation testFunc(string s) string {
+                adminop testFunc(string s) string {
                     s = "test2"
                     return s
                 }

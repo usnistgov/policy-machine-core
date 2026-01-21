@@ -1,6 +1,10 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -12,9 +16,6 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteObligationStatemen
 import gov.nist.csd.pm.core.pap.pml.statement.operation.DeleteProhibitionStatement;
 import org.junit.jupiter.api.Test;
 
-import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class DeleteStmtVisitorTest {
 
     @Test
@@ -23,8 +24,8 @@ class DeleteStmtVisitorTest {
                 """
                 delete if exists node "oa1"
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
-        PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        PMLStatement<?> stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
                 new DeleteNodeStatement(new StringLiteralExpression("oa1"), true),
@@ -34,7 +35,7 @@ class DeleteStmtVisitorTest {
 
     @Test
     void testInvalidExpressions() throws PMException {
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
                 """
@@ -50,7 +51,7 @@ class DeleteStmtVisitorTest {
                 """
                 delete obligation "test"
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(
@@ -65,7 +66,7 @@ class DeleteStmtVisitorTest {
                 """
                 delete prohibition "test"
                 """);
-        VisitorContext visitorCtx = new VisitorContext(new CompileScope());
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         PMLStatement stmt = new DeleteStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
         assertEquals(

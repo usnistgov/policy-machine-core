@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.google.gson.Gson;
@@ -22,6 +21,7 @@ class JSONSerializerTest {
 
         String serialize = pap.serialize(new JSONSerializer());
         MemoryPAP pap2 = new MemoryPAP();
+
         pap2.deserialize(serialize, new JSONDeserializer());
         pap2.serialize(new JSONSerializer());
 

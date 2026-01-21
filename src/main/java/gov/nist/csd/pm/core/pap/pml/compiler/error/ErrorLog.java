@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.error;
 
 import gov.nist.csd.pm.core.pap.pml.compiler.Position;
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class ErrorLog {
 
@@ -31,6 +30,10 @@ public class ErrorLog {
     }
 
     public void addErrors(List<CompileError> errors) {
+        if (errors == null) {
+            return;
+        }
+
         this.errors.addAll(errors);
     }
 
