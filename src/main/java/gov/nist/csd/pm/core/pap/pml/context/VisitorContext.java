@@ -22,12 +22,12 @@ public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLOperat
         return new VisitorContext(this.tokens, scope.copy(), this.errorLog, this.pmlErrorHandler);
     }
 
-    public VisitorContext copyBasicAndQueryOnly() {
-        return new VisitorContext(this.tokens, scope.copyBasicAndQueryFunctionsOnly(), this.errorLog, this.pmlErrorHandler);
+    public VisitorContext copyFunctionsAndQueriesOnly() {
+        return new VisitorContext(this.tokens, scope.copyFunctionsAndQueriesOnly(), this.errorLog, this.pmlErrorHandler);
     }
 
-    public VisitorContext copyBasicOnly() {
-        return new VisitorContext(this.tokens, scope.copyBasicFunctionsOnly(), this.errorLog, this.pmlErrorHandler);
+    public VisitorContext copyFunctionsOnly() {
+        return new VisitorContext(this.tokens, scope.copyFunctionsOnly(), this.errorLog, this.pmlErrorHandler);
     }
 
     @Override

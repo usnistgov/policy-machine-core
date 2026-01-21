@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public sealed abstract class Type<T> implements Serializable
-    permits AdminOperationType, AnyType, BasicFunctionType, BooleanType, ContainerConditionType, EventPatternType,
+    permits AdminOperationType, AnyType, FunctionType, BooleanType, ContainerConditionType, EventPatternType,
     ListType, LongType, MapType, ObligationResponseType, ProhibitionSubjectArgType, ResourceOperationType, RoutineType,
     StringType, VoidType, QueryOperationType {
 

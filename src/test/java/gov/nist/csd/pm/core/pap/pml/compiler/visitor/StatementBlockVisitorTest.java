@@ -22,7 +22,7 @@ class StatementBlockVisitorTest {
     }
 
     @Test
-    void testFunctionInBlockOk() {
+    void testOperationInBlockOk() {
         PMLParser.StatementBlockContext ctx = toStatementBlockCtx(
                 """
                 {

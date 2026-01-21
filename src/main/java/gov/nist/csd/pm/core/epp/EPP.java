@@ -92,8 +92,8 @@ public class EPP implements EventSubscriber {
                               OnPattern onPattern) throws PMException {
         PMLStmtsRoutine<Boolean> matchFunc = onPattern.func();
 
-        // need to pas only the args that the matching function expects which could be a subset of the
-        // params defined in the function and passed in rawArgs
+        // need to pas only the args that the matching operation expects which could be a subset of the
+        // params defined in the operation and passed in rawArgs
         List<FormalParameter<?>> formalParameters = matchFunc.getFormalParameters();
         HashMap<String, Object> matchFuncArgs = new HashMap<>(rawArgs);
         Set<String> paramNames = formalParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
@@ -104,7 +104,7 @@ public class EPP implements EventSubscriber {
         // first, check the user has any privileges on each node in the event context args - any privilege works
         checkAccessOnEventContextArgs(userCtx, args.getMap());
 
-        // execute the matching function to determine if event context args match the pattern
+        // execute the matching operation to determine if event context args match the pattern
         // use the pdptx so that any calls to the querier have privilege checks
         ExecutionContext executionContext = pdpTx.buildExecutionContext(userCtx);
         matchFunc.setCtx(executionContext);

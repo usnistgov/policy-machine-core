@@ -27,50 +27,34 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests for ANY_TYPE integration with functions in PML.
- * These tests verify that ANY_TYPE works correctly with function
- * parameters and return values.
- */
 public class AnyTypeOperationTest {
 
-    private ExecutionContext executionContext;
-
-    @BeforeEach
-    void setUp() throws PMException {
-        executionContext = new ExecutionContext(new TestUserContext("u1"), new MemoryPAP());
-    }
-
     @Test
-    void testFunctionWithObjectTypeParameter() throws PMException {
-        // Create a function signature with an ANY_TYPE parameter
+    void testOpWithObjectTypeParameter() throws PMException {
         PMLOperationSignature functionSignature = new PMLOperationSignature(
             OperationType.FUNCTION,
-            "testFunction",
-            STRING_TYPE,  // Return type
+            "testOp",
+            STRING_TYPE,
             List.of(
                 new FormalParameter<>("arg", ANY_TYPE)
             )
         );
 
-        // Add the function to the scope
         CompileScope scope = new CompileScope(new MemoryPAP());
-        scope.addOperation("testFunction", functionSignature);
+        scope.addOperation("testOp", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
-        // Test with different argument types
         String[] testCalls = {
-            "testFunction(\"string value\")",
-            "testFunction(\"value2\")",
-            "testFunction(true)",
-            "testFunction([\"a\", \"b\", \"c\"])",
-            "testFunction({\"key\": \"value\"})"
+            "testOp(\"string value\")",
+            "testOp(\"value2\")",
+            "testOp(true)",
+            "testOp([\"a\", \"b\", \"c\"])",
+            "testOp({\"key\": \"value\"})"
         };
 
         for (String call : testCalls) {
             PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(call);
 
-            // Should compile without errors
             Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, STRING_TYPE);
             assertEquals(0, visitorContext.errorLog().getErrors().size());
             assertTrue(expr instanceof OperationInvokeExpression);
@@ -79,67 +63,58 @@ public class AnyTypeOperationTest {
     }
 
     @Test
-    void testFunctionWithObjectTypeReturnValue() throws PMException {
-        // Create a function signature that returns ANY_TYPE
+    void testOpWithObjectTypeReturnValue() throws PMException {
         PMLOperationSignature functionSignature = new PMLOperationSignature(
             OperationType.FUNCTION,
-            "objectReturningFunction",
-            ANY_TYPE,  // Return type
+            "returningOp",
+            ANY_TYPE,  
             List.of()
         );
 
-        // Add the function to the scope
         CompileScope scope = new CompileScope(new MemoryPAP());
-        scope.addOperation("objectReturningFunction", functionSignature);
+        scope.addOperation("returningOp", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
-        // Compile function call
-        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression("objectReturningFunction()");
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression("returningOp()");
 
-        // Should compile without errors
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(expr instanceof OperationInvokeExpression);
         assertEquals(ANY_TYPE, expr.getType());
 
-        // Test using the function result in different type contexts
         String[] testContexts = {
-            "\"prefix_\" + objectReturningFunction()",  // String context (concatenation)
-            "objectReturningFunction() == \"expected\"", // Equality comparison
-            "[objectReturningFunction()]", // Array context
-            "{\"key\": objectReturningFunction()}" // Map value context
+            "\"prefix_\" + returningOp()", 
+            "returningOp() == \"expected\"", 
+            "[returningOp()]", 
+            "{\"key\": returningOp()}" 
         };
 
         for (String testExpr : testContexts) {
             PMLParser.ExpressionContext testCtx = TestPMLParser.parseExpression(testExpr);
 
-            // Should compile without errors because ANY_TYPE is compatible with any expected type
             Expression<?> testExpression = ExpressionVisitor.compile(visitorContext, testCtx);
             assertEquals(0, visitorContext.errorLog().getErrors().size());
         }
     }
 
     @Test
-    void testFunctionWithHeterogeneousCollectionParameters() throws PMException {
-        // Create a function signature that takes heterogeneous collections
+    void testOpWithHeterogeneousCollectionParameters() throws PMException {
         PMLOperationSignature functionSignature = new PMLOperationSignature(
             OperationType.FUNCTION,
-            "collectionsFunction",
-            ANY_TYPE,  // Return type
+            "listMapFunction",
+            ANY_TYPE,
             Arrays.asList(
                 new FormalParameter<>("arrayArg", ListType.of(ANY_TYPE)),
                 new FormalParameter<>("mapArg", MapType.of(STRING_TYPE, ANY_TYPE))
             )
         );
 
-        // Add the function to the scope
         CompileScope scope = new CompileScope(new MemoryPAP());
-        scope.addOperation("collectionsFunction", functionSignature);
+        scope.addOperation("listMapFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
-        // Compile function call with heterogeneous collections
         String functionCall = """
-                collectionsFunction(
+                listMapFunction(
                     ["string", "value", true],
                     {
                         "string": "value",
@@ -152,7 +127,6 @@ public class AnyTypeOperationTest {
 
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(functionCall);
 
-        // Should compile without errors
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
         assertTrue(expr instanceof OperationInvokeExpression);
@@ -160,24 +134,21 @@ public class AnyTypeOperationTest {
     }
 
     @Test
-    void testFunctionWithNestedObjectTypeParameters() throws PMException {
-        // Create a function signature with nested ANY_TYPE parameters
+    void testOpWithNestedObjectTypeParameters() throws PMException {
         PMLOperationSignature functionSignature = new PMLOperationSignature(
             OperationType.FUNCTION,
             "nestedFunction",
-            ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)),  // Return type: list<map<string, object>>
+            ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)),
             List.of(
                 new FormalParameter<>("complexArg",
                     MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)))
             )
         );
 
-        // Add the function to the scope
         CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addOperation("nestedFunction", functionSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
-        // Compile function call with a complex nested structure
         String functionCall = """
                 nestedFunction({
                     "array1": ["one", "two", true],
@@ -189,7 +160,6 @@ public class AnyTypeOperationTest {
 
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(functionCall);
 
-        // Should compile without errors
         Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx,
             ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)));
         assertEquals(0, visitorContext.errorLog().getErrors().size());
@@ -198,11 +168,10 @@ public class AnyTypeOperationTest {
     }
 
     @Test
-    void testFunctionWithTypeSpecificParameter() throws PMException {
-        // Test a function that has mixed parameter types (some specific, some ANY_TYPE)
-        PMLOperationSignature functionSignature = new PMLOperationSignature(
+    void testOpWithTypeSpecificParameter() throws PMException {
+        PMLOperationSignature operationSignature = new PMLOperationSignature(
             OperationType.FUNCTION,
-            "mixedParamFunction",
+            "anyParamFunction",
             ANY_TYPE,
             Arrays.asList(
                 new FormalParameter<>("stringArg", STRING_TYPE),
@@ -210,33 +179,28 @@ public class AnyTypeOperationTest {
             )
         );
 
-        // Add the function to the scope
         CompileScope scope = new CompileScope(new MemoryPAP());
-        scope.addOperation("mixedParamFunction", functionSignature);
+        scope.addOperation("anyParamFunction", operationSignature);
         VisitorContext visitorContext = new VisitorContext(scope);
 
-        // Valid calls - first parameter must be a string, second can be anything
         String[] validCalls = {
-            "mixedParamFunction(\"string\", \"value\")",
-            "mixedParamFunction(\"string\", true)",
-            "mixedParamFunction(\"string\", [\"a\", \"b\", \"c\"])",
-            "mixedParamFunction(\"string\", {\"key\": \"value\"})"
+            "anyParamFunction(\"string\", \"value\")",
+            "anyParamFunction(\"string\", true)",
+            "anyParamFunction(\"string\", [\"a\", \"b\", \"c\"])",
+            "anyParamFunction(\"string\", {\"key\": \"value\"})"
         };
 
         for (String call : validCalls) {
             PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(call);
 
-            // Should compile without errors
             Expression<?> expr = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
             assertEquals(0, visitorContext.errorLog().getErrors().size());
         }
 
-        // Invalid call - first parameter must be a string
-        String invalidCall = "mixedParamFunction(true, \"string\")";
+        String invalidCall = "anyParamFunction(true, \"string\")";
         PMLParser.ExpressionContext invalidCtx = TestPMLParser.parseExpression(invalidCall);
 
-        // Should have compilation errors
-        Exception exception = assertThrows(PMLCompilationRuntimeException.class, () -> {
+        assertThrows(PMLCompilationRuntimeException.class, () -> {
             ExpressionVisitor.compile(visitorContext, invalidCtx, ANY_TYPE);
         });
     }

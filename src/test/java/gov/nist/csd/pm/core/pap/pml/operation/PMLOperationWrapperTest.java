@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 class PMLOperationWrapperTest {
 
     @Test
-    void testMultipleLayersOfWrappedFunctions() throws PMException {
+    void testMultipleLayersOfWrappedOperations() throws PMException {
         String pml = """
             adminop op4() string {
                return "op4"

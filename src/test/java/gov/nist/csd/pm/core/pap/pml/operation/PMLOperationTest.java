@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class PMLOperationTest {
 
     @Test
-    void testFunctionsPersisted() throws PMException {
+    void testOperationsPersisted() throws PMException {
         String pml = """
             function test() string {
                 return "test"

@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.operation.basic.builtin;
 
-import static gov.nist.csd.pm.core.pap.pml.operation.basic.PMLBasicOperation.NODE_NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.pml.operation.basic.PMLFunctionOperation.NODE_NAME_PARAM;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpSignatureContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicFunctionSignatureContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.RoutineSignatureContext;
@@ -99,7 +99,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
     }
 
     @Override
-    public PMLOperationSignature visitBasicFunctionSignature(BasicFunctionSignatureContext ctx) {
+    public PMLOperationSignature visitFunctionSignature(FunctionSignatureContext ctx) {
         String funcName = ctx.ID().getText();
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx).visitFormalParamList(ctx.formalParamList());

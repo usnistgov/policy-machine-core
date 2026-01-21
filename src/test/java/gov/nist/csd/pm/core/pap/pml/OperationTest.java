@@ -19,7 +19,7 @@ import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
-public class FunctionTest {
+public class OperationTest {
 
     @Test
     void testElseIfNotAllPathsReturn() {

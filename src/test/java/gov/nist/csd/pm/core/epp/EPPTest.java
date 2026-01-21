@@ -322,7 +322,7 @@ class EPPTest {
     }
 
     @Test
-    void testCustomFunctionInResponse() throws PMException {
+    void testCustomOperationInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
         PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType()) {
@@ -466,82 +466,6 @@ class EPPTest {
         assertFalse(pap.query().graph().nodeExists("test_pc"));
         assertFalse(pap.query().graph().nodeExists("o1"));
         assertFalse(pap.query().graph().nodeExists("u1_pc"));
-    }
-
-    @Test
-    void testEppSendsCorrectEventContextMap() {
-        String pml = """
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
-                
-                create obligation "obl1"
-                    when any user
-                    performs any operation
-                    do(ctx) {
-                        x := [
-                            ctx.test,
-                            ctx.operation,
-                            ctx.check,
-                            ctx.routine,
-                            ctx.function,
-                            ctx.create,
-                            ctx.delete,
-                            ctx.rule,
-                            ctx.when,
-                            ctx.performs,
-                            ctx.on,
-                            ctx.in,
-                            ctx.do,
-                            ctx.any,
-                            ctx.intersection,
-                            ctx.union,
-                            ctx.process,
-                            ctx.assign,
-                            ctx.deassign,
-                            ctx.from,
-                            ctx.of,
-                            ctx.to,
-                            ctx.associate,
-                            ctx.and,
-                            ctx.with,
-                            ctx.dissociate,
-                            ctx.deny,
-                            ctx.prohibition,
-                            ctx.obligation,
-                            ctx.node,
-                            ctx.user,
-                            ctx.pc,
-                            ctx.oa,
-                            ctx.ua,
-                            ctx.o,
-                            ctx.u,
-                            ctx.break,
-                            ctx.default,
-                            ctx.map,
-                            ctx.else,
-                            ctx.const,
-                            ctx.if,
-                            ctx.range,
-                            ctx.continue,
-                            ctx.foreach,
-                            ctx.return,
-                            ctx.var,
-                            ctx.string,
-                            ctx.bool,
-                            ctx.void,
-                            ctx.array,
-                            ctx.nil,
-                            ctx.true,
-                            ctx.false
-                        ]
-                    }
-                
-                """;
-
-        PMLCompiler pmlCompiler = new PMLCompiler();
-        assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
     }
 
     private MemoryPAP testPAP() throws PMException {

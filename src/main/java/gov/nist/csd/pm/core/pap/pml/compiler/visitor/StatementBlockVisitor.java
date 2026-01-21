@@ -82,7 +82,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     @Override
     public Result visitBasicStatementBlock(PMLParser.BasicStatementBlockContext ctx) {
         List<PMLStatement<?>> stmts = new ArrayList<>();
-        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyBasicOnly());
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyFunctionsOnly());
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
             PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
             stmts.add(pmlStatement);
@@ -99,7 +99,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     @Override
     public Result visitOnPatternBlock(OnPatternBlockContext ctx) {
         List<PMLStatement<?>> stmts = new ArrayList<>();
-        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyBasicAndQueryOnly());
+        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyFunctionsAndQueriesOnly());
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
             PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
             stmts.add(pmlStatement);
@@ -153,7 +153,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
 
             if (pmlStatement instanceof ReturnStatement returnStatement) {
                 if (i < statements.size() - 1) {
-                    throw new PMException("function return should be last statement in block");
+                    throw new PMException("return should be last statement in block");
                 }
 
                 if (!returnStatement.matchesReturnType(returnType)) {

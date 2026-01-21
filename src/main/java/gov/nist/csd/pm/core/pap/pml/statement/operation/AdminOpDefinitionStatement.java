@@ -10,11 +10,11 @@ import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
-import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.OperationDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
-public class AdminOpDefinitionStatement extends OperationStatement implements FunctionDefinitionStatement {
+public class AdminOpDefinitionStatement extends OperationStatement implements OperationDefinitionStatement {
 
     protected PMLStmtsAdminOperation<?> pmlStmtsOperation;
 

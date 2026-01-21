@@ -328,10 +328,10 @@ Operations are a fundamental part of NGAC and the policy-machine-core library. T
 - Resource Operations: Represents access on a resource (object).
 - Query Operations: Query the policy information.
 - Routines: A set of operations, with access checks on each statement rather than the routine itself or its args.
-- Basic Functions: Reusable utility functions that do not access the policy.
+- Functions: Reusable utility operations that do not access the policy.
 
-Only Admin and Resource operations emit events to the EPP. All operations define a set of [FormalParameters](./src/main/java/gov/nist/csd/pm/core/pap/operation/param/FormalParameter.java).
-Admin, Resource, and Query operations can define FormalParameters with RequiredCapabilities which are a set of access rights 
+Only `Admin` and `Resource` operations emit events to the EPP. All operations define a set of [FormalParameters](./src/main/java/gov/nist/csd/pm/core/pap/operation/param/FormalParameter.java).
+`Admin`, `Resource`, and `Query` operations can define FormalParameters with RequiredCapabilities which are a set of access rights 
 a user needs on the actual argument in the call to the operation in order to successfully execute the operation. The
 access rights defined in the RequiredCapabilities must be 
 [resource access rights](./src/main/java/gov/nist/csd/pm/core/pap/modification/OperationsModification.java) 

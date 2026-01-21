@@ -8,11 +8,11 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
-public abstract non-sealed class BasicFunction<R> extends Operation<R>{
+public abstract non-sealed class Function<R> extends Operation<R>{
 
-    public BasicFunction(String name,
-                         Type<R> returnType,
-                         List<FormalParameter<?>> parameters) {
+    public Function(String name,
+                    Type<R> returnType,
+                    List<FormalParameter<?>> parameters) {
         super(name, returnType, parameters);
     }
 

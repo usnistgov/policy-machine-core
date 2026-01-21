@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.scope;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinOperations;
@@ -37,31 +37,31 @@ public class ExecuteScope extends Scope<Object, Operation<?>> {
     }
 
     @Override
-    public Scope<Object, Operation<?>> copyBasicFunctionsOnly() {
-        Map<String, Operation<?>> basicOnlyFunctions = new HashMap<>();
+    public Scope<Object, Operation<?>> copyFunctionsOnly() {
+        Map<String, Operation<?>> filteredOps = new HashMap<>();
         for (Operation<?> operation : getOperations().values()) {
-            if (!(operation instanceof BasicFunction<?> basicFunction)) {
+            if (!(operation instanceof Function<?> function)) {
                 continue;
             }
 
-            basicOnlyFunctions.put(basicFunction.getName(), basicFunction);
+            filteredOps.put(function.getName(), function);
         }
 
         return new ExecuteScope(
             this.getPap(),
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
-            basicOnlyFunctions,
+            filteredOps,
             getParentScope() != null ? getParentScope().copy() : null
         );
     }
 
     @Override
-    public Scope<Object, Operation<?>> copyBasicAndQueryFunctionsOnly() {
-        Map<String, Operation<?>> filteredFunctions = new HashMap<>();
-        for (Operation<?> function : getOperations().values()) {
-            if (function instanceof BasicFunction<?> || function instanceof QueryOperation<?>) {
-                filteredFunctions.put(function.getName(), function);
+    public Scope<Object, Operation<?>> copyFunctionsAndQueriesOnly() {
+        Map<String, Operation<?>> filteredOps = new HashMap<>();
+        for (Operation<?> operation : getOperations().values()) {
+            if (operation instanceof Function<?> || operation instanceof QueryOperation<?>) {
+                filteredOps.put(operation.getName(), operation);
             }
         }
 
@@ -69,7 +69,7 @@ public class ExecuteScope extends Scope<Object, Operation<?>> {
             this.getPap(),
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
-            filteredFunctions,
+            filteredOps,
             getParentScope() != null ? getParentScope().copy() : null
         );
     }

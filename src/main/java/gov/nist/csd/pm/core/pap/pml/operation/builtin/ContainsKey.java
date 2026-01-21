@@ -8,11 +8,11 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLBasicOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 import java.util.Map;
 
-public class ContainsKey extends PMLBasicOperation<Boolean> {
+public class ContainsKey extends PMLFunctionOperation<Boolean> {
 
     public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", MapType.of(
         ANY_TYPE, ANY_TYPE));

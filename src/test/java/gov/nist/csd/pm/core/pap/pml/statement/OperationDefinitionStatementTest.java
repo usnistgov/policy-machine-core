@@ -26,7 +26,7 @@ import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class FunctionDefinitionStatementTest {
+class OperationDefinitionStatementTest {
 
     private static final NodeNameFormalParameter a = new NodeNameFormalParameter("a");
     private static final FormalParameter<String> b = new FormalParameter<>("b", STRING_TYPE);

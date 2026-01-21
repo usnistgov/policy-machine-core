@@ -8,19 +8,19 @@ import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
-import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLStmtsBasicOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLStmtsFunctionOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLStmtsQueryOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLStmtsResourceOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
-import gov.nist.csd.pm.core.pap.pml.statement.FunctionDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.OperationDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.QueryOperationDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.ResourceOpDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 
-public class OperationDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitionStatement> {
+public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefinitionStatement> {
 
     private final OperationSignatureVisitor operationSignatureVisitor;
 
@@ -54,7 +54,7 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitio
             operationSignatureVisitor.visitResourceOpSignature(ctx.resourceOpSignature());
 
         PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseBasicOrCheckStatements(
-            visitorCtx.copyBasicAndQueryOnly(),
+            visitorCtx.copyFunctionsAndQueriesOnly(),
             ctx.basicAndCheckStatementBlock(),
             resourceOpSignature.getReturnType(),
             resourceOpSignature.getFormalParameters()
@@ -88,8 +88,8 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitio
     }
 
     @Override
-    public BasicFunctionDefinitionStatement visitBasicFunctionDefinitionStatement(PMLParser.BasicFunctionDefinitionStatementContext ctx) {
-        PMLOperationSignature signature = operationSignatureVisitor.visitBasicFunctionSignature(ctx.basicFunctionSignature());
+    public FunctionDefinitionStatement visitFunctionDefinitionStatement(PMLParser.FunctionDefinitionStatementContext ctx) {
+        PMLOperationSignature signature = operationSignatureVisitor.visitFunctionSignature(ctx.functionSignature());
 
         PMLStatementBlock body = StatementBlockParser.parseBasicStatementBlock(
             visitorCtx,
@@ -98,7 +98,7 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitio
             signature.getFormalParameters()
         );
 
-        return new BasicFunctionDefinitionStatement(new PMLStmtsBasicOperation<>(
+        return new FunctionDefinitionStatement(new PMLStmtsFunctionOperation<>(
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalParameters(),
@@ -111,7 +111,7 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitio
         PMLOperationSignature signature = operationSignatureVisitor.visitQueryOpSignature(ctx.queryOpSignature());
 
         PMLStatementBlock body = StatementBlockParser.parseBasicOrCheckStatements(
-            visitorCtx.copyBasicAndQueryOnly(),
+            visitorCtx.copyFunctionsAndQueriesOnly(),
             ctx.basicAndCheckStatementBlock(),
             signature.getReturnType(),
             signature.getFormalParameters()

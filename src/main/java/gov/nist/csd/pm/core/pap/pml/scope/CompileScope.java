@@ -7,7 +7,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
@@ -23,15 +23,15 @@ import java.util.Map;
 public class CompileScope extends Scope<Variable, PMLOperationSignature> {
 
     public CompileScope(PAP pap) throws PMException {
-        super(pap, loadConstants(), loadFunctions(pap));
+        super(pap, loadConstants(), loadOperations(pap));
     }
 
     private CompileScope(PAP pap,
                          Map<String, Variable> constants,
                          Map<String, Variable> variables,
-                         Map<String, PMLOperationSignature> functions,
+                         Map<String, PMLOperationSignature> operations,
                          Scope<Variable, PMLOperationSignature> parentScope) {
-        super(pap, constants, variables, functions, parentScope);
+        super(pap, constants, variables, operations, parentScope);
     }
 
     @Override
@@ -46,31 +46,31 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
     }
 
     @Override
-    public CompileScope copyBasicFunctionsOnly() {
-        Map<String, PMLOperationSignature> basicOnlyFunctions = new HashMap<>();
+    public CompileScope copyFunctionsOnly() {
+        Map<String, PMLOperationSignature> operations = new HashMap<>();
         for (PMLOperationSignature op : getOperations().values()) {
             if (!(op.getType() == OperationType.FUNCTION)) {
                 continue;
             }
 
-            basicOnlyFunctions.put(op.getName(), op);
+            operations.put(op.getName(), op);
         }
 
         return new CompileScope(
             this.getPap(),
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
-            basicOnlyFunctions,
+            operations,
             getParentScope() != null ? getParentScope().copy() : null
         );
     }
 
     @Override
-    public CompileScope copyBasicAndQueryFunctionsOnly() {
-        Map<String, PMLOperationSignature> filteredFunctions = new HashMap<>();
+    public CompileScope copyFunctionsAndQueriesOnly() {
+        Map<String, PMLOperationSignature> filteredOps = new HashMap<>();
         for (PMLOperationSignature function : getOperations().values()) {
             if (function.getType() == OperationType.FUNCTION || function.getType() == OperationType.QUERY) {
-                filteredFunctions.put(function.getName(), function);
+                filteredOps.put(function.getName(), function);
             }
         }
 
@@ -78,7 +78,7 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
             this.getPap(),
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
-            filteredFunctions,
+            filteredOps,
             getParentScope() != null ? getParentScope().copy() : null
         );
     }
@@ -92,31 +92,31 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
         return constants;
     }
 
-    private static Map<String, PMLOperationSignature> loadFunctions(PAP pap) throws PMException {
+    private static Map<String, PMLOperationSignature> loadOperations(PAP pap) throws PMException {
         Map<String, PMLOperationSignature> operationSignatures = new HashMap<>();
 
         // add builtin operations and routines stored in PAP
         Map<String, Operation<?>> builtinFuncs = PMLBuiltinOperations.builtinOperations();
         builtinFuncs.values().forEach(f -> {
-            operationSignatures.put(f.getName(), getFunctionSignature(f));
+            operationSignatures.put(f.getName(), createOperationSignature(f));
         });
 
         Collection<Operation<?>> operations = pap.query().operations().getOperations();
         for (Operation<?> op : operations) {
-            operationSignatures.put(op.getName(), getFunctionSignature(op));
+            operationSignatures.put(op.getName(), createOperationSignature(op));
         }
 
         // add admin ops
         for (Operation<?> adminOperation : AdminOperations.ADMIN_OPERATIONS) {
-            operationSignatures.put(adminOperation.getName(), getFunctionSignature(adminOperation));
+            operationSignatures.put(adminOperation.getName(), createOperationSignature(adminOperation));
         }
 
         return operationSignatures;
     }
 
-    private static PMLOperationSignature getFunctionSignature(Operation<?> func) {
+    private static PMLOperationSignature createOperationSignature(Operation<?> func) {
         return switch (func) {
-            case BasicFunction<?> basicFunction -> new PMLOperationSignature(
+            case Function<?> function -> new PMLOperationSignature(
                 OperationType.FUNCTION, func.getName(), func.getReturnType(), func.getFormalParameters()
             );
             case QueryOperation<?> queryOperation -> new PMLOperationSignature(

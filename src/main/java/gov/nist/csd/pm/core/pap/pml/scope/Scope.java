@@ -44,8 +44,8 @@ public abstract class Scope<V, F> implements Serializable {
     }
 
     public abstract Scope<V, F> copy();
-    public abstract Scope<V, F> copyBasicFunctionsOnly();
-    public abstract Scope<V, F> copyBasicAndQueryFunctionsOnly();
+    public abstract Scope<V, F> copyFunctionsOnly();
+    public abstract Scope<V, F> copyFunctionsAndQueriesOnly();
 
     public PAP getPap() {
         return pap;
@@ -88,20 +88,20 @@ public abstract class Scope<V, F> implements Serializable {
     }
 
     public F getOperation(String name) throws UnknownOperationInScopeException {
-        F function = operations.get(name);
-        if (function == null) {
+        F operation = operations.get(name);
+        if (operation == null) {
             throw new UnknownOperationInScopeException(name);
         }
 
-        return function;
+        return operation;
     }
 
-    public boolean functionExists(String name) {
+    public boolean operationExists(String name) {
         return operations.containsKey(name);
     }
 
     public void addOperation(String name, F f) throws OperationAlreadyDefinedInScopeException {
-        if (parentHasFunction(name) || operations.containsKey(name)) {
+        if (parentHasOperation(name) || operations.containsKey(name)) {
             throw new OperationAlreadyDefinedInScopeException(name);
         }
 
@@ -167,7 +167,7 @@ public abstract class Scope<V, F> implements Serializable {
         return parentScope != null && parentScope.variables.containsKey(name);
     }
 
-    private boolean parentHasFunction(String name) {
+    private boolean parentHasOperation(String name) {
         return parentScope != null && parentScope.operations.containsKey(name);
     }
 

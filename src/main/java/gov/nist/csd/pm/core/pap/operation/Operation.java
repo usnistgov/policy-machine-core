@@ -28,7 +28,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract sealed class Operation<R> implements Serializable permits AdminOperation, ResourceOperation, QueryOperation, Routine, BasicFunction {
+public abstract sealed class Operation<R> implements Serializable permits AdminOperation, ResourceOperation, QueryOperation, Routine,
+    Function {
 
     private static final long serialVersionUID = 1L;
     public static final FormalParameter<String> NAME_PARAM = new FormalParameter<>("name", STRING_TYPE);

@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.operation.builtin;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.pml.operation.basic.PMLBasicOperation.NODE_NAME_PARAM;
+import static gov.nist.csd.pm.core.pap.pml.operation.basic.PMLFunctionOperation.NODE_NAME_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;

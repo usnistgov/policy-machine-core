@@ -23,7 +23,7 @@ basicStatement: (
     | continueStatement
     | operationInvokeStatement
     | ifStatement
-    | basicFunctionDefinitionStatement
+    | functionDefinitionStatement
 ) ;
 
 adminOperationStatement: (
@@ -146,13 +146,13 @@ adminOpDefinitionStatement: adminOpSignature adminOpStatementBlock ;
 queryOpDefinitionStatement: queryOpSignature basicAndCheckStatementBlock ;
 resourceOpDefinitionStatement: resourceOpSignature basicAndCheckStatementBlock? ;
 routineDefinitionStatement: routineSignature statementBlock ;
-basicFunctionDefinitionStatement: basicFunctionSignature basicStatementBlock ;
+functionDefinitionStatement: functionSignature basicStatementBlock ;
 
 adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
 queryOpSignature: QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
 resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
-basicFunctionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
 operationFormalParam: nodeArgAnnotation? variableType ID reqCap=stringArrayLit?;
@@ -242,6 +242,8 @@ operationInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
 idIndex:
     ID
     | OPERATION
+    | ADMIN_OP
+    | RESOURCE_OP
     | QUERY
     | FUNCTION
     | CHECK

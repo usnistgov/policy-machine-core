@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 public class DeleteOperationStatement extends DeleteStatement{
 
     public DeleteOperationStatement(Expression<String> nameExpression, boolean ifExists) {
-        super(new DeleteOperationOp(), Type.ADMIN_OP, nameExpression, ifExists);
+        super(new DeleteOperationOp(), Type.OPERATION, nameExpression, ifExists);
     }
 
     @Override

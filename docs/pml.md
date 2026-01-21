@@ -329,7 +329,7 @@ return              // void return
 
 ---
 
-## Policy Modification Statements
+## Admin Operation Statements
 
 ### Set Resource Access Rights
 
@@ -579,13 +579,13 @@ adminop test(string name) {
 
 ### Operation Types
 
-| Type               | Keyword      | Allowed Statements                                | Check Statement |
-| ------------------ | ------------ | ------------------------------------------------- | --------------- |
-| Admin Operation    | `adminop`    | All statements                                    | Yes             |
-| Resource Operation | `resourceop` | Basic statements; basic and query operations only | Yes             |
-| Query Operation    | `query`      | Basic statements; basic and query operations only | Yes             |
-| Routine            | `routine`    | All statements                                    | No              |
-| Basic Function     | `function`   | Basic statements; basic functions only            | No              |
+| Type              | Keyword      | Allowed Statements                                    | Check Statement |
+| ----------------- | ------------ |-------------------------------------------------------| --------------- |
+| Admin Operation   | `adminop`    | All statements                                        | Yes             |
+| Resource Operation | `resourceop` | Basic statements; functions and query operations only | Yes             |
+| Query Operation   | `query`      | Basic statements; functions and query operations only | Yes             |
+| Routine           | `routine`    | All statements                                        | No              |
+| Function     | `function`   | Basic statements; functions only                      | No              |
 
 ### Admin Operation
 
@@ -635,9 +635,10 @@ routine routine1(string a) {
 }
 ```
 
-### Basic Function
+### Function
 
-Basic functions use only basic statements and can only call other basic functions. These are utility functions to persist often used processes.
+Functions use only basic statements and can only call other functions. These are utility operations to persist often used processes
+that do not access policy information.
 
 ```pml
 function formatName(string first, string last) string {
@@ -649,9 +650,9 @@ function formatName(string first, string last) string {
 
 ## Builtin Operations
 
-PML provides built-in basic and query operations.
+PML provides built-in functions and query operations.
 
-### Basic Operations
+### Functions
 
 | Operation | Signature | Description |
 |-----------|-----------|-------------|

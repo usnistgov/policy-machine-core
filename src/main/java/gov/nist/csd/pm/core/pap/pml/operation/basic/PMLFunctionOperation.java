@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.operation.basic;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
-import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -12,7 +12,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationTyp
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class PMLBasicOperation<T> extends BasicFunction<T> implements PMLOperation {
+public abstract class PMLFunctionOperation<T> extends Function<T> implements PMLOperation {
 
 	public static final FormalParameter<String> NODE_NAME_PARAM = new FormalParameter<>("nodeName", STRING_TYPE);
 
@@ -21,7 +21,7 @@ public abstract class PMLBasicOperation<T> extends BasicFunction<T> implements P
 	private final PMLOperationSignature signature;
 	protected ExecutionContext ctx;
 
-	public PMLBasicOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters) {
+	public PMLFunctionOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters) {
 		super(name, returnType, new ArrayList<>(formalParameters));
 
 		this.returnType = returnType;
@@ -29,7 +29,7 @@ public abstract class PMLBasicOperation<T> extends BasicFunction<T> implements P
 		this.signature = new PMLOperationSignature(OperationType.FUNCTION, name, returnType, formalParameters);
 	}
 
-	public PMLBasicOperation(String name, Type<T> returnType) {
+	public PMLFunctionOperation(String name, Type<T> returnType) {
 		super(name, returnType, new ArrayList<>());
 
 		this.returnType = returnType;

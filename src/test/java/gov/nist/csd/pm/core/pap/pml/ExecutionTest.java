@@ -336,7 +336,7 @@ public class ExecutionTest {
     }
 
     @Test
-    void testFunction() throws PMException {
+    void testOperation() throws PMException {
         String input = """
                 adminop testFunc(any x) {
                     create PC x
@@ -466,7 +466,7 @@ public class ExecutionTest {
     }
 
     @Test
-    void testOverwriteFunctionArg() throws PMException {
+    void testOverwriteOperationArg() throws PMException {
         String pml = """
                 adminop testFunc(string s) string {
                     s = "test2"

@@ -348,6 +348,74 @@ public class PMLTest {
         pap.modify().graph().createPolicyClass("a");
         o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
         assertEquals(o, "a");
+    }
 
+    @Test
+    void testUsingKeywordsAsMapKeys() {
+        String pml = """
+                m := {}
+                x := [
+                    m.test,
+                    m.operation,
+                    m.check,
+                    m.routine,
+                    m.function,
+                    m.create,
+                    m.delete,
+                    m.rule,
+                    m.when,
+                    m.performs,
+                    m.on,
+                    m.in,
+                    m.do,
+                    m.any,
+                    m.intersection,
+                    m.union,
+                    m.process,
+                    m.assign,
+                    m.deassign,
+                    m.from,
+                    m.of,
+                    m.to,
+                    m.associate,
+                    m.and,
+                    m.with,
+                    m.dissociate,
+                    m.deny,
+                    m.prohibition,
+                    m.obligation,
+                    m.node,
+                    m.user,
+                    m.pc,
+                    m.oa,
+                    m.ua,
+                    m.o,
+                    m.u,
+                    m.break,
+                    m.default,
+                    m.map,
+                    m.else,
+                    m.const,
+                    m.if,
+                    m.range,
+                    m.continue,
+                    m.foreach,
+                    m.return,
+                    m.var,
+                    m.string,
+                    m.bool,
+                    m.void,
+                    m.array,
+                    m.nil,
+                    m.true,
+                    m.false,
+                    m.adminop,
+                    m.resourceop,
+                    m.query
+                ]
+                """;
+
+        PMLCompiler pmlCompiler = new PMLCompiler();
+        assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
     }
 }

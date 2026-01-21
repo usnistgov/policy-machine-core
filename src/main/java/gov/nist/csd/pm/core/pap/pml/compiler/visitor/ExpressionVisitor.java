@@ -157,9 +157,9 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     public OperationInvokeExpression<?> visitOperationInvoke(OperationInvokeContext ctx) {
         String funcName = ctx.ID().getText();
 
-        PMLOperationSignature function;
+        PMLOperationSignature operation;
         try {
-            function = visitorCtx.scope().getOperation(funcName);
+            operation = visitorCtx.scope().getOperation(funcName);
         } catch (UnknownOperationInScopeException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
@@ -171,11 +171,11 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             argExpressions = expressionListContext.expression();
         }
 
-        List<FormalParameter<?>> formalArgs = function.getFormalParameters();
+        List<FormalParameter<?>> formalArgs = operation.getFormalParameters();
         if (formalArgs.size() != argExpressions.size()) {
             throw new PMLCompilationRuntimeException(
                     ctx,
-                    "wrong number of args for function call " + funcName + ": " +
+                    "wrong number of args for operation call " + funcName + ": " +
                             "expected " + formalArgs.size() + ", got " + argExpressions.size());
         }
 
@@ -188,7 +188,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             args.add(expr);
         }
 
-        return new OperationInvokeExpression<>(funcName, args, function.getReturnType());
+        return new OperationInvokeExpression<>(funcName, args, operation.getReturnType());
     }
 
     @Override

@@ -64,7 +64,7 @@ class OperationInvokeStmtVisitorTest {
     }
 
     @Test
-    void testFunctionDoesNotExist() throws PMException {
+    void testOperationDoesNotExist() throws PMException {
         VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
@@ -86,7 +86,7 @@ class OperationInvokeStmtVisitorTest {
             """
             func1("a", "b")
             """, visitorCtx, 1,
-            "wrong number of args for function call func1: expected 3, got 2"
+            "wrong number of args for operation call func1: expected 3, got 2"
         );
     }
 

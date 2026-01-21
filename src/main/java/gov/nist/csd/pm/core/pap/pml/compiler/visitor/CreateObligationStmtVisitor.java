@@ -189,7 +189,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 }
 
                 // remove non query functions from visitor ctx
-                VisitorContext copy = visitorCtx.copyBasicAndQueryOnly();
+                VisitorContext copy = visitorCtx.copyFunctionsAndQueriesOnly();
 
                 PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseOnStatementBlock(copy,
                     onPatternContext.onPatternBlock(), BOOLEAN_TYPE, patternParams);

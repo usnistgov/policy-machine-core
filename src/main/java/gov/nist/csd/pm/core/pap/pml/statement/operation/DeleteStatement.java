@@ -65,9 +65,7 @@ public abstract class DeleteStatement extends OperationStatement {
         switch (type) {
             case PROHIBITION -> typeStr = "prohibition";
             case OBLIGATION -> typeStr = "obligation";
-            case ADMIN_OP -> typeStr = "adminop";
-            case RESOURCE_OP -> typeStr = "resourceop";
-            case FUNCTION -> typeStr = "function";
+            case OPERATION -> typeStr = "operation";
             case NODE -> typeStr = "node";
         }
         typeStr = (ifExists ? "if exists " : "") + typeStr;
@@ -95,8 +93,6 @@ public abstract class DeleteStatement extends OperationStatement {
         NODE,
         PROHIBITION,
         OBLIGATION,
-        ADMIN_OP,
-        RESOURCE_OP,
-        FUNCTION
+        OPERATION,
     }
 }

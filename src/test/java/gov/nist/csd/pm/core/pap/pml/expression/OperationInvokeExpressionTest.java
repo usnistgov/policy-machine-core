@@ -96,7 +96,7 @@ class OperationInvokeExpressionTest {
     }
 
     @Test
-    void testFunctionNotInScope() throws PMException {
+    void testOperationNotInScope() throws PMException {
         VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
 
         testCompilationError(
@@ -115,7 +115,7 @@ class OperationInvokeExpressionTest {
                 """
                 voidFunc("a")
                 """, visitorCtx, 1,
-                "wrong number of args for function call voidFunc: expected 2, got 1"
+                "wrong number of args for operation call voidFunc: expected 2, got 1"
         );
     }
 
@@ -148,7 +148,7 @@ class OperationInvokeExpressionTest {
     }
 
     @Test
-    void testExecuteWithFunctionExecutor() throws PMException {
+    void testExecuteWithOperationExecutor() throws PMException {
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
                 stringFunc("a", "b")
@@ -199,7 +199,7 @@ class OperationInvokeExpressionTest {
     }
 
     @Test
-    void testReassignArgValueInFunctionDoesNotUpdateVariableOutsideOfScope() throws PMException {
+    void testReassignArgValueInOperationDoesNotUpdateVariableOutsideOfScope() throws PMException {
         String pml = """
                 x := "test"
                 a(x)
@@ -233,7 +233,7 @@ class OperationInvokeExpressionTest {
     }
 
     @Test
-    void testScopeIsNotCopiedToFunctionInvokeExpression() throws PMException {
+    void testScopeIsNotCopiedToOperationInvokeExpression() throws PMException {
         String pml = """
                 adminop op1() {
                     x := ""

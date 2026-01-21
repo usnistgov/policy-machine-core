@@ -10,11 +10,11 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import java.util.List;
 import java.util.Objects;
 
-public class PMLStmtsBasicOperation<T> extends PMLBasicOperation<T> implements PMLStatementSerializable {
+public class PMLStmtsFunctionOperation<T> extends PMLFunctionOperation<T> implements PMLStatementSerializable {
 
     private PMLStatementBlock statements;
 
-    public PMLStmtsBasicOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalArgs, PMLStatementBlock statements) {
+    public PMLStmtsFunctionOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalArgs, PMLStatementBlock statements) {
         super(name, returnType, formalArgs);
         this.statements = statements;
     }
@@ -53,7 +53,7 @@ public class PMLStmtsBasicOperation<T> extends PMLBasicOperation<T> implements P
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PMLStmtsBasicOperation<?> that)) return false;
+        if (!(o instanceof PMLStmtsFunctionOperation<?> that)) return false;
         return Objects.equals(statements, that.statements);
     }
 

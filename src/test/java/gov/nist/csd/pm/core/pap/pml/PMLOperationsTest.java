@@ -16,7 +16,7 @@ import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-public class PMLBasicFunctionsTest {
+public class PMLOperationsTest {
 
 	@Test
 	void testCallOperationInObligationResponse() throws PMException {
@@ -142,7 +142,7 @@ public class PMLBasicFunctionsTest {
 
 	@Test
 	void testCallCustomOperationInRoutineDoesTriggerObligationResponse() throws PMException {
-		// call custom operation in a function should trigger an obligation response
+		// call custom operation in a routine should trigger an obligation response
 		String pml = """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]

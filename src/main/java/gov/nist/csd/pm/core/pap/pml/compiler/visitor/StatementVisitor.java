@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.CheckStatementVisitor;
@@ -105,9 +105,9 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitBasicFunctionDefinitionStatement(BasicFunctionDefinitionStatementContext ctx) {
+    public PMLStatement<?> visitFunctionDefinitionStatement(FunctionDefinitionStatementContext ctx) {
         return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
-            .visitBasicFunctionDefinitionStatement(ctx);
+            .visitFunctionDefinitionStatement(ctx);
     }
 
     @Override

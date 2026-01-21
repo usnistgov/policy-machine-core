@@ -7,10 +7,10 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLBasicOperation;
+import gov.nist.csd.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
-public class AppendAll extends PMLBasicOperation<List<Object>> {
+public class AppendAll extends PMLFunctionOperation<List<Object>> {
 
     public static final FormalParameter<List<Object>> SRC_LIST_PARAM = new FormalParameter<>("src", ListType.of(ANY_TYPE));
 

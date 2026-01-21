@@ -55,7 +55,7 @@ class PMLStmtsResourceOperationTest {
     }
 
     @Test
-    void testPMLResourceOpCanOnlyCallQueryOrBasicFunctions() throws PMException {
+    void testPMLResourceOpCanOnlyCallQueryOrFunctions() throws PMException {
         MemoryPAP memoryPAP = new MemoryPAP();
         Object actual = memoryPAP.executePML(new TestUserContext("u1"), """
             set resource access rights ["read"]

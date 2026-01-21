@@ -8,8 +8,10 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.BasicFunctionDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.FunctionDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.QueryOperationDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.ResourceOpDefinitionStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,16 +30,20 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
     public List<PMLStatement<?>> visitPml(PMLParser.PmlContext ctx) {
         SortedStatements sortedStatements = sortStatements(ctx);
 
-        CompiledFunctions functions = compileFunctions(
-                sortedStatements.operationCtxs,
-                sortedStatements.routineCtxs,
-                sortedStatements.functionCtxs
+        CompiledOperations operations = compileOperations(
+            sortedStatements.operationCtxs,
+            sortedStatements.resourceCtxs,
+            sortedStatements.queryCtxs,
+            sortedStatements.routineCtxs,
+            sortedStatements.functionCtxs
         );
 
         List<PMLStatement<?>> stmts = new ArrayList<>();
-        stmts.addAll(functions.operations);
-        stmts.addAll(functions.routines);
-        stmts.addAll(functions.functions);
+        stmts.addAll(operations.adminOps);
+        stmts.addAll(operations.resourceOps);
+        stmts.addAll(operations.queries);
+        stmts.addAll(operations.routines);
+        stmts.addAll(operations.functions);
         stmts.addAll(compileStatements(sortedStatements.statementCtxs));
 
         return stmts;
@@ -45,8 +51,10 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
 
     private SortedStatements sortStatements(PMLParser.PmlContext ctx) {
         List<PMLParser.AdminOpDefinitionStatementContext> adminOpCtxs = new ArrayList<>();
+        List<PMLParser.ResourceOpDefinitionStatementContext> resourceOpCtxs = new ArrayList<>();
+        List<PMLParser.QueryOpDefinitionStatementContext> queryCtxs = new ArrayList<>();
         List<PMLParser.RoutineDefinitionStatementContext> routineCtxs = new ArrayList<>();
-        List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs = new ArrayList<>();
+        List<PMLParser.FunctionDefinitionStatementContext> functionCtxs = new ArrayList<>();
         List<PMLParser.StatementContext> statementCtxs = new ArrayList<>();
 
         for (PMLParser.StatementContext stmtCtx : ctx.statement()) {
@@ -54,14 +62,18 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
             AdminOperationStatementContext operationStatementContext = stmtCtx.adminOperationStatement();
 
             if (basicStatementContext != null) {
-                if (basicStatementContext.basicFunctionDefinitionStatement() != null) {
-                    functionCtxs.add(basicStatementContext.basicFunctionDefinitionStatement());
+                if (basicStatementContext.functionDefinitionStatement() != null) {
+                    functionCtxs.add(basicStatementContext.functionDefinitionStatement());
                 } else {
                     statementCtxs.add(stmtCtx);
                 }
             } else if (operationStatementContext != null) {
                 if (operationStatementContext.adminOpDefinitionStatement() != null) {
                     adminOpCtxs.add(operationStatementContext.adminOpDefinitionStatement());
+                } else if (operationStatementContext.resourceOpDefinitionStatement() != null) {
+                    resourceOpCtxs.add(operationStatementContext.resourceOpDefinitionStatement());
+                } else if (operationStatementContext.queryOpDefinitionStatement() != null) {
+                    queryCtxs.add(operationStatementContext.queryOpDefinitionStatement());
                 } else if (operationStatementContext.routineDefinitionStatement() != null) {
                     routineCtxs.add(operationStatementContext.routineDefinitionStatement());
                 } else {
@@ -70,32 +82,50 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
             }
         }
 
-        return new SortedStatements(adminOpCtxs, routineCtxs, functionCtxs, statementCtxs);
+        return new SortedStatements(adminOpCtxs, resourceOpCtxs, queryCtxs, routineCtxs, functionCtxs, statementCtxs);
     }
 
     private record SortedStatements(List<PMLParser.AdminOpDefinitionStatementContext> operationCtxs,
+                                    List<PMLParser.ResourceOpDefinitionStatementContext> resourceCtxs,
+                                    List<PMLParser.QueryOpDefinitionStatementContext> queryCtxs,
                                     List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
-                                    List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs,
+                                    List<PMLParser.FunctionDefinitionStatementContext> functionCtxs,
                                     List<PMLParser.StatementContext> statementCtxs) {}
 
-    private CompiledFunctions compileFunctions(List<PMLParser.AdminOpDefinitionStatementContext> operationCtxs,
-                                               List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
-                                               List<PMLParser.BasicFunctionDefinitionStatementContext> functionCtxs) {
+    private CompiledOperations compileOperations(List<PMLParser.AdminOpDefinitionStatementContext> operationCtxs,
+                                                                 List<PMLParser.ResourceOpDefinitionStatementContext> resourceCtxs,
+                                                                 List<PMLParser.QueryOpDefinitionStatementContext> queryCtxs,
+                                                                 List<PMLParser.RoutineDefinitionStatementContext> routineCtxs,
+                                                                 List<PMLParser.FunctionDefinitionStatementContext> functionCtxs) {
         Map<String, PMLOperationSignature> functionSignatures = new HashMap<>(visitorCtx.scope().getOperations());
 
         // track the function definitions statements to be processed,
         // function signatures are compiled first in the event that one function calls another
         // any function with an error won't be processed but execution will continue inorder to find anymore errors
-        Map<String, PMLParser.AdminOpDefinitionStatementContext> validOperationDefs = new HashMap<>();
+        Map<String, PMLParser.AdminOpDefinitionStatementContext> validAdminDefs = new HashMap<>();
+        Map<String, PMLParser.ResourceOpDefinitionStatementContext> validResourceDefs = new HashMap<>();
+        Map<String, PMLParser.QueryOpDefinitionStatementContext> validQueryDefs = new HashMap<>();
         Map<String, PMLParser.RoutineDefinitionStatementContext> validRoutineDefs = new HashMap<>();
-        Map<String, PMLParser.BasicFunctionDefinitionStatementContext> validFunctionDefs = new HashMap<>();
+        Map<String, PMLParser.FunctionDefinitionStatementContext> validFunctionDefs = new HashMap<>();
 
         OperationSignatureVisitor signatureVisitor = new OperationSignatureVisitor(visitorCtx, true);
 
-        // operations
+        // admin
         for (PMLParser.AdminOpDefinitionStatementContext operationCtx : operationCtxs) {
             PMLOperationSignature signature = signatureVisitor.visitAdminOpSignature(operationCtx.adminOpSignature());
-            processSignature(operationCtx, signature, functionSignatures, (ctx) -> validOperationDefs.put(signature.getName(), operationCtx));
+            processSignature(operationCtx, signature, functionSignatures, (ctx) -> validAdminDefs.put(signature.getName(), operationCtx));
+        }
+
+        // resource
+        for (PMLParser.ResourceOpDefinitionStatementContext resourceCtx : resourceCtxs) {
+            PMLOperationSignature signature = signatureVisitor.visitResourceOpSignature(resourceCtx.resourceOpSignature());
+            processSignature(resourceCtx, signature, functionSignatures, (ctx) -> validResourceDefs.put(signature.getName(), resourceCtx));
+        }
+
+        // query
+        for (PMLParser.QueryOpDefinitionStatementContext queryCtx : queryCtxs) {
+            PMLOperationSignature signature = signatureVisitor.visitQueryOpSignature(queryCtx.queryOpSignature());
+            processSignature(queryCtx, signature, functionSignatures, (ctx) -> validQueryDefs.put(signature.getName(), queryCtx));
         }
 
         // routines
@@ -105,25 +135,25 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
         }
 
         // functions
-        for (PMLParser.BasicFunctionDefinitionStatementContext functionCtx : functionCtxs) {
-            PMLOperationSignature signature = signatureVisitor.visitBasicFunctionSignature(functionCtx.basicFunctionSignature());
+        for (PMLParser.FunctionDefinitionStatementContext functionCtx : functionCtxs) {
+            PMLOperationSignature signature = signatureVisitor.visitFunctionSignature(functionCtx.functionSignature());
             processSignature(functionCtx, signature, functionSignatures, (ctx) -> validFunctionDefs.put(signature.getName(), functionCtx));
         }
 
         // compile all function bodies now that all signatures are compiled -- do not add signatures to ctx again
         signatureVisitor.setAddToCtx(false);
         OperationDefinitionVisitor operationDefinitionVisitor = new OperationDefinitionVisitor(visitorCtx, signatureVisitor);
-        List<AdminOpDefinitionStatement> operations = compileFunctions(operationCtxs,
-            operationDefinitionVisitor::visitAdminOpDefinitionStatement);
-        List<RoutineDefinitionStatement> routines = compileFunctions(routineCtxs,
-            operationDefinitionVisitor::visitRoutineDefinitionStatement);
-        List<BasicFunctionDefinitionStatement> basicFunctions = compileFunctions(functionCtxs,
-            operationDefinitionVisitor::visitBasicFunctionDefinitionStatement);
 
-        return new CompiledFunctions(operations, routines, basicFunctions);
+        return new CompiledOperations(
+            compileOperations(operationCtxs, operationDefinitionVisitor::visitAdminOpDefinitionStatement),
+            compileOperations(resourceCtxs, operationDefinitionVisitor::visitResourceOpDefinitionStatement),
+            compileOperations(queryCtxs, operationDefinitionVisitor::visitQueryOpDefinitionStatement),
+            compileOperations(routineCtxs, operationDefinitionVisitor::visitRoutineDefinitionStatement),
+            compileOperations(functionCtxs, operationDefinitionVisitor::visitFunctionDefinitionStatement)
+        );
     }
 
-    private <T, R> List<R> compileFunctions(List<T> contexts, java.util.function.Function<T, R> visitor) {
+    private <T, R> List<R> compileOperations(List<T> contexts, java.util.function.Function<T, R> visitor) {
         List<R> results = new ArrayList<>();
         for (T context : contexts) {
             try {
@@ -136,6 +166,12 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
         return results;
     }
 
+    private record CompiledOperations(List<AdminOpDefinitionStatement> adminOps,
+                                      List<ResourceOpDefinitionStatement> resourceOps,
+                                      List<QueryOperationDefinitionStatement> queries,
+                                      List<RoutineDefinitionStatement> routines,
+                                      List<FunctionDefinitionStatement> functions) {}
+
     private void processSignature(ParserRuleContext statementCtx,
                                   PMLOperationSignature signature,
                                   Map<String, PMLOperationSignature> functionSignatures,
@@ -145,8 +181,8 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
             // check that the function isn't already defined in the pml or global scope
             if (functionSignatures.containsKey(signature.getName())) {
                 visitorCtx.errorLog().addError(
-                        statementCtx,
-                        "function '" + signature.getName() + "' already defined in scope"
+                    statementCtx,
+                    "function '" + signature.getName() + "' already defined in scope"
                 );
 
                 return;
@@ -159,10 +195,6 @@ public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
             visitorCtx.errorLog().addErrors(e.getErrors());
         }
     }
-
-    private record CompiledFunctions(List<AdminOpDefinitionStatement> operations,
-                                     List<RoutineDefinitionStatement> routines,
-                                     List<BasicFunctionDefinitionStatement> functions) {}
 
     private List<PMLStatement<?>> compileStatements(List<PMLParser.StatementContext> statementCtxs) {
         List<PMLStatement<?>> statements = new ArrayList<>();

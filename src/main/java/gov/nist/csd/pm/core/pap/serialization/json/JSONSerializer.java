@@ -15,7 +15,7 @@ import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.BasicFunction;
+import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
@@ -63,7 +63,7 @@ public class JSONSerializer implements PolicySerializer {
 
             switch (operation) {
                 case AdminOperation<?> o -> admin.add(serializableOp.toFormattedString(0));
-                case BasicFunction<?> o -> basic.add(serializableOp.toFormattedString(0));
+                case Function<?> o -> basic.add(serializableOp.toFormattedString(0));
                 case QueryOperation<?> o -> query.add(serializableOp.toFormattedString(0));
                 case ResourceOperation<?> o -> resource.add(serializableOp.toFormattedString(0));
                 case Routine<?> o -> routine.add(serializableOp.toFormattedString(0));
