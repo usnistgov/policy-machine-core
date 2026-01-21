@@ -87,6 +87,7 @@ public class PMLExample {
         assertTrue(pap.query().graph().nodeExists("testUser inbox"));
         assertTrue(pap.query().graph().nodeExists("welcome testUser"));
 
+        // try to execute the operation as the new testUser, expect unauthorized error
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
