@@ -14,7 +14,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.AccessAdjudication;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
-import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
