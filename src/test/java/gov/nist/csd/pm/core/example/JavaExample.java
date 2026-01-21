@@ -111,7 +111,7 @@ public class JavaExample {
         epp.subscribeTo(pdp);
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        pdp.adjudicateAdminOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
+        pdp.adjudicateOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
 
         // check admin operation and obligation response was successful
         assertTrue(pap.query().graph().nodeExists("testUser home"));
@@ -122,7 +122,7 @@ public class JavaExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateAdminOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+            () -> pdp.adjudicateOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
         );
     }
 }

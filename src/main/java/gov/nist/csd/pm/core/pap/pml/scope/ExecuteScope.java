@@ -20,9 +20,9 @@ public class ExecuteScope extends Scope<Object, Operation<?>> {
     private ExecuteScope(PAP pap,
                         Map<String, Object> constants,
                         Map<String, Object> variables,
-                        Map<String, Operation<?>> functions,
+                        Map<String, Operation<?>> operations,
                         Scope<Object, Operation<?>> parentScope) {
-        super(pap, constants, variables, functions, parentScope);
+        super(pap, constants, variables, operations, parentScope);
     }
 
     @Override

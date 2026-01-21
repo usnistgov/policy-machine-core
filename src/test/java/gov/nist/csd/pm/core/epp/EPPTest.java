@@ -118,7 +118,7 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateAdminOperation(
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(
             u1,
             "op1",
             Map.of("a", "oa1",
@@ -127,7 +127,7 @@ class EPPTest {
 
         pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("*a"));
 
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(
             u1,
             "op1",
             Map.of(
@@ -135,7 +135,7 @@ class EPPTest {
                 "b", "oa1")
         ));
 
-        assertDoesNotThrow(() -> pdp.adjudicateAdminOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(
             u1,
             "op2",
             Map.of(
@@ -181,7 +181,7 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        assertDoesNotThrow(() -> pdp.adjudicateResourceOperation(new UserContext(id("u1")), "read_file",
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(new UserContext(id("u1")), "read_file",
             Map.of("name", "oa1")));
         assertTrue(pap.query().graph().nodeExists("oa1pc1"));
     }

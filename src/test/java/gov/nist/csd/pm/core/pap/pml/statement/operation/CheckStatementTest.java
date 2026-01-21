@@ -115,7 +115,7 @@ class CheckStatementTest {
         pap.executePML(new TestUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.adjudicateAdminOperation(new TestUserContext("u1"), "op1", Map.of());
+        pdp.adjudicateOperation(new TestUserContext("u1"), "op1", Map.of());
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
     }

@@ -618,7 +618,7 @@ resourceop read_file(@node("read") string filename) {
 Query operations are read-only operations using the PolicyQuery interface.
 
 ```pml
-query getProjectMembers(string a) []string {
+query query1(string a) []string {
     return getAdjacentAscendants(a)
 }
 ```
@@ -711,10 +711,12 @@ resourceop read_file(@node("read") string name) { }
   
 // create a custom administration operation  
 adminop create_new_user(string username) {  
-    check ["assign_to"] on ["users"]        
+    check ["assign_to"] on ["users"]   
+         
     create u username in ["users"]  
     create oa username + " home" in ["user homes"]    
-    create oa username + " inbox" in ["user inboxes"]}  
+    create oa username + " inbox" in ["user inboxes"]
+}  
   
 // - create an obligation on the custom admin operation that when ever a user is created, add an object to their  
 // inbox titled "hello " + username  

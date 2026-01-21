@@ -1,7 +1,6 @@
 # Policy Machine Core
 
 The core components of the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard.
-For complete documentation and detailed examples visit the Wiki.
 
 ## Installation
 
@@ -55,73 +54,40 @@ Then, add the maven dependency
 - `epp` - Event Processing Point. The epp attaches to a PDP to listen to administrative events while exposing an interface for a PEP to send events.
 - `impl` - Policy Machine supported implementations of the PAP interfaces. Included are in memory and embedded Neo4j.
 
+The `pap` package allows you to create NAGC policies without access checks on administrative operations. The `pdp` is designed
+to wrap the features of the `pap` and perform access checks on administrative operations. The `epp` package provides a means
+of subscribing to PDP events and processing obligations defined in the PAP.
+
 ## Getting Started
 
-```java
-import gov.nist.csd.pm.core.epp.EPP;
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pdp.PDP;
+In general, to start using this library:
 
-// create a PAP object to interface with the policy
+```java
+// Create a PAP object to modify and query policy information in the PIP
 PAP pap = new MemoryPAP();
 
-// create a PDP to run transactions as users with access checks
+// Create a PDP object to ensure access checks on administrative operations
 PDP pdp = new PDP(pap);
 
-// create an EPP and subscribe to the events published by the PDP to process obligations and respond to events
+// Create an EPP object that uses the PAP to retrieve obligations and the PDP to execute the obligation responses
 EPP epp = new EPP(pdp, pap);
+
+// Subscribe the EPP to the events emitted by the PDP
 epp.subscribeTo(pdp);
 ```
 
+Below are two code snippets to show the basics of creating an NGAC policy with the Policy Machine. The first example
+uses the Java API to create and test a policy. The second defines the policy in PML and tests using Java.
 
-
-
-### 1. Create a PAP
-
-```java
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-
-PAP pap = new MemoryPAP();
-```
-
-### 2. Set resource access rights
-
-**Java**
-```java
-pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
-```
-
-**PML**
-```pml
-set resource access rights ["read", "write"]
-```
-
-### 3. Create a resource operation
-
-**Java**
-```java
-ResourceOperation<?> op1 = new ResourceOperation<>("name", STRING_TYPE, List.of()) {
-  @Override
-  protected String execute(PolicyQuery query, Args args) throws PMException {
-    return "test";
-  }
-};
-```
-
-**PML**
-```pml
-
-```
-
-
-
-
-
-
-## Basic Usage
+### Java
 
 ```java
 package gov.nist.csd.pm.core.example;
+
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
@@ -130,158 +96,319 @@ import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
-public class Main {
+public class JavaExample {
 
-    public static void main(String[] args) throws PMException {
-        // create a new memory PAP
+    @Test
+    void testJavaExample() throws PMException {
         PAP pap = new MemoryPAP();
 
-        // set the resource operations the policy will support
+        // set resource access rights
         pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-        // create a simple configuration with one of each node type, granting u1 read access to o1.
-        long pc1 = pap.modify().graph().createPolicyClass("pc1");
-        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
-        long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(pc1));
-        long u1 = pap.modify().graph().createUser("u1", List.of(ua1, ua2));
-        long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
-        long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
+        // create initial graph config
+        long pc1Id = pap.modify().graph().createPolicyClass("pc1");
+        long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
+        long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
+        pap.modify().graph().createUser("admin_user", List.of(adminId));
+        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRights.ASSIGN_TO));
 
-        pap.modify().graph().associate(ua1, oa1,
-            new AccessRightSet("read", "write", "create_object_attribute", "associate", "associate_to"));
-        pap.modify().graph().associate(ua2, ua1, new AccessRightSet("associate"));
+        long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
+        long userInboxes = pap.modify().graph().createObjectAttribute("user inboxes", List.of(pc1Id));
+        pap.modify().graph().associate(adminId, userHomes, new AccessRightSet(AdminAccessRights.WC_ALL));
+        pap.modify().graph().associate(adminId, userInboxes, new AccessRightSet(AdminAccessRights.WC_ALL));
 
-        // create a prohibition
+        // prohibit the admin user from reading inboxes
         pap.modify().prohibitions().createProhibition(
-            "deny u1 write on oa1",
-            new ProhibitionSubject(u1),
-            new AccessRightSet("write"),
+            "deny admin on user inboxes",
+            new ProhibitionSubject(adminId),
+            new AccessRightSet("read"),
             false,
-            List.of(new ContainerCondition(oa1, false)));
+            List.of(new ContainerCondition(userInboxes, false))
+        );
 
-        // create an obligation that associates ua1 with any OA
-        String obligationPML = """
-            create obligation "sample_obligation" {
-            	create rule "rule1"
-            	when any user
-            	performs "create_object_attribute"
-            	on {
-                    descendants: "oa1"
-                }
-            	do(ctx) {
-            		associate "ua1" and ctx.args.name with ["read", "write"]
-            	}
-            }""";
+        // create resource operation to read a file
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", "read"))) {
+            @Override
+            protected Void execute(PolicyQuery query, Args args) throws PMException {
+                return null;
+            }
+        };
+        pap.modify().operations().createOperation(resourceOp);
 
-        // when creating an obligation a user is required
-        // this is the user the obligation response will be executed on behalf of
-        pap.executePML(new UserContext(u1), obligationPML);
+        // create a custom administration operation
+        FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
+        AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam)) {
 
-    /*
-    Alternatively, create the above policy using PML:
+            @Override
+            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+                pap.privilegeChecker().check(userCtx, usersId, AdminAccessRights.ASSIGN_TO);
+            }
 
-    String pml = """
-    set resource operations ["read", "write"]
+            @Override
+            public Void execute(PAP pap, Args args) throws PMException {
+                String username = args.get(usernameParam);
 
-    create pc "pc1"
-    create oa "oa1" in ["pc1"]
-    create ua "ua1" in ["pc1"]
-    create u "u1" in ["ua1"]
-    create o "o1" in ["oa1"]
+                pap.modify().graph().createUser(username, List.of(usersId));
+                pap.modify().graph().createObjectAttribute(username + " home", List.of(userHomes));
+                pap.modify().graph().createObjectAttribute(username + " inbox", List.of(userInboxes));
+                return null;
+            }
+        };
+        pap.modify().operations().createOperation(adminOp);
 
-    associate "ua1" and "oa1" with ["read", "write", "create_object_attribute", "associate", "associate_to"]
-    associate "ua2" and "ua1" with ["associate"]
+        // - create an obligation on the custom admin operation that when ever a user is created, add an object to their
+        // inbox titled "hello " + username
+        // - obligations require the use of PML to define responses, so they may be serialized
+        // - obligations require an author which we will set as the admin user since they are allowed to perform the
+        // operations in the response
+        String pml = """
+            create obligation "o1"
+            when any user
+            performs create_new_user
+            do(ctx) {
+                objName := "welcome " + ctx.args.username
+                inboxName := ctx.args.username + " inbox"
+                create o objName in [inboxName]
+            }
+            """;
+        pap.executePML(new UserContext(adminId), pml);
 
-    create prohibition "deny u1 write on oa1"
-    deny U "u1"
-    access rights ["write"]
-    on union of {"oa1": false}
-
-    create obligation "sample_obligation" {
-        create rule "rule1"
-        when any user
-        performs "create_object_attribute"
-        on {
-        descendants: "oa1"
-        }
-        do(ctx) {
-        associate "ua1" and ctx.args.name with ["read", "write"]
-        }
-    }
-    """;
-
-    pap.executePML(new UserContext("u1")), pml);
-    */
-
-        AccessRightSet privileges = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        System.out.println(privileges);
-        // expected output: {associate, read, create_object_attribute, associate_to}
-
-        // create a PDP instance
+        // create a PDP to run transactions
         PDP pdp = new PDP(pap);
 
-        // create a new EPP instance to listen to admin operations emitted by the PDP
+        // create an EPP to process events in the EPP and matching obligation responses
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        // run a tx as u1 that will trigger the above obligation
-        pdp.runTx(new UserContext(u1), policy -> {
-            policy.modify().graph().createObjectAttribute("oa2", List.of(oa1));
-            return null;
-        });
+        // adjudicate the admin operation which will cause the EPP to execute the above obligation response
+        pdp.adjudicateAdminOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
 
-        System.out.println(pap.query().graph().getAssociationsWithSource(ua1));
-        // expected output: {ua1->oa1{associate, read, create_object_attribute, write, associate_to}, ua1->oa2{read, write}}
+        // check admin operation and obligation response was successful
+        assertTrue(pap.query().graph().nodeExists("testUser home"));
+        assertTrue(pap.query().graph().nodeExists("testUser inbox"));
+        assertTrue(pap.query().graph().nodeExists("welcome testUser"));
+
+        // try to execute the operation as the new testUser, expect unauthorized error
+        long testUserId = pap.query().graph().getNodeId("testUser");
+        assertThrows(
+            UnauthorizedException.class,
+            () -> pdp.adjudicateAdminOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+        );
     }
 }
 ```
-## Creating Prohibitions
 
-Prohibitions can be created by specifying:
-
-- **name**: or unique identifier
-- **subject**: (either a user ID, user attribute ID, or process)
-- **set**: of access rights to be denied
-- **boolean**: flag indicating whether to take the union of the following container conditions
-- **container conditions**:
-  - attribute ID: the ID of an attribute node
-  - complement (boolean): if true, the condition applies to everything outside the specified containers subgraph
+### PML
 
 ```java
-pap.modify().prohibitions().createProhibition(
-    "deny u1 write on oa1",
-    new ProhibitionSubject(u1),
-    new AccessRightSet("write"),
-    false,
-    List.of(new ContainerCondition(oa1, false))
-);
+package gov.nist.csd.pm.core.example;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EPP;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.PDP;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
+import org.junit.jupiter.api.Test;
+
+public class PMLExample {
+    String pml = """
+        // set resource access rights
+        set resource access rights ["read", "write"]
+                
+        // create initial graph config
+        create pc "pc1"
+        create ua "users" in ["pc1"]
+        create ua "admin" in ["pc1"]
+        // the admin_user will be created automatically during bootstrapping 
+        assign "admin_user" to ["admin"]
+        associate "admin" and "users" with ["assign_to"]
+                
+        create oa "user homes" in ["pc1"]
+        create oa "user inboxes" in ["pc1"]
+        associate "admin" and "user homes" with ["*"]
+        associate "admin" and "user inboxes" with ["*"]
+                
+        // prohibit the admin user from reading inboxes
+        create prohibition "deny admin on user inboxes"
+        deny u "admin"
+        access rights ["read"]
+        on union of {"user inboxes": false}
+                
+        // create resource operation to read a file
+        resourceop read_file(@node("read") string name) { }
+                
+        // create a custom administration operation
+        adminop create_new_user(string username) {
+            check ["assign_to"] on ["users"]
+            
+            create u username in ["users"]
+            create oa username + " home" in ["user homes"]
+            create oa username + " inbox" in ["user inboxes"]
+        }
+                
+        // - create an obligation on the custom admin operation that when ever a user is created, add an object to their
+        // inbox titled "hello " + username
+        // - obligations require the use of PML to define responses, so they may be serialized
+        // - obligations require an author which we will set as the admin user since they are allowed to perform the
+        // operations in the response
+        create obligation "o1"
+        when any user
+        performs create_new_user
+        do(ctx) {
+            objName := "welcome " + ctx.args.username
+            inboxName := ctx.args.username + " inbox"
+            create o objName in [inboxName]
+        }
+        """;
+    @Test
+    void testPMLExample() throws PMException {
+        PAP pap = new MemoryPAP();
+        // we bootstrap instead of calling pap.executePML because the admin_user needs to exist before executing the PML
+        // the call to executePML requires a UserContext with the node id which wouldn't exist yet if the admin_user was created in the PML.
+        // Notice the admin_user is only assigned to the "admin" UA in the PML instead of being created.
+        // The PMLBootstrapped handles creating the user then executes the PML as the admin_user.
+        pap.bootstrap(new PMLBootstrapper("admin_user", pml));
+
+        // create a PDP to run transactions
+        PDP pdp = new PDP(pap);
+
+        // create an EPP to process events in the EPP and matching obligation responses
+        EPP epp = new EPP(pdp, pap);
+        epp.subscribeTo(pdp);
+
+        // adjudicate the admin operation which will cause the EPP to execute the above obligation response
+        long adminId = pap.query().graph().getNodeId("admin");
+        pdp.executePML(new UserContext(adminId), """
+            create_new_user("testUser")
+            """);
+
+        // check admin operation and obligation response was successful
+        assertTrue(pap.query().graph().nodeExists("testUser home"));
+        assertTrue(pap.query().graph().nodeExists("testUser inbox"));
+        assertTrue(pap.query().graph().nodeExists("welcome testUser"));
+
+        // try to execute the operation as the new testUser, expect unauthorized error
+        long testUserId = pap.query().graph().getNodeId("testUser");
+        assertThrows(
+            UnauthorizedException.class,
+            () -> pdp.executePML(new UserContext(testUserId), """
+                create_new_user("testUser2")
+                """)
+        );
+    }
+}
+
 ```
 
-## Creating Obligations
+## Operations
 
-Obligations should be defined using PML because obligation responses are defined using PML statements. See the full
-[Obligation PML specification](./docs/pml.md#create-obligation) for more details
+Operations are a fundamental part of NGAC and the policy-machine-core library. There are 5 types of supported operations:
+
+- Admin Operations: Modify the policy.
+- Resource Operations: Represents access on a resource (object).
+- Query Operations: Query the policy information.
+- Routines: A set of operations, with access checks on each statement rather than the routine itself or its args.
+- Basic Functions: Reusable utility functions that do not access the policy.
+
+Only Admin and Resource operations emit events to the EPP. All operations define a set of [FormalParameters](./src/main/java/gov/nist/csd/pm/core/pap/operation/param/FormalParameter.java).
+Admin, Resource, and Query operations can define FormalParameters with RequiredCapabilities which are a set of access rights 
+a user needs on the actual argument in the call to the operation in order to successfully execute the operation. The
+access rights defined in the RequiredCapabilities must be 
+[resource access rights](./src/main/java/gov/nist/csd/pm/core/pap/modification/OperationsModification.java) 
+or 
+[admin access rights](./src/main/java/gov/nist/csd/pm/core/pap/admin/AdminAccessRights.java).
+
+### Define an operation
+Define an admin and resource operation using PML.
+
+```pml
+set resource access rights ["read"]
+
+// check for the read access right on the node passed to the filename param
+// return a map representing the node name, type, and properties
+resourceop read_file(@node("read") string filename) map[string]any {
+    return getNode(filename)
+}
+
+adminop create_new_user(string username) {  
+    check ["assign_to"] on ["users"]        
+    
+    create u username in ["users"]  
+    create oa username + " home" in ["user homes"]    
+    create oa username + " inbox" in ["user inboxes"]
+}  
+```
+
+### Execute operation
+```java
+PAP pap = new MemoryPAP();
+pap.executePML(userCtx, pml);
+
+// or
+
+PDP pdp = new PDP(pap);
+pdp.executePML(useCtx, pml);
+```
+
+### Obligation example
+Now that the operations are persisted in the PIP, they can be executed by the PDP and the resulting events can be processed
+by the EPP against any obligations.
+
+```pml
+create obligation "o1"  
+when any user  
+performs read_file on (filename) {
+    return filename == "file1.txt"
+} 
+do(ctx) {  
+    // do something
+}
+```
+
+Now when the PDP executes an operation:
 
 ```java
-String pml = """
-        create obligation "sample_obligation" {
-            create rule "rule1"
-            when any user
-            performs "create_object_attribute"
-            on {
-                descendants: "oa1"
-            }
-            do(ctx) {
-                associate "ua1" and ctx.args.name with ["read", "write"]
-            }
-        }""";
-pap.executePML(u1, pml);
+UserContext userCtx = new UserContext(adminUserId);
+
+PDP pdp = new PDP(pap);
+pdp.adjudicateResourceOperation(userCtx, "read_file", Map.of("filename", "file1.txt"))
 ```
+
+It will emit an event:
+
+```json
+{
+  "user": "<username>",
+  "process": "<process>",
+  "opName": "read_file",
+  "args": {
+    "filename": "file1.txt"
+  }
+}
+```
+
+Which matches the obligation's operation pattern: `filename == "file1.txt"` and the EPP will execute the obligation
+response.
 
 ## Policy Machine Language (PML)
 
@@ -298,49 +425,6 @@ String json = pap.serialize(new JSONSerializer());
 // Create new PAP and import policy
 PAP newPap = new MemoryPAP();
 newPap.deserialize(json, new JSONDeserializer());
-```
-
-## Administrative Functions
-
-The Policy Machine supports custom, parameterized administrative functions for packaging policy modifications into single
-transactions. Administrative functions can be defined in Java or PML.
-
-### Operations
-
-Operations are administrative functions with a single privilege check. Once the check is passed, the policy modifications
-in the body of the operation are executed without privilege checks.
-
-```java
-String pml = """
-        operation op1(string a, string[] b) {
-            check "read" on [a]
-            check "write" on b
-        } {
-            // PML statements
-        }
-        """;
-
-pap.executePML(userContext, pml);
-
-// Call the operation
-pap.adjudicateAdminOperation(userContext, "op1", Map.of("a", "arg1", "b", List.of("arg2", "arg3")));
-```
-
-### Routines
-
-Routines are administrative functions with privilege checks for each modification.
-
-```java
-String pml = """
-        routine routine1(string a, string[] b) {
-            // PML Statements
-        }
-        """;
-
-pap.executePML(userContext, pml);
-
-// Call the routine
-pap.adjudicateAdminRoutine(userContext, "routine1", Map.of("a", "arg1", "b", List.of("arg2", "arg3")));
 ```
 
 ## Custom Policy Store Implementations

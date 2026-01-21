@@ -133,7 +133,7 @@ public class PMLBasicFunctionsTest {
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateAdminOperation(new UserContext(id("u1")),
+		pdp.adjudicateOperation(new UserContext(id("u1")),
 			"op2",
 			Map.of());
 
@@ -171,7 +171,7 @@ public class PMLBasicFunctionsTest {
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
+		pdp.adjudicateOperation(new UserContext(id("u1")), "routine1", Map.of());
 
 		assertTrue(pap.query().graph().nodeExists("pc3"));
 	}

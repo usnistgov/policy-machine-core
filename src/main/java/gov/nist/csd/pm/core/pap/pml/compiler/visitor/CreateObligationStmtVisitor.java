@@ -171,9 +171,9 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
             // get FormalParameters of the operation, keep only the ones defined in argNames
             List<FormalParameter<?>> patternParams = new ArrayList<>();
             try {
-                PMLOperationSignature function = visitorCtx.scope().getOperation(opName);
+                PMLOperationSignature operation = visitorCtx.scope().getOperation(opName);
 
-                List<FormalParameter<?>> formalParameters = function.getFormalParameters();
+                List<FormalParameter<?>> formalParameters = operation.getFormalParameters();
 
                 // check that all of the argNames are defined as formal params for the operation
                 Set<String> formalParamNames = formalParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());

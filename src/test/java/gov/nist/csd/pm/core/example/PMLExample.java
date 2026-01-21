@@ -66,6 +66,10 @@ public class PMLExample {
     @Test
     void testPMLExample() throws PMException {
         PAP pap = new MemoryPAP();
+        // we bootstrap instead of calling pap.executePML because the admin_user needs to exist before executing the PML
+        // the call to executePML requires a UserContext with the node id which wouldn't exist yet if the admin_user was created in the PML.
+        // Notice the admin_user is only assigned to the "admin" UA in the PML instead of being created.
+        // The PMLBootstrapped handles creating the user then executes the PML as the admin_user.
         pap.bootstrap(new PMLBootstrapper("admin_user", pml));
 
         // create a PDP to run transactions
