@@ -15,7 +15,7 @@ the Policy Machine. This document provides a complete reference for PML syntax a
 7. [Policy Modification Statements](#policy-modification-statements)
 8. [Operation Definitions](#operation-definitions)
 9. [Builtin Operations](#builtin-operations)
-10. [Complete Example](#complete-example)
+10. [Example](#example)
 
 ---
 
