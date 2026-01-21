@@ -55,6 +55,69 @@ Then, add the maven dependency
 - `epp` - Event Processing Point. The epp attaches to a PDP to listen to administrative events while exposing an interface for a PEP to send events.
 - `impl` - Policy Machine supported implementations of the PAP interfaces. Included are in memory and embedded Neo4j.
 
+## Getting Started
+
+```java
+import gov.nist.csd.pm.core.epp.EPP;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pdp.PDP;
+
+// create a PAP object to interface with the policy
+PAP pap = new MemoryPAP();
+
+// create a PDP to run transactions as users with access checks
+PDP pdp = new PDP(pap);
+
+// create an EPP and subscribe to the events published by the PDP to process obligations and respond to events
+EPP epp = new EPP(pdp, pap);
+epp.subscribeTo(pdp);
+```
+
+
+
+
+### 1. Create a PAP
+
+```java
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+
+PAP pap = new MemoryPAP();
+```
+
+### 2. Set resource access rights
+
+**Java**
+```java
+pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
+```
+
+**PML**
+```pml
+set resource access rights ["read", "write"]
+```
+
+### 3. Create a resource operation
+
+**Java**
+```java
+ResourceOperation<?> op1 = new ResourceOperation<>("name", STRING_TYPE, List.of()) {
+  @Override
+  protected String execute(PolicyQuery query, Args args) throws PMException {
+    return "test";
+  }
+};
+```
+
+**PML**
+```pml
+
+```
+
+
+
+
+
+
 ## Basic Usage
 
 ```java

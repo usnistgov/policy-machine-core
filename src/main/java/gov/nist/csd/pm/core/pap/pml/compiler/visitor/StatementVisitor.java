@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicFunctionDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.CheckStatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationDefinitionVisitor;
@@ -110,8 +111,14 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
+    public PMLStatement<?> visitQueryOpDefinitionStatement(QueryOpDefinitionStatementContext ctx) {
+        return new OperationDefinitionVisitor(visitorCtx, new OperationSignatureVisitor(visitorCtx, true))
+            .visitQueryOpDefinitionStatement(ctx);
+    }
+
+    @Override
     public PMLStatement<?> visitReturnStatement(PMLParser.ReturnStatementContext ctx) {
-        return new FunctionReturnStmtVisitor(visitorCtx).visitReturnStatement(ctx);
+        return new OperationReturnStmtVisitor(visitorCtx).visitReturnStatement(ctx);
     }
 
     @Override

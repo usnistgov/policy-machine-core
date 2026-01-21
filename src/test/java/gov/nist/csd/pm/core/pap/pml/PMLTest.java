@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,6 +18,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -203,5 +205,130 @@ public class PMLTest {
                 ARGC.getName(), Map.of("4", "5", "6", "7")
             )
         ));
+    }
+
+    /*
+     - test retunr {} with return type
+     - test return in root PML with value and withou -- without value in if
+     - test reasingemtn of variable value type
+     */
+
+    @Test
+    void testEmptyValueIsCorrectlyAssignedTheOperationReturnType() throws PMException {
+        String pml = """
+            adminop op1() map[string]string {
+                return {}
+            }
+            
+            adminop op2(map[string]string a) {}
+            
+            adminop op3() []string {
+                return []
+            }
+            
+            adminop op4([]string a) {}
+            
+            op2(op1())
+            op4(op3())
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+
+        String pml2 = """
+            adminop op1() map[string]string {
+                return {}
+            }
+            
+            adminop op2(string a) {}
+            
+            op2(op1())
+            """;
+        MemoryPAP pap2 = new MemoryPAP();
+        assertThrows(PMLCompilationException.class, () -> pap2.executePML(new UserContext(-1), pml2));
+    }
+
+    @Test
+    void testReassignmentOfVariableType() throws PMException {
+        String pml = """
+            adminop op1() map[string]string {
+                return {}
+            }
+            
+            adminop op2(string s) {}
+            
+            a := op1()
+            a = "test"
+            op2(a)
+            
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+    }
+
+    @Test
+    void testReturnValueFromRootPMLInIfStatement() throws PMException {
+        String pml = """
+            adminop op1(string a) string {
+                return a
+            }
+            
+            if op1("a") == "a" {
+                return "a"
+            }
+            
+            return "b"
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        Object o = pap.executePML(new UserContext(-1), pml);
+        assertEquals(o, "a");
+    }
+
+    @Test
+    void testObligationMatchingFuncHasBasicAndQueryOperationsOnly() throws PMException {
+        String pml = """
+            adminop test() string { return "test" }
+            
+            create obligation "o1"
+            when any user
+            performs test on () {
+                a := getAdjacentAscendants("123")
+                b := test()
+            }
+            do(ctx) {
+                create pc "pc1"
+            }
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        PMLCompilationException e = assertThrows(
+            PMLCompilationException.class,
+            () -> pap.executePML(new UserContext(-1), pml)
+        );
+        assertEquals(
+            "unknown operation 'test' in scope",
+            e.getErrors().getFirst().errorMessage()
+        );
+    }
+
+    @Test
+    void testQueryDefinitionStmt() throws PMException {
+        String pml = """
+            create pc "123"
+            
+            adminop test() string { return "test" }
+            
+            query q1() string {
+                n := getNode("123")
+                return test()
+            }
+            """;
+        MemoryPAP pap = new MemoryPAP();
+        PMLCompilationException e = assertThrows(
+            PMLCompilationException.class,
+            () -> pap.executePML(new UserContext(-1), pml)
+        );
+        assertEquals(
+            "unknown operation 'test' in scope",
+            e.getErrors().getFirst().errorMessage()
+        );
     }
 }

@@ -8,9 +8,9 @@ import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
+public class OperationReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
 
-    public FunctionReturnStmtVisitor(VisitorContext visitorCtx) {
+    public OperationReturnStmtVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
     }
 
@@ -23,18 +23,5 @@ public class FunctionReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {
         Expression<?> e = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         return new ReturnStatement(e);
-    }
-
-    private ParserRuleContext getEnclosingContext(ParserRuleContext ctx) {
-        if (ctx instanceof PMLParser.BasicFunctionDefinitionStatementContext ||
-                ctx instanceof PMLParser.AdminOpStatementBlockContext ||
-                ctx instanceof PMLParser.RoutineDefinitionStatementContext ||
-                ctx instanceof PMLParser.ResponseContext) {
-            return ctx;
-        } else if (ctx == null) {
-            return null;
-        }
-
-        return getEnclosingContext(ctx.getParent());
     }
 }

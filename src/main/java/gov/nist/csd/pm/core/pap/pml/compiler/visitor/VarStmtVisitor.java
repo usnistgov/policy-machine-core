@@ -68,17 +68,18 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
         Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
 
         VariableAssignmentStatement stmt = new VariableAssignmentStatement(
-                varName,
-                ctx.PLUS() != null,
-                expr
+            varName,
+            ctx.PLUS() != null,
+            expr
         );
 
         try {
-           if (visitorCtx.scope().getVariable(varName).isConst()) {
+            if (visitorCtx.scope().getVariable(varName).isConst()) {
                 throw new PMLCompilationRuntimeException(ctx, "cannot reassign const variable");
             }
 
-            // don't need to update variable since the name and type are the only thing that matter during compilation
+            // update the variable in scope
+            visitorCtx.scope().updateVariable(varName, new Variable(varName, expr.getType(), false));
         } catch (PMLScopeException e) {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }

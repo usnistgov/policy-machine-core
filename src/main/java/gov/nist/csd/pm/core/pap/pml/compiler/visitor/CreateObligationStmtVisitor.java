@@ -38,6 +38,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -162,7 +163,10 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 return new MatchesOperationPattern(opName);
             }
 
-            Set<String> argNames = onPatternContext.argNames().ID().stream().map(TerminalNode::getText).collect(Collectors.toSet());
+            Set<String> argNames = new HashSet<>();
+            if (onPatternContext.argNames() != null) {
+                argNames.addAll(onPatternContext.argNames().ID().stream().map(TerminalNode::getText).collect(Collectors.toSet()));
+            }
 
             // get FormalParameters of the operation, keep only the ones defined in argNames
             List<FormalParameter<?>> patternParams = new ArrayList<>();

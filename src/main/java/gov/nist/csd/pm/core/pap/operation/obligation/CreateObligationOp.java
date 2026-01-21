@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import java.util.List;
 
-public class CreateObligationOp extends gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp {
+public class CreateObligationOp extends ObligationOp {
 
     public CreateObligationOp() {
         super(

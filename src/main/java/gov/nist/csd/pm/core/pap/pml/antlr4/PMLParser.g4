@@ -84,7 +84,7 @@ basicSubjectPatternExpr:
 operationPattern:
     ANY OPERATION #AnyOperation
     | (opName=ID onPattern?) #OperationPatternFunc ;
-onPattern: ON OPEN_PAREN argNames CLOSE_PAREN onPatternBlock? ;
+onPattern: ON OPEN_PAREN argNames? CLOSE_PAREN onPatternBlock? ;
 onPatternBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 argNames: ID (COMMA ID)*;
 

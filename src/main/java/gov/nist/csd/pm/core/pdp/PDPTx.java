@@ -10,8 +10,10 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
@@ -27,6 +29,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
+import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
 import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
@@ -151,8 +154,23 @@ public class PDPTx implements OperationExecutor {
                 return routine.execute(this, args);
             }
 
+            // check if user can execute the operation
             operation.canExecute(pap, userCtx, args);
-            return operation.execute(pap, args);
+
+            // execute the operation
+            Object result = operation.execute(pap, args);
+
+            // if the operation is an Admin or Resource operation publish the event for EPPs
+            if (operation instanceof AdminOperation<?> || operation instanceof ResourceOperation<?>) {
+                eventPublisher.publishEvent(EventContextUtil.buildEventContext(
+                    pap,
+                    userCtx,
+                    operation.getName(),
+                    args
+                ));
+            }
+
+            return result;
         }
 
         @Override

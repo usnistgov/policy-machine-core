@@ -133,14 +133,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
         // execute operation
         Object ret = pdpTx.executeOperation(operation, args);
 
-        // send to EPP
-        publishEvent(EventContextUtil.buildEventContext(
-            pap,
-            user,
-            operation.getName(),
-            args
-        ));
-
         return ret;
     }
 

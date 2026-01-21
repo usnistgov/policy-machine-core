@@ -107,11 +107,11 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<FunctionDefinitio
     }
 
     @Override
-    public FunctionDefinitionStatement visitQueryOpDefinitionStatement(QueryOpDefinitionStatementContext ctx) {
+    public QueryOperationDefinitionStatement visitQueryOpDefinitionStatement(QueryOpDefinitionStatementContext ctx) {
         PMLOperationSignature signature = operationSignatureVisitor.visitQueryOpSignature(ctx.queryOpSignature());
 
         PMLStatementBlock body = StatementBlockParser.parseBasicOrCheckStatements(
-            visitorCtx,
+            visitorCtx.copyBasicAndQueryOnly(),
             ctx.basicAndCheckStatementBlock(),
             signature.getReturnType(),
             signature.getFormalParameters()

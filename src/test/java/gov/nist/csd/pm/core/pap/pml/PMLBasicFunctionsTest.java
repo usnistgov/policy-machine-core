@@ -37,7 +37,12 @@ public class PMLBasicFunctionsTest {
                     when any user
                     performs any operation
                     do(ctx) {
-                        op1("test")
+                    	name := ctx.opName
+                    	if nodeExists(name) {
+                    		return
+                    	}
+                    	
+                        op1(ctx.opName)
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
@@ -53,8 +58,8 @@ public class PMLBasicFunctionsTest {
 			return null;
 		});
 
-		assertTrue(pap.query().graph().nodeExists("test"));
-		assertTrue(pap.query().graph().nodeExists("test2"));
+		assertTrue(pap.query().graph().nodeExists("create_policy_class"));
+		assertTrue(pap.query().graph().nodeExists("op1"));
 	}
 
 	@Test
@@ -142,6 +147,7 @@ public class PMLBasicFunctionsTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
                 
                 routine routine1() {
                     op1()
@@ -153,7 +159,7 @@ public class PMLBasicFunctionsTest {
                 
                 create obligation "ob1"
                     when any user
-                    performs any operation
+                    performs op1
                     do(ctx) {
                         create pc "pc3"
                     }
@@ -167,7 +173,7 @@ public class PMLBasicFunctionsTest {
 
 		pdp.adjudicateAdminRoutine(new UserContext(id("u1")), "routine1", Map.of());
 
-		assertFalse(pap.query().graph().nodeExists("pc3"));
+		assertTrue(pap.query().graph().nodeExists("pc3"));
 	}
 
 	@Test
