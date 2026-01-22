@@ -451,3 +451,11 @@ public class CustomPolicyStore implements PolicyStore {
 3. Create a Custom PAP that extends [PAP](/src/main/java/gov/nist/csd/pm/core/pap/PAP.java).
 
 See the [MemoryPAP implementation](src/main/java/gov/nist/csd/pm/core/impl/memory/pap/MemoryPAP.java) for a complete example.
+
+## Update Protocol Buffers
+```
+git submodule update --remote --merge protos
+git add protos
+git commit -m "Update protos submodule"
+git push
+```
