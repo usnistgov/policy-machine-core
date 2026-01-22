@@ -28,7 +28,7 @@ public class PMLStmtsResourceOperation<T> extends PMLResourceOperation<T> implem
     }
 
     @Override
-    protected T execute(PolicyQuery query, Args args) throws PMException {
+    public T execute(PolicyQuery query, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         Object result = ctx.executeOperationStatements(this.body.getStmts(), args);

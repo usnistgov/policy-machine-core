@@ -59,7 +59,7 @@ public class JavaExample {
         // create resource operation to read a file
         ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", "read"))) {
             @Override
-            protected Void execute(PolicyQuery query, Args args) throws PMException {
+            public Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
             }
         };

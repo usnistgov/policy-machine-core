@@ -10,8 +10,13 @@ import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
+import gov.nist.csd.pm.core.pap.id.RandomIdGenerator;
+import gov.nist.csd.pm.core.pap.modification.GraphModifier;
+import gov.nist.csd.pm.core.pap.modification.ObligationsModifier;
+import gov.nist.csd.pm.core.pap.modification.OperationsModifier;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
+import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifier;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
 import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
@@ -22,8 +27,13 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
+import gov.nist.csd.pm.core.pap.query.AccessQuerier;
+import gov.nist.csd.pm.core.pap.query.GraphQuerier;
+import gov.nist.csd.pm.core.pap.query.ObligationsQuerier;
+import gov.nist.csd.pm.core.pap.query.OperationsQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerier;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
@@ -34,38 +44,68 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class PAP implements OperationExecutor, Transactional {
+public class PAP implements OperationExecutor, Transactional {
 
-    private final PolicyStore policyStore;
-    private final PolicyModifier modifier;
-    private final PolicyQuerier querier;
-    private final PrivilegeChecker privilegeChecker;
-    private final PluginRegistry pluginRegistry;
+    private PolicyStore policyStore;
+    private PolicyModifier modifier;
+    private PolicyQuerier querier;
+    private PrivilegeChecker privilegeChecker;
+    private PluginRegistry pluginRegistry;
 
-    public PAP(PolicyStore policyStore, PolicyModifier modifier, PolicyQuerier querier, PrivilegeChecker privilegeChecker, PluginRegistry pluginRegistry) throws PMException {
-        this.policyStore = policyStore;
-        this.modifier = modifier;
-        this.querier = querier;
-        this.privilegeChecker = privilegeChecker;
-        this.pluginRegistry = pluginRegistry;
+    public PAP(PolicyStore policyStore) throws PMException {
+        this.pluginRegistry = new PluginRegistry();
 
-        // verify admin policy
-        AdminPolicy.verifyAdminPolicy(policyStore().graph());
-    }
-
-    public PAP(PolicyQuerier querier, PolicyModifier modifier, PolicyStore policyStore, PluginRegistry pluginRegistry) throws PMException {
-        this.querier = querier;
-        this.modifier = modifier;
+        this.querier = new PolicyQuerier(
+            new GraphQuerier(policyStore),
+            new ProhibitionsQuerier(policyStore),
+            new ObligationsQuerier(policyStore),
+            new OperationsQuerier(policyStore, pluginRegistry),
+            new AccessQuerier(policyStore)
+        );
+        this.modifier = new PolicyModifier(
+            new GraphModifier(policyStore, new RandomIdGenerator()),
+            new ProhibitionsModifier(policyStore),
+            new ObligationsModifier(policyStore),
+            new OperationsModifier(policyStore, pluginRegistry)
+        );
         this.policyStore = policyStore;
         this.privilegeChecker = new PrivilegeChecker(querier.access(), querier.graph());
-        this.pluginRegistry = pluginRegistry;
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
     }
 
-    public PAP(PAP pap) throws PMException {
-        this(pap.policyStore, pap.modifier, pap.querier, pap.privilegeChecker, pap.pluginRegistry);
+    protected PAP(PAP pap) throws PMException {
+        this.policyStore = pap.policyStore();
+        this.modifier = pap.modifier;
+        this.querier = pap.querier;
+        this.privilegeChecker = pap.privilegeChecker;
+        this.pluginRegistry = new PluginRegistry();
+    }
+
+    public PAP withPolicyStore(PolicyStore policyStore) {
+        this.policyStore = policyStore;
+        return this;
+    }
+
+    public PAP withPolicyModifier(PolicyModifier policyModifier) {
+        this.modifier = policyModifier;
+        return this;
+    }
+
+    public PAP withPolicyQuerier(PolicyQuerier policyQuerier) {
+        this.querier = policyQuerier;
+        return this;
+    }
+
+    public PAP withPrivilegeChecker(PrivilegeChecker privilegeChecker) {
+        this.privilegeChecker = privilegeChecker;
+        return this;
+    }
+
+    public PAP withPluginRegistry(PluginRegistry pluginRegistry) {
+        this.pluginRegistry = pluginRegistry;
+        return this;
     }
 
     public PolicyQuery query() {

@@ -28,7 +28,7 @@ public class ContainsKey extends PMLFunctionOperation<Boolean> {
     }
 
     @Override
-    protected Boolean execute(Args args) throws PMException {
+    public Boolean execute(Args args) throws PMException {
         Map<Object, Object> valueMap = args.get(MAP_PARAM);
         Object element = args.get(KEY_PARAM);
         return valueMap.containsKey(element);

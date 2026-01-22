@@ -16,7 +16,7 @@ public abstract non-sealed class Function<R> extends Operation<R>{
         super(name, returnType, parameters);
     }
 
-    protected abstract R execute(Args args) throws PMException;
+    public abstract R execute(Args args) throws PMException;
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {

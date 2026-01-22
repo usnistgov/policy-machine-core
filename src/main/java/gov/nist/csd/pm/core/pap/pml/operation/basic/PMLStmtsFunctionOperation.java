@@ -28,7 +28,7 @@ public class PMLStmtsFunctionOperation<T> extends PMLFunctionOperation<T> implem
     }
 
     @Override
-    protected T execute(Args args) throws PMException {
+    public T execute(Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         Object result = ctx.executeRoutineStatements(statements.getStmts(), args);
