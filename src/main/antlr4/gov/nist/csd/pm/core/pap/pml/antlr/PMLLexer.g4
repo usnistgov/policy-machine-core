@@ -1,9 +1,5 @@
 lexer grammar PMLLexer;
 
-@header {
-package gov.nist.csd.pm.core.pap.pml.antlr;
-}
-
 ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
 NODE_ARG: '@node';
