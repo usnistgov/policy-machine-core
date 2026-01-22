@@ -25,25 +25,6 @@
                 <version>3.3.0</version>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>add-generated-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/gov/nist/csd/pm/core/pap/pml/antlr</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
@@ -97,18 +78,14 @@
                 <version>${antlr.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-antlr-sources</id>
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/java/gov/nist/csd/pm/core/pap/pml/antlr4</sourceDirectory>
-                            <outputDirectory>${project.build.directory}/generated-sources/gov/nist/csd/pm/core/pap/pml/antlr</outputDirectory>
-                            <visitor>true</visitor>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <visitor>true</visitor>
+                </configuration>
             </plugin>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
@@ -138,6 +115,25 @@
                             <goal>compile</goal>
                             <goal>compile-custom</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/antlr4</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
