@@ -19,7 +19,6 @@ import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifier;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
-import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
 import gov.nist.csd.pm.core.pap.operation.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
@@ -70,6 +69,7 @@ public class PAP implements OperationExecutor, Transactional {
         );
         this.policyStore = policyStore;
         this.privilegeChecker = new PrivilegeChecker(querier.access(), querier.graph());
+        this.pluginRegistry.setOperationsQuery(this.querier.operations());
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
@@ -80,7 +80,7 @@ public class PAP implements OperationExecutor, Transactional {
         this.modifier = pap.modifier;
         this.querier = pap.querier;
         this.privilegeChecker = pap.privilegeChecker;
-        this.pluginRegistry = new PluginRegistry();
+        this.pluginRegistry = pap.pluginRegistry;
     }
 
     public PAP withPolicyStore(PolicyStore policyStore) {
@@ -100,11 +100,6 @@ public class PAP implements OperationExecutor, Transactional {
 
     public PAP withPrivilegeChecker(PrivilegeChecker privilegeChecker) {
         this.privilegeChecker = privilegeChecker;
-        return this;
-    }
-
-    public PAP withPluginRegistry(PluginRegistry pluginRegistry) {
-        this.pluginRegistry = pluginRegistry;
         return this;
     }
 

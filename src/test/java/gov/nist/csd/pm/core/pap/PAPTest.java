@@ -9,14 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
+import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
@@ -184,7 +187,7 @@ public abstract class PAPTest extends PAPTestInitializer {
             }
 
         };
-        pap.plugins().addOperation(pap.query().operations(), op1);
+        pap.plugins().addOperation(op1);
 
         Routine<Void> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
@@ -193,15 +196,34 @@ public abstract class PAPTest extends PAPTestInitializer {
             }
 
         };
-        pap.plugins().addOperation(pap.query().operations(), routine1);
+        pap.plugins().addOperation(routine1);
 
-        assertTrue(pap.plugins().getOperationsList().contains(op1));
-        assertTrue(pap.plugins().getOperationsList().contains(routine1));
+        assertTrue(pap.plugins().getOperationsList().containsAll(List.of(op1, routine1)));
+        assertTrue(pap.query().operations().getOperations().containsAll(List.of(op1, routine1)));
+    }
+
+    static ResourceOperation<Void> a = new ResourceOperation<>("a", VOID_TYPE, List.of()) {
+        @Override
+        public Void execute(PolicyQuery query, Args args) throws PMException {
+            return null;
+        }
+    };
+
+    @Test
+    void testPluginExistsCausesAddOperationToFail() throws PMException {
+        pap.plugins().addOperation(a);
+        assertThrows(OperationExistsException.class, () -> pap.modify().operations().createOperation(a));
+    }
+
+    @Test
+    void testOperationExistsCausesPluginAddOperationToFail() throws PMException {
+        pap.modify().operations().createOperation(a);
+        assertThrows(OperationExistsException.class, () -> pap.plugins().addOperation(a));
     }
 
     @Test
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().addOperation(pap.query().operations(), new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(new AdminOperation<>("op1", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;

@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
-import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
+import gov.nist.csd.pm.core.pap.PluginRegistry;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class OperationsModifier extends Modifier implements OperationsModification {

@@ -1,8 +1,9 @@
-package gov.nist.csd.pm.core.pap.operation;
+package gov.nist.csd.pm.core.pap;
 
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,10 +15,15 @@ import java.util.Map;
  */
 public class PluginRegistry {
 
+    private OperationsQuery operationsQuery;
     private final Map<String, Operation<?>> operations;
 
     public PluginRegistry() {
-        operations = new HashMap<>();
+        this.operations = new HashMap<>();
+    }
+
+    void setOperationsQuery(OperationsQuery operationsQuery) {
+        this.operationsQuery = operationsQuery;
     }
 
     /**
@@ -54,13 +60,12 @@ public class PluginRegistry {
     /**
      * Add an operation to the registry. The name cannot conflict with an existing operation in the policy
      * or the registry.
-     * @param opQuery An OperationsQuery implementation to check for name conflict with operations stored in the policy.
      * @param operation The operation to add.
      * @throws PMException If there is an error checking if the operation exists or if the name does conflict
      */
-    public void addOperation(OperationsQuery opQuery, Operation<?> operation) throws PMException {
+    public void addOperation(Operation<?> operation) throws PMException {
         String name = operation.getName();
-        boolean exists = opQuery.operationExists(name) || pluginExists(name);
+        boolean exists = operationsQuery.operationExists(name) || pluginExists(name);
         if (exists) {
             throw new OperationExistsException(name);
         }

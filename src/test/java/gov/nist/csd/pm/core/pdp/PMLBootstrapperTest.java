@@ -63,8 +63,8 @@ class PMLBootstrapperTest {
 
         };
 
-        pap.plugins().addOperation(pap.query().operations(), op1);
-        pap.plugins().addOperation(pap.query().operations(), routine1);
+        pap.plugins().addOperation(op1);
+        pap.plugins().addOperation(routine1);
 
         pdp.bootstrap(new PMLBootstrapper("u1", input));
 

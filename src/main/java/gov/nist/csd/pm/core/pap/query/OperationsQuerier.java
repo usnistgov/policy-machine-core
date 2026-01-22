@@ -4,7 +4,7 @@ import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.Operation;
-import gov.nist.csd.pm.core.pap.operation.PluginRegistry;
+import gov.nist.csd.pm.core.pap.PluginRegistry;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;

@@ -81,7 +81,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
                     () -> pap.modify().operations().createOperation(testOp));
 
             pap.modify().operations().deleteOperation(testOp.getName());
-            pap.plugins().addOperation(pap.query().operations(), testOp);
+            pap.plugins().addOperation(testOp);
             assertThrows(OperationExistsException.class,
                 () -> pap.modify().operations().createOperation(testOp));
         }
@@ -154,7 +154,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             });
 
             pap.modify().operations().deleteOperation(routine1.getName());
-            pap.plugins().addOperation(pap.query().operations(), routine1);
+            pap.plugins().addOperation(routine1);
             assertThrows(OperationExistsException.class,
                 () -> pap.modify().operations().createOperation(routine1));
         }
@@ -192,7 +192,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             pap.modify().operations().deleteOperation("routine1");
             assertFalse(pap.query().operations().getOperations().contains(routine1));
 
-            pap.plugins().addOperation(pap.query().operations(), routine1);
+            pap.plugins().addOperation(routine1);
             assertTrue(pap.query().operations().getOperations().contains(routine1));
             assertThrows(CannotDeletePluginOperationException.class, () ->
                 pap.modify().operations().deleteOperation(routine1.getName()));
