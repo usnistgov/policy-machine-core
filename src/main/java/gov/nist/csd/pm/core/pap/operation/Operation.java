@@ -138,15 +138,14 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
     private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws PMException {
         TargetContext targetCtx = new TargetContext(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-        check(pap.query().graph(), userCtx, targetCtx, nodeFormalParameter.getAccessRights(), privs);
+        check(pap.query().graph(), userCtx, targetCtx, nodeFormalParameter.getRequiredCapabilities(), privs);
     }
 
     private void check(GraphQuery graphQuery,
                        UserContext user,
                        TargetContext target,
-                       RequiredCapabilities reqCap,
+                       AccessRightSet reqCaps,
                        AccessRightSet userPrivileges) throws PMException {
-        AccessRightSet reqCaps = reqCap.getReqCaps();
         if(userPrivileges.containsAll(reqCaps)) {
             return;
         }

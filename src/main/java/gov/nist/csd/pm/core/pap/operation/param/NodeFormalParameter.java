@@ -1,30 +1,25 @@
 package gov.nist.csd.pm.core.pap.operation.param;
 
-import gov.nist.csd.pm.core.pap.operation.RequiredCapabilities;
+import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 
 public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>
 	permits NodeIdFormalParameter, NodeIdListFormalParameter, NodeNameFormalParameter, NodeNameListFormalParameter {
 
-	private RequiredCapabilities accessRights;
+	private final AccessRightSet reqCaps;
 
-	public NodeFormalParameter(String name, Type<T> type, RequiredCapabilities accessRights) {
+	public NodeFormalParameter(String name, Type<T> type, AccessRightSet reqCaps) {
 		super(name, type);
-		this.accessRights = accessRights;
+		this.reqCaps = reqCaps;
 	}
 
 	public NodeFormalParameter(String name, Type<T> type, String ... accessRights) {
 		super(name, type);
-		this.accessRights = new RequiredCapabilities(accessRights);
+		this.reqCaps = new AccessRightSet(accessRights);
 	}
 
-	public RequiredCapabilities getAccessRights() {
-		return accessRights;
+	public AccessRightSet getRequiredCapabilities() {
+		return reqCaps;
 	}
-
-	public void setAccessRights(RequiredCapabilities accessRights) {
-		this.accessRights = accessRights;
-	}
-
 
 }

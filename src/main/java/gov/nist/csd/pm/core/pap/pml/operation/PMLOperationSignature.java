@@ -51,7 +51,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
 
             String annotationStr = "";
             if (formalParameter instanceof NodeFormalParameter<?> nodeFormalParameter) {
-                AccessRightSet reqCaps = nodeFormalParameter.getAccessRights().getReqCaps();
+                AccessRightSet reqCaps = nodeFormalParameter.getRequiredCapabilities();
 
                 annotationStr = "@node" +
                     (!reqCaps.isEmpty() ?
