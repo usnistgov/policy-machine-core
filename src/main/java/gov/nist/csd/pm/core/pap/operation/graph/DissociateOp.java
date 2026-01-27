@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap.operation.graph;
 
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE_TO;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE;
+import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DISSOCIATE_FROM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -14,7 +15,7 @@ import java.util.List;
 public class DissociateOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DISSOCIATE_UA_PARAM = new NodeIdFormalParameter("ua", DISSOCIATE);
-    public static final NodeIdFormalParameter DISSOCIATE_TARGET_PARAM = new NodeIdFormalParameter("target", ASSOCIATE_TO);
+    public static final NodeIdFormalParameter DISSOCIATE_TARGET_PARAM = new NodeIdFormalParameter("target", DISSOCIATE_FROM);
 
     public DissociateOp() {
         super(
