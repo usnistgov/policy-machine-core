@@ -66,7 +66,7 @@ adminop createProjectAdmin(string projectName) {
 
 create obligation "create us project admin"
     when any user
-    performs createProject on (locProjectAttr) {
+    performs "createProject" on (locProjectAttr) {
       return locProjectAttr == "US project"
     }
     do(ctx) {
@@ -75,7 +75,7 @@ create obligation "create us project admin"
 
 create obligation "create eu project admin"
     when any user
-    performs createProject on (locProjectAttr) {
+    performs "createProject" on (locProjectAttr) {
         return locProjectAttr == "EU project"
     }
     do(ctx) {

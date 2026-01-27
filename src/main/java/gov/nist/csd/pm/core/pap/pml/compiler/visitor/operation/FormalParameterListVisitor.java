@@ -110,7 +110,7 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
 
         List<String> strings = new ArrayList<>();
         for (StringLitContext stringLitContext : ctxs) {
-            strings.add(ExpressionVisitor.removeQuotes(stringLitContext.getText()));
+            strings.add(ExpressionVisitor.removeQuotes(stringLitContext));
         }
 
         return strings;

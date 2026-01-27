@@ -25,6 +25,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PlusExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringLitContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.VariableReferenceContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -234,8 +235,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     @Override
     public Expression<?> visitStringLiteral(PMLParser.StringLiteralContext ctx) {
-        String text = ctx.stringLit().getText();
-        return new StringLiteralExpression(removeQuotes(text));
+        return new StringLiteralExpression(removeQuotes(ctx.stringLit()));
     }
 
     @Override
@@ -347,8 +347,9 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return mapType;
     }
 
-    public static String removeQuotes(String s) {
-        return s.trim().substring(1, s.length() - 1);
+    public static String removeQuotes(StringLitContext lit) {
+        String str = lit.getText();
+        return str.trim().substring(1, str.length() - 1);
     }
 
     private static void assertIsCastableTo(Type<?> type, Type<?> targetType) throws UnexpectedExpressionTypeException {

@@ -380,7 +380,7 @@ class PDPTest {
                 
                 create obligation "o1"
                     when any user
-                    performs create_user_attribute
+                    performs "create_user_attribute"
                     do(ctx) {
                         create pc "test"
                     }
@@ -413,7 +413,7 @@ class PDPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs op1
+                    performs "op1"
                     do(ctx) {
                         create oa "oa_" + ctx.args.name in [ctx.args.name]
                     }

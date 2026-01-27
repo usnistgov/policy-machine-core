@@ -81,10 +81,6 @@ public class Node implements Serializable {
         this.properties = properties;
     }
 
-    public String nameAndId() {
-        return name + ":" + id;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

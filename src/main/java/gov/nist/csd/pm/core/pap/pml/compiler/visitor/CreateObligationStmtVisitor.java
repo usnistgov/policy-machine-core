@@ -129,17 +129,17 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
 
         @Override
         public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
-            return new InSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new InSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit()));
         }
 
         @Override
         public SubjectPatternExpression visitUsernameSubject(PMLParser.UsernameSubjectContext ctx) {
-            return new UsernamePatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new UsernamePatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit()));
         }
 
         @Override
         public SubjectPatternExpression visitProcessSubject(PMLParser.ProcessSubjectContext ctx) {
-            return new ProcessSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit().getText()));
+            return new ProcessSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit()));
         }
     }
 
@@ -156,7 +156,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
 
         @Override
         public OperationPattern visitOperationPatternFunc(OperationPatternFuncContext ctx) {
-            String opName = ctx.opName.getText();
+            String opName = ExpressionVisitor.removeQuotes(ctx.opName);
 
             OnPatternContext onPatternContext = ctx.onPattern();
             if (onPatternContext == null) {

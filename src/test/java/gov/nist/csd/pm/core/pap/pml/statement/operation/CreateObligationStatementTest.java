@@ -124,7 +124,7 @@ class CreateObligationStatementTest {
             """
                     create obligation "obl1"
                     when any user
-                    performs e1 on (opnd1) {
+                    performs "e1" on (opnd1) {
                         return opnd1 == "oa1" || opnd1 == "oa2"
                     }
                     do (evtCtx) {
@@ -137,7 +137,7 @@ class CreateObligationStatementTest {
             """
                     create obligation "obl2"
                     when any user
-                    performs e1 on (opnd1) {
+                    performs "e1" on (opnd1) {
                         return opnd1 == "oa1" || opnd1 == "oa2"
                     }
                     do (evtCtx) {
@@ -161,11 +161,11 @@ class CreateObligationStatementTest {
             
             create obligation "o1"
                 when any user
-                performs op1
+                performs "op1"
                 do(ctx) {
                     create obligation "rule2"
                     when any user
-                    performs op2
+                    performs "op2"
                     do(ctx2) {
                         create pc "pc2"
                     }

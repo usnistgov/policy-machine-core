@@ -195,12 +195,12 @@
     {
       "author": 14,
       "name": "create us project admin",
-      "pml": "create obligation \"create us project admin\"\n    when any user\n    performs createProject on (locProjectAttr) {\n      return locProjectAttr == \"US project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
+      "pml": "create obligation \"create us project admin\"\n    when any user\n    performs \"createProject\" on (locProjectAttr) {\n      return locProjectAttr == \"US project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
     },
     {
       "author": 14,
       "name": "create eu project admin",
-      "pml": "create obligation \"create eu project admin\"\n    when any user\n    performs createProject on (locProjectAttr) {\n        return locProjectAttr == \"EU project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
+      "pml": "create obligation \"create eu project admin\"\n    when any user\n    performs \"createProject\" on (locProjectAttr) {\n        return locProjectAttr == \"EU project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
     }
   ],
   "operations": {

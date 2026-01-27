@@ -15,6 +15,7 @@ import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.NodeHasAscendantsException;
 import gov.nist.csd.pm.core.common.exception.NodeIdExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
+import gov.nist.csd.pm.core.common.exception.NodeReferencedInObligationException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
@@ -28,12 +29,14 @@ import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class GraphModifier extends Modifier implements GraphModification {
 
@@ -209,10 +212,11 @@ public class GraphModifier extends Modifier implements GraphModification {
 
         if (!ascendants.isEmpty()) {
             Node node = policyStore.graph().getNodeById(id);
-            throw new NodeHasAscendantsException(node.nameAndId());
+            throw new NodeHasAscendantsException(node.getName());
         }
 
         checkIfNodeInProhibition(id);
+        checkIfNodeIsObligationAuthor(id);
 
         return true;
     }
@@ -230,10 +234,26 @@ public class GraphModifier extends Modifier implements GraphModification {
             for (Prohibition p : subjPros) {
                 if (nodeInProhibition(id, p)) {
                     Node node = policyStore.graph().getNodeById(id);
-                    throw new NodeReferencedInProhibitionException(node.nameAndId(), p.getName());
+                    throw new NodeReferencedInProhibitionException(node.getName(), p.getName());
                 }
             }
         }
+    }
+
+    /**
+     * Helper method to check if a given node is referenced in any obligations as the author.
+     * @param id The node to check for.
+     * @throws PMException If any PM related exceptions occur in the implementing class.
+     */
+    protected void checkIfNodeIsObligationAuthor(long id) throws PMException {
+        Collection<Obligation> obligationsWithAuthor = policyStore.obligations().getObligationsWithAuthor(id);
+        if (obligationsWithAuthor.isEmpty()) {
+            return;
+        }
+
+        throw new NodeReferencedInObligationException(
+            policyStore.graph().getNodeById(id).getName(),
+            obligationsWithAuthor.stream().map(Obligation::getName).collect(Collectors.toSet()));
     }
 
     /**
@@ -300,7 +320,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         if (descs.size() == 1) {
             Node aNode = policyStore.graph().getNodeById(ascendant);
             Node dNode = policyStore.graph().getNodeById(descendant);
-            throw new DisconnectedNodeException(aNode.nameAndId(), dNode.nameAndId());
+            throw new DisconnectedNodeException(aNode.getName(), dNode.getName());
         }
 
         return true;

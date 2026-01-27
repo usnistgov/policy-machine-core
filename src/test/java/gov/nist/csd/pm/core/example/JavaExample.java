@@ -94,7 +94,7 @@ public class JavaExample {
         String pml = """
             create obligation "o1"
             when any user
-            performs create_new_user
+            performs "create_new_user"
             do(ctx) {
                 objName := "welcome " + ctx.args.username
                 inboxName := ctx.args.username + " inbox"

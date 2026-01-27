@@ -78,7 +78,7 @@ class EPPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs op1 on (a, b) {
+                    performs "op1" on (a, b) {
                         return a == "oa1" && b == "oa1"
                     }
                     do(ctx) {
@@ -105,7 +105,7 @@ class EPPTest {
         pap.executePML(u1, """
             create obligation "obl2"
             when any user
-            performs op2 on (a, b) {
+            performs "op2" on (a, b) {
                 return a == "oa2" && b == "oa2"
             }
             do(ctx) {
@@ -169,7 +169,7 @@ class EPPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs read_file
+                    performs "read_file"
                     on (name) {
                         return name == "oa1"
                     }
@@ -202,7 +202,7 @@ class EPPTest {
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -239,7 +239,7 @@ class EPPTest {
                 
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -358,7 +358,7 @@ class EPPTest {
                 
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -396,7 +396,7 @@ class EPPTest {
                 
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -438,7 +438,7 @@ class EPPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs create_policy_class
+                    performs "create_policy_class"
                     do(ctx) {
                         op1()
                         routine1()

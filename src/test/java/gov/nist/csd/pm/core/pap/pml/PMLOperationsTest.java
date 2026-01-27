@@ -121,7 +121,7 @@ public class PMLOperationsTest {
                 
                 create obligation "ob1"
                     when any user
-                    performs op1
+                    performs "op1"
                     do(ctx) {
                         create pc "pc3"
                     }
@@ -159,7 +159,7 @@ public class PMLOperationsTest {
                 
                 create obligation "ob1"
                     when any user
-                    performs op1
+                    performs "op1"
                     do(ctx) {
                         create pc "pc3"
                     }

@@ -290,7 +290,7 @@ public class PMLTest {
             
             create obligation "o1"
             when any user
-            performs test on () {
+            performs "test" on () {
                 a := getAdjacentAscendants("123")
                 b := test()
             }

@@ -17,8 +17,6 @@ import java.util.List;
 
 public class GetAdjacentDescendants extends PMLQueryOperation<List<String>> {
 
-    private static final Type<?> returnType = ListType.of(STRING_TYPE);
-
     public GetAdjacentDescendants() {
         super(
                 "getAdjacentDescendants",
