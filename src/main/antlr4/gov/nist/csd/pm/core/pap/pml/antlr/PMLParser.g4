@@ -207,7 +207,8 @@ expression:
     | literal #LiteralExpression
     | EXCLAMATION expression #NegateExpression
     | OPEN_PAREN expression CLOSE_PAREN #ParenExpression
-	| left=expression PLUS right=expression #PlusExpression
+    | expression index #IndexExpression
+    | left=expression PLUS right=expression #PlusExpression
     | left=expression (EQUALS | NOT_EQUALS) right=expression #EqualsExpression
     | left=expression (LOGICAL_AND | LOGICAL_OR) right=expression #LogicalExpression ;
 expressionList: expression (COMMA expression)* ;
@@ -226,7 +227,7 @@ stringArrayLit: OPEN_BRACKET (stringLit (COMMA stringLit)*)? CLOSE_BRACKET ;
 mapLit: OPEN_CURLY (element (COMMA element)*)? CLOSE_CURLY ;
 element: key=expression COLON value=expression ;
 
-variableReference: ID (index)* ;
+variableReference: ID ;
 
 index:
     OPEN_BRACKET key=expression CLOSE_BRACKET #BracketIndex

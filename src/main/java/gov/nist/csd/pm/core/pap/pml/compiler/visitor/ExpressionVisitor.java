@@ -16,6 +16,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BracketIndexContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.DotIndexContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EqualsExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.IndexExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionListContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.IndexContext;
@@ -202,21 +203,7 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
             throw new PMLCompilationRuntimeException(ctx, e.getMessage());
         }
 
-        Expression<?> baseExpr = new VariableReferenceExpression<>(varName, variable.type());
-
-        for (IndexContext indexCtx : ctx.index()) {
-            try {
-                if (indexCtx instanceof BracketIndexContext bracketIndexContext) {
-                    baseExpr = createBracketIndexExpression(baseExpr, bracketIndexContext);
-                } else if (indexCtx instanceof DotIndexContext dotIndexContext) {
-                    baseExpr = createDotIndexExpression(baseExpr, dotIndexContext);
-                }
-            } catch (UnexpectedExpressionTypeException e) {
-                throw new PMLCompilationRuntimeException(ctx, e.getMessage());
-            }
-        }
-
-        return baseExpr;
+        return new VariableReferenceExpression<>(varName, variable.type());
     }
 
     @Override
@@ -231,6 +218,24 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         boolean isEquals = ctx.EQUALS() != null;
 
         return new EqualsExpression(left, right, isEquals);
+    }
+
+    @Override
+    public Expression<?> visitIndexExpression(IndexExpressionContext ctx) {
+        Expression<?> baseExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
+
+        try {
+            IndexContext indexCtx = ctx.index();
+            if (indexCtx instanceof BracketIndexContext bracketIndexContext) {
+                return createBracketIndexExpression(baseExpr, bracketIndexContext);
+            } else if (indexCtx instanceof DotIndexContext dotIndexContext) {
+                return createDotIndexExpression(baseExpr, dotIndexContext);
+            }
+        } catch (UnexpectedExpressionTypeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+
+        throw new PMLCompilationRuntimeException(ctx, "Unknown index type");
     }
 
     @Override

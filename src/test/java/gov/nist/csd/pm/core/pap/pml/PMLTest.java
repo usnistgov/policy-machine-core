@@ -351,6 +351,22 @@ public class PMLTest {
     }
 
     @Test
+    void testIndexExpressionAsStatementCausesCompilationError() throws PMException {
+        MemoryPAP pap = new MemoryPAP();
+        pap.executePML(new UserContext(-1), """
+                create pc "pc1"
+                """);
+
+        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), """
+                getNode("pc1")
+                """));
+
+        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(-1), """
+                getNode("pc1").name
+                """));
+    }
+
+    @Test
     void testUsingKeywordsAsMapKeys() {
         String pml = """
                 m := {}
