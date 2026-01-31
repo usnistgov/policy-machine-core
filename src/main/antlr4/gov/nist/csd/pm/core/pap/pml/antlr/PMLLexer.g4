@@ -22,7 +22,6 @@ ON: 'on' ;
 IN: 'in' ;
 DO: 'do' ;
 ANY: 'any';
-ASCENDANT_OF: 'ascendant of' ;
 
 INTERSECTION: 'intersection' | 'inter';
 UNION: 'union' ;
