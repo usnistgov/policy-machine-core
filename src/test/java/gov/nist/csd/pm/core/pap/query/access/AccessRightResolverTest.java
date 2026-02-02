@@ -5,7 +5,6 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_GRAPH_A
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET;
@@ -159,7 +158,6 @@ class AccessRightResolverTest {
         all.addAll(ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET);
         all.addAll(ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET);
         all.addAll(ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET);
-        all.addAll(ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET);
         all.add(RESET);
         all.add(SERIALIZE_POLICY);
         all.add(DESERIALIZE_POLICY);

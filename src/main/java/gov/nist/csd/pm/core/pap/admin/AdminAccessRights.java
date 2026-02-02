@@ -59,11 +59,6 @@ public class AdminAccessRights {
     public static final String CREATE_OPERATION = "create_operation";
     public static final String DELETE_OPERATION = "delete_operation";
 
-
-    // routines
-    public static final String CREATE_ADMIN_ROUTINE = "create_admin_routine";
-    public static final String DELETE_ADMIN_ROUTINE = "delete_admin_routine";
-
     // general
     public static final String RESET = "reset";
     public static final String SERIALIZE_POLICY = "serialize_policy";
@@ -146,11 +141,6 @@ public class AdminAccessRights {
         DELETE_OPERATION
     );
 
-    public static final Set<String> ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET = Set.of(
-        CREATE_ADMIN_ROUTINE,
-        DELETE_ADMIN_ROUTINE
-    );
-
     public static final Set<String> ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET = Set.of(
         QUERY_POLICY_CLASSES,
         QUERY_ASSIGNMENTS,
@@ -192,7 +182,6 @@ public class AdminAccessRights {
         allAdminAccessRights.addAll(ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET);
         allAdminAccessRights.addAll(ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET);
         allAdminAccessRights.addAll(ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET);
-        allAdminAccessRights.addAll(ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET);
         allAdminAccessRights.add(RESET);
         allAdminAccessRights.add(SERIALIZE_POLICY);
         allAdminAccessRights.add(DESERIALIZE_POLICY);
@@ -236,7 +225,6 @@ public class AdminAccessRights {
         Map.entry(WC_ADMIN_PROHIBITION, ALL_ADMIN_PROHIBITION_ACCESS_RIGHTS_SET),
         Map.entry(WC_ADMIN_OBLIGATION, ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET),
         Map.entry(WC_ADMIN_OPERATION, ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET),
-        Map.entry(WC_ADMIN_ROUTINE, ALL_ADMIN_ROUTINE_ACCESS_RIGHTS_SET),
         Map.entry(WC_QUERY, ALL_QUERY_ACCESS_RIGHTS_SET),
         Map.entry(WC_QUERY_GRAPH, ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET),
         Map.entry(WC_QUERY_PROHIBITION, ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET),
