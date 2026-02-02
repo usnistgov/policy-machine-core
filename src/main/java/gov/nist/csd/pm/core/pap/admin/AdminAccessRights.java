@@ -70,8 +70,8 @@ public class AdminAccessRights {
     public static final String QUERY_PROHIBITIONS = "query_prohibitions";
     public static final String QUERY_PROCESS_PROHIBITIONS = "query_process_prohibitions";
     public static final String QUERY_OBLIGATIONS = "query_obligations";
-    public static final String QUERY_RESOURCE_ACCESS_RIGHTS = "query_resource_operations";
-    public static final String QUERY_OPERATIONS = "query_admin_operations";
+    public static final String QUERY_RESOURCE_ACCESS_RIGHTS = "query_resource_access_rights";
+    public static final String QUERY_OPERATIONS = "query_operations";
 
     public static final String WC_ALL = "*";
     public static final String WC_ADMIN = "*a";
