@@ -23,7 +23,6 @@ public class AdminAccessRights {
     public static final String DELETE_USER_ATTRIBUTE = "delete_user_attribute";
     public static final String DELETE_USER = "delete_user";
 
-    public static final String DELETE_POLICY_CLASS_FROM = "delete_policy_class_from";
     public static final String DELETE_OBJECT_FROM = "delete_object_from";
     public static final String DELETE_OBJECT_ATTRIBUTE_FROM = "delete_object_attribute_from";
     public static final String DELETE_USER_ATTRIBUTE_FROM = "delete_user_attribute_from";
@@ -50,9 +49,7 @@ public class AdminAccessRights {
 
     // obligations
     public static final String CREATE_OBLIGATION = "create_obligation";
-    public static final String CREATE_OBLIGATION_WITH_ANY_PATTERN = "create_obligation_with_any_pattern";
     public static final String DELETE_OBLIGATION = "delete_obligation";
-    public static final String DELETE_OBLIGATION_WITH_ANY_PATTERN = "delete_obligation_with_any_pattern";
 
     // operations
     public static final String SET_RESOURCE_ACCESS_RIGHTS = "set_resource_access_rights";
@@ -73,9 +70,8 @@ public class AdminAccessRights {
     public static final String QUERY_PROHIBITIONS = "query_prohibitions";
     public static final String QUERY_PROCESS_PROHIBITIONS = "query_process_prohibitions";
     public static final String QUERY_OBLIGATIONS = "query_obligations";
-    public static final String QUERY_RESOURCE_OPERATIONS = "query_resource_operations";
-    public static final String QUERY_ADMIN_OPERATIONS = "query_admin_operations";
-    public static final String QUERY_ADMIN_ROUTINES = "query_admin_routines";
+    public static final String QUERY_RESOURCE_ACCESS_RIGHTS = "query_resource_operations";
+    public static final String QUERY_OPERATIONS = "query_admin_operations";
 
     public static final String WC_ALL = "*";
     public static final String WC_ADMIN = "*a";
@@ -84,13 +80,11 @@ public class AdminAccessRights {
     public static final String WC_ADMIN_PROHIBITION = "*a:prohibition";
     public static final String WC_ADMIN_OBLIGATION = "*a:obligation";
     public static final String WC_ADMIN_OPERATION = "*a:operation";
-    public static final String WC_ADMIN_ROUTINE = "*a:routine";
     public static final String WC_QUERY = "*q";
     public static final String WC_QUERY_GRAPH = "*q:graph";
     public static final String WC_QUERY_PROHIBITION = "*q:prohibition";
     public static final String WC_QUERY_OBLIGATION = "*q:obligation";
     public static final String WC_QUERY_OPERATION = "*q:operation";
-    public static final String WC_QUERY_ROUTINE = "*q:routine";
 
     public static final Set<String> ALL_ADMIN_GRAPH_ACCESS_RIGHTS_SET = Set.of(
         CREATE_POLICY_CLASS,
@@ -104,7 +98,6 @@ public class AdminAccessRights {
         DELETE_OBJECT_ATTRIBUTE,
         DELETE_USER_ATTRIBUTE,
         DELETE_USER,
-        DELETE_POLICY_CLASS_FROM,
         DELETE_OBJECT_FROM,
         DELETE_OBJECT_ATTRIBUTE_FROM,
         DELETE_USER_ATTRIBUTE_FROM,
@@ -130,9 +123,7 @@ public class AdminAccessRights {
 
     public static final Set<String> ALL_ADMIN_OBLIGATION_ACCESS_RIGHTS_SET = Set.of(
         CREATE_OBLIGATION,
-        CREATE_OBLIGATION_WITH_ANY_PATTERN,
-        DELETE_OBLIGATION,
-        DELETE_OBLIGATION_WITH_ANY_PATTERN
+        DELETE_OBLIGATION
     );
 
     public static final Set<String> ALL_ADMIN_OPERATION_ACCESS_RIGHTS_SET = Set.of(
@@ -158,12 +149,8 @@ public class AdminAccessRights {
     );
 
     public static final Set<String> ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET = Set.of(
-        QUERY_RESOURCE_OPERATIONS,
-        QUERY_ADMIN_OPERATIONS
-    );
-
-    public static final Set<String> ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET = Set.of(
-        QUERY_ADMIN_ROUTINES
+        QUERY_RESOURCE_ACCESS_RIGHTS,
+        QUERY_OPERATIONS
     );
 
     private static final Set<String> allQueryAccessRights = new HashSet<>();
@@ -172,7 +159,6 @@ public class AdminAccessRights {
         allQueryAccessRights.addAll(ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET);
         allQueryAccessRights.addAll(ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET);
         allQueryAccessRights.addAll(ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET);
-        allQueryAccessRights.addAll(ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET);
     }
     public static final Set<String> ALL_QUERY_ACCESS_RIGHTS_SET = Collections.unmodifiableSet(allQueryAccessRights);
 
@@ -207,13 +193,11 @@ public class AdminAccessRights {
         WC_ADMIN_PROHIBITION,
         WC_ADMIN_OBLIGATION,
         WC_ADMIN_OPERATION,
-        WC_ADMIN_ROUTINE,
         WC_QUERY,
         WC_QUERY_GRAPH,
         WC_QUERY_PROHIBITION,
         WC_QUERY_OBLIGATION,
-        WC_QUERY_OPERATION,
-        WC_QUERY_ROUTINE
+        WC_QUERY_OPERATION
     ));
     public static boolean isWildcardAccessRight(String ar) {
         return WILDCARD_ACCESS_RIGHTS.contains(ar);
@@ -229,8 +213,7 @@ public class AdminAccessRights {
         Map.entry(WC_QUERY_GRAPH, ALL_GRAPH_QUERY_ACCESS_RIGHTS_SET),
         Map.entry(WC_QUERY_PROHIBITION, ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET),
         Map.entry(WC_QUERY_OBLIGATION, ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET),
-        Map.entry(WC_QUERY_OPERATION, ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET),
-        Map.entry(WC_QUERY_ROUTINE, ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET)
+        Map.entry(WC_QUERY_OPERATION, ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET)
     );
 
     private AdminAccessRights() {}

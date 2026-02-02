@@ -10,7 +10,6 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_OBLIGATION_QU
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_QUERY_ACCESS_RIGHTS_SET;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSIGN;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSOCIATE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
@@ -24,14 +23,12 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_GRAPH;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_OBLIGATION;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_OPERATION;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_PROHIBITION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN_ROUTINE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_GRAPH;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_OBLIGATION;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_OPERATION;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_PROHIBITION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_QUERY_ROUTINE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WILDCARD_MAP;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,7 +103,7 @@ class AccessRightResolverTest {
     @ParameterizedTest
     @ValueSource(strings = {
         WC_ADMIN_GRAPH, WC_ADMIN_PROHIBITION, WC_ADMIN_OBLIGATION, 
-        WC_ADMIN_OPERATION, WC_ADMIN_ROUTINE
+        WC_ADMIN_OPERATION
     })
     void testAdminWildcards(String wildcard) {
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of());
@@ -134,7 +131,7 @@ class AccessRightResolverTest {
     @ParameterizedTest
     @ValueSource(strings = {
         WC_QUERY, WC_QUERY_GRAPH, WC_QUERY_PROHIBITION, 
-        WC_QUERY_OBLIGATION, WC_QUERY_OPERATION, WC_QUERY_ROUTINE
+        WC_QUERY_OBLIGATION, WC_QUERY_OPERATION
     })
     void testQueryWildcards(String wildcard) {
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of());
@@ -173,8 +170,7 @@ class AccessRightResolverTest {
         coveredRights.addAll(ALL_PROHIBITION_QUERY_ACCESS_RIGHTS_SET);
         coveredRights.addAll(ALL_OBLIGATION_QUERY_ACCESS_RIGHTS_SET);
         coveredRights.addAll(ALL_OPERATION_QUERY_ACCESS_RIGHTS_SET);
-        coveredRights.addAll(ALL_ROUTINE_QUERY_ACCESS_RIGHTS_SET);
-        
+
         assertEquals(ALL_QUERY_ACCESS_RIGHTS_SET, coveredRights);
     }
 
@@ -363,14 +359,12 @@ class AccessRightResolverTest {
         assertTrue(wildcardMap.containsKey(WC_ADMIN_PROHIBITION));
         assertTrue(wildcardMap.containsKey(WC_ADMIN_OBLIGATION));
         assertTrue(wildcardMap.containsKey(WC_ADMIN_OPERATION));
-        assertTrue(wildcardMap.containsKey(WC_ADMIN_ROUTINE));
         assertTrue(wildcardMap.containsKey(WC_QUERY));
         assertTrue(wildcardMap.containsKey(WC_QUERY_GRAPH));
         assertTrue(wildcardMap.containsKey(WC_QUERY_PROHIBITION));
         assertTrue(wildcardMap.containsKey(WC_QUERY_OBLIGATION));
         assertTrue(wildcardMap.containsKey(WC_QUERY_OPERATION));
-        assertTrue(wildcardMap.containsKey(WC_QUERY_ROUTINE));
-        
+
         assertEquals(ALL_ADMIN_ACCESS_RIGHTS_SET, wildcardMap.get(WC_ADMIN));
         assertEquals(ALL_QUERY_ACCESS_RIGHTS_SET, wildcardMap.get(WC_QUERY));
     }
