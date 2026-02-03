@@ -1,6 +1,4 @@
-package gov.nist.csd.pm.core.common.graph.relationship;
-
-import gov.nist.csd.pm.core.common.exception.PMException;
+package gov.nist.csd.pm.core.common.exception;
 
 public class InvalidAssociationException extends PMException {
     public InvalidAssociationException(String msg) {

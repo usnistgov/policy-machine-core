@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.pap.dag;
+package gov.nist.csd.pm.core.pap.graph.dag;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;

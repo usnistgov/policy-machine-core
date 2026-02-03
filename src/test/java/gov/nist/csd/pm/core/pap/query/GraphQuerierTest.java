@@ -14,8 +14,8 @@ import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.Properties;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.util.TestUserContext;
@@ -196,10 +196,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         }
 
         private void checkAssociation(Association association) throws PMException {
-            if (association.getTarget() == id("oa1")) {
-                assertEquals(new AccessRightSet("read"), association.getAccessRightSet());
-            } else if (association.getTarget() == id("oa2")) {
-                assertEquals(new AccessRightSet("read", "write"), association.getAccessRightSet());
+            if (association.target() == id("oa1")) {
+                assertEquals(new AccessRightSet("read"), association.arset());
+            } else if (association.target() == id("oa2")) {
+                assertEquals(new AccessRightSet("read", "write"), association.arset());
             }
         }
     }
@@ -233,10 +233,10 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         }
 
         private void checkAssociation(Association association) throws PMException {
-            if (association.getSource() == id("ua1")) {
-                assertEquals(new AccessRightSet("read"), association.getAccessRightSet());
-            } else if (association.getSource() == id("ua2")) {
-                assertEquals(new AccessRightSet("read", "write"), association.getAccessRightSet());
+            if (association.source() == id("ua1")) {
+                assertEquals(new AccessRightSet("read"), association.arset());
+            } else if (association.source() == id("ua2")) {
+                assertEquals(new AccessRightSet("read", "write"), association.arset());
             }
         }
     }

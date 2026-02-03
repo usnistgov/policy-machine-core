@@ -3,8 +3,8 @@ package gov.nist.csd.pm.core.pap.query.access;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
-import gov.nist.csd.pm.core.pap.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
@@ -96,7 +96,7 @@ public class UserExplainer {
 			for (Map.Entry<Path, List<Association>> pathAssociations : pcPaths.getValue().entrySet()) {
 				List<Association> associations = pathAssociations.getValue();
 				for (Association association : associations) {
-					uas.add(association.getSource());
+					uas.add(association.source());
 				}
 			}
 		}

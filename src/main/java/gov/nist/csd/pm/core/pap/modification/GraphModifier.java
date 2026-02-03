@@ -11,6 +11,7 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessR
 import gov.nist.csd.pm.core.common.exception.AssignmentCausesLoopException;
 import gov.nist.csd.pm.core.common.exception.CannotDeleteAdminPolicyConfigException;
 import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
+import gov.nist.csd.pm.core.common.exception.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.NodeHasAscendantsException;
 import gov.nist.csd.pm.core.common.exception.NodeIdExistsException;
@@ -22,9 +23,9 @@ import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Assignment;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -35,6 +36,7 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -73,13 +75,13 @@ public class GraphModifier extends Modifier implements GraphModification {
 
     @Override
     public long createUserAttribute(String name, Collection<Long> assignments)
-            throws PMException {
+    throws PMException {
         return createNonPolicyClassNode(name, UA, assignments);
     }
 
     @Override
     public long createObjectAttribute(String name, Collection<Long> assignments)
-            throws PMException {
+    throws PMException {
         return createNonPolicyClassNode(name, OA, assignments);
     }
 
@@ -158,16 +160,16 @@ public class GraphModifier extends Modifier implements GraphModification {
         AtomicBoolean loop = new AtomicBoolean(false);
 
         new GraphStoreDFS(policyStore.graph())
-                .withVisitor((node -> {
-                    if (node != ascendant) {
-                        return;
-                    }
+            .withVisitor((node -> {
+                if (node != ascendant) {
+                    return;
+                }
 
-                    loop.set(true);
-                }))
-                .withDirection(Direction.DESCENDANTS)
-                .withAllPathShortCircuit(node -> node == ascendant)
-                .walk(descendant);
+                loop.set(true);
+            }))
+            .withDirection(Direction.DESCENDANTS)
+            .withAllPathShortCircuit(node -> node == ascendant)
+            .walk(descendant);
 
         if (loop.get()) {
             Node aNode = policyStore.graph().getNodeById(ascendant);
@@ -284,7 +286,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         Node descNode = policyStore.graph().getNodeById(descendant);
 
         // check node types make a valid assignment relation
-        Assignment.checkAssignment(ascNode.getType(), descNode.getType());
+        checkAssignment(ascNode.getType(), descNode.getType());
 
         // check the assignment won't create a loop
         checkAssignmentDoesNotCreateLoop(ascendant, descendant);
@@ -308,7 +310,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         } else if (!policyStore.graph().nodeExists(descendant)) {
             throw new NodeDoesNotExistException(descendant);
         } else if (ascendant == AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId() &&
-                descendant == AdminPolicyNode.PM_ADMIN_PC.nodeId()) {
+            descendant == AdminPolicyNode.PM_ADMIN_PC.nodeId()) {
             throw new CannotDeleteAdminPolicyConfigException();
         }
 
@@ -350,7 +352,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         checkAccessRightsValid(policyStore.operations().getResourceAccessRights(), accessRights);
 
         // check the types of each node make a valid association
-        Association.checkAssociation(uaNode.getType(), targetNode.getType());
+        checkAssociation(uaNode.getType(), targetNode.getType());
     }
 
     /**
@@ -371,7 +373,7 @@ public class GraphModifier extends Modifier implements GraphModification {
 
         Collection<Association> associations = policyStore.graph().getAssociationsWithSource(ua);
         for (Association a : associations) {
-            if (a.getSource() == ua && a.getTarget() == target) {
+            if (a.source() == ua && a.target() == target) {
                 return true;
             }
         }
@@ -382,8 +384,8 @@ public class GraphModifier extends Modifier implements GraphModification {
     static void checkAccessRightsValid(AccessRightSet resourceAccessRights, AccessRightSet accessRightSet) throws PMException {
         for (String ar : accessRightSet) {
             if (!resourceAccessRights.contains(ar)
-                    && !isAdminAccessRight(ar)
-                    && !isWildcardAccessRight(ar)) {
+                && !isAdminAccessRight(ar)
+                && !isWildcardAccessRight(ar)) {
                 throw new UnknownAccessRightException(ar);
             }
         }
@@ -404,7 +406,7 @@ public class GraphModifier extends Modifier implements GraphModification {
     }
 
     private long createNonPolicyClassNode(String name, NodeType type, Collection<Long> descendants)
-            throws PMException {
+    throws PMException {
         long id = idGenerator.generateId(name, type);
 
 
@@ -430,7 +432,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             }
 
             Node assignNode = policyStore.graph().getNodeById(assignment);
-            Assignment.checkAssignment(type, assignNode.getType());
+            checkAssignment(type, assignNode.getType());
         }
 
         return runTx(() -> {
@@ -442,5 +444,53 @@ public class GraphModifier extends Modifier implements GraphModification {
 
             return id;
         });
+    }
+
+    private static final Map<NodeType, Set<NodeType>> validAssociations = Map.of(
+        PC, Set.of(),
+        OA, Set.of(),
+        O, Set.of(),
+        UA, Set.of(UA, OA, O),
+        U, Set.of()
+    );
+
+    /**
+     * Check if the provided types create a valid association.
+     *
+     * @param uaType     the type of the source node in the association. This should always be a user Attribute,
+     *                   so an InvalidAssociationException will be thrown if it's not.
+     * @param targetType the type of the target node. This can be either an Object Attribute or a user attribute.
+     * @throws InvalidAssociationException if the provided types do not make a valid Association under NGAC
+     */
+    public static void checkAssociation(NodeType uaType, NodeType targetType) throws InvalidAssociationException {
+        Set<NodeType> check = validAssociations.get(uaType);
+        if (!check.contains(targetType)) {
+            throw new InvalidAssociationException(String.format("cannot associate a node of type %s to a node of type %s", uaType, targetType));
+        }
+    }
+
+    private static final Map<NodeType, Set<NodeType>> validAssignments = Map.of(
+        NodeType.PC, Set.of(),
+        NodeType.OA, Set.of(NodeType.OA, NodeType.PC),
+        NodeType.O, Set.of(NodeType.OA, NodeType.PC),
+        NodeType.UA, Set.of(NodeType.UA, NodeType.PC),
+        NodeType.U, Set.of(NodeType.UA)
+    );
+
+    /**
+     * Check if the assignment provided, is valid under NGAC.
+     *
+     * @param ascType The type of the ascendant node.
+     * @param dscType The type of the descendant node.
+     * @throws InvalidAssignmentException if the ascendant type is not allowed to be assigned to the descendant type.
+     */
+    public static void checkAssignment(NodeType ascType, NodeType dscType) throws InvalidAssignmentException {
+        Set<NodeType> check = validAssignments.get(ascType);
+        if (!check.contains(dscType)) {
+            throw new InvalidAssignmentException(String.format("cannot assign a node of type %s to a node of type %s",
+                ascType,
+                dscType
+            ));
+        }
     }
 }

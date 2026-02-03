@@ -5,7 +5,7 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROHIBITIO
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;

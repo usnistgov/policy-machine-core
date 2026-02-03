@@ -90,7 +90,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
@@ -141,7 +141,8 @@ public class JavaExample {
         );
 
         // create resource operation to read a file
-        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", "read"))) {
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE,
+            List.of(new NodeNameFormalParameter("name", "read"))) {
             @Override
             protected Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
@@ -206,7 +207,8 @@ public class JavaExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateAdminOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+            () -> pdp.adjudicateAdminOperation(new UserContext(testUserId), "create_new_user",
+                Map.of("username", "testUser2"))
         );
     }
 }

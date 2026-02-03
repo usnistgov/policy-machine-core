@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.graph.Association;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collection;
@@ -79,9 +79,9 @@ class VertexAttribute extends Vertex {
     @Override
     public void deleteAssociation(long ua, long target) {
         if (ua == id) {
-            outgoingAssociations.removeIf(a -> a.getSource() == ua && a.getTarget() == target);
+            outgoingAssociations.removeIf(a -> a.source() == ua && a.target() == target);
         } else {
-            incomingAssociations.removeIf(a -> a.getSource() == ua && a.getTarget() == target);
+            incomingAssociations.removeIf(a -> a.source() == ua && a.target() == target);
         }
     }
 }

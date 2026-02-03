@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.operation.param;
 
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 
 public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>

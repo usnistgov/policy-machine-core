@@ -10,7 +10,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -176,8 +176,8 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         List<Association> ret = new ArrayList<>();
         for (Association association : associations) {
             try {
-                pap.privilegeChecker().check(userCtx, association.getSource(), QUERY_ASSOCIATIONS);
-                pap.privilegeChecker().check(userCtx, association.getTarget(), QUERY_ASSOCIATIONS);
+                pap.privilegeChecker().check(userCtx, association.source(), QUERY_ASSOCIATIONS);
+                pap.privilegeChecker().check(userCtx, association.target(), QUERY_ASSOCIATIONS);
             } catch (UnauthorizedException e) {
                 continue;
             } catch (PMException e) {

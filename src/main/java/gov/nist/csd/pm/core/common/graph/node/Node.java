@@ -40,15 +40,6 @@ public class Node implements Serializable {
         this.properties = new HashMap<>();
     }
 
-    public Node addProperty(String key, String value) {
-        if (key == null || value == null) {
-            throw new IllegalArgumentException("a node cannot have a property with a null key or value");
-        }
-
-        this.properties.put(key, value);
-        return this;
-    }
-
     public long getId() {
         return id;
     }

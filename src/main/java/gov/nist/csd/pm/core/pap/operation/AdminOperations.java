@@ -1,7 +1,6 @@
-package gov.nist.csd.pm.core.pap.admin;
+package gov.nist.csd.pm.core.pap.operation;
 
 import gov.nist.csd.pm.core.common.exception.AdminOperationDoesNotExistException;
-import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
@@ -24,6 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * AdminOperations stores a list of the admin operations used in the PolicyModification interfaces.
+ */
 public class AdminOperations {
 
     public static List<Operation<?>> ADMIN_OPERATIONS = List.of(

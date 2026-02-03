@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;

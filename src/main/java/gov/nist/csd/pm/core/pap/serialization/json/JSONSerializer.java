@@ -8,7 +8,7 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
@@ -164,8 +164,8 @@ public class JSONSerializer implements PolicySerializer {
             List<JSONAssociation> jsonAssociations = new ArrayList<>();
             for (Association assoc : assocList) {
                 jsonAssociations.add(new JSONAssociation(
-                    assoc.getTarget(),
-                    assoc.getAccessRightSet())
+                    assoc.target(),
+                    assoc.arset())
                 );
             }
 

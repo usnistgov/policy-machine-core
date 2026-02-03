@@ -8,10 +8,10 @@ import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolveP
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
+import gov.nist.csd.pm.core.pap.query.access.TargetDagResult;
+import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.access.CachedTargetEvaluator;
 import gov.nist.csd.pm.core.pap.query.access.Explainer;
 import gov.nist.csd.pm.core.pap.query.access.TargetEvaluator;

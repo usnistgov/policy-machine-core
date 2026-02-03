@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.graph.Association;
 import java.util.Collection;
 import java.util.Map;
 

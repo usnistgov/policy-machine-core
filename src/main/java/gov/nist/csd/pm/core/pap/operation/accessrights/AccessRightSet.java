@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.common.graph.relationship;
+package gov.nist.csd.pm.core.pap.operation.accessrights;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Arrays;

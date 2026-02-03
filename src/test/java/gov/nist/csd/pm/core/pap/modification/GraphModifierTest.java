@@ -18,10 +18,10 @@ import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
-import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssignmentException;
-import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssociationException;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.common.exception.InvalidAssignmentException;
+import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
@@ -735,17 +735,17 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             Collection<Association> assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));
             Association assoc = assocs.iterator().next();
-            assertEquals(id("ua1"), assoc.getSource());
-            assertEquals(id("oa1"), assoc.getTarget());
-            assertEquals(new AccessRightSet("read"), assoc.getAccessRightSet());
+            assertEquals(id("ua1"), assoc.source());
+            assertEquals(id("oa1"), assoc.target());
+            assertEquals(new AccessRightSet("read"), assoc.arset());
 
             pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read", "write"));
 
             assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));
             assoc = assocs.iterator().next();
-            assertEquals(id("ua1"), assoc.getSource());
-            assertEquals(id("oa1"), assoc.getTarget());
-            assertEquals(new AccessRightSet("read", "write"), assoc.getAccessRightSet());
+            assertEquals(id("ua1"), assoc.source());
+            assertEquals(id("oa1"), assoc.target());
+            assertEquals(new AccessRightSet("read", "write"), assoc.arset());
         }
 
         @Test

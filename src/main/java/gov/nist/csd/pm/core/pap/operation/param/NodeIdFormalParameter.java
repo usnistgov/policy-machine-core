@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.operation.param;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.LONG_TYPE;
 
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 
 public final class NodeIdFormalParameter extends NodeFormalParameter<Long> {
 

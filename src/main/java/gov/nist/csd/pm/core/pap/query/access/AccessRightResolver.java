@@ -5,9 +5,7 @@ import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
 import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WILDCARD_MAP;
 
-import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import java.util.ArrayList;
