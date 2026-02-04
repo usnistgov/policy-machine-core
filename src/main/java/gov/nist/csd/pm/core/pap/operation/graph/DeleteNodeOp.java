@@ -54,11 +54,8 @@ public class DeleteNodeOp extends AdminOperation<Void> {
 
     private ReqCaps getReqCap(NodeType type) {
         return switch (type) {
-            case OA -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_OA_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
-            case UA -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_UA_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
-            case U -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_U_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
-            case O  -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_O_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
-            case PC -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_PC_DELETE, null);
+            case OA, UA, U, O -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
+            case PC -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_DELETE, null);
             default -> throw new IllegalArgumentException("Unsupported node type: " + type);
         };
     }

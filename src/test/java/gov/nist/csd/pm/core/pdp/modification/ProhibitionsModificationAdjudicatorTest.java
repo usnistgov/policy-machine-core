@@ -43,10 +43,10 @@ class ProhibitionsModificationAdjudicatorTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and "oa2" with ["*a"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
-                associate "ua1" and "ua2" with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and "oa2" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua1" and "ua2" with ["admin:*"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
@@ -69,7 +69,7 @@ class ProhibitionsModificationAdjudicatorTest {
         assertDoesNotThrow(() -> ok.createProhibition(
                 "pro1",
                 new ProhibitionSubject(id("u2")),
-		        new AccessRightSet("assign"),
+		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
 		        true,
 		        List.of(new ContainerCondition(id("oa1"), false))));
 
@@ -80,7 +80,7 @@ class ProhibitionsModificationAdjudicatorTest {
         assertDoesNotThrow(() -> ok.createProhibition(
                 "pro2",
                 new ProhibitionSubject("123"),
-		        new AccessRightSet("assign"),
+		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
 		        true,
 		        List.of(new ContainerCondition(id("oa1"), true))));
 
@@ -90,14 +90,14 @@ class ProhibitionsModificationAdjudicatorTest {
         assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
                 "pro1",
                 new ProhibitionSubject(id("u2")),
-		        new AccessRightSet("assign"),
+		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
 		        true,
 		        List.of(new ContainerCondition(id("oa1"), false))));
 
         assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
                 "pro1",
                 new ProhibitionSubject("123"),
-		        new AccessRightSet("assign"),
+		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
 		        true,
 		        List.of(new ContainerCondition(id("oa1"), true))));
     }
@@ -107,7 +107,7 @@ class ProhibitionsModificationAdjudicatorTest {
         ok.createProhibition(
                 "pro1",
                 new ProhibitionSubject(id("u2")),
-		        new AccessRightSet("assign"),
+		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
 		        true,
 		        List.of(new ContainerCondition(id("oa1"), false)));
 

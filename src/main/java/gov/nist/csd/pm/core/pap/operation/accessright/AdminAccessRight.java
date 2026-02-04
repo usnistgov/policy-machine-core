@@ -9,29 +9,19 @@ import java.util.Map;
 public enum AdminAccessRight {
 
     // graph
-    ADMIN_GRAPH_NODE_PC_CREATE("admin:graph:node:pc:create"),
-    ADMIN_GRAPH_NODE_OA_CREATE("admin:graph:node:oa:create"),
-    ADMIN_GRAPH_NODE_O_CREATE("admin:graph:node:o:create"),
-    ADMIN_GRAPH_NODE_U_CREATE("admin:graph:node:u:create"),
-    ADMIN_GRAPH_NODE_UA_CREATE("admin:graph:node:ua:create"),
-
-    ADMIN_GRAPH_NODE_PC_DELETE("admin:graph:node:pc:delete"),
-    ADMIN_GRAPH_NODE_OA_DELETE("admin:graph:node:oa:delete"),
-    ADMIN_GRAPH_NODE_O_DELETE("admin:graph:node:o:delete"),
-    ADMIN_GRAPH_NODE_U_DELETE("admin:graph:node:u:delete"),
-    ADMIN_GRAPH_NODE_UA_DELETE("admin:graph:node:ua:delete"),
-
-    ADMIN_GRAPH_NODE_PROPERTIES_UPDATE("admin:graph:node:properties:update"),
+    ADMIN_GRAPH_NODE_CREATE("admin:graph:node:create"),
+    ADMIN_GRAPH_NODE_DELETE("admin:graph:node:delete"),
+    ADMIN_GRAPH_NODE_UPDATE("admin:graph:node:update"),
 
     ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE("admin:graph:assignment:ascendant:create"),
-    ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE("admin:graph:assignment:descendant:create"),
     ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_DELETE("admin:graph:assignment:ascendant:delete"),
+    ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE("admin:graph:assignment:descendant:create"),
     ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE("admin:graph:assignment:descendant:delete"),
 
-    ADMIN_GRAPH_ASSOCIATION_CREATE_UA("admin:graph:association:ua:create"),
-    ADMIN_GRAPH_ASSOCIATION_CREATE_TARGET("admin:graph:association:target:create"),
-    ADMIN_GRAPH_ASSOCIATION_DELETE_UA("admin:graph:association:ua:delete"),
-    ADMIN_GRAPH_ASSOCIATION_DELETE_TARGET("admin:graph:association:target:delete"),
+    ADMIN_GRAPH_ASSOCIATION_UA_CREATE("admin:graph:association:ua:create"),
+    ADMIN_GRAPH_ASSOCIATION_TARGET_CREATE("admin:graph:association:target:create"),
+    ADMIN_GRAPH_ASSOCIATION_UA_DELETE("admin:graph:association:ua:delete"),
+    ADMIN_GRAPH_ASSOCIATION_TARGET_DELETE("admin:graph:association:target:delete"),
 
     ADMIN_GRAPH_POLICY_CLASS_LIST("admin:graph:node:pc:list"),
     ADMIN_GRAPH_ASSIGNMENT_LIST("admin:graph:assignment:list"),

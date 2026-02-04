@@ -1512,7 +1512,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
         pap.modify().graph().associate(ua1, oa1, AccessRightSet.resourceWildcard());
         list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
+        assertFalse(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
     }
 

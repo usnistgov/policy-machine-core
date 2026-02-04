@@ -35,7 +35,7 @@ class PrivilegeCheckerTest {
         pap.privilegeChecker().check(new UserContext(u1), id("o1"), List.of("read"));
         pap.privilegeChecker().check(new UserContext(u1), id("pc1"), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE);
         assertThrows(UnauthorizedException.class, () -> pap.privilegeChecker().check(new UserContext(u1), id("pc1"),
-            AdminAccessRight.ADMIN_GRAPH_NODE_PC_DELETE));
+            AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
     }
 
 }

@@ -46,8 +46,8 @@ class OperationsModificationAdjudicatorTest {
 
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]

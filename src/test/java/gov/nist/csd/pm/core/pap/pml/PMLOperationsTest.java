@@ -29,7 +29,7 @@ public class PMLOperationsTest {
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 adminop op1(string name) {
-                    check ["assign"] on ["oa1"]
+                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
                     create pc name
                 }
                 

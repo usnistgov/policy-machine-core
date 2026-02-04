@@ -123,7 +123,7 @@ class EPPTest {
                 "b", "oa1")
         ));
 
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("*a"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("admin:*"));
 
         assertDoesNotThrow(() -> pdp.adjudicateOperation(
             u1,
@@ -163,7 +163,7 @@ class EPPTest {
                 create oa "oa2" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
                 create obligation "obl1"
                     when any user
@@ -232,8 +232,8 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create obligation "test"
                     when any user
@@ -282,13 +282,13 @@ class EPPTest {
             txPAP.modify().graph().createObject("o1",  ids("oa1"));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(),
                 new AccessRightSet(AdminAccessRight.ADMIN_OBLIGATION_CREATE));
-            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_O_CREATE));
+            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
             policy.modify().obligations().createObligation(id("u1"), "test",
-                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE.toString())),
+                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString())),
                 new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(
                         new StringLiteralExpression("o2"),
@@ -306,7 +306,7 @@ class EPPTest {
 
         EventContext eventCtx = new EventContext(
             new EventContextUser("u1", null),
-            AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE.toString(),
+            AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString(),
             Map.of(
                 "name", id("oa2"),
                 "descendants", List.of(id("pc1"))
@@ -351,8 +351,8 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:*"]
                 
                 create obligation "test"
                     when any user
@@ -389,8 +389,8 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:node:create"]
                 
                 create obligation "test"
                     when any user
@@ -421,11 +421,11 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
                 adminop op1() {
-                    check ["admin:graph:assignments:ascendant:create"] on ["oa1"]
+                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
 
                     create pc "test_pc"
                 }

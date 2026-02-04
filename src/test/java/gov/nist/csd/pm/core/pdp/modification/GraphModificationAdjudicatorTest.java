@@ -66,12 +66,12 @@ class GraphModificationAdjudicatorTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and "oa2" with ["*a"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
-                associate "ua3" and "ua1" with ["*a"]
-                associate "ua1" and "ua4" with ["*a"]
-                associate "ua1" and "ua3" with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and "oa2" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua3" and "ua1" with ["admin:*"]
+                associate "ua1" and "ua4" with ["admin:*"]
+                associate "ua1" and "ua3" with ["admin:*"]
                 
                 create u "u1" in ["ua1", "ua3"]
                 create u "u2" in ["ua2"]
@@ -209,13 +209,13 @@ class GraphModificationAdjudicatorTest {
 
     @Test
     void associate() throws PMException {
-        assertDoesNotThrow(() -> ok.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
+        assertDoesNotThrow(() -> ok.associate(id("ua1"), id("ua3"), new AccessRightSet("admin:graph:assignment:ascendant:create")));
         assertEquals(
-                new EventContext(new EventContextUser("u1"), new AssociateOp().getName(), Map.of("ua", id("ua1"), "target", id("ua3"), "arset", List.of("assign"))),
+                new EventContext(new EventContextUser("u1"), new AssociateOp().getName(), Map.of("ua", id("ua1"), "target", id("ua3"), "arset", List.of("admin:graph:assignment:ascendant:create"))),
                 testEventProcessor.getEventContext()
         );
         assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1"))
-                .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("assign"))));
+                .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("admin:graph:assignment:ascendant:create"))));
 
         assertThrows(UnauthorizedException.class, () -> fail.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
     }
@@ -228,7 +228,7 @@ class GraphModificationAdjudicatorTest {
                 testEventProcessor.getEventContext()
         );
         assertFalse(pap.query().graph().getAssociationsWithSource(id("ua1"))
-                .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("*a"))));
+                .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("admin:*"))));
 
         assertThrows(UnauthorizedException.class, () -> fail.dissociate(id("ua1"), id("ua3")));
     }

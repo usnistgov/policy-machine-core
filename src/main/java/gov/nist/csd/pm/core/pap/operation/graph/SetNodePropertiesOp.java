@@ -12,7 +12,7 @@ import java.util.List;
 public class SetNodePropertiesOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter SET_NODE_PROPS_NODE_ID_PARAM =
-        new NodeIdFormalParameter("id", AdminAccessRight.ADMIN_GRAPH_NODE_PROPERTIES_UPDATE);
+        new NodeIdFormalParameter("id", AdminAccessRight.ADMIN_GRAPH_NODE_UPDATE);
 
     public SetNodePropertiesOp() {
         super(

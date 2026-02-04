@@ -12,9 +12,9 @@ import java.util.List;
 public class DissociateOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DISSOCIATE_UA_PARAM = new NodeIdFormalParameter("ua",
-        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_DELETE_UA);
+        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_DELETE);
     public static final NodeIdFormalParameter DISSOCIATE_TARGET_PARAM = new NodeIdFormalParameter("target",
-        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_DELETE_TARGET);
+        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_TARGET_DELETE);
 
     public DissociateOp() {
         super(

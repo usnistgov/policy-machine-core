@@ -59,7 +59,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserAttributeOp op = new CreateUserAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserAttributeOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -69,7 +69,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectAttributeOp op = new CreateObjectAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectAttributeOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -79,7 +79,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectOp op = new CreateObjectOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateObjectOp.CREATE_O_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -89,7 +89,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserOp op = new CreateUserOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateUserOp.CREATE_U_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }

@@ -58,10 +58,10 @@ class PMLBootstrapperWithSuperTest {
         long superUaId = pap.query().graph().getNodeId("@super");
         Collection<Association> actual = pap.query().graph().getAssociationsWithSource(superUaId);
         assertEquals(4, actual.size());
-        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"))));
-        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), TestIdGenerator.id("@pm_admin_users"), new AccessRightSet("*"))));
-        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), TestIdGenerator.id("oa2"), new AccessRightSet("*"))));
-        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), TestIdGenerator.id("ua2"), new AccessRightSet("*"))));
+        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("admin:*"))));
+        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), TestIdGenerator.id("@pm_admin_users"), new AccessRightSet("admin:*"))));
+        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), TestIdGenerator.id("oa2"), new AccessRightSet("admin:*"))));
+        assertTrue(actual.contains(new Association(TestIdGenerator.id("@super"), TestIdGenerator.id("ua2"), new AccessRightSet("admin:*"))));
     }
 
     @Test

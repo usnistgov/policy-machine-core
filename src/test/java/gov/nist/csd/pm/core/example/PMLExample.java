@@ -24,7 +24,7 @@ public class PMLExample {
         create ua "admin" in ["pc1"]
         // the admin_user will be created automatically during bootstrapping 
         assign "admin_user" to ["admin"]
-        associate "admin" and "users" with ["assign_to"]
+        associate "admin" and "users" with ["admin:graph:assignment:descendant:create"]
         
         create oa "user homes" in ["pc1"]
         create oa "user inboxes" in ["pc1"]
@@ -42,7 +42,7 @@ public class PMLExample {
         
         // create a custom administration operation
         adminop create_new_user(string username) {
-            check ["assign_to"] on ["users"]
+            check ["admin:graph:assignment:descendant:create"] on ["users"]
             
             create u username in ["users"]
             create oa username + " home" in ["user homes"]

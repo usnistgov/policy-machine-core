@@ -138,7 +138,7 @@ public abstract class PAPTest extends PAPTestInitializer {
                 associate "ua1" and "ua2" with ["admin:graph:assignment:ascendant:create"]
                 
                 adminop op1(@node string a) {
-                    check ["assign"] on [a]
+                    check ["admin:graph:assignment:ascendant:create"] on [a]
 
                     if a == PM_ADMIN_BASE_OA {
                         op1("ua2")

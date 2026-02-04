@@ -42,18 +42,18 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
                 create prohibition "pro1"
                 deny U "u2"
-                access rights ["assign"]
+                access rights ["admin:graph:assignment:ascendant:create"]
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
         AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
+                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "admin:graph:assignment:ascendant:create");
             }
 
             @Override
@@ -129,15 +129,15 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
                 create prohibition "pro1"
                 deny U "u2"
-                access rights ["assign"]
+                access rights ["admin:graph:assignment:ascendant:create"]
                 on union of {PM_ADMIN_BASE_OA: false}
                 
                 adminop op1(string a, []string b, map[string]string c) {
-                    check ["assign"] on [PM_ADMIN_BASE_OA]
+                    check ["admin:graph:assignment:ascendant:create"] on [PM_ADMIN_BASE_OA]
                     create pc "1" + a
                 
                     foreach x in b {

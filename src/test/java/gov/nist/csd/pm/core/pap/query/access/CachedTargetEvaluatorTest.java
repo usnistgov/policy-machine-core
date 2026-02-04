@@ -50,7 +50,7 @@ class CachedTargetEvaluatorTest {
             
             associate "ua1" and "oa1" with ["read", "write"]
             associate "ua1" and "oa2" with ["read"]
-            associate "ua1" and PM_ADMIN_BASE_OA with ["assign_to"]
+            associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:descendant:create"]
             """;
         pap = new TestPAP();
         pap.executePML(new UserContext(-1), pml);
@@ -189,7 +189,7 @@ class CachedTargetEvaluatorTest {
         UserDagResult userWithWriteAccess = new UserDagResult(
             Map.of(
                 id("oa1"), new AccessRightSet("read", "write"),
-                AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("assign_to")
+                AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("admin:graph:assignment:descendant:create")
             ),
             Set.of()
         );

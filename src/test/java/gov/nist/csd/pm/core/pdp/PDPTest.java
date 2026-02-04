@@ -60,12 +60,12 @@ class PDPTest {
                 () -> pdp.runTx(
                         new TestUserContext("u1"),
                         policy -> {
-                            policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE));
+                            policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
                             return null;
                         }
                 )
         );
-        assertEquals("{user: u1} missing required access rights {associate} on {target: ua1}", e.getMessage());
+        assertEquals("{user: u1} missing required access rights {admin:graph:association:ua:create} on {target: ua1}", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -208,15 +208,15 @@ class PDPTest {
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["assign"]
-                associate "ua1" and "oa2" with ["assign_to"]
+                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" and "oa2" with ["admin:graph:assignment:descendant:create"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 
                 adminop op1() string {
-                    check ["assign_to"] on ["oa2"]
+                    check ["admin:graph:assignment:descendant:create"] on ["oa2"]
                     create pc "test"
                     return "test"
                 }
@@ -312,7 +312,7 @@ class PDPTest {
                 create oa "oa2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and "oa1" with ["create_object"]
+                associate "ua1" and "oa1" with ["admin:graph:node:create"]
                 
                 routine routine1() {
                     foreach x in ["oa1", "oa2"] {
@@ -338,7 +338,7 @@ class PDPTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["create_object"]
+                associate "ua1" and "oa1" with ["admin:graph:node:create"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -366,8 +366,8 @@ class PDPTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["create_object"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
+                associate "ua1" and "oa1" with ["admin:graph:node:create"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -403,7 +403,7 @@ class PDPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and PM_ADMIN_BASE_OA with ["create_policy_class", "create_object_attribute"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 
                 create u "u1" in ["ua1"]
                 

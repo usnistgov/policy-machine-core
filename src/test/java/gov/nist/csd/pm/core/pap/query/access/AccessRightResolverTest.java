@@ -47,7 +47,7 @@ class AccessRightResolverTest {
         
         // Should contain only resource operations
         assertEquals(RESOURCE_OPS, result);
-        assertFalse(result.contains(AdminAccessRight.ADMIN_GRAPH_NODE_PC_CREATE.toString()));
+        assertFalse(result.contains(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString()));
     }
 
     @Test
@@ -72,14 +72,14 @@ class AccessRightResolverTest {
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of());
         
         Map<Long, AccessRightSet> pcMap = Map.of(
-            1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_PC_CREATE,
-                AdminAccessRight.ADMIN_GRAPH_NODE_O_CREATE,
+            1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE,
+                AdminAccessRight.ADMIN_GRAPH_NODE_CREATE,
                 AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
-            2L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_O_CREATE,
+            2L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE,
                 AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE,
-                AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA),
+                AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE),
             3L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE,
-                AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA,
+                AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE,
                 AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_DELETE)
         );
         
@@ -96,7 +96,7 @@ class AccessRightResolverTest {
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of());
         
         Map<Long, AccessRightSet> pcMap = Map.of(
-            1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_PC_CREATE, AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE),
+            1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE),
             2L, new AccessRightSet() // Empty access rights
         );
         
@@ -114,19 +114,19 @@ class AccessRightResolverTest {
         Prohibition prohibition = new Prohibition(
             "test_prohibition",
             new ProhibitionSubject(1L),
-            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
+            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
             false, // union (not intersection)
             List.of(condition1, condition2)
         );
         
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of(prohibition));
         TargetDagResult targetCtx = new TargetDagResult(
-            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA)),
+            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE)),
             Set.of(100L)
         );
         
         AccessRightSet result = AccessRightResolver.resolvePrivileges(userCtx, targetCtx, RESOURCE_OPS);
-        AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA);
+        AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE);
         assertEquals(expected, result);
     }
 
@@ -138,19 +138,19 @@ class AccessRightResolverTest {
         Prohibition prohibition = new Prohibition(
             "test_prohibition",
             new ProhibitionSubject(1L),
-            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
+            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
             true,
             List.of(condition1, condition2)
         );
         
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of(prohibition));
         TargetDagResult targetCtx = new TargetDagResult(
-            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA)),
+            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE)),
             Set.of(100L, 200L)
         );
         
         AccessRightSet result = AccessRightResolver.resolvePrivileges(userCtx, targetCtx, RESOURCE_OPS);
-        AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA);
+        AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE);
         assertEquals(expected, result);
     }
 
@@ -161,14 +161,14 @@ class AccessRightResolverTest {
         Prohibition prohibition = new Prohibition(
             "test_prohibition",
             new ProhibitionSubject(1L),
-            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE),
+            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE),
             false,
             List.of(condition1)
         );
         
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of(prohibition));
         TargetDagResult targetCtx = new TargetDagResult(
-            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE)),
+            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE)),
             Set.of(200L)
         );
         
@@ -185,7 +185,7 @@ class AccessRightResolverTest {
         Prohibition prohibition1 = new Prohibition(
             "prohibition1",
             new ProhibitionSubject(1L),
-            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE),
+            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE),
             false,
             List.of(condition1)
         );
@@ -200,7 +200,7 @@ class AccessRightResolverTest {
         
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of(prohibition1, prohibition2));
         TargetDagResult targetCtx = new TargetDagResult(
-            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE)),
+            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE)),
             Set.of(100L)
         );
         
@@ -217,20 +217,20 @@ class AccessRightResolverTest {
         Prohibition prohibition = new Prohibition(
             "test_prohibition",
             new ProhibitionSubject(1L),
-            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
+            new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
             false,
             List.of(condition)
         );
         
         UserDagResult userCtx = new UserDagResult(Map.of(), Set.of(prohibition));
         TargetDagResult targetCtx = new TargetDagResult(
-            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA)),
+            Map.of(1L, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE)),
             Set.of(100L)
         );
         
         AccessRightSet denied = AccessRightResolver.resolveDeniedAccessRights(userCtx, targetCtx);
         
-        AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE);
+        AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE);
         assertEquals(expected, denied);
     }
 

@@ -50,7 +50,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testAdminAccessRightExistsException() {
             assertThrows(AdminAccessRightExistsException.class, () ->
-                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_PC_CREATE)));
+                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)));
         }
 
         @Test

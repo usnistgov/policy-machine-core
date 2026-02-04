@@ -14,9 +14,9 @@ import java.util.List;
 public class AssociateOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter ASSOCIATE_UA_PARAM = new NodeIdFormalParameter("ua",
-        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_UA);
+        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE);
     public static final NodeIdFormalParameter ASSOCIATE_TARGET_PARAM = new NodeIdFormalParameter("target",
-        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_CREATE_TARGET);
+        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_TARGET_CREATE);
 
     public AssociateOp() {
         super(

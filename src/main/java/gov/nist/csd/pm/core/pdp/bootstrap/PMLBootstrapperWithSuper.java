@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
-import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
@@ -64,7 +63,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     }
                     do(ctx) {
-                        associate "@super" and ctx.args.name with ["*"]
+                        associate "@super" and ctx.args.name with ["admin:*"]
                     }
                     
                     create obligation "grant_super_on_new_oa_assigned_to_pc"
@@ -80,7 +79,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     }
                     do(ctx) {
-                        associate "@super" and ctx.args.name with ["*"]
+                        associate "@super" and ctx.args.name with ["admin:*"]
                     }
                     
                     create obligation "grant_super_on_attr_assigned_to_pc"
@@ -97,7 +96,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     } 
                     do(ctx) {
-                        associate "@super" and name(ctx.args.ascendant) with ["*"]
+                        associate "@super" and name(ctx.args.ascendant) with ["admin:*"]
                     }                    
                     """;
             // execute the obligation pml
