@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.core.pap.operation.graph;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SET_NODE_PROPERTIES;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
@@ -13,7 +12,7 @@ import java.util.List;
 public class SetNodePropertiesOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter SET_NODE_PROPS_NODE_ID_PARAM =
-        new NodeIdFormalParameter("id", SET_NODE_PROPERTIES);
+        new NodeIdFormalParameter("id", AdminAccessRight.ADMIN_GRAPH_NODE_PROPERTIES_UPDATE);
 
     public SetNodePropertiesOp() {
         super(

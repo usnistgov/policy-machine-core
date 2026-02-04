@@ -1,11 +1,8 @@
 package gov.nist.csd.pm.core.pap.operation.prohibition;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_PROCESS_PROHIBITION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_PROHIBITION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_PROHIBITION_WITH_COMPLEMENT_CONTAINER;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
@@ -29,7 +26,11 @@ public class DeleteProhibitionOp extends ProhibitionOp {
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        checkSubject(pap, userCtx, args.get(SUBJECT_PARAM), DELETE_PROHIBITION, DELETE_PROCESS_PROHIBITION);
-        checkContainers(pap, userCtx, args.get(CONTAINERS_PARAM), DELETE_PROHIBITION, DELETE_PROHIBITION_WITH_COMPLEMENT_CONTAINER);
+        checkSubject(pap, userCtx, args.get(SUBJECT_PARAM),
+            AdminAccessRight.ADMIN_PROHIBITION_DELETE.toString(),
+            AdminAccessRight.ADMIN_PROHIBITION_PROCESS_DELETE.toString());
+        checkContainers(pap, userCtx, args.get(CONTAINERS_PARAM),
+            AdminAccessRight.ADMIN_PROHIBITION_DELETE.toString(),
+            AdminAccessRight.ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_DELETE.toString());
     }
 }

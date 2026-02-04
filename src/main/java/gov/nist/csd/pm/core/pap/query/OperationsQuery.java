@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import java.util.Collection;
 

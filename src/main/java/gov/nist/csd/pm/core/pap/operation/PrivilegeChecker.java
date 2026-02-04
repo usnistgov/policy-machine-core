@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.core.pap.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.AccessQuerier;
 import gov.nist.csd.pm.core.pap.query.GraphQuerier;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
@@ -45,6 +46,18 @@ public class PrivilegeChecker {
 
     public void check(UserContext userCtx, UserContext targetUserCtx, String ... rightsToCheck) throws PMException {
         check(userCtx, new TargetContext(targetUserCtx), List.of(rightsToCheck));
+    }
+
+    public void check(UserContext userCtx, UserContext targetUserCtx, AdminAccessRight accessRight) throws PMException {
+        check(userCtx, new TargetContext(targetUserCtx), List.of(accessRight.toString()));
+    }
+
+    public void check(UserContext userCtx, TargetContext targetCtx, AdminAccessRight accessRight) throws PMException {
+        check(userCtx, targetCtx, List.of(accessRight.toString()));
+    }
+
+    public void check(UserContext userCtx, long target, AdminAccessRight accessRight) throws PMException {
+        check(userCtx, new TargetContext(target), List.of(accessRight.toString()));
     }
 
     public void check(UserContext userCtx, List<Long> targetIds, String... rightsToCheck) throws PMException {

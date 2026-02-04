@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pdp;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.testAdminPolicy;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
@@ -15,7 +14,7 @@ import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
@@ -27,6 +26,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -60,7 +60,7 @@ class PDPTest {
                 () -> pdp.runTx(
                         new TestUserContext("u1"),
                         policy -> {
-                            policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT_ATTRIBUTE));
+                            policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE));
                             return null;
                         }
                 )

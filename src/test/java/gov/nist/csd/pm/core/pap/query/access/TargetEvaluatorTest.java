@@ -4,7 +4,7 @@ import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
@@ -53,7 +53,7 @@ class TargetEvaluatorTest {
             
             create u "u1" in ["ua1"]
             
-            associate "ua1" and PM_ADMIN_BASE_OA with ["assign_to"]
+            associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignments:descendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
         pap.executePML(new UserContext(-1), pml);
@@ -61,7 +61,7 @@ class TargetEvaluatorTest {
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(
             new UserDagResult(
-                Map.of(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("assign_to")),
+                Map.of(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("admin:graph:assignments:descendant:create")),
                 new HashSet<>()
             ),
             new TargetContext(id("oa1"))

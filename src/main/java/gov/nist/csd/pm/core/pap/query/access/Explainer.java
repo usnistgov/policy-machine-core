@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.computeSatisfiedProhibitions;
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolveDeniedAccessRights;
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolvePrivileges;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.computeSatisfiedProhibitions;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.resolveDeniedAccessRights;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.resolvePrivileges;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;

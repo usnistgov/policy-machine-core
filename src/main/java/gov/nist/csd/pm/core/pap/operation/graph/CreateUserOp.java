@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.core.pap.operation.graph;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_USER;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
@@ -13,7 +12,7 @@ import java.util.List;
 public class CreateUserOp extends AdminOperation<Long> {
 
     public static final NodeIdListFormalParameter CREATE_U_DESCENDANTS_PARAM =
-        new NodeIdListFormalParameter("descendants", CREATE_USER);
+        new NodeIdListFormalParameter("descendants", AdminAccessRight.ADMIN_GRAPH_NODE_U_CREATE);
 
     public CreateUserOp() {
         super(

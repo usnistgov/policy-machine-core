@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.operation.param;
 
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 
 public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>
@@ -14,6 +15,11 @@ public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>
 	}
 
 	public NodeFormalParameter(String name, Type<T> type, String ... accessRights) {
+		super(name, type);
+		this.reqCaps = new AccessRightSet(accessRights);
+	}
+
+	public NodeFormalParameter(String name, Type<T> type, AdminAccessRight ... accessRights) {
 		super(name, type);
 		this.reqCaps = new AccessRightSet(accessRights);
 	}

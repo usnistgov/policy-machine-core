@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_POLICY_CLASS;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -15,12 +14,13 @@ import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifier.CannotDeletePluginOperationException;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -50,7 +50,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testAdminAccessRightExistsException() {
             assertThrows(AdminAccessRightExistsException.class, () ->
-                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(CREATE_POLICY_CLASS)));
+                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_PC_CREATE)));
         }
 
         @Test

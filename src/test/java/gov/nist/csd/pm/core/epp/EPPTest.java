@@ -2,9 +2,6 @@ package gov.nist.csd.pm.core.epp;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.LONG_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
@@ -19,7 +16,7 @@ import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -34,6 +31,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
@@ -283,14 +281,14 @@ class EPPTest {
             txPAP.modify().graph().createUser("u1",  ids("ua1", "ua2"));
             txPAP.modify().graph().createObject("o1",  ids("oa1"));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(),
-                new AccessRightSet(CREATE_OBLIGATION));
-            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT));
+                new AccessRightSet(AdminAccessRight.ADMIN_OBLIGATION_CREATE));
+            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_O_CREATE));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
             policy.modify().obligations().createObligation(id("u1"), "test",
-                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(CREATE_OBJECT_ATTRIBUTE)),
+                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE.toString())),
                 new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(
                         new StringLiteralExpression("o2"),
@@ -308,7 +306,7 @@ class EPPTest {
 
         EventContext eventCtx = new EventContext(
             new EventContextUser("u1", null),
-            CREATE_OBJECT_ATTRIBUTE,
+            AdminAccessRight.ADMIN_GRAPH_NODE_OA_CREATE.toString(),
             Map.of(
                 "name", id("oa2"),
                 "descendants", List.of(id("pc1"))
@@ -427,7 +425,7 @@ class EPPTest {
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
                 
                 adminop op1() {
-                    check ["assign"] on ["oa1"]
+                    check ["admin:graph:assignments:ascendant:create"] on ["oa1"]
 
                     create pc "test_pc"
                 }

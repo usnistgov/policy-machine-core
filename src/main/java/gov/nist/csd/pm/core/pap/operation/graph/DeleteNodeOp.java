@@ -1,19 +1,10 @@
 package gov.nist.csd.pm.core.pap.operation.graph;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT_ATTRIBUTE;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT_ATTRIBUTE_FROM;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBJECT_FROM;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_POLICY_CLASS;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER_ATTRIBUTE;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER_ATTRIBUTE_FROM;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_USER_FROM;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
@@ -43,7 +34,7 @@ public class DeleteNodeOp extends AdminOperation<Void> {
         NodeType type = NodeType.toNodeType(args.get(TYPE_PARAM));
         ReqCaps reqCaps = getReqCap(type);
 
-        pap.privilegeChecker().check(userCtx, nodeId, reqCaps.ascReqCap);
+        pap.privilegeChecker().check(userCtx, nodeId, reqCaps.ascReqCap.toString());
 
         if (type == NodeType.PC) {
             return;
@@ -51,7 +42,7 @@ public class DeleteNodeOp extends AdminOperation<Void> {
 
         List<Long> descs = args.get(DELETE_NODE_DESCENDANTS_PARAM);
         for (Long desc : descs) {
-            pap.privilegeChecker().check(userCtx, desc, reqCaps.descsReqCap);
+            pap.privilegeChecker().check(userCtx, desc, reqCaps.descsReqCap.toString());
         }
     }
 
@@ -63,14 +54,14 @@ public class DeleteNodeOp extends AdminOperation<Void> {
 
     private ReqCaps getReqCap(NodeType type) {
         return switch (type) {
-            case OA -> new ReqCaps(DELETE_OBJECT_ATTRIBUTE, DELETE_OBJECT_ATTRIBUTE_FROM);
-            case UA -> new ReqCaps(DELETE_USER_ATTRIBUTE, DELETE_USER_ATTRIBUTE_FROM);
-            case U -> new ReqCaps(DELETE_USER, DELETE_USER_FROM);
-            case O  -> new ReqCaps(DELETE_OBJECT, DELETE_OBJECT_FROM);
-            case PC -> new ReqCaps(DELETE_POLICY_CLASS, null);
+            case OA -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_OA_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
+            case UA -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_UA_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
+            case U -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_U_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
+            case O  -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_O_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
+            case PC -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_PC_DELETE, null);
             default -> throw new IllegalArgumentException("Unsupported node type: " + type);
         };
     }
 
-    private record ReqCaps(String ascReqCap, String descsReqCap) {}
+    private record ReqCaps(AdminAccessRight ascReqCap, AdminAccessRight descsReqCap) {}
 }

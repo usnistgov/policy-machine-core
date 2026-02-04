@@ -6,15 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
@@ -40,12 +40,12 @@ public class JavaExample {
         long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
         long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
         pap.modify().graph().createUser("admin_user", List.of(adminId));
-        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRights.ASSIGN_TO));
+        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
 
         long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
         long userInboxes = pap.modify().graph().createObjectAttribute("user inboxes", List.of(pc1Id));
-        pap.modify().graph().associate(adminId, userHomes, new AccessRightSet(AdminAccessRights.WC_ALL));
-        pap.modify().graph().associate(adminId, userInboxes, new AccessRightSet(AdminAccessRights.WC_ALL));
+        pap.modify().graph().associate(adminId, userHomes, AccessRightSet.wildcard());
+        pap.modify().graph().associate(adminId, userInboxes, AccessRightSet.wildcard());
 
         // prohibit the admin user from reading inboxes
         pap.modify().prohibitions().createProhibition(
@@ -57,7 +57,7 @@ public class JavaExample {
         );
 
         // create resource operation to read a file
-        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", "read"))) {
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", new AccessRightSet("read")))) {
             @Override
             public Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
@@ -71,7 +71,7 @@ public class JavaExample {
 
             @Override
             public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, usersId, AdminAccessRights.ASSIGN_TO);
+                pap.privilegeChecker().check(userCtx, usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE);
             }
 
             @Override

@@ -1,21 +1,18 @@
 package gov.nist.csd.pm.core.pap.query;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ADMIN_ACCESS_RIGHTS_SET;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ADMIN;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
@@ -1008,7 +1005,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1028,7 +1025,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1105,7 +1102,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.contains("read"));
     }
 
@@ -1126,7 +1123,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1147,7 +1144,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
 
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(u1), new TargetContext(o1));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
     }
 
@@ -1502,20 +1499,20 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(WC_ALL));
+        pap.modify().graph().associate(ua1, oa1, AccessRightSet.wildcard());
 
         Set<String> list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
 
-        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(WC_ADMIN));
+        pap.modify().graph().associate(ua1, oa1, AccessRightSet.adminWildcard());
         list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertTrue(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertFalse(list.containsAll(RWE));
 
-        pap.modify().graph().associate(ua1, oa1, new AccessRightSet(WC_RESOURCE));
+        pap.modify().graph().associate(ua1, oa1, AccessRightSet.resourceWildcard());
         list = pap.query().access().computePrivileges(new UserContext(id("u1")), new TargetContext(id("o1")));
-        assertFalse(list.containsAll(ALL_ADMIN_ACCESS_RIGHTS_SET));
+        assertTrue(list.containsAll(WildcardAccessRight.ADMIN_WILDCARD.getAccessRights()));
         assertTrue(list.containsAll(RWE));
     }
 

@@ -2,8 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,7 +16,7 @@ import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.common.exception.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
@@ -683,11 +681,11 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                     () -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("write")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
-                WC_ALL)));
+                "admin:*")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
-                WC_RESOURCE)));
+                "resource:*")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
-                WC_RESOURCE)));
+                "resource:*")));
         }
 
         @Test

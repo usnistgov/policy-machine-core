@@ -1,10 +1,9 @@
 package gov.nist.csd.pm.core.pdp.query;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_OBLIGATIONS;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -44,14 +43,14 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     public Obligation getObligation(String name) throws PMException {
         Obligation obligation = pap.query().obligations().getObligation(name);
 
-        pap.privilegeChecker().check(userCtx, obligation.getAuthorId(), QUERY_OBLIGATIONS);
+        pap.privilegeChecker().check(userCtx, obligation.getAuthorId(), AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
         return obligation;
     }
 
     @Override
     public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
-        pap.privilegeChecker().check(userCtx, userId, QUERY_OBLIGATIONS);
+        pap.privilegeChecker().check(userCtx, userId, AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
         Collection<Obligation> obligationsWithAuthor = new ArrayList<>(pap.query().obligations().getObligationsWithAuthor(userId));
         return filterObligations(obligationsWithAuthor);
@@ -60,7 +59,7 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     private Collection<Obligation> filterObligations(Collection<Obligation> obligations) {
         obligations.removeIf(obligation -> {
             try {
-                pap.privilegeChecker().check(userCtx, obligation.getAuthorId(), QUERY_OBLIGATIONS);
+                pap.privilegeChecker().check(userCtx, obligation.getAuthorId(), AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
                 return false;
             } catch (UnauthorizedException e) {

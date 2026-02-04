@@ -1,14 +1,12 @@
 package gov.nist.csd.pm.core.pdp.query;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_PROCESS_PROHIBITIONS;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.QUERY_PROHIBITIONS;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -90,14 +88,14 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
 
     private void checkCanQueryProhibition(Prohibition prohibition) throws PMException {
         if (prohibition.getSubject().isNode()) {
-            pap.privilegeChecker().check(userCtx, prohibition.getSubject().getNodeId(), QUERY_PROHIBITIONS);
+            pap.privilegeChecker().check(userCtx, prohibition.getSubject().getNodeId(), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         } else {
-            pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), QUERY_PROCESS_PROHIBITIONS);
+            pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId(), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
 
         // check user has access to each container condition
         for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            pap.privilegeChecker().check(userCtx, containerCondition.getId(), QUERY_PROHIBITIONS);
+            pap.privilegeChecker().check(userCtx, containerCondition.getId(), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
     }
 }

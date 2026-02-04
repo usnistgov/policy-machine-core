@@ -1,13 +1,9 @@
-package gov.nist.csd.pm.core.pap.query.access;
+package gov.nist.csd.pm.core.pap.operation.accessright;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ALL_ACCESS_RIGHTS_SET;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WILDCARD_MAP;
-
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.query.access.TargetDagResult;
+import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,17 +15,11 @@ public class AccessRightResolver {
 
     private AccessRightResolver() {}
 
-    public static AccessRightSet resolvePrivileges(UserDagResult userCtx, TargetDagResult targetCtx, AccessRightSet resourceOps) {
-        Map<Long, AccessRightSet> resolvedPcMap = new HashMap<>();
-        for (Map.Entry<Long, AccessRightSet> pc : targetCtx.pcMap().entrySet()) {
-            AccessRightSet pcOps = pc.getValue();
+    public static AccessRightSet resolvePrivileges(UserDagResult userCtx, TargetDagResult targetCtx, AccessRightSet resourceAccessRights) {
+        // resolve any access rights with "*" to their enumerated rights
+        Map<Long, AccessRightSet> resolvedPcMap = resolvePcMap(targetCtx.pcMap(), resourceAccessRights);
 
-            // replace instances of *, *a or *r with the literal access rights
-            pcOps = resolveWildcardAccessRights(pcOps, resourceOps);
-
-            resolvedPcMap.put(pc.getKey(), pcOps);
-        }
-
+        // determine the common set of access rights across all policy classes
         AccessRightSet result = resolvePolicyClassAccessRightSets(resolvedPcMap);
 
         // remove any prohibited access rights
@@ -37,6 +27,20 @@ public class AccessRightResolver {
         result.removeAll(denied);
 
         return result;
+    }
+
+    private static Map<Long, AccessRightSet> resolvePcMap(Map<Long, AccessRightSet> targetCtx, AccessRightSet resourceAccessRights) {
+        Map<Long, AccessRightSet> resolvedPcMap = new HashMap<>();
+        for (Map.Entry<Long, AccessRightSet> pc : targetCtx.entrySet()) {
+            AccessRightSet pcOps = pc.getValue();
+
+            // replace instances of *, *a or *r with the literal access rights
+            pcOps = resolveWildcardAccessRights(pcOps, resourceAccessRights);
+
+            resolvedPcMap.put(pc.getKey(), pcOps);
+        }
+
+        return resolvedPcMap;
     }
 
     public static AccessRightSet resolveDeniedAccessRights(UserDagResult userCtx, TargetDagResult targetCtx) {
@@ -91,35 +95,18 @@ public class AccessRightResolver {
     }
 
     private static AccessRightSet resolveWildcardAccessRights(AccessRightSet accessRightSet, AccessRightSet resourceOps) {
-        if (accessRightSet.contains(WC_ALL)) {
-            return createAllAccessRightsSet(resourceOps);
-        }
+        AccessRightSet resolved = new AccessRightSet();
 
-        if (accessRightSet.contains(WC_RESOURCE)) {
-            return new AccessRightSet(resourceOps);
-        }
-
-        return expandWildcards(accessRightSet);
-    }
-
-    private static AccessRightSet createAllAccessRightsSet(AccessRightSet resourceOps) {
-        AccessRightSet result = new AccessRightSet(ALL_ACCESS_RIGHTS_SET);
-        result.addAll(resourceOps);
-        return result;
-    }
-
-    private static AccessRightSet expandWildcards(AccessRightSet accessRightSet) {
-        AccessRightSet result = new AccessRightSet();
-
-        for (String accessRight : accessRightSet) {
-            if (WILDCARD_MAP.containsKey(accessRight)) {
-                result.addAll(WILDCARD_MAP.get(accessRight));
+        for (String ar : accessRightSet) {
+            WildcardAccessRight wildcardAccessRight = WildcardAccessRight.fromString(ar);
+            if (wildcardAccessRight == null) {
+                resolved.add(ar);
             } else {
-                result.add(accessRight);
+                resolved.addAll(wildcardAccessRight.resolveAccessRights(resourceOps));
             }
         }
 
-        return result;
+        return resolved;
     }
 
     private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<Long> reachedTargets) {

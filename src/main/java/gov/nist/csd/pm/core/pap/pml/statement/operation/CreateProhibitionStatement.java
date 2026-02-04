@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
 import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
@@ -12,7 +11,7 @@ import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.SUBJE
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
@@ -131,11 +130,7 @@ public class CreateProhibitionStatement extends OperationStatement {
     public static CreateProhibitionStatement fromProhibition(PolicyQuery policyQuery, Prohibition prohibition) throws PMException {
         List<Expression<String>> accessRightsList = new ArrayList<>();
         for (String ar : prohibition.getAccessRightSet()) {
-            if (isAdminAccessRight(ar)) {
-                accessRightsList.add(new VariableReferenceExpression<>(ar, STRING_TYPE));
-            } else {
-                accessRightsList.add(new StringLiteralExpression(ar));
-            }
+            accessRightsList.add(new StringLiteralExpression(ar));
         }
 
         ArrayLiteralExpression<String> arList = ArrayLiteralExpression.of(accessRightsList, STRING_TYPE);

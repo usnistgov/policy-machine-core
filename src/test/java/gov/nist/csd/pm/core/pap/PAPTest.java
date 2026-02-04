@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
@@ -134,8 +134,8 @@ public abstract class PAPTest extends PAPTestInitializer {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
-                associate "ua1" and "ua2" with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" and "ua2" with ["admin:graph:assignment:ascendant:create"]
                 
                 adminop op1(@node string a) {
                     check ["assign"] on [a]

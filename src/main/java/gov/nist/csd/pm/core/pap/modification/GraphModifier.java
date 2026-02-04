@@ -5,8 +5,6 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
 
 import gov.nist.csd.pm.core.common.exception.AssignmentCausesLoopException;
 import gov.nist.csd.pm.core.common.exception.CannotDeleteAdminPolicyConfigException;
@@ -25,7 +23,9 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
 import gov.nist.csd.pm.core.pap.graph.Association;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
+import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -391,6 +391,14 @@ public class GraphModifier extends Modifier implements GraphModification {
         }
     }
 
+    static boolean isAdminAccessRight(String ar) {
+        return AdminAccessRight.fromString(ar) != null;
+    }
+
+    static boolean isWildcardAccessRight(String ar) {
+        return WildcardAccessRight.fromString(ar) != null;
+    }
+
     private static boolean nodeInProhibition(long id, Prohibition prohibition) {
         if (prohibition.getSubject().getNodeId() == id) {
             return true;
@@ -408,8 +416,6 @@ public class GraphModifier extends Modifier implements GraphModification {
     private long createNonPolicyClassNode(String name, NodeType type, Collection<Long> descendants)
     throws PMException {
         long id = idGenerator.generateId(name, type);
-
-
 
         if (name.equals(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeName())) {
             return AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId();

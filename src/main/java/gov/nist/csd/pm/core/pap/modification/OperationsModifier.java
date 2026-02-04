@@ -1,12 +1,12 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isAdminAccessRight;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.isWildcardAccessRight;
+import static gov.nist.csd.pm.core.pap.modification.GraphModifier.isAdminAccessRight;
+import static gov.nist.csd.pm.core.pap.modification.GraphModifier.isWildcardAccessRight;
 
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.PluginRegistry;

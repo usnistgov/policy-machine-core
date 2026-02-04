@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.core.pdp.bootstrap;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
+import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
@@ -40,10 +41,12 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
             long superUserId = graph.createUser("super", List.of(superUaId, pmAdminId));
 
             // grant the super user all privileges on operations that require access to the admin policy nodes
-            graph.associate(superUaId, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet(AdminAccessRights.WC_ALL));
+            graph.associate(superUaId, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet(
+                WildcardAccessRight.ADMIN_WILDCARD.toString()
+            ));
 
             // this association will grant super privileges on itself
-            graph.associate(superUaId, pmAdminId, new AccessRightSet(AdminAccessRights.WC_ALL));
+            graph.associate(superUaId, pmAdminId, new AccessRightSet(WildcardAccessRight.ADMIN_WILDCARD.toString()));
 
             // create an obligation that when any node is created in a PC node or assigned to a PC node,
             // associate the super user with it.

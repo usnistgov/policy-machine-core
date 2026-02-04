@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pdp.bootstrap;
 import static org.junit.jupiter.api.Assertions.*;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;

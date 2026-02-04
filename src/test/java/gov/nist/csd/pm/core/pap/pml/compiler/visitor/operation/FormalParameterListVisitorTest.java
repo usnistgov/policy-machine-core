@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
@@ -35,7 +36,7 @@ class FormalParameterListVisitorTest {
         assertEquals(2, actual.size());
         assertEquals(
             List.of(
-                new NodeNameFormalParameter("a", "read", "write"),
+                new NodeNameFormalParameter("a", new AccessRightSet("read", "write")),
                 new FormalParameter<>("b", STRING_TYPE)
             ),
             actual

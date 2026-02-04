@@ -10,12 +10,11 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionExistsException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
@@ -45,8 +44,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
         void testProhibitionSubjectDoesNotExistException() {
             assertThrows(
                     NodeDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(
-                        AdminAccessRights.WC_ALL), false, List.of()));
+                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("admin:*"), false, List.of()));
         }
 
 

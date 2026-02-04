@@ -5,7 +5,7 @@ import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_TAR
 import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_UA_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;

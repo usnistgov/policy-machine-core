@@ -1,12 +1,9 @@
 package gov.nist.csd.pm.core.pap.operation.prohibition;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROCESS_PROHIBITION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROHIBITION;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
@@ -34,7 +31,9 @@ public class CreateProhibitionOp extends ProhibitionOp {
 
     @Override
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        checkSubject(pap, userCtx, args.get(SUBJECT_PARAM), CREATE_PROHIBITION, CREATE_PROCESS_PROHIBITION);
-        checkContainers(pap, userCtx, args.get(CONTAINERS_PARAM), CREATE_PROHIBITION, CREATE_PROHIBITION_WITH_COMPLEMENT_CONTAINER);
+        checkSubject(pap, userCtx, args.get(SUBJECT_PARAM), AdminAccessRight.ADMIN_PROHIBITION_CREATE.toString(),
+            AdminAccessRight.ADMIN_PROHIBITION_PROCESS_CREATE.toString());
+        checkContainers(pap, userCtx, args.get(CONTAINERS_PARAM), AdminAccessRight.ADMIN_PROHIBITION_CREATE.toString(),
+            AdminAccessRight.ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_CREATE.toString());
     }
 }

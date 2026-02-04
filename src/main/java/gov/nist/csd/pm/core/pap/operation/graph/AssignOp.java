@@ -1,12 +1,11 @@
 package gov.nist.csd.pm.core.pap.operation.graph;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSIGN;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.ASSIGN_TO;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
@@ -15,10 +14,10 @@ import java.util.List;
 public class AssignOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter ASSIGN_ASCENDANT_PARAM =
-        new NodeIdFormalParameter("ascendant", ASSIGN);
+        new NodeIdFormalParameter("ascendant", AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE);
 
     public static final NodeIdListFormalParameter ASSIGN_DESCENDANTS_PARAM =
-        new NodeIdListFormalParameter("descendants", ASSIGN_TO);
+        new NodeIdListFormalParameter("descendants", AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE);
 
     public AssignOp() {
         super(

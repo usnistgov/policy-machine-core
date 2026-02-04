@@ -1,8 +1,5 @@
 package gov.nist.csd.pm.core.pdp;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DESERIALIZE_POLICY;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.RESET;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SERIALIZE_POLICY;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
@@ -15,6 +12,7 @@ import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -175,21 +173,22 @@ public class PDPTx implements OperationExecutor {
 
         @Override
         public void reset() throws PMException {
-            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), RESET);
+            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(),
+                AdminAccessRight.ADMIN_POLICY_RESET.toString());
 
             pap.reset();
         }
 
         @Override
         public String serialize(PolicySerializer serializer) throws PMException {
-            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), SERIALIZE_POLICY);
+            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), AdminAccessRight.ADMIN_POLICY_SERIALIZE);
 
             return pap.serialize(serializer);
         }
 
         @Override
         public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
-            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), DESERIALIZE_POLICY);
+            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), AdminAccessRight.ADMIN_POLICY_DESERIALIZE);
 
             pap.deserialize(input, policyDeserializer);
         }

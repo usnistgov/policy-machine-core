@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.query.access;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.dag.Visitor;
-import gov.nist.csd.pm.core.pap.operation.accessrights.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
