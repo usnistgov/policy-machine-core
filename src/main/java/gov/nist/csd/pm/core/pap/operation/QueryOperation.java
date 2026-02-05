@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.List;
 
@@ -12,8 +13,16 @@ public abstract non-sealed class QueryOperation<R> extends Operation<R> {
 
     public QueryOperation(String name,
                           Type<R> returnType,
-                          List<FormalParameter<?>> parameters) {
-        super(name, returnType, parameters, List.of());
+                          List<FormalParameter<?>> parameters,
+                          List<RequiredCapability> requiredCapabilities) {
+        super(name, returnType, parameters, requiredCapabilities);
+    }
+
+    public QueryOperation(String name,
+                          Type<R> returnType,
+                          List<FormalParameter<?>> parameters,
+                          RequiredCapability... requiredCapabilities) {
+        super(name, returnType, parameters, requiredCapabilities);
     }
 
     public abstract R execute(PolicyQuery query, Args args) throws PMException;

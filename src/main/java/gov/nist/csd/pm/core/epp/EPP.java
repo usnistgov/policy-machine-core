@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OnPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
@@ -23,6 +24,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.PDPTx;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -119,25 +121,34 @@ public class EPP implements EventSubscriber {
 
             switch (formalParameter) {
                 case NodeIdFormalParameter nodeId ->
-                    pap.privilegeChecker().check(userCtx, new TargetContext((long) value));
+                    check(userCtx, new TargetContext((long) value));
                 case NodeIdListFormalParameter nodeIdList -> {
                     List<Long> idList = (List<Long>) value;
                     for (Long id : idList) {
-                        pap.privilegeChecker().check(userCtx, new TargetContext(id));
+                        check(userCtx, new TargetContext(id));
                     }
                 }
                 case NodeNameFormalParameter nodeName ->
-                    pap.privilegeChecker().check(userCtx, new TargetContext(pap.query().graph().getNodeId((String) value)));
+                    check(userCtx, new TargetContext(pap.query().graph().getNodeId((String) value)));
                 case NodeNameListFormalParameter nodeNameList -> {
                     List<String> nameList = (List<String>) value;
                     for (String name : nameList) {
-                        pap.privilegeChecker().check(userCtx, new TargetContext(pap.query().graph().getNodeId(name)));
+                        check(userCtx, new TargetContext(pap.query().graph().getNodeId(name)));
                     }
                 }
                 default -> {
                     return;
                 }
             }
+        }
+    }
+
+    private void check(UserContext userCtx, TargetContext targetCtx) throws PMException {
+        if(pap.query()
+            .access()
+            .computePrivileges(userCtx, targetCtx)
+            .isEmpty()) {
+            throw UnauthorizedException.of(pap.query().graph(), userCtx, targetCtx, new AccessRightSet(), List.of());
         }
     }
 }
