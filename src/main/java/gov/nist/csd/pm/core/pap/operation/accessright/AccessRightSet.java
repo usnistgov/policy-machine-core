@@ -10,7 +10,7 @@ public class AccessRightSet extends ObjectOpenHashSet<String> {
     }
 
     public AccessRightSet(AdminAccessRight... adminAccessRight) {
-        this();
+        super();
 
         for (AdminAccessRight a : adminAccessRight) {
             this.add(a.toString());
@@ -22,12 +22,12 @@ public class AccessRightSet extends ObjectOpenHashSet<String> {
     }
 
     public AccessRightSet(Collection<String> ops) {
-        this();
+        super();
         this.addAll(ops);
     }
 
     public AccessRightSet(AccessRightSet a, AccessRightSet b) {
-        this();
+        super();
 
         this.addAll(a);
         this.addAll(b);

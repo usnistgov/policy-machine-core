@@ -13,7 +13,7 @@ public abstract non-sealed class ResourceOperation<T> extends Operation<T> {
     public ResourceOperation(String name,
                              Type<T> returnType,
                              List<FormalParameter<?>> parameters) {
-        super(name, returnType, parameters);
+        super(name, returnType, parameters, List.of());
     }
 
     public abstract T execute(PolicyQuery query, Args args) throws PMException;

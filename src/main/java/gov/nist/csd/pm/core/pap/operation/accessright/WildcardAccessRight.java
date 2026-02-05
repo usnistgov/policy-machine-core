@@ -59,13 +59,13 @@ public enum WildcardAccessRight {
         AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_LIST.toString()
     ),
     ADMIN_PROHIBITION_WILDCARD("admin:prohibition:*",
-        AdminAccessRight.ADMIN_PROHIBITION_CREATE.toString(),
-        AdminAccessRight.ADMIN_PROHIBITION_PROCESS_CREATE.toString(),
-        AdminAccessRight.ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_CREATE.toString(),
+        AdminAccessRight.ADMIN_PROHIBITION_SUBJECT_CREATE.toString(),
+        AdminAccessRight.ADMIN_PROHIBITION_INCLUSION_CREATE.toString(),
+        AdminAccessRight.ADMIN_PROHIBITION_EXCLUSION_CREATE.toString(),
 
-        AdminAccessRight.ADMIN_PROHIBITION_DELETE.toString(),
-        AdminAccessRight.ADMIN_PROHIBITION_PROCESS_DELETE.toString(),
-        AdminAccessRight.ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_DELETE.toString(),
+        AdminAccessRight.ADMIN_PROHIBITION_SUBJECT_DELETE.toString(),
+        AdminAccessRight.ADMIN_PROHIBITION_INCLUSION_DELETE.toString(),
+        AdminAccessRight.ADMIN_PROHIBITION_EXCLUSION_DELETE.toString(),
 
         AdminAccessRight.ADMIN_PROHIBITION_LIST.toString()
     ),

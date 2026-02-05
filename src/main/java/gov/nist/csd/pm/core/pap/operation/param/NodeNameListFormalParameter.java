@@ -10,11 +10,7 @@ import java.util.List;
 
 public final class NodeNameListFormalParameter extends NodeFormalParameter<List<String>>{
 
-    public NodeNameListFormalParameter(String name, AccessRightSet reqCaps) {
-        super(name, ListType.of(STRING_TYPE), reqCaps);
-    }
-
-    public NodeNameListFormalParameter(String name, AdminAccessRight... accessRights) {
-        super(name, ListType.of(STRING_TYPE), accessRights);
+    public NodeNameListFormalParameter(String name) {
+        super(name, ListType.of(STRING_TYPE));
     }
 }

@@ -9,20 +9,24 @@ import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import java.util.List;
+import java.util.Map;
 
 public class AssociateOp extends AdminOperation<Void> {
 
-    public static final NodeIdFormalParameter ASSOCIATE_UA_PARAM = new NodeIdFormalParameter("ua",
-        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE);
-    public static final NodeIdFormalParameter ASSOCIATE_TARGET_PARAM = new NodeIdFormalParameter("target",
-        AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_TARGET_CREATE);
+    public static final NodeIdFormalParameter ASSOCIATE_UA_PARAM = new NodeIdFormalParameter("ua");
+    public static final NodeIdFormalParameter ASSOCIATE_TARGET_PARAM = new NodeIdFormalParameter("target");
 
     public AssociateOp() {
         super(
             "associate",
             VOID_TYPE,
-            List.of(ASSOCIATE_UA_PARAM, ASSOCIATE_TARGET_PARAM, ARSET_PARAM)
+            List.of(ASSOCIATE_UA_PARAM, ASSOCIATE_TARGET_PARAM, ARSET_PARAM),
+            new RequiredCapability(
+                ASSOCIATE_UA_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE),
+                ASSOCIATE_TARGET_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_TARGET_CREATE)
+            )
         );
     }
 

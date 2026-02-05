@@ -19,7 +19,6 @@ import gov.nist.csd.pm.core.pap.modification.PolicyModifier;
 import gov.nist.csd.pm.core.pap.modification.ProhibitionsModifier;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
-import gov.nist.csd.pm.core.pap.operation.PrivilegeChecker;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -48,7 +47,6 @@ public class PAP implements OperationExecutor, Transactional {
     private PolicyStore policyStore;
     private PolicyModifier modifier;
     private PolicyQuerier querier;
-    private PrivilegeChecker privilegeChecker;
     private PluginRegistry pluginRegistry;
 
     public PAP(PolicyStore policyStore) throws PMException {
@@ -68,7 +66,6 @@ public class PAP implements OperationExecutor, Transactional {
             new OperationsModifier(policyStore, pluginRegistry)
         );
         this.policyStore = policyStore;
-        this.privilegeChecker = new PrivilegeChecker(querier.access(), querier.graph());
         this.pluginRegistry.setOperationsQuery(this.querier.operations());
 
         // verify admin policy
@@ -79,7 +76,6 @@ public class PAP implements OperationExecutor, Transactional {
         this.policyStore = pap.policyStore();
         this.modifier = pap.modifier;
         this.querier = pap.querier;
-        this.privilegeChecker = pap.privilegeChecker;
         this.pluginRegistry = pap.pluginRegistry;
     }
 
@@ -98,11 +94,6 @@ public class PAP implements OperationExecutor, Transactional {
         return this;
     }
 
-    public PAP withPrivilegeChecker(PrivilegeChecker privilegeChecker) {
-        this.privilegeChecker = privilegeChecker;
-        return this;
-    }
-
     public PolicyQuery query() {
         return querier;
     }
@@ -113,10 +104,6 @@ public class PAP implements OperationExecutor, Transactional {
 
     public PolicyStore policyStore() {
         return policyStore;
-    }
-
-    public PrivilegeChecker privilegeChecker() {
-        return privilegeChecker;
     }
 
     public PluginRegistry plugins() {

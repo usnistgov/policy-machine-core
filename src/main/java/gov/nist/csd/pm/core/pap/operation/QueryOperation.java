@@ -13,7 +13,7 @@ public abstract non-sealed class QueryOperation<R> extends Operation<R> {
     public QueryOperation(String name,
                           Type<R> returnType,
                           List<FormalParameter<?>> parameters) {
-        super(name, returnType, parameters);
+        super(name, returnType, parameters, List.of());
     }
 
     public abstract R execute(PolicyQuery query, Args args) throws PMException;

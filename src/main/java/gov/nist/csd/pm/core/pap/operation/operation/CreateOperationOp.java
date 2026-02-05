@@ -10,7 +10,6 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.AdminOperationType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class CreateOperationOp extends AdminOperation<Void>  {
@@ -21,14 +20,10 @@ public class CreateOperationOp extends AdminOperation<Void>  {
         super(
             "create_operation",
             BasicTypes.VOID_TYPE,
-            List.of(OPERATION_PARAM)
+            List.of(OPERATION_PARAM),
+            AdminPolicyNode.PM_ADMIN_OPERATIONS,
+            AdminAccessRight.ADMIN_OPERATION_CREATE
         );
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(),
-            AdminAccessRight.ADMIN_OPERATION_CREATE.toString());
     }
 
     @Override

@@ -1,3 +1,4 @@
+/*
 package gov.nist.csd.pm.core.pap.operation;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
@@ -36,7 +37,7 @@ public class PrivilegeChecker {
         check(userCtx, new TargetContext(targetId), rightsToCheck);
     }
 
-    public void check(UserContext userCtx, long targetId, String... rightsToCheck) throws PMException {
+    public   check(UserContext userCtx, long targetId, String... rightsToCheck) throws PMException {
         check(userCtx, targetId, Arrays.asList(rightsToCheck));
     }
 
@@ -75,3 +76,4 @@ public class PrivilegeChecker {
     }
 }
 
+*/

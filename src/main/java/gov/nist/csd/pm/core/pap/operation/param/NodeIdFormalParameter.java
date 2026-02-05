@@ -7,11 +7,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 
 public final class NodeIdFormalParameter extends NodeFormalParameter<Long> {
 
-    public NodeIdFormalParameter(String name, AccessRightSet reqCaps) {
-        super(name, LONG_TYPE, reqCaps);
-    }
-
-    public NodeIdFormalParameter(String name, AdminAccessRight ... reqCaps) {
-        super(name, LONG_TYPE, new AccessRightSet(reqCaps));
+    public NodeIdFormalParameter(String name) {
+        super(name, LONG_TYPE);
     }
 }

@@ -9,7 +9,8 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import java.util.List;
 
 public class DeleteNodeOp extends AdminOperation<Void> {
@@ -24,26 +25,35 @@ public class DeleteNodeOp extends AdminOperation<Void> {
         super(
             "delete_node",
             BasicTypes.VOID_TYPE,
-            List.of(DELETE_NODE_NODE_ID_PARAM, TYPE_PARAM, DELETE_NODE_DESCENDANTS_PARAM)
+            List.of(DELETE_NODE_NODE_ID_PARAM, TYPE_PARAM, DELETE_NODE_DESCENDANTS_PARAM),
+            new RequiredCapabilityFunc((policyQuery, userCtx, args) -> {
+                long nodeId = args.get(DELETE_NODE_NODE_ID_PARAM);
+                NodeType type = NodeType.toNodeType(args.get(TYPE_PARAM));
+
+                boolean hasPrivs = policyQuery.access()
+                    .computePrivileges(userCtx, new TargetContext(nodeId))
+                    .contains(AdminAccessRight.ADMIN_GRAPH_NODE_DELETE.toString());
+
+                if (!hasPrivs) {
+                    return false;
+                } else if (type == NodeType.PC) {
+                    return true;
+                }
+
+                List<Long> descs = args.get(DELETE_NODE_DESCENDANTS_PARAM);
+                for (Long desc : descs) {
+                    hasPrivs = policyQuery.access()
+                        .computePrivileges(userCtx, new TargetContext(desc))
+                        .contains(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE.toString());
+
+                    if(!hasPrivs) {
+                        return false;
+                    }
+                }
+
+                return true;
+            })
         );
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        long nodeId = args.get(DELETE_NODE_NODE_ID_PARAM);
-        NodeType type = NodeType.toNodeType(args.get(TYPE_PARAM));
-        ReqCaps reqCaps = getReqCap(type);
-
-        pap.privilegeChecker().check(userCtx, nodeId, reqCaps.ascReqCap.toString());
-
-        if (type == NodeType.PC) {
-            return;
-        }
-
-        List<Long> descs = args.get(DELETE_NODE_DESCENDANTS_PARAM);
-        for (Long desc : descs) {
-            pap.privilegeChecker().check(userCtx, desc, reqCaps.descsReqCap.toString());
-        }
     }
 
     @Override
@@ -51,14 +61,4 @@ public class DeleteNodeOp extends AdminOperation<Void> {
         pap.modify().graph().deleteNode(args.get(DELETE_NODE_NODE_ID_PARAM));
         return null;
     }
-
-    private ReqCaps getReqCap(NodeType type) {
-        return switch (type) {
-            case OA, UA, U, O -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_DELETE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE);
-            case PC -> new ReqCaps(AdminAccessRight.ADMIN_GRAPH_NODE_DELETE, null);
-            default -> throw new IllegalArgumentException("Unsupported node type: " + type);
-        };
-    }
-
-    private record ReqCaps(AdminAccessRight ascReqCap, AdminAccessRight descsReqCap) {}
 }

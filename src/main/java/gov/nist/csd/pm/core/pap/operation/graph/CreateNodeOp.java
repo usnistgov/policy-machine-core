@@ -3,31 +3,36 @@ package gov.nist.csd.pm.core.pap.operation.graph;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import java.util.List;
 
 public abstract class CreateNodeOp extends AdminOperation<Long> {
 
-    public static final NodeIdListFormalParameter CREATE_NODE_DESCENDANTS_PARAM =
-        new NodeIdListFormalParameter("descendants", AdminAccessRight.ADMIN_GRAPH_NODE_CREATE);
+    public static final NodeIdListFormalParameter CREATE_NODE_DESCENDANTS_PARAM = new NodeIdListFormalParameter("descendants");
 
     public CreateNodeOp(String name) {
         super(
             name,
             BasicTypes.LONG_TYPE,
-            List.of(NAME_PARAM, CREATE_NODE_DESCENDANTS_PARAM)
+            List.of(NAME_PARAM, CREATE_NODE_DESCENDANTS_PARAM),
+            new RequiredCapability(
+                CREATE_NODE_DESCENDANTS_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)
+            )
         );
     }
 
-    public CreateNodeOp(String name, List<FormalParameter<?>> params) {
+    public CreateNodeOp(String name, List<FormalParameter<?>> params, RequiredCapability reqCap) {
         super(
             name,
             BasicTypes.LONG_TYPE,
-            params
+            params,
+            reqCap
         );
     }
 
