@@ -37,11 +37,6 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     static AdminOperation<Void> op = new AdminOperation<>("testFunc", VOID_TYPE, List.of()) {
         @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) {
-
-        }
-
-        @Override
         public Void execute(PAP pap, Args args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
             return null;
@@ -176,10 +171,6 @@ public abstract class PAPTest extends PAPTestInitializer {
     @Test
     void testPluginRegistry() throws PMException {
         AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-            }
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -227,11 +218,6 @@ public abstract class PAPTest extends PAPTestInitializer {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
-            }
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
             }
         });
 

@@ -30,23 +30,12 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
         }
-
-        @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws
-                                                                                                     PMException {
-        }
     };
 
     static AdminOperation<Void> op2 = new AdminOperation<>("op2", VOID_TYPE, List.of()) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
-        }
-
-        @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws
-                                                                                                     PMException {
-
         }
     };
 
@@ -77,11 +66,6 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
-            }
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
             }
         });
 

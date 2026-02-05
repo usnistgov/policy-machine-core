@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
@@ -18,8 +19,9 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
     public PMLStmtsAdminOperation(String name,
                                   Type<T> returnType,
                                   List<FormalParameter<?>> formalParameters,
+                                  List<RequiredCapability> requiredCapabilities,
                                   PMLStatementBlock body) {
-        super(name, returnType, formalParameters);
+        super(name, returnType, formalParameters, requiredCapabilities);
         this.body = body;
     }
 

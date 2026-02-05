@@ -17,7 +17,8 @@ public class GetNodeType extends PMLQueryOperation<String> {
         super(
                 "getNodeType",
                 STRING_TYPE,
-                List.of(NODE_NAME_PARAM)
+                List.of(NODE_NAME_PARAM),
+            List.of()
         );
     }
 

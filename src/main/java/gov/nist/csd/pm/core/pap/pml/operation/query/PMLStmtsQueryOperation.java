@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
@@ -18,8 +19,9 @@ public class PMLStmtsQueryOperation<T> extends PMLQueryOperation<T> implements P
     public PMLStmtsQueryOperation(String operationName,
                                   Type<T> returnType,
                                   List<FormalParameter<?>> parameters,
+                                  List<RequiredCapability> requiredCapabilities,
                                   PMLStatementBlock stmts) {
-        super(operationName, returnType, parameters);
+        super(operationName, returnType, parameters, requiredCapabilities);
         this.stmts = stmts;
     }
 

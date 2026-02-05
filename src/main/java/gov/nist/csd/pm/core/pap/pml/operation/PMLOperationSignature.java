@@ -6,24 +6,30 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PMLOperationSignature implements PMLStatementSerializable {
 
-    private OperationType type;
-    private String name;
-    private Type<?> returnType;
-    private List<FormalParameter<?>> formalParameters;
+    private final OperationType type;
+    private final String name;
+    private final Type<?> returnType;
+    private final List<FormalParameter<?>> formalParameters;
+    private final List<RequiredCapability> reqCaps;
 
-    public PMLOperationSignature(OperationType type, String name, Type<?> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLOperationSignature(OperationType type, String name, Type<?> returnType, List<FormalParameter<?>> formalParameters,
+                                 List<RequiredCapability> reqCaps) {
         this.type = type;
         this.name = name;
         this.returnType = returnType;
         this.formalParameters = formalParameters;
+        this.reqCaps = reqCaps;
     }
 
     public OperationType getType() {
@@ -42,6 +48,10 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return formalParameters;
     }
 
+    public List<RequiredCapability> getReqCaps() {
+        return reqCaps;
+    }
+
     protected String serializeFormalArgs() {
         String pml = "";
         for (FormalParameter<?> formalParameter : getFormalParameters()) {
@@ -49,28 +59,47 @@ public class PMLOperationSignature implements PMLStatementSerializable {
                 pml += ", ";
             }
 
-            String annotationStr = "";
-            if (formalParameter instanceof NodeFormalParameter<?> nodeFormalParameter) {
-                AccessRightSet reqCaps = nodeFormalParameter.getRequiredCapabilities();
-
-                annotationStr = "@node" +
-                    (!reqCaps.isEmpty() ?
-                        "(" + reqCaps.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(", ")) + ") "
-                        : " ");
-            }
-
-            pml += String.format("%s%s %s", annotationStr, TypeStringer.toPMLString(formalParameter.getType()),
+            String annotationStr = formalParameter instanceof NodeFormalParameter<?> ? "@node ": "";
+            pml += String.format("%s%s %s",
+                annotationStr,
+                TypeStringer.toPMLString(formalParameter.getType()),
                 formalParameter.getName());
         }
         return pml;
     }
 
+    private String serializeReqCap(int indent) {
+        List<String> reqCapStrs = new ArrayList<>();
+        for (RequiredCapability reqCap : getReqCaps()) {
+            if (reqCap instanceof PMLRequiredCapabilityFunc pmlRequiredCapabilityFunc) {
+                String s = "@reqcap(() " + pmlRequiredCapabilityFunc.getStmts().toFormattedString(indent) + ")";
+                reqCapStrs.add(s);
+            } else {
+                Map<NodeFormalParameter<?>, AccessRightSet> reqCapMap = reqCap.getCapabilityMap();
+                List<String> entries = new ArrayList<>();
+                for (Map.Entry<NodeFormalParameter<?>, AccessRightSet> e : reqCapMap.entrySet()) {
+                    String name = e.getKey().getName();
+                    AccessRightSet arset = e.getValue();
+                    String ars = arset.stream().map(ar -> "\"" + ar + "\"")
+                        .collect(Collectors.joining(", "));
+
+                    entries.add(String.format("%s: [%s]", name, ars));
+                }
+                reqCapStrs.add(String.format("@reqcap({%s})", String.join(", ", entries)));
+            }
+        }
+        return String.join("\n", reqCapStrs);
+    }
+
     protected String toString(String prefix, int indentLevel) {
+        String reqCapStr = serializeReqCap(indentLevel);
         String argsStr = serializeFormalArgs();
 
         String indent = indent(indentLevel);
         return String.format(
-            "%s%s %s(%s) %s",
+            "%s%s\n%s%s %s(%s) %s",
+            indent,
+            reqCapStr,
             indent,
             prefix,
             name,

@@ -17,7 +17,8 @@ public class HasPropertyKey extends PMLQueryOperation<Boolean> {
     public HasPropertyKey() {
         super("hasPropertyKey",
                 BOOLEAN_TYPE,
-                List.of(NODE_NAME_PARAM, Env.KEY_PARAM)
+                List.of(NODE_NAME_PARAM, Env.KEY_PARAM),
+            List.of()
         );
     }
 

@@ -136,16 +136,20 @@ resourceOpDefinitionStatement: resourceOpSignature basicAndCheckStatementBlock? 
 routineDefinitionStatement: routineSignature statementBlock ;
 functionDefinitionStatement: functionSignature basicStatementBlock ;
 
-adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-queryOpSignature: QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
+adminOpSignature: reqCapList? ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+queryOpSignature: reqCapList? QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+resourceOpSignature: reqCapList? RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
-operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
-operationFormalParam: nodeArgAnnotation? variableType ID reqCap=stringArrayLit?;
+reqCapList: reqCap+ ;
+reqCap: REQ_CAP OPEN_PAREN (arsetReqCap | funcReqCap) CLOSE_PAREN ;
+arsetReqCap: OPEN_CURLY (arsetEntry (COMMA arsetEntry)*)? CLOSE_CURLY ;
+arsetEntry: ID COLON stringArrayLit ;
+funcReqCap: OPEN_PAREN CLOSE_PAREN basicAndCheckStatementBlock ;
 
-nodeArgAnnotation: NODE_ARG (OPEN_PAREN (stringLit (COMMA stringLit)*)? CLOSE_PAREN)? ;
+operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
+operationFormalParam: NODE_ARG? variableType ID paramReqCap=stringArrayLit?;
 
 adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
 adminOpStatement:

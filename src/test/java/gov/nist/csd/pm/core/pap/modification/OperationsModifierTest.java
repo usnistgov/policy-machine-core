@@ -34,11 +34,6 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
     static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of()) {
         @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-        }
-
-        @Override
         public Object execute(PAP pap, Args args) throws PMException {
             return null;
         }

@@ -23,8 +23,8 @@ class PMLStmtsOperationSignatureTest {
                 new NodeNameFormalParameter("a"),
                 new FormalParameter<>("b", STRING_TYPE),
                 new FormalParameter<>("c", STRING_TYPE)
-            )
-        );
+            ),
+            List.of());
 
         assertEquals(
             "adminop op1(@node string a, string b, string c) string ",

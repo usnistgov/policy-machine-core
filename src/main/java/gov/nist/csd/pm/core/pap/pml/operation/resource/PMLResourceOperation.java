@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.operation.resource;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
@@ -17,12 +18,12 @@ public abstract class PMLResourceOperation<T> extends ResourceOperation<T> imple
     private final PMLOperationSignature signature;
     private ExecutionContext ctx;
 
-    public PMLResourceOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLResourceOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters, List<RequiredCapability> reqCaps) {
         super(name, returnType, new ArrayList<>(formalParameters));
 
         this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;
-        this.signature = new PMLOperationSignature(OperationType.RESOURCEOP, name, returnType, formalParameters);
+        this.signature = new PMLOperationSignature(OperationType.RESOURCEOP, name, returnType, formalParameters, reqCaps);
     }
 
     public List<FormalParameter<?>> getPmlFormalArgs() {

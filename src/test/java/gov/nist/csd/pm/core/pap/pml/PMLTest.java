@@ -18,7 +18,9 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -50,12 +52,16 @@ public class PMLTest {
                 on union of {PM_ADMIN_BASE_OA: false}
                 """);
 
-        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "admin:graph:assignment:ascendant:create");
-            }
-
+        AdminOperation<?> op1 = new AdminOperation<>(
+            "op1",
+            VOID_TYPE,
+            List.of(ARGA, ARGB, ARGC),
+            new RequiredCapabilityFunc((policyQuery, userCtx, args) ->
+                policyQuery.access()
+                    .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                    .contains("admin:graph:assignment:ascendant:create")
+            )
+        ) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 String a = actualArgs.get(ARGA);

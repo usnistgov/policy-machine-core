@@ -57,6 +57,10 @@ public class RequiredCapability {
         this.reqCap.put(param3, arset3);
     }
 
+    public Map<NodeFormalParameter<?>, AccessRightSet> getCapabilityMap() {
+        return reqCap;
+    }
+
     /**
      * Checks if the given user and args satisfies this RequiredCapability.
      * @param pap the PAP object used to access the policy information.

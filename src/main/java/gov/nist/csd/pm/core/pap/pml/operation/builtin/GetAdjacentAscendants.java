@@ -22,7 +22,8 @@ public class GetAdjacentAscendants extends PMLQueryOperation<List<String>> {
         super(
                 "getAdjacentAscendants",
                 returnType,
-                List.of(NODE_NAME_PARAM)
+                List.of(NODE_NAME_PARAM),
+            List.of()
         );
     }
 

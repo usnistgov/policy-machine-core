@@ -3,6 +3,7 @@ lexer grammar PMLLexer;
 ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
 NODE_ARG: '@node';
+REQ_CAP: '@reqcap';
 NODE: 'node';
 CHECK: 'check';
 ROUTINE: 'routine';

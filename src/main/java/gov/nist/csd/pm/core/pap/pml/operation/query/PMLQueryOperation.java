@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.operation.query;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
@@ -17,20 +18,20 @@ public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements 
     private final PMLOperationSignature signature;
     private ExecutionContext ctx;
 
-    public PMLQueryOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLQueryOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters, List<RequiredCapability> reqCaps) {
         super(name, returnType, new ArrayList<>(formalParameters));
 
         this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;
-        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, formalParameters);
+        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, formalParameters, reqCaps);
     }
 
-    public PMLQueryOperation(String name, Type<T> returnType) {
+    public PMLQueryOperation(String name, Type<T> returnType, List<RequiredCapability> reqCaps) {
         super(name, returnType, new ArrayList<>());
 
         this.returnType = returnType;
         this.pmlFormalParameters = new ArrayList<>();
-        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, new ArrayList<>());
+        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, new ArrayList<>(), reqCaps);
     }
 
     public List<FormalParameter<?>> getPmlFormalArgs() {

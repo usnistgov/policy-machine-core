@@ -19,9 +19,10 @@ public class GetAdjacentDescendants extends PMLQueryOperation<List<String>> {
 
     public GetAdjacentDescendants() {
         super(
-                "getAdjacentDescendants",
-                ListType.of(STRING_TYPE),
-                List.of(NODE_NAME_PARAM)
+            "getAdjacentDescendants",
+            ListType.of(STRING_TYPE),
+            List.of(NODE_NAME_PARAM),
+            List.of()
         );
     }
 

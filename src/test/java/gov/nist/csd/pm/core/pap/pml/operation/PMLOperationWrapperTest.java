@@ -32,9 +32,7 @@ class PMLOperationWrapperTest {
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
         operations.createOperation(new AdminOperation<>("op1", STRING_TYPE, List.of(a)) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {}
-
+            
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
@@ -43,9 +41,7 @@ class PMLOperationWrapperTest {
         });
 
         operations.createOperation(new AdminOperation<>("op2", STRING_TYPE, List.of(a)) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {}
-
+            
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 return args.get(a);
@@ -54,9 +50,7 @@ class PMLOperationWrapperTest {
         });
 
         operations.createOperation(new AdminOperation<>("op3", STRING_TYPE, List.of(a)) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {}
-
+            
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 return args.get(a);

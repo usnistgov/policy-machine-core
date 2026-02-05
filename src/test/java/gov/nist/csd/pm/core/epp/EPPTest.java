@@ -85,13 +85,7 @@ class EPPTest {
                     }
                 """);
 
-        AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(ARG_A, ARG_B)) {
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {
-
-            }
-
+        AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(ARG_A, ARG_B), List.of()) {
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 return "";
@@ -323,12 +317,7 @@ class EPPTest {
     void testCustomOperationInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType()) {
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {
-
-            }
+        PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {

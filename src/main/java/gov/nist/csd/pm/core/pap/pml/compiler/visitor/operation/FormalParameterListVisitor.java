@@ -12,7 +12,6 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NodeArgAnnotationContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationFormalParamContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationFormalParamListContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringLitContext;
@@ -44,19 +43,17 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
 
             Type<?> type = TypeResolver.resolveFromParserCtx(operationFormalParamContext.variableType());
 
-            boolean isNodeOp = operationFormalParamContext.nodeArgAnnotation() != null;
-            if (isNodeOp) {
-                AccessRightSet reqCaps = parseReqCaps(operationFormalParamContext.nodeArgAnnotation());
-
+            boolean isNodeArg = operationFormalParamContext.NODE_ARG() != null;
+            if (isNodeArg) {
                 // node params can be one of 4 types: int64, int64[], string, string[]
                 if (type.equals(LONG_TYPE)) {
-                    params.add(new NodeIdFormalParameter(name, reqCaps));
+                    params.add(new NodeIdFormalParameter(name));
                 } else if (type.equals(ListType.of(LONG_TYPE))) {
-                    params.add(new NodeIdListFormalParameter(name, reqCaps));
+                    params.add(new NodeIdListFormalParameter(name));
                 } else if (type.equals(STRING_TYPE)) {
-                    params.add(new NodeNameFormalParameter(name, reqCaps));
+                    params.add(new NodeNameFormalParameter(name));
                 } else if (type.equals(ListType.of(STRING_TYPE))) {
-                    params.add(new NodeNameListFormalParameter(name, reqCaps));
+                    params.add(new NodeNameListFormalParameter(name));
                 } else {
                     throw new PMLCompilationRuntimeException(operationFormalParamContext, "@node annotation cannot be applied to type " + type);
                 }
@@ -68,10 +65,6 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
         }
 
         return params;
-    }
-
-    private AccessRightSet parseReqCaps(NodeArgAnnotationContext nodeArgAnnotationContext) {
-        return new AccessRightSet(parseStringArrayLit(nodeArgAnnotationContext.stringLit()));
     }
 
     @Override

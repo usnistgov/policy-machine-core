@@ -37,6 +37,7 @@ class OperationDefinitionStatementTest {
             "op1",
             STRING_TYPE,
             List.of(a, b),
+            List.of(),
             new PMLStatementBlock(
                 new CheckStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),
@@ -101,6 +102,7 @@ class OperationDefinitionStatementTest {
             "func1",
             new VoidType(),
             List.of(a, b),
+            List.of(),
             new PMLStatementBlock(
                 new CheckStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),

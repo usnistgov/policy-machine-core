@@ -40,10 +40,6 @@ class PMLBootstrapperTest {
                 """;
 
         AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-            }
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {

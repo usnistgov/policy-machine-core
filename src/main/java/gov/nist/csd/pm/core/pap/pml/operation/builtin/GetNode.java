@@ -21,7 +21,8 @@ public class GetNode extends PMLQueryOperation<Map<String, Object>> {
         super(
                 "getNode",
                 MapType.of(STRING_TYPE, ANY_TYPE),
-                List.of(NODE_NAME_PARAM)
+                List.of(NODE_NAME_PARAM),
+            List.of()
         );
     }
 
