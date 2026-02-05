@@ -217,7 +217,7 @@ class GraphModificationAdjudicatorTest {
         assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1"))
                 .contains(new Association(id("ua1"), id("ua3"), new AccessRightSet("admin:graph:assignment:ascendant:create"))));
 
-        assertThrows(UnauthorizedException.class, () -> fail.associate(id("ua1"), id("ua3"), new AccessRightSet("assign")));
+        assertThrows(UnauthorizedException.class, () -> fail.associate(id("ua1"), id("ua3"), new AccessRightSet("admin:graph:assignment:ascendant:create")));
     }
 
     @Test
