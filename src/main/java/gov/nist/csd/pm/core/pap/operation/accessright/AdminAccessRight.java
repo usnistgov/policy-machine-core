@@ -31,11 +31,11 @@ public enum AdminAccessRight {
     // prohibition
     ADMIN_PROHIBITION_CREATE("admin:prohibition:create"),
     ADMIN_PROHIBITION_PROCESS_CREATE("admin:prohibition:process:create"),
-    ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_CREATE("admin:prohibition:exclusion:create"),
+    ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_CREATE("admin:prohibition:complement_container:create"),
 
     ADMIN_PROHIBITION_DELETE("admin:prohibition:delete"),
     ADMIN_PROHIBITION_PROCESS_DELETE("admin:prohibition:process:delete"),
-    ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_DELETE("admin:prohibition:exclusion:delete"),
+    ADMIN_PROHIBITION_COMPLEMENT_CONTAINER_DELETE("admin:prohibition:complement_container:delete"),
 
     ADMIN_PROHIBITION_LIST("admin:prohibition:list"),
 
