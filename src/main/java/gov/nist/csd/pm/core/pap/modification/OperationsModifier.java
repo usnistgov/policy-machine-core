@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import static gov.nist.csd.pm.core.pap.modification.GraphModifier.isAdminAccessRight;
-import static gov.nist.csd.pm.core.pap.modification.GraphModifier.isWildcardAccessRight;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator.isAdminAccessRight;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator.isWildcardAccessRight;
 
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;

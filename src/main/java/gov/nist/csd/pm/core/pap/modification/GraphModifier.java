@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator.validateAccessRights;
 
 import gov.nist.csd.pm.core.common.exception.AssignmentCausesLoopException;
 import gov.nist.csd.pm.core.common.exception.CannotDeleteAdminPolicyConfigException;
@@ -349,7 +350,7 @@ public class GraphModifier extends Modifier implements GraphModification {
         Node targetNode = policyStore.graph().getNodeById(target);
 
         // check the access rights are valid
-        checkAccessRightsValid(policyStore.operations().getResourceAccessRights(), accessRights);
+        validateAccessRights(policyStore.operations().getResourceAccessRights(), accessRights);
 
         // check the types of each node make a valid association
         checkAssociation(uaNode.getType(), targetNode.getType());
@@ -379,24 +380,6 @@ public class GraphModifier extends Modifier implements GraphModification {
         }
 
         return false;
-    }
-
-    static void checkAccessRightsValid(AccessRightSet resourceAccessRights, AccessRightSet accessRightSet) throws PMException {
-        for (String ar : accessRightSet) {
-            if (!resourceAccessRights.contains(ar)
-                && !isAdminAccessRight(ar)
-                && !isWildcardAccessRight(ar)) {
-                throw new UnknownAccessRightException(ar);
-            }
-        }
-    }
-
-    static boolean isAdminAccessRight(String ar) {
-        return AdminAccessRight.fromString(ar) != null;
-    }
-
-    static boolean isWildcardAccessRight(String ar) {
-        return WildcardAccessRight.fromString(ar) != null;
     }
 
     private static boolean nodeInProhibition(long id, Prohibition prohibition) {

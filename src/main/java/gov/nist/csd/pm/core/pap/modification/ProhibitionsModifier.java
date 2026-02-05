@@ -1,6 +1,6 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import static gov.nist.csd.pm.core.pap.modification.GraphModifier.checkAccessRightsValid;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator.validateAccessRights;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionContainerDoesNotExistException;
@@ -52,7 +52,7 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
         }
 
         // check the prohibition parameters are valid
-        checkAccessRightsValid(policyStore.operations().getResourceAccessRights(), accessRightSet);
+        validateAccessRights(policyStore.operations().getResourceAccessRights(), accessRightSet);
         checkProhibitionSubjectExists(subject);
         checkProhibitionContainersExist(containerConditions);
     }

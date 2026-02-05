@@ -17,6 +17,7 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -25,7 +26,6 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +57,9 @@ public class CreateProhibitionStatement extends OperationStatement {
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String name = this.name.execute(ctx, pap);
         String subject = this.subject.execute(ctx, pap);
-        AccessRightSet ops = new AccessRightSet(this.accessRights.execute(ctx, pap));
+        AccessRightSet arset = new AccessRightSet(this.accessRights.execute(ctx, pap));
+
+        AccessRightValidator.validateAccessRights(pap.query().operations().getResourceAccessRights(), arset);
 
         ProhibitionSubject prohibitionSubject;
         if (subjectType == ProhibitionSubjectType.PROCESS) {
@@ -77,7 +79,7 @@ public class CreateProhibitionStatement extends OperationStatement {
         return new Args()
             .put(NAME_PARAM, name)
             .put(SUBJECT_PARAM, prohibitionSubject)
-            .put(ARSET_PARAM, new ArrayList<>(ops))
+            .put(ARSET_PARAM, new ArrayList<>(arset))
             .put(INTERSECTION_PARAM, isIntersection)
             .put(CONTAINERS_PARAM, new ArrayList<>(containerConditions));
     }

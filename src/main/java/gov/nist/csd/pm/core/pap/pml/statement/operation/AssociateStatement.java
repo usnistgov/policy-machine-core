@@ -7,6 +7,7 @@ import static gov.nist.csd.pm.core.pap.operation.graph.AssociateOp.ASSOCIATE_UA_
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -35,6 +36,9 @@ public class AssociateStatement extends OperationStatement {
         String uaName = ua.execute(ctx, pap);
         String targetName = target.execute(ctx, pap);
         AccessRightSet accessRightSet = new AccessRightSet(accessRights.execute(ctx, pap));
+
+        // validate ars
+        AccessRightValidator.validateAccessRights(pap.query().operations().getResourceAccessRights(), accessRightSet);
 
         GraphQuery graph = pap.query().graph();
 
