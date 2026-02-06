@@ -38,7 +38,8 @@ public class PMLExample {
         on union of {"user inboxes": false}
         
         // create resource operation to read a file
-        resourceop read_file(@node("read") string name) { }
+        @reqcap({name: ["read"]})
+        resourceop read_file(@node string name) { }
         
         // create a custom administration operation
         adminop create_new_user(string username) {

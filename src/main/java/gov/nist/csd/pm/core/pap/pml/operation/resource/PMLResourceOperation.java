@@ -19,7 +19,7 @@ public abstract class PMLResourceOperation<T> extends ResourceOperation<T> imple
     private ExecutionContext ctx;
 
     public PMLResourceOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters, List<RequiredCapability> reqCaps) {
-        super(name, returnType, new ArrayList<>(formalParameters));
+        super(name, returnType, new ArrayList<>(formalParameters), reqCaps);
 
         this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;

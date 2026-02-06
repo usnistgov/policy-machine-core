@@ -29,7 +29,7 @@ public abstract class ProhibitionOp extends AdminOperation<Void> {
     public ProhibitionOp(String name,
                          List<FormalParameter<?>> parameters,
                          RequiredCapability... requiredCapabilities) {
-        super(name, VOID_TYPE, parameters, requiredCapabilities);
+        super(name, VOID_TYPE, parameters, List.of(requiredCapabilities));
     }
 
     static boolean checkSubject(PolicyQuery policyQuery, UserContext userCtx, ProhibitionSubject subject, AdminAccessRight ar) throws PMException {

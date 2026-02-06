@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import java.io.Serializable;
 
 public class RequiredCapabilityFunc extends RequiredCapability {
 
@@ -20,7 +21,7 @@ public class RequiredCapabilityFunc extends RequiredCapability {
     }
 
     @FunctionalInterface
-    public interface RequiredCapabilitiesFuncExecutor {
+    public interface RequiredCapabilitiesFuncExecutor extends Serializable {
         boolean execute(PolicyQuery policyQuery, UserContext userCtx, Args args) throws PMException;
     }
 }

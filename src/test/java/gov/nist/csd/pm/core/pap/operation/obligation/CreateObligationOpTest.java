@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,27 +30,25 @@ class CreateObligationOpTest {
     }
 
     @Test
-    void testIsSatisfiedWhenAuthorized() throws PMException {
+    void testCanExecuteWhenAuthorized() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """
                 set resource access rights ["read"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["admin:obligation:create"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:obligation:create"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreateObligationOp op = new CreateObligationOp();
-        // RequiredCapabilityFunc checks PM_ADMIN_OBLIGATIONS node for admin:obligation:create
-        // Use an empty args since the func only uses policyQuery and userCtx
         Args args = new Args();
-        assertTrue(op.getRequiredCapabilities().get(0).isSatisfied(pap, new UserContext(id("u1")), args));
+        op.canExecute(pap, new UserContext(id("u1")), args);
     }
 
     @Test
-    void testIsSatisfiedWhenUnauthorized() throws PMException {
+    void testCanExecuteWhenUnauthorized() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """
                 set resource access rights ["read"]
@@ -65,6 +64,6 @@ class CreateObligationOpTest {
 
         CreateObligationOp op = new CreateObligationOp();
         Args args = new Args();
-        assertFalse(op.getRequiredCapabilities().get(0).isSatisfied(pap, new UserContext(id("u2")), args));
+        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));
     }
 }

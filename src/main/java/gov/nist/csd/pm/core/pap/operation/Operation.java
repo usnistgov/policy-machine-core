@@ -44,11 +44,15 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         this.requiredCapabilities = requiredCapabilities;
     }
 
-    public Operation(String name, Type<R> returnType, List<FormalParameter<?>> parameters, RequiredCapability... requiredCapabilities) {
+    public Operation(String name, Type<R> returnType, List<FormalParameter<?>> parameters,
+                     RequiredCapability requiredCapability, RequiredCapability... requiredCapabilities) {
         this.name = name;
         this.returnType = returnType;
         this.parameters = parameters;
-        this.requiredCapabilities = new ArrayList<>(List.of(requiredCapabilities));
+
+        this.requiredCapabilities = new ArrayList<>();
+        this.requiredCapabilities.add(requiredCapability);
+        this.requiredCapabilities.addAll(List.of(requiredCapabilities));
     }
 
     /**
@@ -120,19 +124,18 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Operation<?> operation)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        Operation<?> operation = (Operation<?>) o;
         return Objects.equals(name, operation.name) && Objects.equals(returnType, operation.returnType)
-            && Objects.equals(parameters, operation.parameters);
+            && Objects.equals(parameters, operation.parameters) && Objects.equals(requiredCapabilities,
+            operation.requiredCapabilities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, returnType, parameters);
+        return Objects.hash(name, returnType, parameters, requiredCapabilities);
     }
 
     private Args validateAndPrepareArgs(Map<String, Object> rawArgs, boolean checkMissing) {

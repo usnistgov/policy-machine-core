@@ -151,7 +151,9 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 
                 set resource access rights ["read"]
-                resourceop read_file(@node("read") string name)
+                
+                @reqcap({name: ["read"]})
+                resourceop read_file(@node string name)
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]

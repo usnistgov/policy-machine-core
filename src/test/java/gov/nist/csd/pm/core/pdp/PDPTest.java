@@ -65,7 +65,7 @@ class PDPTest {
                         }
                 )
         );
-        assertEquals("{user: u1} missing required access rights {admin:graph:association:ua:create} on {target: ua1}", e.getMessage());
+        assertEquals("{user: u1} cannot perform operation associate", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -174,8 +174,11 @@ class PDPTest {
         pap.executePML(new TestUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 
-                resourceop read_file(@node("read") string name) {}
-                resourceop write_file(@node("write") string name) {}
+                @reqcap({name: ["read"]})
+                resourceop read_file(@node string name) {}
+                
+                @reqcap({name: ["write"]})
+                resourceop write_file(@node string name) {}
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -246,7 +249,8 @@ class PDPTest {
                 
                 set resource access rights ["read", "write"]
                 
-                resourceop read_file(@node("read") int64 id) {}
+                @reqcap({id: ["read"]})
+                resourceop read_file(@node int64 id) {}
 
                 """);
         PDP pdp = new PDP(pap);

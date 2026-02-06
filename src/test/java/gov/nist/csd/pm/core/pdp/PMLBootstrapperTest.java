@@ -39,7 +39,7 @@ class PMLBootstrapperTest {
                 routine1()
                 """;
 
-        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {

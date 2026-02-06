@@ -22,7 +22,7 @@ class PMLStmtsResourceOperationTest {
     void testNonPMLResourceOpInvokedInPML() throws PMException {
         MemoryPAP memoryPAP = new MemoryPAP();
         memoryPAP.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
-        memoryPAP.modify().operations().createOperation(new ResourceOperation<>("op1", STRING_TYPE, List.of()) {
+        memoryPAP.modify().operations().createOperation(new ResourceOperation<>("op1", STRING_TYPE, List.of(), List.of()) {
             @Override
             public String execute(PolicyQuery query, Args args) throws PMException {
                 return "test";

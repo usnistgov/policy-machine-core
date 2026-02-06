@@ -22,7 +22,8 @@ public class GetNodeProperties extends QueryOperation<Map<String, String>> {
         super(
                 "getNodeProperties",
                 returnType,
-                List.of(NODE_NAME_PARAM)
+                List.of(NODE_NAME_PARAM),
+                List.of()
         );
     }
 

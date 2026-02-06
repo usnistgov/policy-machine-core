@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ class CreateUserAttributeOpTest {
     }
 
     @Test
-    void testIsSatisfiedWhenAuthorized() throws PMException {
+    void testCanExecuteWhenAuthorized() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """
                 set resource access rights ["read"]
@@ -45,11 +46,11 @@ class CreateUserAttributeOpTest {
                 "name", "ua2",
                 "descendants", List.of(id("oa1"))
         ));
-        assertTrue(op.getRequiredCapabilities().get(0).isSatisfied(pap, new UserContext(id("u1")), args));
+        op.canExecute(pap, new UserContext(id("u1")), args);
     }
 
     @Test
-    void testIsSatisfiedWhenUnauthorized() throws PMException {
+    void testCanExecuteWhenUnauthorized() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """
                 set resource access rights ["read"]
@@ -68,6 +69,6 @@ class CreateUserAttributeOpTest {
                 "name", "ua3",
                 "descendants", List.of(id("oa1"))
         ));
-        assertFalse(op.getRequiredCapabilities().get(0).isSatisfied(pap, new UserContext(id("u2")), args));
+        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));
     }
 }

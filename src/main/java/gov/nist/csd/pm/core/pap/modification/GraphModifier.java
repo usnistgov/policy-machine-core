@@ -23,6 +23,7 @@ import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
+import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
@@ -201,7 +202,9 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected boolean checkDeleteNodeInput(long id) throws PMException {
-        if (!policyStore.graph().nodeExists(id)) {
+        if (AdminPolicyNode.isAdminPolicyNode(id)) {
+            throw new CannotDeleteAdminPolicyConfigException();
+        } else if (!policyStore.graph().nodeExists(id)) {
             return false;
         }
 
@@ -310,8 +313,7 @@ public class GraphModifier extends Modifier implements GraphModification {
             throw new NodeDoesNotExistException(ascendant);
         } else if (!policyStore.graph().nodeExists(descendant)) {
             throw new NodeDoesNotExistException(descendant);
-        } else if (ascendant == AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId() &&
-            descendant == AdminPolicyNode.PM_ADMIN_PC.nodeId()) {
+        } else if (AdminPolicy.isAdminPolicyAssignment(ascendant, descendant)) {
             throw new CannotDeleteAdminPolicyConfigException();
         }
 
@@ -400,9 +402,13 @@ public class GraphModifier extends Modifier implements GraphModification {
     throws PMException {
         long id = idGenerator.generateId(name, type);
 
-        if (name.equals(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeName())) {
-            return AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId();
-        } else if (policyStore.graph().nodeExists(name)) {
+        for (AdminPolicyNode adminNode : AdminPolicyNode.values()) {
+            if (adminNode != AdminPolicyNode.PM_ADMIN_PC && name.equals(adminNode.nodeName())) {
+                return adminNode.nodeId();
+            }
+        }
+
+        if (policyStore.graph().nodeExists(name)) {
             throw new NodeNameExistsException(name);
         } else if (policyStore.graph().nodeExists(id)) {
             throw new NodeIdExistsException(id);

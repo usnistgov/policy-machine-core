@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
-    static AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+    static AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
@@ -32,7 +32,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         }
     };
 
-    static AdminOperation<Void> op2 = new AdminOperation<>("op2", VOID_TYPE, List.of()) {
+    static AdminOperation<Void> op2 = new AdminOperation<>("op2", VOID_TYPE, List.of(), List.of()) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
@@ -62,7 +62,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         Collection<String> adminOperationNames = pap.query().operations().getOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
 
-        pap.plugins().addOperation(new AdminOperation<>("op3", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(new AdminOperation<>("op3", VOID_TYPE, List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;

@@ -35,7 +35,7 @@ public abstract class PAPTest extends PAPTestInitializer {
     public static final FormalParameter<String> ARG_A = new FormalParameter<>("a", STRING_TYPE);
     public static final FormalParameter<String> ARG_B = new FormalParameter<>("b", STRING_TYPE);
 
-    static AdminOperation<Void> op = new AdminOperation<>("testFunc", VOID_TYPE, List.of()) {
+    static AdminOperation<Void> op = new AdminOperation<>("testFunc", VOID_TYPE, List.of(), List.of()) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
@@ -170,7 +170,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testPluginRegistry() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -193,7 +193,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         assertTrue(pap.query().operations().getOperations().containsAll(List.of(op1, routine1)));
     }
 
-    static ResourceOperation<Void> a = new ResourceOperation<>("a", VOID_TYPE, List.of()) {
+    static ResourceOperation<Void> a = new ResourceOperation<>("a", VOID_TYPE, List.of(), List.of()) {
         @Override
         public Void execute(PolicyQuery query, Args args) throws PMException {
             return null;
@@ -214,7 +214,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     @Test
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().addOperation(new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;

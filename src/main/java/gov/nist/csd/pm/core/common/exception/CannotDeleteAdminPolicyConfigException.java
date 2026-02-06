@@ -2,6 +2,6 @@ package gov.nist.csd.pm.core.common.exception;
 
 public class CannotDeleteAdminPolicyConfigException extends PMException {
     public CannotDeleteAdminPolicyConfigException() {
-        super("cannot delete PM_ADMIN_PC, PM_ADMIN_OBJECT, or the assignment between the two");
+        super("cannot delete nodes or assignments in AdminPolicy");
     }
 }

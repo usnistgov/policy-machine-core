@@ -68,11 +68,11 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return pml;
     }
 
-    private String serializeReqCap(int indent) {
+    private String serializeReqCap(int indentLevel) {
         List<String> reqCapStrs = new ArrayList<>();
         for (RequiredCapability reqCap : getReqCaps()) {
             if (reqCap instanceof PMLRequiredCapabilityFunc pmlRequiredCapabilityFunc) {
-                String s = "@reqcap(() " + pmlRequiredCapabilityFunc.getStmts().toFormattedString(indent) + ")";
+                String s = "@reqcap(() " + pmlRequiredCapabilityFunc.getStmts().toFormattedString(indentLevel) + ")";
                 reqCapStrs.add(s);
             } else {
                 Map<NodeFormalParameter<?>, AccessRightSet> reqCapMap = reqCap.getCapabilityMap();
@@ -88,7 +88,13 @@ public class PMLOperationSignature implements PMLStatementSerializable {
                 reqCapStrs.add(String.format("@reqcap({%s})", String.join(", ", entries)));
             }
         }
-        return String.join("\n", reqCapStrs);
+
+        if (reqCapStrs.isEmpty()) {
+            return "";
+        }
+
+        return String.format("%s%s\n", indent(indentLevel), String.join("\n", reqCapStrs));
+
     }
 
     protected String toString(String prefix, int indentLevel) {
@@ -97,8 +103,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
 
         String indent = indent(indentLevel);
         return String.format(
-            "%s%s\n%s%s %s(%s) %s",
-            indent,
+            "%s%s%s %s(%s) %s",
             reqCapStr,
             indent,
             prefix,
@@ -115,17 +120,18 @@ public class PMLOperationSignature implements PMLStatementSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof PMLOperationSignature signature))
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        return Objects.equals(name, signature.name) && Objects.equals(returnType,
-            signature.returnType) && Objects.equals(formalParameters, signature.formalParameters);
+        }
+        PMLOperationSignature that = (PMLOperationSignature) o;
+        return type == that.type && Objects.equals(name, that.name) && Objects.equals(returnType,
+            that.returnType) && Objects.equals(formalParameters, that.formalParameters)
+            && Objects.equals(reqCaps, that.reqCaps);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, returnType, formalParameters);
+        return Objects.hash(type, name, returnType, formalParameters, reqCaps);
     }
 
     public enum OperationType {

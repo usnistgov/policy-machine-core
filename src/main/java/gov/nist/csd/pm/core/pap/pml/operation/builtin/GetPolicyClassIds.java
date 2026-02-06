@@ -17,6 +17,7 @@ public class GetPolicyClassIds extends QueryOperation<List<Long>> {
         super(
             "getPolicyClassIds",
             ListType.of(LONG_TYPE),
+            List.of(),
             List.of()
         );
     }

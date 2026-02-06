@@ -156,7 +156,6 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
-
             pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
                     true, List.of(
                             new ContainerCondition(id("oa1"), true),

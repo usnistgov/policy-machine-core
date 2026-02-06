@@ -35,7 +35,7 @@ public class CheckStatement extends PMLStatement<VoidResult> {
             long id = pap.query().graph().getNodeByName(target).getId();
             TargetContext targetCtx = new TargetContext(id);
             AccessRightSet privs = pap.query().access().computePrivileges(ctx.author(), targetCtx);
-            if (!privs.containsAll(ars)) {
+            if (!privs.containsAll(ars) || (privs.isEmpty() && ars.isEmpty())) {
                 throw UnauthorizedException.of(pap.query().graph(), ctx.author(), targetCtx, privs, ars);
             }
         }

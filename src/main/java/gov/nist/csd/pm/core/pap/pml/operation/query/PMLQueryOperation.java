@@ -19,7 +19,7 @@ public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements 
     private ExecutionContext ctx;
 
     public PMLQueryOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters, List<RequiredCapability> reqCaps) {
-        super(name, returnType, new ArrayList<>(formalParameters));
+        super(name, returnType, new ArrayList<>(formalParameters), reqCaps);
 
         this.returnType = returnType;
         this.pmlFormalParameters = formalParameters;
@@ -27,7 +27,7 @@ public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements 
     }
 
     public PMLQueryOperation(String name, Type<T> returnType, List<RequiredCapability> reqCaps) {
-        super(name, returnType, new ArrayList<>());
+        super(name, returnType, new ArrayList<>(), reqCaps);
 
         this.returnType = returnType;
         this.pmlFormalParameters = new ArrayList<>();

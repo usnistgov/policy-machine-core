@@ -60,6 +60,15 @@ public class ReqCapListVisitor extends PMLBaseVisitor<List<RequiredCapability>> 
         }
 
         @Override
+        public RequiredCapability visitReqCap(ReqCapContext ctx) {
+            if (ctx.arsetReqCap() != null) {
+                return visitArsetReqCap(ctx.arsetReqCap());
+            } else {
+                return visitFuncReqCap(ctx.funcReqCap());
+            }
+        }
+
+        @Override
         public RequiredCapability visitArsetReqCap(ArsetReqCapContext ctx) {
             List<ArsetEntryContext> arsetEntryContexts = ctx.arsetEntry();
             Map<NodeFormalParameter<?>, AccessRightSet> arMap = new HashMap<>();
@@ -89,9 +98,11 @@ public class ReqCapListVisitor extends PMLBaseVisitor<List<RequiredCapability>> 
                     continue;
                 }
 
-                if (!(arg instanceof NodeFormalParameter)) {
+                if (!(arg instanceof NodeFormalParameter<?> nodeFormalParameter)) {
                     throw new PMLCompilationRuntimeException(name + " must be annotated with @node to be used in the reqcap");
                 }
+
+                return nodeFormalParameter;
             }
 
             throw new PMLCompilationRuntimeException("unknown parameter in reqcap " + name);

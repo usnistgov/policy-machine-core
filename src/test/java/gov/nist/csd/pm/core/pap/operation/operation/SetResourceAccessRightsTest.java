@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -26,25 +27,25 @@ class SetResourceAccessRightsTest {
     }
 
     @Test
-    void testIsSatisfiedWhenAuthorized() throws PMException {
+    void testCanExecuteWhenAuthorized() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """
                 set resource access rights ["read"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_OBJECT with ["admin:policy:resource_access_rights:update"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:policy:resource_access_rights:update"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
 
         SetResourceAccessRights op = new SetResourceAccessRights();
         Args args = new Args();
-        assertTrue(op.getRequiredCapabilities().get(0).isSatisfied(pap, new UserContext(id("u1")), args));
+        op.canExecute(pap, new UserContext(id("u1")), args);
     }
 
     @Test
-    void testIsSatisfiedWhenUnauthorized() throws PMException {
+    void testCanExecuteWhenUnauthorized() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """
                 set resource access rights ["read"]
@@ -60,6 +61,6 @@ class SetResourceAccessRightsTest {
 
         SetResourceAccessRights op = new SetResourceAccessRights();
         Args args = new Args();
-        assertFalse(op.getRequiredCapabilities().get(0).isSatisfied(pap, new UserContext(id("u2")), args));
+        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));
     }
 }

@@ -75,7 +75,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void createAdminOperation() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
@@ -90,7 +90,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {

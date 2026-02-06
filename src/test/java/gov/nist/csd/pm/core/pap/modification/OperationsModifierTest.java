@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of()) {
+    static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of(), List.of()) {
         @Override
         public Object execute(PAP pap, Args args) throws PMException {
             return null;

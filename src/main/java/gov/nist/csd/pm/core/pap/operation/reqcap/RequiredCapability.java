@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,9 +20,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * RequiredCapability maps a operation formal parameter to the access rights required to satisfy this capability.
+ * RequiredCapability maps an operation formal parameter to the access rights required to satisfy this capability.
  */
-public class RequiredCapability {
+public class RequiredCapability implements Serializable {
 
     private final Map<NodeFormalParameter<?>, AccessRightSet> reqCap;
 
@@ -70,13 +71,17 @@ public class RequiredCapability {
      * @throws PMException if there is an error checking if the user has the required privileges.
      */
     public boolean isSatisfied(PAP pap, UserContext userCtx, Args args) throws PMException {
+        if (reqCap.isEmpty()) {
+            return false;
+        }
+
         for (Entry<? extends NodeFormalParameter<?>, AccessRightSet> entry : reqCap.entrySet()) {
-            if (hasRequiredPrivilegesForParam(pap, userCtx, args, entry.getKey(), entry.getValue())) {
-                return true;
+            if (!hasRequiredPrivilegesForParam(pap, userCtx, args, entry.getKey(), entry.getValue())) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     private boolean hasRequiredPrivilegesForParam(PAP pap, UserContext userCtx, Args args,
@@ -88,7 +93,8 @@ public class RequiredCapability {
                 return false;
             }
         }
-        return !nodeIds.isEmpty();
+
+        return true;
     }
 
     private List<Long> resolveNodeIds(GraphQuery graph, Args args,

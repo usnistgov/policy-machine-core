@@ -21,8 +21,9 @@ public abstract non-sealed class AdminOperation<R> extends Operation<R> {
     public AdminOperation(String name,
                           Type<R> returnType,
                           List<FormalParameter<?>> parameters,
+                          RequiredCapability requiredCapability,
                           RequiredCapability... requiredCapabilities) {
-        super(name, returnType, parameters, requiredCapabilities);
+        super(name, returnType, parameters, requiredCapability, requiredCapabilities);
     }
 
     public AdminOperation(String name,
