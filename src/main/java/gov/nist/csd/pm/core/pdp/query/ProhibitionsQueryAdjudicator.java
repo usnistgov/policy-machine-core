@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
@@ -97,7 +96,7 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
             case NodeProhibition nodeProhibition ->
                 check(userCtx, new TargetContext(nodeProhibition.getNodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
             case ProcessProhibition processProhibition ->
-                check(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+                check(userCtx, new TargetContext(processProhibition.getUserId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
 
         // check user has access to each attribute
