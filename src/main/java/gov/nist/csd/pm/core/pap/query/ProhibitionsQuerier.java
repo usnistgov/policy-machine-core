@@ -9,7 +9,6 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 

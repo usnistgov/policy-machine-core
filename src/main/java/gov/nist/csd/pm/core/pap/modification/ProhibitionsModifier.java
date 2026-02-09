@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionExistsException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
-import java.util.Collection;
 import java.util.Set;
 
 public class ProhibitionsModifier extends Modifier implements ProhibitionsModification {

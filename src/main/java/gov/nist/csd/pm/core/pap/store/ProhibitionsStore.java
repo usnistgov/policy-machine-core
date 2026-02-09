@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.core.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.common.tx.Transactional;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.Set;
 

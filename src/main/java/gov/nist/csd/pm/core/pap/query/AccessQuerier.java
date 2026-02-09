@@ -8,13 +8,13 @@ import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.pap.query.access.TargetDagResult;
-import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.access.CachedTargetEvaluator;
 import gov.nist.csd.pm.core.pap.query.access.Explainer;
+import gov.nist.csd.pm.core.pap.query.access.TargetDagResult;
 import gov.nist.csd.pm.core.pap.query.access.TargetEvaluator;
+import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
 import gov.nist.csd.pm.core.pap.query.access.UserEvaluator;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;

@@ -12,7 +12,6 @@ import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.ArrayList;

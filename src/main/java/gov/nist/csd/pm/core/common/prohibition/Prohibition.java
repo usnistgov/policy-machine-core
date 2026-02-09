@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.common.prohibition;
 
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 

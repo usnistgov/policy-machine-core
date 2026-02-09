@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.operation.accessright;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
-import gov.nist.csd.pm.core.pap.PAP;
 
 public class AccessRightValidator {
 
