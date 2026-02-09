@@ -13,12 +13,14 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
@@ -441,5 +443,36 @@ public class PMLTest {
 
         PMLCompiler pmlCompiler = new PMLCompiler();
         assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
+    }
+
+    @Test
+    void testReqCap() throws PMException {
+        String pml = """
+            set resource access rights ["read"]
+            
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create ua "u1" in ["ua1"]
+            create ua "oa1" in ["pc1"]
+            create ua "o1" in ["oa1"]
+            create ua "oa2" in ["pc1"]
+            create ua "o2" in ["oa2"]
+            
+            associate "ua1" and "oa1" with ["read"]
+            associate "ua1" and "oa2" with ["read"]
+            
+            @reqcap({file: ["read"]})
+            @reqcap({"o2": ["read"]})
+            resourceop read_file(@node string file) { }
+            """;
+        PAP pap = new TestPAP();
+        pap.executePML(null, pml);
+        Operation<?> readFile = pap.query().operations().getOperation("read_file");
+
+        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
+
+        pap.modify().graph().dissociate(id("ua1"), id("oa1"));
+
+        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
     }
 }
