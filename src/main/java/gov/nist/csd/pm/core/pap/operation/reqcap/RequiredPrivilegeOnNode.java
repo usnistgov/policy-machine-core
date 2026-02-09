@@ -8,7 +8,6 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.Objects;
-import java.util.Set;
 
 public final class RequiredPrivilegeOnNode extends RequiredPrivilege{
 
