@@ -17,7 +17,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -70,16 +70,10 @@ public class JavaExample {
         };
         pap.modify().operations().createOperation(resourceOp);
 
-        /*
-        (policyQuery, userCtx, args) -> policyQuery.access()
-                .computePrivileges(userCtx, new TargetContext(usersId))
-                .contains(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE.toString())))
-         */
-
         // create a custom administration operation
         FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
         AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam),
-            List.of(new RequiredCapability(new RequiredPrivilegeOnNodeId(usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
+            List.of(new RequiredCapability(new RequiredPrivilegeOnNode("users", AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {

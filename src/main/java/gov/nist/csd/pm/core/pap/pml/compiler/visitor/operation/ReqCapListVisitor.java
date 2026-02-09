@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeName;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ReqCapContext;
@@ -66,7 +66,7 @@ public class ReqCapListVisitor extends PMLBaseVisitor<List<RequiredCapability>> 
                     NodeFormalParameter<?> formalParameter = findNodeFormalParameter(paramName);
                     requiredPrivileges.add(new RequiredPrivilegeOnParameter(formalParameter, arset));
                 } else {
-                    requiredPrivileges.add(new RequiredPrivilegeOnNodeName(ExpressionVisitor.removeQuotes(entryCtx.node), arset));
+                    requiredPrivileges.add(new RequiredPrivilegeOnNode(ExpressionVisitor.removeQuotes(entryCtx.node), arset));
                 }
             }
 

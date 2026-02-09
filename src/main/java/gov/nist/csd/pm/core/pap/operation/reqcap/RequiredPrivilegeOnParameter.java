@@ -17,14 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class RequiredPrivilegeOnParameter implements RequiredPrivilege {
+public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
 
     private final NodeFormalParameter<?> param;
-    private final AccessRightSet required;
 
     public RequiredPrivilegeOnParameter(NodeFormalParameter<?> param, AccessRightSet required) {
+        super(required);
         this.param = param;
-        this.required = required;
     }
 
     public RequiredPrivilegeOnParameter(NodeFormalParameter<?> param, AdminAccessRight adminAccessRight) {
@@ -35,7 +34,7 @@ public class RequiredPrivilegeOnParameter implements RequiredPrivilege {
     public boolean isSatisfied(PAP pap, UserContext userCtx, Args args) throws PMException {
         List<Long> nodeIds = resolveNodeIds(pap.query().graph(), args);
         for (long id : nodeIds) {
-            if (!hasRequiredPrivileges(pap, userCtx, id, required)) {
+            if (!hasRequiredPrivileges(pap, userCtx, id, getRequired())) {
                 return false;
             }
         }
@@ -69,33 +68,22 @@ public class RequiredPrivilegeOnParameter implements RequiredPrivilege {
         return param;
     }
 
-    public AccessRightSet required() {
-        return required;
-    }
-
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (obj == null || obj.getClass() != this.getClass()) {
+        if (!(o instanceof RequiredPrivilegeOnParameter that)) {
             return false;
         }
-        var that = (RequiredPrivilegeOnParameter) obj;
-        return Objects.equals(this.param, that.param) &&
-            Objects.equals(this.required, that.required);
+        if (!super.equals(o)) {
+            return false;
+        }
+        return Objects.equals(param, that.param);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(param, required);
+        return Objects.hash(super.hashCode(), param);
     }
-
-    @Override
-    public String toString() {
-        return "RequiredPrivilegeOnParameter[" +
-            "param=" + param + ", " +
-            "required=" + required + ']';
-    }
-
 }

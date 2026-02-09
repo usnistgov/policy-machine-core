@@ -8,8 +8,7 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeName;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
@@ -83,18 +82,12 @@ public class PMLOperationSignature implements PMLStatementSerializable {
                 switch (requiredPrivilege) {
                     case RequiredPrivilegeOnParameter requiredPrivilegeOnParameter -> {
                         key = requiredPrivilegeOnParameter.param().getName();
-                        ars = requiredPrivilegeOnParameter.required();
+                        ars = requiredPrivilegeOnParameter.getRequired();
                     }
-                    case RequiredPrivilegeOnNodeId requiredPrivilegeOnNodeId -> {
-                        key = String.valueOf(requiredPrivilegeOnNodeId.nodeId());
-                        ars = requiredPrivilegeOnNodeId.required();
+                    case RequiredPrivilegeOnNode requiredPrivilegeOnNode -> {
+                        key = String.format("\"%s\"", requiredPrivilegeOnNode.getName());
+                        ars = requiredPrivilegeOnNode.getRequired();
                     }
-                    case RequiredPrivilegeOnNodeName requiredPrivilegeOnNodeName -> {
-                        key = String.format("%s", requiredPrivilegeOnNodeName.getName());
-                        ars = requiredPrivilegeOnNodeName.getRequired();
-                    }
-                    case null, default ->
-                        throw new IllegalStateException("unsupported RequiredPrivilege in PMLOperationSignature");
                 }
 
                 entries.add(String.format(
