@@ -61,10 +61,10 @@ adminop createProjectAdmin(string projectName) {
     create UA uaName in ["writer"]
     associate uaName and projectName with ["*"]
 
-    create prohibition "deny admin delete README"
-    deny UA uaName
-    access rights ["delete_readme"]
-    on union of {projectName: false}
+    create conj node prohibition "deny admin delete README"
+    deny uaName
+    arset ["delete_readme"]
+    include [projectName]
 }
 
 create obligation "create us project admin"

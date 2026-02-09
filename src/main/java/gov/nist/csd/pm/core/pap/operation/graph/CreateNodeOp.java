@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;
 
 public abstract class CreateNodeOp extends AdminOperation<Long> {
@@ -22,7 +23,7 @@ public abstract class CreateNodeOp extends AdminOperation<Long> {
             BasicTypes.LONG_TYPE,
             List.of(NAME_PARAM, CREATE_NODE_DESCENDANTS_PARAM),
             new RequiredCapability(
-                CREATE_NODE_DESCENDANTS_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)
+                new RequiredPrivilegeOnParameter(CREATE_NODE_DESCENDANTS_PARAM, AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)
             )
         );
     }

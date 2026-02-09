@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.pdp.modification;
 import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.PROPERTIES_PARAM;
-import static gov.nist.csd.pm.core.pdp.event.EventContextUtil.buildEventContext;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
@@ -117,7 +116,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
 
         // build event context before executing or else the node will not exist when the util
         // tries to convert the id to the name
-        EventContext eventContext = buildEventContext(pap, userCtx, op.getName(), args);
+        EventContext eventContext = new EventContext(pap, userCtx, op.getName(), args.toMap());
 
         executeOp(op, args, eventContext);
     }
@@ -174,7 +173,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 
-        eventPublisher.publishEvent(buildEventContext(pap, userCtx, op.getName(), args));
+        eventPublisher.publishEvent(new EventContext(pap, userCtx, op.getName(), args.toMap()));
 
         return ret;
     }

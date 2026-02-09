@@ -9,9 +9,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.graph.Association;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
@@ -23,7 +21,6 @@ import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
-import gov.nist.csd.pm.core.pap.serialization.json.JSONProhibition.JSONSubject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -85,24 +82,8 @@ public class JSONSerializer implements PolicySerializer {
         return jsonObligations.isEmpty() ? null : jsonObligations;
     }
 
-    private List<JSONProhibition> buildProhibitionsJSON(PolicyQuery policyQuery) throws PMException {
-        List<JSONProhibition> prohibitions = new ArrayList<>();
-        Collection<Prohibition> all = policyQuery.prohibitions().getProhibitions();
-        for (Prohibition prohibition : all) {
-            ProhibitionSubject subject = prohibition.getSubject();
-            Collection<ContainerCondition> containers = prohibition.getContainers();
-
-            JSONProhibition jsonProhibition = new JSONProhibition(
-                prohibition.getName(),
-                JSONSubject.fromProhibitionSubject(subject),
-                containers,
-                prohibition.getAccessRightSet().stream().toList(),
-                prohibition.isIntersection()
-            );
-
-            prohibitions.add(jsonProhibition);
-        }
-
+    private List<Prohibition> buildProhibitionsJSON(PolicyQuery policyQuery) throws PMException {
+        List<Prohibition> prohibitions = new ArrayList<>(policyQuery.prohibitions().getProhibitions());
         return prohibitions.isEmpty() ? null : prohibitions;
     }
 

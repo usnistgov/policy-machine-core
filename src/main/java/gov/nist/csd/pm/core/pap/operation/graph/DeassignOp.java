@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,8 @@ public class DeassignOp extends AdminOperation<Void> {
             BasicTypes.VOID_TYPE,
             List.of(DEASSIGN_ASCENDANT_PARAM, DEASSIGN_DESCENDANTS_PARAM),
             new RequiredCapability(
-                DEASSIGN_ASCENDANT_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_DELETE),
-                DEASSIGN_DESCENDANTS_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE)
+                new RequiredPrivilegeOnParameter(DEASSIGN_ASCENDANT_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_DELETE),
+                new RequiredPrivilegeOnParameter(DEASSIGN_DESCENDANTS_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE)
             )
         );
     }

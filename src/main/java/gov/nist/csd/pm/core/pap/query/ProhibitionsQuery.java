@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import java.util.Collection;
 
 /**
@@ -19,13 +18,20 @@ public interface ProhibitionsQuery {
     Collection<Prohibition> getProhibitions() throws PMException;
 
     /**
-     * Get prohibitions with the given subject.
-     *
-     * @param subject The subject to get the prohibitions for (user, user attribute, process)
-     * @return The prohibitions with the given subject.
+     * Get the node prohibitions for the given node.
+     * @param nodeId the ID of the node.
+     * @return the node prohibitions with the given node.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException;
+    Collection<Prohibition> getNodeProhibitions(long nodeId) throws PMException;
+
+    /**
+     * Get the process prohibitions for the given process.
+     * @param process the process.
+     * @return the process prohibitions with the given process.
+     * @throws PMException If any PM related exceptions occur in the implementing class.
+     */
+    Collection<Prohibition> getProcessProhibitions(String process) throws PMException;
 
     /**
      * Get the prohibition with the given name.

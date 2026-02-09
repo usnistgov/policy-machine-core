@@ -29,11 +29,13 @@ public enum AdminAccessRight {
     ADMIN_GRAPH_ASSOCIATION_LIST("admin:graph:association:list"),
 
     // prohibition
-    ADMIN_PROHIBITION_SUBJECT_CREATE("admin:prohibition:subject:create"),
+    ADMIN_PROHIBITION_NODE_CREATE("admin:prohibition:node:create"),
+    ADMIN_PROHIBITION_PROCESS_CREATE("admin:prohibition:process:create"),
     ADMIN_PROHIBITION_INCLUSION_CREATE("admin:prohibition:inclusion:create"),
     ADMIN_PROHIBITION_EXCLUSION_CREATE("admin:prohibition:exclusion:create"),
 
-    ADMIN_PROHIBITION_SUBJECT_DELETE("admin:prohibition:subject:delete"),
+    ADMIN_PROHIBITION_NODE_DELETE("admin:prohibition:node:delete"),
+    ADMIN_PROHIBITION_PROCESS_DELETE("admin:prohibition:process:delete"),
     ADMIN_PROHIBITION_INCLUSION_DELETE("admin:prohibition:inclusion:delete"),
     ADMIN_PROHIBITION_EXCLUSION_DELETE("admin:prohibition:exclusion:delete"),
 

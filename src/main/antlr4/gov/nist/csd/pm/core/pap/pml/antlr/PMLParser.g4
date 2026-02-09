@@ -91,10 +91,13 @@ responseBlock:
     OPEN_CURLY statement* CLOSE_CURLY ;
 
 createProhibitionStatement:
-    CREATE PROHIBITION name=expression
-    DENY (U | UA | PROCESS) subject=expression
-    ACCESS_RIGHTS accessRights=expression
-    ON (INTERSECTION|UNION) OF containers=expression ;
+    CREATE type=(CONJ | DISJ)
+    entity=(NODE | PROCESS) PROHIBITION name=expression
+    DENY node=expression (PROCESS process=expression)?
+    ARSET arset=expression
+    (INCLUDE inclusionSet=expression)?
+    (EXCLUDE exclusionSet=expression)?
+  ;
 
 setNodePropertiesStatement:
     SET_PROPERTIES OF name=expression TO properties=expression ;
@@ -143,10 +146,8 @@ routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=v
 functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
 reqCapList: reqCap+ ;
-reqCap: REQ_CAP OPEN_PAREN (arsetReqCap | funcReqCap) CLOSE_PAREN ;
-arsetReqCap: OPEN_CURLY (arsetEntry (COMMA arsetEntry)*)? CLOSE_CURLY ;
-arsetEntry: ID COLON stringArrayLit ;
-funcReqCap: OPEN_PAREN CLOSE_PAREN basicAndCheckStatementBlock ;
+reqCap: REQ_CAP OPEN_PAREN (OPEN_CURLY reqCapEntry (COMMA reqCapEntry)*? CLOSE_CURLY) CLOSE_PAREN ;
+reqCapEntry:(param=ID | node=stringLit) COLON arset=stringArrayLit ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
 operationFormalParam: NODE_ARG? variableType ID paramReqCap=stringArrayLit?;
@@ -250,6 +251,10 @@ idIndex:
     | IN
     | DO
     | ANY
+    | DISJ
+    | CONJ
+    | INCLUDE
+    | EXCLUDE
     | INTERSECTION
     | UNION
     | PROCESS
@@ -264,6 +269,7 @@ idIndex:
     | DISSOCIATE
     | DENY
     | PROHIBITION
+    | ARSET
     | OBLIGATION
     | USER
     | NODE
@@ -287,6 +293,7 @@ idIndex:
     | BOOL_TYPE
     | VOID_TYPE
     | ARRAY_TYPE
+    | INT64_TYPE
     | NIL_LIT
     | TRUE
     | FALSE

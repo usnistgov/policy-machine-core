@@ -151,7 +151,7 @@ public interface GraphQuery {
     Collection<Long> getPolicyClassDescendants(long nodeId) throws PMException;
 
     /**
-     * Return true if the ascendant is an ascendant of the descendant.
+     * Return true if the ascendant is an ascendant of the descendant. Nodes are ascendants of themselves.
      *
      * @param ascendantId  The ascendant.
      * @param descendantId The descendant.
@@ -161,7 +161,7 @@ public interface GraphQuery {
     boolean isAscendant(long ascendantId, long descendantId) throws PMException;
 
     /**
-     * Return true if the descendant is a descendant of the ascendant.
+     * Return true if the descendant is a descendant of the ascendant. Nodes are descendants of themselves.
      *
      * @param ascendantId  The ascendant.
      * @param descendantId The descendant.

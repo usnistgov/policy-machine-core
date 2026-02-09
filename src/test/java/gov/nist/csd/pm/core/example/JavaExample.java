@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -19,14 +17,15 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class JavaExample {
@@ -51,17 +50,19 @@ public class JavaExample {
         pap.modify().graph().associate(adminId, userInboxes, AccessRightSet.wildcard());
 
         // prohibit the admin user from reading inboxes
-        pap.modify().prohibitions().createProhibition(
+        pap.modify().prohibitions().createNodeProhibition(
             "deny admin on user inboxes",
-            new ProhibitionSubject(adminId),
+            adminId,
             new AccessRightSet("read"),
-            false,
-            List.of(new ContainerCondition(userInboxes, false))
+            Set.of(userInboxes),
+            Set.of(),
+            false
         );
 
         // create resource operation to read a file
         NodeNameFormalParameter nameFormalParameter = new NodeNameFormalParameter("name");
-        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter), List.of(new RequiredCapability(nameFormalParameter, new AccessRightSet("read")))) {
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter),
+            List.of(new RequiredCapability(new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
             @Override
             public Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
@@ -69,12 +70,16 @@ public class JavaExample {
         };
         pap.modify().operations().createOperation(resourceOp);
 
+        /*
+        (policyQuery, userCtx, args) -> policyQuery.access()
+                .computePrivileges(userCtx, new TargetContext(usersId))
+                .contains(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE.toString())))
+         */
+
         // create a custom administration operation
         FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
         AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam),
-            List.of(new RequiredCapabilityFunc((policyQuery, userCtx, args) -> policyQuery.access()
-                .computePrivileges(userCtx, new TargetContext(usersId))
-                .contains(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE.toString())))) {
+            List.of(new RequiredCapability(new RequiredPrivilegeOnNodeId(usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {

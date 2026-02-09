@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
@@ -27,8 +27,13 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     }
 
     @Override
-    public Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException {
-        return filterProhibitions(pap.query().prohibitions().getProhibitionsWithSubject(subject));
+    public Collection<Prohibition> getNodeProhibitions(long nodeId) throws PMException {
+        return filterProhibitions(pap.query().prohibitions().getNodeProhibitions(nodeId));
+    }
+
+    @Override
+    public Collection<Prohibition> getProcessProhibitions(String process) throws PMException {
+        return filterProhibitions(pap.query().prohibitions().getProcessProhibitions(process));
     }
 
     @Override
@@ -88,15 +93,20 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     }
 
     private void checkCanQueryProhibition(Prohibition prohibition) throws PMException {
-        if (prohibition.getSubject().isNode()) {
-            check(userCtx, new TargetContext(prohibition.getSubject().getNodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
-        } else {
-            check(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+        switch (prohibition) {
+            case NodeProhibition nodeProhibition ->
+                check(userCtx, new TargetContext(nodeProhibition.getNodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+            case ProcessProhibition processProhibition ->
+                check(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_PROHIBITIONS.nodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
 
-        // check user has access to each container condition
-        for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            check(userCtx, new TargetContext(containerCondition.getId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+        // check user has access to each attribute
+        for (long inc : prohibition.getInclusionSet()) {
+            check(userCtx, new TargetContext(inc), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+        }
+
+        for (long exc : prohibition.getExclusionSet()) {
+            check(userCtx, new TargetContext(exc), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
     }
 }

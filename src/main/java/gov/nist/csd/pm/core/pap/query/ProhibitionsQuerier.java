@@ -3,10 +3,7 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
@@ -22,26 +19,17 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 
     @Override
     public Collection<Prohibition> getProhibitions() throws PMException {
-        List<Prohibition> prohibitions = new ArrayList<>();
-
-        Map<Long, Collection<Prohibition>> nodeProhibitions = store.prohibitions().getNodeProhibitions();
-        nodeProhibitions.values().forEach(prohibitions::addAll);
-
-        Map<String, Collection<Prohibition>> processProhibitions = store.prohibitions().getProcessProhibitions();
-        processProhibitions.values().forEach(prohibitions::addAll);
-
-        return prohibitions;
+        return store.prohibitions().getAllProhibitions();
     }
 
     @Override
-    public Collection<Prohibition> getProhibitionsWithSubject(ProhibitionSubject subject) throws PMException {
-        if (subject.isNode()) {
-            Node node = store.graph().getNodeById(subject.getNodeId());
-            return store.prohibitions().getNodeProhibitions().getOrDefault(node.getId(), new ArrayList<>());
-        } else {
-            return store.prohibitions().getProcessProhibitions().getOrDefault(subject.getProcess(), new ArrayList<>());
-        }
+    public Collection<Prohibition> getNodeProhibitions(long nodeId) throws PMException {
+        return store.prohibitions().getNodeProhibitions(nodeId);
+    }
 
+    @Override
+    public Collection<Prohibition> getProcessProhibitions(String process) throws PMException {
+        return store.prohibitions().getProcessProhibitions(process);
     }
 
     @Override
@@ -63,11 +51,11 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
         List<Prohibition> pros = new ArrayList<>();
 
         new GraphStoreDFS(store.graph())
-                .withVisitor((n) -> {
-                    pros.addAll(getProhibitionsWithSubject(new ProhibitionSubject(n)));
-                })
-                .withDirection(Direction.DESCENDANTS)
-                .walk(subjectId);
+            .withVisitor((n) -> {
+                pros.addAll(getNodeProhibitions(n));
+            })
+            .withDirection(Direction.DESCENDANTS)
+            .walk(subjectId);
 
         return pros;
     }
@@ -78,10 +66,9 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 
         Collection<Prohibition> prohibitions = getProhibitions();
         for (Prohibition prohibition : prohibitions) {
-            for (ContainerCondition cc : prohibition.getContainers()) {
-                if (cc.getId() == (containerId)) {
-                    pros.add(prohibition);
-                }
+            if (prohibition.getInclusionSet().contains(containerId)
+                || prohibition.getExclusionSet().contains(containerId)) {
+                pros.add(prohibition);
             }
         }
 

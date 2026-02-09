@@ -20,12 +20,11 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.common.exception.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -411,12 +410,13 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua2", ids("pc1"));
             pap.modify().graph().createUser("u1", ids("ua2"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
-            pap.modify().prohibitions().createProhibition(
-                    "pro1", 
-                    new ProhibitionSubject(id("ua1")),
-                    new AccessRightSet(), 
-                    true,
-                    List.of(new ContainerCondition(id("oa1"), true))
+            pap.modify().prohibitions().createNodeProhibition(
+                    "pro1",
+                    id("ua1"),
+                    new AccessRightSet(),
+                    Set.of(),
+                    Set.of(id("oa1")),
+                    true
             );
 
             assertThrows(NodeReferencedInProhibitionException.class,

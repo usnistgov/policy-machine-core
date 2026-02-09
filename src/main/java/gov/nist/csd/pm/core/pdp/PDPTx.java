@@ -28,7 +28,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
-import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
 import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
@@ -161,11 +160,11 @@ public class PDPTx implements OperationExecutor {
 
             // if the operation is an Admin or Resource operation publish the event for EPPs
             if (operation instanceof AdminOperation<?> || operation instanceof ResourceOperation<?>) {
-                eventPublisher.publishEvent(EventContextUtil.buildEventContext(
+                eventPublisher.publishEvent(new EventContext(
                     pap,
                     userCtx,
                     operation.getName(),
-                    args
+                    args.toMap()
                 ));
             }
 

@@ -32,10 +32,10 @@ public class PMLExample {
         associate "admin" and "user inboxes" with ["*"]
         
         // prohibit the admin user from reading inboxes
-        create prohibition "deny admin on user inboxes"
-        deny u "admin"
-        access rights ["read"]
-        on union of {"user inboxes": false}
+        create conj node prohibition "deny admin on user inboxes"
+        deny "admin"
+        arset ["read"]
+        include ["user inboxes"]
         
         // create resource operation to read a file
         @reqcap({name: ["read"]})

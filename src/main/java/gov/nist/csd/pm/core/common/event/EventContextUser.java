@@ -1,31 +1,9 @@
 package gov.nist.csd.pm.core.common.event;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 public class EventContextUser {
-
-    public static EventContextUser fromUserContext(UserContext userCtx, PAP pap) throws PMException {
-        if (userCtx.isUserDefined()) {
-            Node node = pap.query().graph().getNodeById(userCtx.getUser());
-            return new EventContextUser(node.getName(), userCtx.getProcess());
-        } else {
-            Collection<Long> attributeIds = userCtx.getAttributeIds();
-            List<String> attributeNames = new ArrayList<>();
-            for (Long attributeId : attributeIds) {
-                Node node = pap.query().graph().getNodeById(attributeId);
-                attributeNames.add(node.getName());
-            }
-
-            return new EventContextUser(attributeNames, userCtx.getProcess());
-        }
-    }
 
     private final String name;
     private final List<String> attrs;

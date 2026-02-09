@@ -2,131 +2,168 @@ package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.CONTAINERS_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.INTERSECTION_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.SUBJECT_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.CreateProcessProhibitionOp.PROCESS_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.CreateProcessProhibitionOp.USER_ID_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.EXCLUSION_SET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.INCLUSION_SET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.IS_CONJUNCTIVE_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.NODE_ID_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.graph.node.NodeType;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubjectType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidator;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateNodeProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProcessProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class CreateProhibitionStatement extends OperationStatement {
 
-    private final Expression<String> name;
-    private final Expression<String> subject;
-    private final ProhibitionSubjectType subjectType;
-    private final Expression<List<String>> accessRights;
-    private final boolean isIntersection;
-    private final Expression<Map<String, Boolean>> containers;
+    public static CreateProhibitionStatement nodeProhibition(Expression<String> name,
+                                                             Expression<String> nodeName,
+                                                             Expression<List<String>> accessRights,
+                                                             Expression<List<String>> inclusionSet,
+                                                             Expression<List<String>> exclusionSet,
+                                                             boolean isConjunctive) {
+        return new CreateProhibitionStatement(new CreateNodeProhibitionOp(), name, nodeName, null,
+            accessRights, inclusionSet, exclusionSet, isConjunctive);
+    }
 
-    public CreateProhibitionStatement(Expression<String> name, Expression<String> subject, ProhibitionSubjectType subjectType,
-                                      Expression<List<String>> accessRights, boolean isIntersection, Expression<Map<String, Boolean>> containers) {
-        super(new CreateProhibitionOp());
-        this.name = name;
-        this.subject = subject;
-        this.subjectType = subjectType;
-        this.accessRights = accessRights;
-        this.isIntersection = isIntersection;
-        this.containers = containers;
+    public static CreateProhibitionStatement processProhibition(Expression<String> name,
+                                                                Expression<String> nodeName,
+                                                                Expression<String> process,
+                                                                Expression<List<String>> accessRights,
+                                                                Expression<List<String>> inclusionSet,
+                                                                Expression<List<String>> exclusionSet,
+                                                                boolean isConjunctive) {
+        return new CreateProhibitionStatement(new CreateProcessProhibitionOp(), name, nodeName, process,
+            accessRights, inclusionSet, exclusionSet, isConjunctive);
+    }
+
+    private final Expression<String> nameExpr;
+    private final Expression<String> nodeExpr;
+    private final Expression<String> processExpr;
+    private final Expression<List<String>> accessRightsExpr;
+    private final Expression<List<String>> inclusionSetExpr;
+    private final Expression<List<String>> exclusionSetExpr;
+    private final boolean isConjunctive;
+
+    private CreateProhibitionStatement(Operation<?> op,
+                                       Expression<String> nameExpr,
+                                       Expression<String> nodeExpr,
+                                       Expression<String> processExpr,
+                                       Expression<List<String>> accessRightsExpr,
+                                       Expression<List<String>> inclusionSetExpr,
+                                       Expression<List<String>> exclusionSetExpr,
+                                       boolean isConjunctive) {
+        super(op);
+        this.nameExpr = nameExpr;
+        this.nodeExpr = nodeExpr;
+        this.processExpr = processExpr;
+        this.accessRightsExpr = accessRightsExpr;
+        this.inclusionSetExpr = inclusionSetExpr;
+        this.exclusionSetExpr = exclusionSetExpr;
+        this.isConjunctive = isConjunctive;
     }
 
     @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
-        String name = this.name.execute(ctx, pap);
-        String subject = this.subject.execute(ctx, pap);
-        AccessRightSet arset = new AccessRightSet(this.accessRights.execute(ctx, pap));
+        boolean isNodeProhibition = processExpr == null;
 
+        String name = this.nameExpr.execute(ctx, pap);
+        String nodeName = this.nodeExpr.execute(ctx, pap);
+        long nodeId = pap.query().graph().getNodeId(nodeName);
+        AccessRightSet arset = new AccessRightSet(this.accessRightsExpr.execute(ctx, pap));
         AccessRightValidator.validateAccessRights(pap.query().operations().getResourceAccessRights(), arset);
 
-        ProhibitionSubject prohibitionSubject;
-        if (subjectType == ProhibitionSubjectType.PROCESS) {
-            prohibitionSubject = new ProhibitionSubject(subject);
-        } else {
-            long subjectId = pap.query().graph().getNodeId(subject);
-            prohibitionSubject = new ProhibitionSubject(subjectId);
+        List<String> inclusionSetNames = inclusionSetExpr.execute(ctx, pap);
+        List<Long> inclusionIds = new ArrayList<>();
+        for (String incName : inclusionSetNames) {
+            inclusionIds.add(pap.query().graph().getNodeId(incName));
         }
 
-        List<ContainerCondition> containerConditions = new ArrayList<>();
-        for (var container : containers.execute(ctx, pap).entrySet()) {
-            long containerId = pap.query().graph().getNodeId(container.getKey());
-
-            containerConditions.add(new ContainerCondition(containerId, container.getValue()));
+        List<String> exclusionSetNames = exclusionSetExpr.execute(ctx, pap);
+        List<Long> exclusionIds = new ArrayList<>();
+        for (String excName : exclusionSetNames) {
+            exclusionIds.add(pap.query().graph().getNodeId(excName));
         }
 
-        return new Args()
+        Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(SUBJECT_PARAM, prohibitionSubject)
             .put(ARSET_PARAM, new ArrayList<>(arset))
-            .put(INTERSECTION_PARAM, isIntersection)
-            .put(CONTAINERS_PARAM, new ArrayList<>(containerConditions));
+            .put(INCLUSION_SET_PARAM, inclusionIds)
+            .put(EXCLUSION_SET_PARAM, exclusionIds)
+            .put(IS_CONJUNCTIVE_PARAM, isConjunctive);
+
+        if (isNodeProhibition) {
+            args.put(NODE_ID_PARAM, nodeId);
+        } else {
+            String process = processExpr.execute(ctx, pap);
+            args.put(USER_ID_PARAM, nodeId)
+                .put(PROCESS_PARAM, process);
+        }
+
+        return args;
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        String subjectStr = getSubjectStr();
+        boolean isNodeProhibition = processExpr == null;
+
+        String conjType = isConjunctive ? "conj" : "disj";
+        String entityType = isNodeProhibition ? "node" : "process";
         String indent = indent(indentLevel);
-        return String.format(
-            """
-            %screate prohibition %s
-            %s  deny %s %s
-            %s  access rights %s
-            %s  on %s of %s""",
-            indent, name,
-            indent, subjectStr, subject,
-            indent, accessRights,
-            indent, (isIntersection ? "intersection" : "union"), containers
-        );
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%screate %s %s prohibition %s\n",
+            indent, conjType, entityType, nameExpr.toFormattedString(0)));
+        sb.append(String.format("%sdeny %s",
+            indent, nodeExpr.toFormattedString(0)));
+        if (!isNodeProhibition) {
+            sb.append(String.format(" process %s", processExpr.toFormattedString(0)));
+        }
+        sb.append("\n");
+        sb.append(String.format("%sarset %s\n",
+            indent, accessRightsExpr.toFormattedString(0)));
+        sb.append(String.format("%sinclude %s\n",
+            indent, inclusionSetExpr.toFormattedString(0)));
+        sb.append(String.format("%sexclude %s",
+            indent, exclusionSetExpr.toFormattedString(0)));
+
+        return sb.toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof CreateProhibitionStatement that))
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        return isIntersection == that.isIntersection && Objects.equals(name, that.name)
-            && Objects.equals(subject, that.subject) && subjectType == that.subjectType
-            && Objects.equals(accessRights, that.accessRights) && Objects.equals(containers,
-            that.containers);
+        }
+        CreateProhibitionStatement that = (CreateProhibitionStatement) o;
+        return isConjunctive == that.isConjunctive && Objects.equals(nameExpr, that.nameExpr)
+            && Objects.equals(nodeExpr, that.nodeExpr) && Objects.equals(processExpr, that.processExpr)
+            && Objects.equals(accessRightsExpr, that.accessRightsExpr) && Objects.equals(
+            inclusionSetExpr, that.inclusionSetExpr) && Objects.equals(exclusionSetExpr, that.exclusionSetExpr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, subject, subjectType, accessRights, isIntersection, containers);
-    }
-
-    private String getSubjectStr() {
-        String subjectStr = "";
-        switch (subjectType) {
-            case USER_ATTRIBUTE -> subjectStr = "UA";
-            case USER -> subjectStr = "U";
-            case PROCESS -> subjectStr = "process";
-        }
-
-        return subjectStr;
+        return Objects.hash(nameExpr, nodeExpr, processExpr, accessRightsExpr, inclusionSetExpr, exclusionSetExpr,
+            isConjunctive);
     }
 
     public static CreateProhibitionStatement fromProhibition(PolicyQuery policyQuery, Prohibition prohibition) throws PMException {
@@ -137,38 +174,44 @@ public class CreateProhibitionStatement extends OperationStatement {
 
         ArrayLiteralExpression<String> arList = ArrayLiteralExpression.of(accessRightsList, STRING_TYPE);
 
-        Map<Expression<String>, Expression<Boolean>> containersMap = new HashMap<>();
-        for (ContainerCondition cc : prohibition.getContainers()) {
-            String contName = policyQuery.graph().getNodeById(cc.getId()).getName();
-            StringLiteralExpression s = new StringLiteralExpression(contName);
-            containersMap.put(s, new BoolLiteralExpression(cc.isComplement()));
+        List<Expression<String>> inclusionSet = new ArrayList<>();
+        for (long inc : prohibition.getInclusionSet()) {
+            String incName = policyQuery.graph().getNodeById(inc).getName();
+            StringLiteralExpression s = new StringLiteralExpression(incName);
+            inclusionSet.add(s);
         }
 
-        MapLiteralExpression<String, Boolean> containers = MapLiteralExpression.of(containersMap, STRING_TYPE, BOOLEAN_TYPE);
+        List<Expression<String>> exclusionSet = new ArrayList<>();
+        for (long exc : prohibition.getExclusionSet()) {
+            String excName = policyQuery.graph().getNodeById(exc).getName();
+            StringLiteralExpression s = new StringLiteralExpression(excName);
+            exclusionSet.add(s);
+        }
 
-        ProhibitionSubjectType type;
-        StringLiteralExpression subjectName;
-        if (prohibition.getSubject().isNode()) {
-            Node subjectNode = policyQuery.graph().getNodeById(prohibition.getSubject().getNodeId());
-            subjectName = new StringLiteralExpression(subjectNode.getName());
-
-            if (subjectNode.getType() == NodeType.UA) {
-                type = ProhibitionSubjectType.USER_ATTRIBUTE;
-            } else {
-                type = ProhibitionSubjectType.USER;
+        ProhibitionOp op;
+        Expression<String> nodeName;
+        Expression<String> process = null;
+        switch (prohibition) {
+            case NodeProhibition nodeProhibition ->{
+                op = new CreateNodeProhibitionOp();
+                nodeName = new StringLiteralExpression(policyQuery.graph().getNodeById(nodeProhibition.getNodeId()).getName());
             }
-        } else {
-            subjectName = new StringLiteralExpression(prohibition.getSubject().getProcess());
-            type = ProhibitionSubjectType.PROCESS;
-        }
+            case ProcessProhibition processProhibition -> {
+                op = new CreateProcessProhibitionOp();
+                nodeName = new StringLiteralExpression(policyQuery.graph().getNodeById(processProhibition.getUserId()).getName());
+                process = new StringLiteralExpression(processProhibition.getProcess());
+            }
+        };
 
         return new CreateProhibitionStatement(
+            op,
             new StringLiteralExpression(prohibition.getName()),
-            subjectName,
-            type,
+            nodeName,
+            process,
             arList,
-            prohibition.isIntersection(),
-            containers
+            ArrayLiteralExpression.of(inclusionSet, STRING_TYPE),
+            ArrayLiteralExpression.of(exclusionSet, STRING_TYPE),
+            prohibition.isConjunctive()
         );
     }
 }

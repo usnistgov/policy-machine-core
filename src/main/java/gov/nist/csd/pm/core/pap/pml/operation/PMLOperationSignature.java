@@ -7,11 +7,14 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeName;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -71,22 +74,39 @@ public class PMLOperationSignature implements PMLStatementSerializable {
     private String serializeReqCap(int indentLevel) {
         List<String> reqCapStrs = new ArrayList<>();
         for (RequiredCapability reqCap : getReqCaps()) {
-            if (reqCap instanceof PMLRequiredCapabilityFunc pmlRequiredCapabilityFunc) {
-                String s = "@reqcap(() " + pmlRequiredCapabilityFunc.getStmts().toFormattedString(indentLevel) + ")";
-                reqCapStrs.add(s);
-            } else {
-                Map<NodeFormalParameter<?>, AccessRightSet> reqCapMap = reqCap.getCapabilityMap();
-                List<String> entries = new ArrayList<>();
-                for (Map.Entry<NodeFormalParameter<?>, AccessRightSet> e : reqCapMap.entrySet()) {
-                    String name = e.getKey().getName();
-                    AccessRightSet arset = e.getValue();
-                    String ars = arset.stream().map(ar -> "\"" + ar + "\"")
-                        .collect(Collectors.joining(", "));
+            List<RequiredPrivilege> requiredPrivileges = reqCap.getRequiredPrivileges();
+            List<String> entries = new ArrayList<>();
+            for (RequiredPrivilege requiredPrivilege : requiredPrivileges) {
+                String key;
+                AccessRightSet ars;
 
-                    entries.add(String.format("%s: [%s]", name, ars));
+                switch (requiredPrivilege) {
+                    case RequiredPrivilegeOnParameter requiredPrivilegeOnParameter -> {
+                        key = requiredPrivilegeOnParameter.param().getName();
+                        ars = requiredPrivilegeOnParameter.required();
+                    }
+                    case RequiredPrivilegeOnNodeId requiredPrivilegeOnNodeId -> {
+                        key = String.valueOf(requiredPrivilegeOnNodeId.nodeId());
+                        ars = requiredPrivilegeOnNodeId.required();
+                    }
+                    case RequiredPrivilegeOnNodeName requiredPrivilegeOnNodeName -> {
+                        key = String.format("%s", requiredPrivilegeOnNodeName.getName());
+                        ars = requiredPrivilegeOnNodeName.getRequired();
+                    }
+                    case null, default ->
+                        throw new IllegalStateException("unsupported RequiredPrivilege in PMLOperationSignature");
                 }
-                reqCapStrs.add(String.format("@reqcap({%s})", String.join(", ", entries)));
+
+                entries.add(String.format(
+                    "%s: [%s]",
+                    key,
+                    ars.stream()
+                        .map(s -> "\"" + s + "\"")
+                        .collect(Collectors.joining(", "))
+                ));
             }
+
+            reqCapStrs.add(String.format("@reqcap({%s})", String.join(", ", entries)));
         }
 
         if (reqCapStrs.isEmpty()) {

@@ -315,6 +315,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
 
         long o1 = id("o1");
+        assertTrue(pap.query().graph().isAscendant(o1, o1));
         assertTrue(pap.query().graph().isAscendant(o1, id("oa1")));
         assertTrue(pap.query().graph().isAscendant(o1, id("oa2")));
         assertTrue(pap.query().graph().isAscendant(o1, id("oa3")));
@@ -344,6 +345,7 @@ public abstract class GraphQuerierTest extends PAPTestInitializer {
         pap.executePML(new TestUserContext("u1"), pml);
 
         long o1 = id("o1");
+        assertTrue(pap.query().graph().isDescendant(o1, o1));
         assertTrue(pap.query().graph().isDescendant(o1, id("oa1")));
         assertTrue(pap.query().graph().isDescendant(o1, id("oa2")));
         assertTrue(pap.query().graph().isDescendant(o1, id("oa3")));

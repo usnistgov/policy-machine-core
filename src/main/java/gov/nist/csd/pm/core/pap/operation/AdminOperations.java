@@ -17,7 +17,8 @@ import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.DeleteOperationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.SetResourceAccessRights;
-import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateNodeProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProcessProhibitionOp;
 import gov.nist.csd.pm.core.pap.operation.prohibition.DeleteProhibitionOp;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +49,8 @@ public class AdminOperations {
         new CreateOperationOp(),
         new DeleteOperationOp(),
 
-        new CreateProhibitionOp(),
+        new CreateNodeProhibitionOp(),
+        new CreateProcessProhibitionOp(),
         new DeleteProhibitionOp()
     );
 

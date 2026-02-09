@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;
 
 public class AssignOp extends AdminOperation<Void> {
@@ -24,8 +25,12 @@ public class AssignOp extends AdminOperation<Void> {
             VOID_TYPE,
             List.of(ASSIGN_ASCENDANT_PARAM, ASSIGN_DESCENDANTS_PARAM),
             new RequiredCapability(
-                ASSIGN_ASCENDANT_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE),
-                ASSIGN_DESCENDANTS_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)
+                new RequiredPrivilegeOnParameter(
+                    ASSIGN_ASCENDANT_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE
+                ),
+                new RequiredPrivilegeOnParameter(
+                    ASSIGN_DESCENDANTS_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE
+                )
             )
         );
     }

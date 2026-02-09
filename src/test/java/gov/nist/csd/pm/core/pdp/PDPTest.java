@@ -15,8 +15,6 @@ import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -37,6 +35,7 @@ import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class PDPTest {
@@ -112,10 +111,9 @@ class PDPTest {
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         pap.modify().graph().createObject("o1", List.of(oa1));
 
-        pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(u1),
+        pap.modify().prohibitions().createNodeProhibition("pro1", u1,
                 new AccessRightSet("read"),
-                true,
-                Collections.singleton(new ContainerCondition(id("oa1"), false)));
+                Set.of(id("oa1")), Set.of(), true);
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
             pdp.bootstrap(new PolicyBootstrapper() {

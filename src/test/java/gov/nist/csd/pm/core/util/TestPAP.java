@@ -22,44 +22,12 @@ public class TestPAP extends MemoryPAP {
 		checkOrThrow(userCtx, targetCtx, computed, rightsToCheck);
 	}
 
-	public void check(UserContext userCtx, TargetContext targetCtx, String... rightsToCheck) throws PMException {
-		AccessRightSet computed = query().access().computePrivileges(userCtx, targetCtx);
-		checkOrThrow(userCtx, targetCtx, computed, List.of(rightsToCheck));
-	}
-
 	public void check(UserContext userCtx, long targetId, Collection<String> rightsToCheck) throws PMException {
 		check(userCtx, new TargetContext(targetId), rightsToCheck);
 	}
 
-	public void check(UserContext userCtx, long targetId, String... rightsToCheck) throws PMException {
-		check(userCtx, targetId, Arrays.asList(rightsToCheck));
-	}
-
-	public void check(UserContext userCtx, UserContext targetUserCtx, Collection<String> rightsToCheck) throws PMException {
-		check(userCtx, new TargetContext(targetUserCtx), rightsToCheck);
-	}
-
-	public void check(UserContext userCtx, UserContext targetUserCtx, String... rightsToCheck) throws PMException {
-		check(userCtx, new TargetContext(targetUserCtx), List.of(rightsToCheck));
-	}
-
-	public void check(UserContext userCtx, UserContext targetUserCtx, AdminAccessRight accessRight) throws PMException {
-		check(userCtx, new TargetContext(targetUserCtx), List.of(accessRight.toString()));
-	}
-
-	public void check(UserContext userCtx, TargetContext targetCtx, AdminAccessRight accessRight) throws PMException {
-		check(userCtx, targetCtx, List.of(accessRight.toString()));
-	}
-
 	public void check(UserContext userCtx, long target, AdminAccessRight accessRight) throws PMException {
 		check(userCtx, new TargetContext(target), List.of(accessRight.toString()));
-	}
-
-	public void check(UserContext userCtx, List<Long> targetIds, String... rightsToCheck) throws PMException {
-		List<String> rightsList = Arrays.asList(rightsToCheck);
-		for (long targetId : targetIds) {
-			check(userCtx, targetId, rightsList);
-		}
 	}
 
 	private void checkOrThrow(UserContext userCtx, TargetContext targetCtx, AccessRightSet computed,

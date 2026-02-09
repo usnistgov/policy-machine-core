@@ -8,15 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +30,7 @@ class CachedTargetEvaluatorTest {
     void setUp() throws PMException {
         String pml = """
             set resource access rights ["read", "write"]
-            
+
             create pc "pc1"
             create pc "pc2"
             create ua "ua1" in ["pc1"]
@@ -42,12 +40,12 @@ class CachedTargetEvaluatorTest {
             create o "o1" in ["oa1"]
             create o "o2" in ["oa2"]
             create o "o3" in ["oa3"]
-            
+
             assign "oa2" to ["oa1"]
             assign "o2" to ["oa1"]
-            
+
             create u "u1" in ["ua1"]
-            
+
             associate "ua1" and "oa1" with ["read", "write"]
             associate "ua1" and "oa2" with ["read"]
             associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:descendant:create"]
@@ -62,12 +60,13 @@ class CachedTargetEvaluatorTest {
                 AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("assign_to")
             ),
             Set.of(
-                new Prohibition(
+                new NodeProhibition(
                     "p1",
-                    new ProhibitionSubject(id("u1")),
+                    id("u1"),
                     new AccessRightSet("write"),
-                    false,
-                    List.of(new ContainerCondition(id("oa2"), false))
+                    Set.of(id("oa2")),
+                    Set.of(),
+                    false
                 )
             )
         );
@@ -122,14 +121,14 @@ class CachedTargetEvaluatorTest {
         TargetEvaluator regularEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult regularResult1 = regularEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         TargetDagResult regularResult2 = regularEvaluator.evaluate(alternateUserDagResult, new TargetContext(id("o1")));
-        
+
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
-        
+
         TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
-        
+
         TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         assertEquals(result1.pcMap(), result2.pcMap());
-        
+
         TargetDagResult result3 = cachedEvaluator.evaluate(alternateUserDagResult, new TargetContext(id("o1")));
         assertEquals(regularResult1.pcMap(), result1.pcMap());
         assertEquals(regularResult2.pcMap(), result3.pcMap());
@@ -163,12 +162,12 @@ class CachedTargetEvaluatorTest {
     @Test
     void testCacheDoesNotAffectProhibitionResolution() throws PMException {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
-        
+
         TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o2")));
         // evaluating a new target should reset the prohibition evaluation state
         TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
         TargetDagResult result3 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o2")));
-        
+
         assertEquals(result1, result3);
         assertNotEquals(result1, result2);
     }
@@ -177,9 +176,9 @@ class CachedTargetEvaluatorTest {
     void testEmptyUserDagResult() throws PMException {
         UserDagResult emptyUserDagResult = new UserDagResult(Map.of(), Set.of());
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
-        
+
         TargetDagResult result = cachedEvaluator.evaluate(emptyUserDagResult, new TargetContext(id("o1")));
-        
+
         assertNotNull(result);
         assertTrue(result.pcMap().isEmpty() || result.pcMap().values().stream().allMatch(AccessRightSet::isEmpty));
     }
@@ -204,7 +203,7 @@ class CachedTargetEvaluatorTest {
 
         TargetDagResult cachedResultWithAccess = cachedEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
         TargetDagResult regularResultWithAccess = regularEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
-        
+
         TargetDagResult cachedResultNoAccess = cachedEvaluator.evaluate(userWithNoAccess, new TargetContext(id("o1")));
         TargetDagResult regularResultNoAccess = regularEvaluator.evaluate(userWithNoAccess, new TargetContext(id("o1")));
 

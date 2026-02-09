@@ -5,8 +5,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
 import java.util.List;
 
 public abstract non-sealed class AdminOperation<R> extends Operation<R> {
@@ -31,9 +30,6 @@ public abstract non-sealed class AdminOperation<R> extends Operation<R> {
                           List<FormalParameter<?>> parameters,
                           AdminPolicyNode target,
                           AdminAccessRight ar) {
-        super(name, returnType, parameters, new RequiredCapabilityFunc((policyQuery, userCtx, args) -> policyQuery.access()
-            .computePrivileges(userCtx, new TargetContext(target.nodeId()))
-            .contains(ar.toString())
-        ));
+        super(name, returnType, parameters, new RequiredCapability(new RequiredPrivilegeOnNodeId(target.nodeId(), ar)));
     }
 }

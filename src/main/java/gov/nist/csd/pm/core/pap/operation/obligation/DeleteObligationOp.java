@@ -8,8 +8,6 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import java.util.List;
 
 public class DeleteObligationOp extends AdminOperation<Void> {

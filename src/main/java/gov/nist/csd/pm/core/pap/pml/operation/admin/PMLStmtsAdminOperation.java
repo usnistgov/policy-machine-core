@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +37,16 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
         Object result = ctx.executeOperationStatements(this.body.getStmts(), args);
 
         return getReturnType().cast(result);
+    }
+
+    @Override
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        /*
+        make reqcap PMLReqCap
+        all i need to do is resolve the names
+
+
+         */
     }
 
     @Override

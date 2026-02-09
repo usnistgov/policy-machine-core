@@ -14,8 +14,6 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.EventPatternType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ObligationResponseType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import java.util.List;
 
 public class CreateObligationOp extends AdminOperation<Void> {

@@ -2,64 +2,31 @@ package gov.nist.csd.pm.core.pap.operation.reqcap;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
-import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * RequiredCapability maps an operation formal parameter to the access rights required to satisfy this capability.
  */
 public class RequiredCapability implements Serializable {
 
-    private final Map<NodeFormalParameter<?>, AccessRightSet> reqCap;
+    private final List<RequiredPrivilege> requiredPrivileges;
 
-    public RequiredCapability() {
-        reqCap = new HashMap<>();
+    public RequiredCapability(List<RequiredPrivilege> requiredPrivileges) {
+        this.requiredPrivileges = requiredPrivileges;
     }
 
-    public RequiredCapability(Map<NodeFormalParameter<?>, AccessRightSet> reqCap) {
-        this.reqCap = reqCap;
+    public RequiredCapability(RequiredPrivilege requiredPrivilege, RequiredPrivilege ... requiredPrivileges) {
+        this.requiredPrivileges = new ArrayList<>();
+        this.requiredPrivileges.add(requiredPrivilege);
+        this.requiredPrivileges.addAll(List.of(requiredPrivileges));
     }
 
-    public RequiredCapability(NodeFormalParameter<?> param, AccessRightSet arset) {
-        this.reqCap = new HashMap<>();
-
-        this.reqCap.put(param, arset);
-    }
-
-    public RequiredCapability(NodeFormalParameter<?> param1, AccessRightSet arset1,
-                              NodeFormalParameter<?> param2, AccessRightSet arset2) {
-        this.reqCap = new HashMap<>();
-
-        this.reqCap.put(param1, arset1);
-        this.reqCap.put(param2, arset2);
-    }
-
-    public RequiredCapability(NodeFormalParameter<?> param1, AccessRightSet arset1,
-                              NodeFormalParameter<?> param2, AccessRightSet arset2,
-                              NodeFormalParameter<?> param3, AccessRightSet arset3) {
-        this.reqCap = new HashMap<>();
-
-        this.reqCap.put(param1, arset1);
-        this.reqCap.put(param2, arset2);
-        this.reqCap.put(param3, arset3);
-    }
-
-    public Map<NodeFormalParameter<?>, AccessRightSet> getCapabilityMap() {
-        return reqCap;
+    public List<RequiredPrivilege> getRequiredPrivileges() {
+        return requiredPrivileges;
     }
 
     /**
@@ -71,51 +38,16 @@ public class RequiredCapability implements Serializable {
      * @throws PMException if there is an error checking if the user has the required privileges.
      */
     public boolean isSatisfied(PAP pap, UserContext userCtx, Args args) throws PMException {
-        if (reqCap.isEmpty()) {
-            return false;
+        if (requiredPrivileges.isEmpty()) {
+            return true;
         }
 
-        for (Entry<? extends NodeFormalParameter<?>, AccessRightSet> entry : reqCap.entrySet()) {
-            if (!hasRequiredPrivilegesForParam(pap, userCtx, args, entry.getKey(), entry.getValue())) {
+        for (RequiredPrivilege requiredPrivilege : requiredPrivileges) {
+            if (!requiredPrivilege.isSatisfied(pap, userCtx, args)) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    private boolean hasRequiredPrivilegesForParam(PAP pap, UserContext userCtx, Args args,
-                                                  NodeFormalParameter<?> formalParameter,
-                                                  AccessRightSet required) throws PMException {
-        List<Long> nodeIds = resolveNodeIds(pap.query().graph(), args, formalParameter);
-        for (long id : nodeIds) {
-            if (!hasRequiredPrivileges(pap, userCtx, id, required)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private List<Long> resolveNodeIds(GraphQuery graph, Args args,
-                                      NodeFormalParameter<?> formalParameter) throws PMException {
-        return switch (formalParameter) {
-            case NodeIdFormalParameter p -> List.of(args.get(p));
-            case NodeIdListFormalParameter p -> args.get(p);
-            case NodeNameFormalParameter p -> List.of(graph.getNodeId(args.get(p)));
-            case NodeNameListFormalParameter p -> {
-                List<Long> ids = new ArrayList<>();
-                for (String name : args.get(p)) {
-                    ids.add(graph.getNodeId(name));
-                }
-                yield ids;
-            }
-        };
-    }
-
-    private boolean hasRequiredPrivileges(PAP pap, UserContext userCtx, long id, AccessRightSet required) throws PMException {
-        TargetContext targetCtx = new TargetContext(id);
-        AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-        return privs.containsAll(required);
     }
 }

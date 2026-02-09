@@ -85,7 +85,7 @@
                         "type": "string"
                     }
                 },
-                "basic": {
+                "function": {
                     "type": "array",
                     "items": {
                         "type": "string"

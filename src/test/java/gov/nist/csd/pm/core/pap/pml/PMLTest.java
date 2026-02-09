@@ -18,9 +18,10 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -46,20 +47,21 @@ public class PMLTest {
                 create u "u2" in ["ua1"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
-                create prohibition "pro1"
-                deny U "u2"
-                access rights ["admin:graph:assignment:ascendant:create"]
-                on union of {PM_ADMIN_BASE_OA: false}
+                create conj node prohibition "pro1"
+                deny "u2"
+                arset ["admin:graph:assignment:ascendant:create"]
+                include [PM_ADMIN_BASE_OA]
                 """);
 
         AdminOperation<?> op1 = new AdminOperation<>(
             "op1",
             VOID_TYPE,
             List.of(ARGA, ARGB, ARGC),
-            new RequiredCapabilityFunc((policyQuery, userCtx, args) ->
-                policyQuery.access()
-                    .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
-                    .contains("admin:graph:assignment:ascendant:create")
+            new RequiredCapability(
+                new RequiredPrivilegeOnNodeId(
+                    AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(),
+                    new AccessRightSet("admin:graph:assignment:ascendant:create")
+                )
             )
         ) {
             @Override
@@ -137,10 +139,10 @@ public class PMLTest {
                 create u "u2" in ["ua1"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
-                create prohibition "pro1"
-                deny U "u2"
-                access rights ["admin:graph:assignment:ascendant:create"]
-                on union of {PM_ADMIN_BASE_OA: false}
+                create conj node prohibition "pro1"
+                deny "u2"
+                arset ["admin:graph:assignment:ascendant:create"]
+                include [PM_ADMIN_BASE_OA]
                 
                 adminop op1(string a, []string b, map[string]string c) {
                     check ["admin:graph:assignment:ascendant:create"] on [PM_ADMIN_BASE_OA]

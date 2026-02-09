@@ -4,24 +4,25 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Object representing a Prohibition.
  */
-public class Prohibition implements Serializable {
+public abstract sealed class Prohibition implements Serializable permits ProcessProhibition, NodeProhibition {
 
     private String name;
-    private ProhibitionSubject subject;
     private AccessRightSet accessRightSet;
-    private boolean      intersection;
-    private Collection<ContainerCondition> containers;
+    private Set<Long> inclusionSet;
+    private Set<Long> exclusionSet;
+    private boolean isConjunctive;
 
-    public Prohibition(String name, ProhibitionSubject subject, AccessRightSet accessRightSet, boolean intersection, Collection<ContainerCondition> containers) {
+    public Prohibition(String name, AccessRightSet accessRightSet, Set<Long> inclusionSet, Set<Long> exclusionSet, boolean isConjunctive) {
         this.name = name;
-        this.subject = subject;
         this.accessRightSet = accessRightSet;
-        this.intersection = intersection;
-        this.containers = containers;
+        this.inclusionSet = inclusionSet;
+        this.exclusionSet = exclusionSet;
+        this.isConjunctive = isConjunctive;
     }
 
     public String getName() {
@@ -32,22 +33,6 @@ public class Prohibition implements Serializable {
         this.name = name;
     }
 
-    public ProhibitionSubject getSubject() {
-        return subject;
-    }
-
-    public void setSubject(ProhibitionSubject subject) {
-        this.subject = subject;
-    }
-
-    public Collection<ContainerCondition> getContainers() {
-        return containers;
-    }
-
-    public void setContainers(Collection<ContainerCondition> containers) {
-        this.containers = containers;
-    }
-
     public AccessRightSet getAccessRightSet() {
         return accessRightSet;
     }
@@ -56,38 +41,43 @@ public class Prohibition implements Serializable {
         this.accessRightSet = accessRightSet;
     }
 
-    public boolean isIntersection() {
-        return intersection;
+    public Set<Long> getInclusionSet() {
+        return inclusionSet;
     }
 
-    public void setIntersection(boolean intersection) {
-        this.intersection = intersection;
+    public void setInclusionSet(Set<Long> inclusionSet) {
+        this.inclusionSet = inclusionSet;
+    }
+
+    public Set<Long> getExclusionSet() {
+        return exclusionSet;
+    }
+
+    public void setExclusionSet(Set<Long> exclusionSet) {
+        this.exclusionSet = exclusionSet;
+    }
+
+    public boolean isConjunctive() {
+        return isConjunctive;
+    }
+
+    public void setConjunctive(boolean conjunctive) {
+        isConjunctive = conjunctive;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Prohibition that)) return false;
-	    return intersection == that.intersection &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(subject, that.subject) &&
-                Objects.equals(containers, that.containers) &&
-                Objects.equals(accessRightSet, that.accessRightSet);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Prohibition that = (Prohibition) o;
+        return isConjunctive == that.isConjunctive && Objects.equals(name, that.name) && Objects.equals(
+            accessRightSet, that.accessRightSet) && Objects.equals(inclusionSet, that.inclusionSet)
+            && Objects.equals(exclusionSet, that.exclusionSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, subject, containers, accessRightSet, intersection);
-    }
-
-    @Override
-    public String toString() {
-        return "Prohibition{" +
-                "name='" + name + '\'' +
-                ", subject=" + subject +
-                ", containers=" + containers +
-                ", accessRightSet=" + accessRightSet +
-                ", intersection=" + intersection +
-                '}';
+        return Objects.hash(name, accessRightSet, inclusionSet, exclusionSet, isConjunctive);
     }
 }

@@ -484,7 +484,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(List.of(id("ua2")));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -510,7 +510,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(List.of(id("ua2")));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -533,7 +533,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -561,7 +561,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -589,7 +589,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"), "");
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -707,7 +707,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"), "");
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", id("a"), "descendants", List.of(id("b")))
         );
@@ -744,7 +744,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"), "");
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );

@@ -1,29 +1,26 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
-import gov.nist.csd.pm.core.common.exception.InvalidProhibitionSubjectException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownTypeException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.ResourceIterable;
 
 public class Neo4jUtil {
 
@@ -40,11 +37,14 @@ public class Neo4jUtil {
 	public static final Label PROCESS_LABEL = Label.label("Process");
 
 	public static final String ARSET_PROPERTY = "arset";
+	public static final String INCLUSION_SET_PROPERTY = "inclusion_set";
+	public static final String EXCLUSION_SET_PROPERTY = "exclusion_set";
 	public static final String NAME_PROPERTY = "name";
+	public static final String NODE_ID_PROPERTY = "node_id";
+	public static final String PROCESS_PROPERTY = "process";
 	public static final String ID_PROPERTY = "id";
 	public static final String DATA_PROPERTY = "data";
-	public static final String COMPLEMENT_PROPERTY = "complement";
-	public static final String INTERSECTION_PROPERTY = "intersection";
+	public static final String IS_CONJUNCTIVE_PROPERTY = "is_conjunctive";
 
 	public static final RelationshipType ASSIGNMENT_RELATIONSHIP_TYPE = RelationshipType.withName("ASSIGNED_TO");
 	public static final RelationshipType ASSOCIATION_RELATIONSHIP_TYPE = RelationshipType.withName("ASSOCIATED_WITH");
@@ -64,36 +64,18 @@ public class Neo4jUtil {
 		throw new UnknownTypeException(null);
 	}
 
-	public static Prohibition getProhibitionFromNode(Node prohibitionNode) throws InvalidProhibitionSubjectException {
-		String label = String.valueOf(prohibitionNode.getProperty(NAME_PROPERTY));
-
-		// get subject
-		Relationship subjectRel = prohibitionNode.getSingleRelationship(PROHIBITION_SUBJECT_REL_TYPE, Direction.INCOMING);
-		Node subjectNode = subjectRel.getStartNode();
-		ProhibitionSubject subject;
-		if (subjectNode.hasLabel(PROCESS_LABEL)) {
-			subject = new ProhibitionSubject(String.valueOf(subjectNode.getProperty(ID_PROPERTY)));
-		} else {
-			subject = new ProhibitionSubject((Long) subjectNode.getProperty(ID_PROPERTY));
-		}
-
+	public static Prohibition getProhibitionFromNode(Node prohibitionNode) {
+		String name = String.valueOf(prohibitionNode.getProperty(NAME_PROPERTY));
+		long nodeId = (long) prohibitionNode.getProperty(NODE_ID_PROPERTY);
+		String process = String.valueOf(prohibitionNode.getProperty(PROCESS_PROPERTY, ""));
 		AccessRightSet accessRights = new AccessRightSet((String[]) prohibitionNode.getProperty(ARSET_PROPERTY));
+		Set<Long> inclusion = toLongSet((long[]) prohibitionNode.getProperty(INCLUSION_SET_PROPERTY));
+		Set<Long> exclusion = toLongSet((long[]) prohibitionNode.getProperty(EXCLUSION_SET_PROPERTY));
+		boolean isConjunctive = (boolean)prohibitionNode.getProperty(IS_CONJUNCTIVE_PROPERTY);
 
-		boolean intersection = (boolean)prohibitionNode.getProperty(INTERSECTION_PROPERTY);
-
-		List<ContainerCondition> containerConditions = new ArrayList<>();
-		try(ResourceIterable<Relationship> contRels = prohibitionNode.getRelationships(Direction.INCOMING, PROHIBITION_CONTAINER_REL_TYPE)) {
-			for (Relationship relationship : contRels) {
-				Node contNode = relationship.getStartNode();
-				containerConditions.add(new ContainerCondition(
-						(Long) contNode.getProperty(ID_PROPERTY),
-						Boolean.parseBoolean(relationship.getProperty(COMPLEMENT_PROPERTY).toString())
-				));
-			}
-		}
-
-
-		return new Prohibition(label, subject, accessRights, intersection, containerConditions);
+		return process.isEmpty()
+			? new NodeProhibition(name, nodeId, accessRights, inclusion, exclusion, isConjunctive)
+			: new ProcessProhibition(name, nodeId, process, accessRights, inclusion, exclusion, isConjunctive);
 	}
 
 	public static Label typeToLabel(NodeType type) {
@@ -138,6 +120,10 @@ public class Neo4jUtil {
 			e.printStackTrace();
 			throw new PMException(e);
 		}
+	}
+
+	private static Set<Long> toLongSet(long[] arr) {
+		return Arrays.stream(arr).boxed().collect(Collectors.toSet());
 	}
 
 }

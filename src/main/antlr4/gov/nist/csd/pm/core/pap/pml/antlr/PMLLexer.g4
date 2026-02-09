@@ -1,5 +1,9 @@
 lexer grammar PMLLexer;
 
+DISJ: ('disjunctive' | 'disj');
+CONJ: ('conjunctive' | 'conj');
+INCLUDE: ('inclusion' | 'include');
+EXCLUDE: ('exclusion' | 'exclude');
 ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
 NODE_ARG: '@node';
@@ -42,7 +46,7 @@ DISSOCIATE: 'dissociate' ;
 DENY: 'deny';
 PROHIBITION: 'prohibition';
 OBLIGATION: 'obligation';
-ACCESS_RIGHTS: 'access rights' ;
+ARSET: 'arset' ;
 
 PC : PC_FRAG ;
 OA : OA_FRAG ;

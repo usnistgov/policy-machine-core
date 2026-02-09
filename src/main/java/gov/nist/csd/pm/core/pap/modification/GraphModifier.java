@@ -18,17 +18,15 @@ import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInObligationException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
-import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
@@ -235,13 +233,11 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected void checkIfNodeInProhibition(long id) throws PMException {
-        Map<Long, Collection<Prohibition>> allProhibitions = policyStore.prohibitions().getNodeProhibitions();
-        for (Collection<Prohibition> subjPros : allProhibitions.values()) {
-            for (Prohibition p : subjPros) {
-                if (nodeInProhibition(id, p)) {
-                    Node node = policyStore.graph().getNodeById(id);
-                    throw new NodeReferencedInProhibitionException(node.getName(), p.getName());
-                }
+        Collection<Prohibition> prohibitions = policyStore.prohibitions().getAllProhibitions();
+        for (Prohibition p : prohibitions) {
+            if (nodeInProhibition(id, p)) {
+                Node node = policyStore.graph().getNodeById(id);
+                throw new NodeReferencedInProhibitionException(node.getName(), p.getName());
             }
         }
     }
@@ -385,12 +381,20 @@ public class GraphModifier extends Modifier implements GraphModification {
     }
 
     private static boolean nodeInProhibition(long id, Prohibition prohibition) {
-        if (prohibition.getSubject().getNodeId() == id) {
+        if (prohibition instanceof NodeProhibition nodeProhibition && nodeProhibition.getNodeId() == id) {
+            return true;
+        } else if (prohibition instanceof ProcessProhibition processProhibition && processProhibition.getUserId() == id) {
             return true;
         }
 
-        for (ContainerCondition containerCondition : prohibition.getContainers()) {
-            if (containerCondition.getId() == id) {
+        for (Long i : prohibition.getInclusionSet()) {
+            if (i == id) {
+                return true;
+            }
+        }
+
+        for (Long i : prohibition.getExclusionSet()) {
+            if (i == id) {
                 return true;
             }
         }

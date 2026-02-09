@@ -53,7 +53,7 @@ public class UserEvaluator {
 	private Set<Prohibition> initializeProcessProhibitions(UserContext userContext) throws PMException {
 		Set<Prohibition> prohibitions = new HashSet<>();
 		if (userContext.getProcess() != null) {
-			prohibitions.addAll(policyStore.prohibitions().getProhibitionsWithProcess(userContext.getProcess()));
+			prohibitions.addAll(policyStore.prohibitions().getProcessProhibitions(userContext.getProcess()));
 		}
 		return prohibitions;
 	}
@@ -74,7 +74,7 @@ public class UserEvaluator {
 	}
 
 	private void collectNodeProhibitions(long nodeId, Set<Prohibition> reachedProhibitions) throws PMException {
-		Collection<Prohibition> nodeProhibitions = policyStore.prohibitions().getProhibitionsWithNode(nodeId);
+		Collection<Prohibition> nodeProhibitions = policyStore.prohibitions().getNodeProhibitions(nodeId);
 		reachedProhibitions.addAll(nodeProhibitions);
 	}
 

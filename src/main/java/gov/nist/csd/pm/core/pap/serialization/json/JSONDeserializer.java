@@ -10,12 +10,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
+import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
-import gov.nist.csd.pm.core.pap.serialization.json.JSONProhibition.JSONSubject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class JSONDeserializer implements PolicyDeserializer {
             graph = new JSONGraph();
         }
 
-        List<JSONProhibition> prohibitions = jsonPolicy.getProhibitions();
+        List<Prohibition> prohibitions = jsonPolicy.getProhibitions();
         if (prohibitions == null) {
             prohibitions = new ArrayList<>();
         }
@@ -63,16 +64,28 @@ public class JSONDeserializer implements PolicyDeserializer {
         createObligations(pap, obligations);
     }
 
-    private void createProhibitions(PAP pap, List<JSONProhibition> prohibitions) throws PMException {
-        for (JSONProhibition prohibition : prohibitions) {
-            JSONSubject subject = prohibition.getSubject();
-            pap.modify().prohibitions().createProhibition(
-                prohibition.getName(),
-                subject.getNode() != null ? new ProhibitionSubject(subject.getNode()) : new ProhibitionSubject(subject.getProcess()),
-                new AccessRightSet(prohibition.getArset()),
-                prohibition.getIntersection(),
-                prohibition.getContainers()
-            );
+    private void createProhibitions(PAP pap, List<Prohibition> prohibitions) throws PMException {
+        for (Prohibition prohibition : prohibitions) {
+            if (prohibition instanceof NodeProhibition nodeProhibition) {
+                pap.modify().prohibitions().createNodeProhibition(
+                    nodeProhibition.getName(),
+                    nodeProhibition.getNodeId(),
+                    new AccessRightSet(nodeProhibition.getAccessRightSet()),
+                    nodeProhibition.getInclusionSet(),
+                    nodeProhibition.getExclusionSet(),
+                    nodeProhibition.isConjunctive()
+                );
+            } else if (prohibition instanceof ProcessProhibition processProhibition) {
+                pap.modify().prohibitions().createProcessProhibition(
+                    processProhibition.getName(),
+                    processProhibition.getUserId(),
+                    processProhibition.getProcess(),
+                    new AccessRightSet(processProhibition.getAccessRightSet()),
+                    processProhibition.getInclusionSet(),
+                    processProhibition.getExclusionSet(),
+                    processProhibition.isConjunctive()
+                );
+            }
         }
     }
 

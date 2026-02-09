@@ -19,7 +19,8 @@ import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.CreateOperationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.DeleteOperationOp;
 import gov.nist.csd.pm.core.pap.operation.operation.SetResourceAccessRights;
-import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateNodeProhibitionOp;
+import gov.nist.csd.pm.core.pap.operation.prohibition.CreateProcessProhibitionOp;
 import gov.nist.csd.pm.core.pap.operation.prohibition.DeleteProhibitionOp;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ class AdminOperationsTest {
 
     @Test
     void testRegistryContains18Operations() {
-        assertEquals(18, AdminOperations.ADMIN_OPERATIONS.size());
+        assertEquals(19, AdminOperations.ADMIN_OPERATIONS.size());
     }
 
     @Test
@@ -38,7 +39,7 @@ class AdminOperationsTest {
                 "deassign", "delete_node", "dissociate", "set_node_properties",
                 "create_obligation", "delete_obligation",
                 "set_resource_access_rights", "create_operation", "delete_operation",
-                "create_prohibition", "delete_prohibition"
+                "create_node_prohibition", "create_process_prohibition", "delete_prohibition"
         };
 
         for (String name : expectedNames) {
@@ -68,7 +69,8 @@ class AdminOperationsTest {
         assertInstanceOf(SetNodePropertiesOp.class, AdminOperations.get("set_node_properties"));
         assertInstanceOf(CreateObligationOp.class, AdminOperations.get("create_obligation"));
         assertInstanceOf(DeleteObligationOp.class, AdminOperations.get("delete_obligation"));
-        assertInstanceOf(CreateProhibitionOp.class, AdminOperations.get("create_prohibition"));
+        assertInstanceOf(CreateNodeProhibitionOp.class, AdminOperations.get("create_node_prohibition"));
+        assertInstanceOf(CreateProcessProhibitionOp.class, AdminOperations.get("create_process_prohibition"));
         assertInstanceOf(DeleteProhibitionOp.class, AdminOperations.get("delete_prohibition"));
         assertInstanceOf(CreateOperationOp.class, AdminOperations.get("create_operation"));
         assertInstanceOf(DeleteOperationOp.class, AdminOperations.get("delete_operation"));

@@ -41,7 +41,7 @@ public class CachedTargetEvaluator extends TargetEvaluator {
             firstLevelDescs.addAll(targetCtx.getAttributeIds());
         }
 
-        Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userDagResult.prohibitions());
+        Set<Long> userProhibitionTargets = collectUserProhibitionAttributes(userDagResult.prohibitions());
         Set<Long> visitedProhibitionTargets = new LongOpenHashSet();
 
         // Use cached visitedNodes instead of creating a new one

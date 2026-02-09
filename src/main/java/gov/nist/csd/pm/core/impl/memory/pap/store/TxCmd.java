@@ -3,6 +3,8 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
@@ -168,13 +170,25 @@ public abstract class TxCmd implements TxRollbackSupport {
 
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
-            memoryPolicyStore.prohibitions().createProhibition(
-                    prohibitionToDelete.getName(),
-                    prohibitionToDelete.getSubject(),
-                    prohibitionToDelete.getAccessRightSet(),
-                    prohibitionToDelete.isIntersection(),
-                    prohibitionToDelete.getContainers()
-            );
+            switch (prohibitionToDelete) {
+                case NodeProhibition nodeProhibition -> memoryPolicyStore.prohibitions().createNodeProhibition(
+                    nodeProhibition.getName(),
+                    nodeProhibition.getNodeId(),
+                    nodeProhibition.getAccessRightSet(),
+                    nodeProhibition.getInclusionSet(),
+                    nodeProhibition.getExclusionSet(),
+                    nodeProhibition.isConjunctive()
+                );
+                case ProcessProhibition processProhibition -> memoryPolicyStore.prohibitions().createProcessProhibition(
+                    processProhibition.getName(),
+                    processProhibition.getUserId(),
+                    processProhibition.getProcess(),
+                    processProhibition.getAccessRightSet(),
+                    processProhibition.getInclusionSet(),
+                    processProhibition.getExclusionSet(),
+                    processProhibition.isConjunctive()
+                );
+            }
         }
     }
 

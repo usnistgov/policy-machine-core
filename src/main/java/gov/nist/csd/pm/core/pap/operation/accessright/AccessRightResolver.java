@@ -1,11 +1,9 @@
 package gov.nist.csd.pm.core.pap.operation.accessright;
 
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.query.access.TargetDagResult;
 import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,25 +107,43 @@ public class AccessRightResolver {
         return resolved;
     }
 
-    private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<Long> reachedTargets) {
-        boolean inter = prohibition.isIntersection();
-        Collection<ContainerCondition> containers = prohibition.getContainers();
-        boolean addOps = false;
+    private static boolean isProhibitionSatisfied(Prohibition prohibition, Set<Long> reachedAttributes) {
+        Set<Long> inclusionSet = prohibition.getInclusionSet();
+        Set<Long> exclusionSet = prohibition.getExclusionSet();
+        boolean isConjunctive = prohibition.isConjunctive();
 
-        for (ContainerCondition containerCondition : containers) {
-            long contId = containerCondition.getId();
-            boolean isComplement = containerCondition.isComplement();
-            boolean reached = reachedTargets.contains(contId);
-
-            addOps = !isComplement && reached ||
-                    isComplement && !reached;
-
-            if ((addOps && !inter) || (!addOps && inter)) {
-                break;
-            }
+        if (inclusionSet.isEmpty() && exclusionSet.isEmpty()) {
+            return false;
         }
 
-        return addOps;
-    }
+        if (isConjunctive) {
+            // conjunctive (intersection): all inclusion and exclusion conditions must be met
 
+            // target must be an ascendant of every node in the inclusion set
+            for (long inc : inclusionSet) {
+                if (!reachedAttributes.contains(inc)) return false;
+            }
+
+            // target must NOT be an ascendant of ANY node in the exclusion set
+            for (long exc : exclusionSet) {
+                if (reachedAttributes.contains(exc)) return false;
+            }
+
+            return true;
+        } else {
+            // disjunctive (union): only one inclusion or exclusion condition needs to be met
+
+            // satisfied if target is an ascendant of ANY node in the inclusion set
+            for (long inc : inclusionSet) {
+                if (reachedAttributes.contains(inc)) return true;
+            }
+
+            // satisfied if target is NOT an ascendant of at least one node in the exclusion set.
+            for (long exc : exclusionSet) {
+                if (!reachedAttributes.contains(exc)) return true;
+            }
+
+            return false;
+        }
+    }
 }

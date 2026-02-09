@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -17,8 +17,8 @@ import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,12 +42,12 @@ class ProhibitionsModificationAdjudicatorTest {
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                
+
                 associate "ua1" and "oa1" with ["admin:*"]
                 associate "ua1" and "oa2" with ["admin:*"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 associate "ua1" and "ua2" with ["admin:*"]
-                
+
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
@@ -65,57 +65,64 @@ class ProhibitionsModificationAdjudicatorTest {
     }
 
     @Test
-    void createProhibition() throws PMException {
-        assertDoesNotThrow(() -> ok.createProhibition(
+    void createNodeProhibition() throws PMException {
+        assertDoesNotThrow(() -> ok.createNodeProhibition(
                 "pro1",
-                new ProhibitionSubject(id("u2")),
+                id("u2"),
 		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
-		        true,
-		        List.of(new ContainerCondition(id("oa1"), false))));
+		        Set.of(id("oa1")),
+		        Set.of(),
+		        true));
 
         assertFalse(pap.query().prohibitions().getProhibitions().stream().filter(p -> {
-	        return p.getSubject().getNodeId() == id("u2");
+	        return p instanceof NodeProhibition np && np.getNodeId() == id("u2");
         }).toList().isEmpty());
 
-        assertDoesNotThrow(() -> ok.createProhibition(
+        assertDoesNotThrow(() -> ok.createProcessProhibition(
                 "pro2",
-                new ProhibitionSubject("123"),
+                id("u2"),
+                "123",
 		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
-		        true,
-		        List.of(new ContainerCondition(id("oa1"), true))));
+		        Set.of(id("oa1")),
+		        Set.of(),
+		        true));
 
 	    assertFalse(pap.query().prohibitions().getProhibitions().stream()
-			    .filter(p -> Objects.equals(p.getSubject().getProcess(), "123")).toList().isEmpty());
+			    .filter(p -> p instanceof ProcessProhibition pp && Objects.equals(pp.getProcess(), "123")).toList().isEmpty());
 
-        assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
-                "pro1",
-                new ProhibitionSubject(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> fail.createNodeProhibition(
+                "pro3",
+                id("u2"),
 		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
-		        true,
-		        List.of(new ContainerCondition(id("oa1"), false))));
+		        Set.of(id("oa1")),
+		        Set.of(),
+		        true));
 
-        assertThrows(UnauthorizedException.class, () -> fail.createProhibition(
-                "pro1",
-                new ProhibitionSubject("123"),
+        assertThrows(UnauthorizedException.class, () -> fail.createProcessProhibition(
+                "pro4",
+                id("u2"),
+                "123",
 		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
-		        true,
-		        List.of(new ContainerCondition(id("oa1"), true))));
+		        Set.of(id("oa1")),
+		        Set.of(),
+		        true));
     }
 
     @Test
     void deleteProhibition() throws PMException {
-        ok.createProhibition(
+        ok.createNodeProhibition(
                 "pro1",
-                new ProhibitionSubject(id("u2")),
+                id("u2"),
 		        new AccessRightSet("admin:graph:assignment:ascendant:create"),
-		        true,
-		        List.of(new ContainerCondition(id("oa1"), false)));
+		        Set.of(id("oa1")),
+		        Set.of(),
+		        true);
 
         assertThrows(UnauthorizedException.class, () -> fail.deleteProhibition("pro1"));
         assertDoesNotThrow(() -> ok.deleteProhibition("pro1"));
 
 	    assertTrue(pap.query().prohibitions().getProhibitions().stream().filter(p -> {
-		    return p.getSubject().getNodeId() == id("u2");
+		    return p instanceof NodeProhibition np && np.getNodeId() == id("u2");
 	    }).toList().isEmpty());
     }
 }

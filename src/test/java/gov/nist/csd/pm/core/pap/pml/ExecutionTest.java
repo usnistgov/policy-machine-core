@@ -430,15 +430,15 @@ public class ExecutionTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
 
         String input = """
-                create prohibition "p1"
-                deny UA "ua1"
-                access rights ["read"]
-                on union of {"oa1": false}
+                create conj node prohibition "p1"
+                deny "ua1"
+                arset ["read"]
+                include ["oa1"]
                 
-                create prohibition "p2"
-                deny UA "ua1"
-                access rights ["read"]
-                on union of {"oa1": false}
+                create conj node prohibition "p2"
+                deny "ua1"
+                arset ["read"]
+                include ["oa1"]
                 """;
         pap.executePML(new TestUserContext("u1"), input);
 

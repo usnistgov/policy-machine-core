@@ -5,8 +5,8 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
 import java.util.List;
 
 public class CreatePolicyClassOp extends CreateNodeOp {
@@ -15,9 +15,10 @@ public class CreatePolicyClassOp extends CreateNodeOp {
         super(
             "create_policy_class",
             List.of(NAME_PARAM),
-            new RequiredCapabilityFunc((policyQuery, userCtx, args) -> policyQuery.access()
-                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId()))
-                .contains(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString())
+            new RequiredCapability(
+                new RequiredPrivilegeOnNodeId(
+                    AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), AdminAccessRight.ADMIN_GRAPH_NODE_CREATE
+                )
             )
         );
     }

@@ -8,9 +8,8 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
 import java.util.List;
 
 public class DeleteOperationOp extends AdminOperation<Void> {
@@ -20,9 +19,9 @@ public class DeleteOperationOp extends AdminOperation<Void> {
             "delete_operation",
             VOID_TYPE,
             List.of(NAME_PARAM),
-            new RequiredCapabilityFunc((policyQuery, userCtx, args) -> policyQuery.access()
-                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId()))
-                .contains(AdminAccessRight.ADMIN_OPERATION_DELETE.toString()))
+            new RequiredCapability(
+                new RequiredPrivilegeOnNodeId(AdminPolicyNode.PM_ADMIN_OPERATIONS.nodeId(), AdminAccessRight.ADMIN_OPERATION_DELETE)
+            )
         );
     }
 

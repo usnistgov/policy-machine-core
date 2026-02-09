@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +25,8 @@ public class AssociateOp extends AdminOperation<Void> {
             VOID_TYPE,
             List.of(ASSOCIATE_UA_PARAM, ASSOCIATE_TARGET_PARAM, ARSET_PARAM),
             new RequiredCapability(
-                ASSOCIATE_UA_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE),
-                ASSOCIATE_TARGET_PARAM, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_TARGET_CREATE)
+                new RequiredPrivilegeOnParameter(ASSOCIATE_UA_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_UA_CREATE),
+                new RequiredPrivilegeOnParameter(ASSOCIATE_TARGET_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_TARGET_CREATE)
             )
         );
     }

@@ -108,7 +108,7 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
      * @throws UnauthorizedException if the user does not satisfy the required capabilities of the operation.
      * @throws PMException If there is an error checking access.
      */
-    public final void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
+    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
         if (requiredCapabilities.isEmpty()) {
             return;
         }
