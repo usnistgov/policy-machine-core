@@ -217,12 +217,6 @@ public class PMLTest {
         ));
     }
 
-    /*
-     - test retunr {} with return type
-     - test return in root PML with value and withou -- without value in if
-     - test reasingemtn of variable value type
-     */
-
     @Test
     void testEmptyValueIsCorrectlyAssignedTheOperationReturnType() throws PMException {
         String pml = """
