@@ -10,7 +10,6 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
@@ -39,11 +38,7 @@ class PMLBootstrapperTest {
                 routine1()
                 """;
 
-        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-            }
+        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -63,8 +58,8 @@ class PMLBootstrapperTest {
 
         };
 
-        pap.plugins().addOperation(pap.query().operations(), op1);
-        pap.plugins().addOperation(pap.query().operations(), routine1);
+        pap.plugins().addOperation(op1);
+        pap.plugins().addOperation(routine1);
 
         pdp.bootstrap(new PMLBootstrapper("u1", input));
 

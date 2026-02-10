@@ -2,9 +2,6 @@ package gov.nist.csd.pm.core.epp;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBLIGATION;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.LONG_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
@@ -19,7 +16,6 @@ import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -34,6 +30,8 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
@@ -78,7 +76,7 @@ class EPPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs op1 on (a, b) {
+                    performs "op1" on (a, b) {
                         return a == "oa1" && b == "oa1"
                     }
                     do(ctx) {
@@ -87,13 +85,7 @@ class EPPTest {
                     }
                 """);
 
-        AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(ARG_A, ARG_B)) {
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {
-
-            }
-
+        AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(ARG_A, ARG_B), List.of()) {
             @Override
             public String execute(PAP pap, Args args) throws PMException {
                 return "";
@@ -105,7 +97,7 @@ class EPPTest {
         pap.executePML(u1, """
             create obligation "obl2"
             when any user
-            performs op2 on (a, b) {
+            performs "op2" on (a, b) {
                 return a == "oa2" && b == "oa2"
             }
             do(ctx) {
@@ -125,7 +117,7 @@ class EPPTest {
                 "b", "oa1")
         ));
 
-        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("*a"));
+        pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("admin:*"));
 
         assertDoesNotThrow(() -> pdp.adjudicateOperation(
             u1,
@@ -159,17 +151,19 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 
                 set resource access rights ["read"]
-                resourceop read_file(@node("read") string name)
+                
+                @reqcap({name: ["read"]})
+                resourceop read_file(@node string name)
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
                 create obligation "obl1"
                     when any user
-                    performs read_file
+                    performs "read_file"
                     on (name) {
                         return name == "oa1"
                     }
@@ -202,7 +196,7 @@ class EPPTest {
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -234,12 +228,12 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -283,14 +277,14 @@ class EPPTest {
             txPAP.modify().graph().createUser("u1",  ids("ua1", "ua2"));
             txPAP.modify().graph().createObject("o1",  ids("oa1"));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(),
-                new AccessRightSet(CREATE_OBLIGATION));
-            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT));
+                new AccessRightSet(AdminAccessRight.ADMIN_OBLIGATION_CREATE));
+            txPAP.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
         });
 
         pdp.runTx(new UserContext(id("u1")), (policy) -> {
             policy.modify().obligations().createObligation(id("u1"), "test",
-                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(CREATE_OBJECT_ATTRIBUTE)),
+                new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString())),
                 new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(
                         new StringLiteralExpression("o2"),
@@ -308,7 +302,7 @@ class EPPTest {
 
         EventContext eventCtx = new EventContext(
             new EventContextUser("u1", null),
-            CREATE_OBJECT_ATTRIBUTE,
+            AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString(),
             Map.of(
                 "name", id("oa2"),
                 "descendants", List.of(id("pc1"))
@@ -325,12 +319,7 @@ class EPPTest {
     void testCustomOperationInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType()) {
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) {
-
-            }
+        PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -353,12 +342,12 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:*"]
                 
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -391,12 +380,12 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["create_policy_class"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:node:create"]
                 
                 create obligation "test"
                     when any user
-                    performs create_object_attribute
+                    performs "create_object_attribute"
                     on (descendants) {
                         return contains(descendants, id("oa1"))
                     }
@@ -423,11 +412,11 @@ class EPPTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
                 adminop op1() {
-                    check ["assign"] on ["oa1"]
+                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
 
                     create pc "test_pc"
                 }
@@ -438,7 +427,7 @@ class EPPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs create_policy_class
+                    performs "create_policy_class"
                     do(ctx) {
                         op1()
                         routine1()
@@ -495,7 +484,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(List.of(id("ua2")));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -521,7 +510,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(List.of(id("ua2")));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -544,7 +533,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -572,7 +561,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"));
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -600,7 +589,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"), "");
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );
@@ -718,7 +707,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"), "");
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", id("a"), "descendants", List.of(id("b")))
         );
@@ -755,7 +744,7 @@ class EPPTest {
         UserContext userCtx = new UserContext(id("u1"), "");
 
         EventContext eventContext = new EventContext(
-            EventContextUser.fromUserContext(userCtx, pap),
+            pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
         );

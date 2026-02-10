@@ -1,11 +1,12 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -51,21 +52,20 @@ public class MemoryPolicy {
     }
 
     public void addProhibition(Prohibition prohibition) {
-        ProhibitionSubject subject = prohibition.getSubject();
-
-        if (subject.isNode()) {
-            nodeProhibitions.computeIfAbsent(subject.getNodeId(), k -> new ArrayList<>()).add(prohibition);
-        } else {
-            processProhibitions.computeIfAbsent(subject.getProcess(), k -> new ArrayList<>()).add(prohibition);
+        switch (prohibition) {
+            case NodeProhibition nodeProhibition ->
+                nodeProhibitions.computeIfAbsent(nodeProhibition.getNodeId(), k -> new ArrayList<>()).add(prohibition);
+            case ProcessProhibition processProhibition ->
+                processProhibitions.computeIfAbsent(processProhibition.getProcess(), k -> new ArrayList<>()).add(prohibition);
         }
     }
 
     public void deleteProhibition(Prohibition prohibition) {
-        ProhibitionSubject subject = prohibition.getSubject();
-        if (subject.isNode()) {
-            removeProhibitionFromMap(nodeProhibitions, subject.getNodeId(), prohibition);
-        } else {
-            removeProhibitionFromMap(processProhibitions, subject.getProcess(), prohibition);
+        switch (prohibition) {
+            case NodeProhibition nodeProhibition ->
+                removeProhibitionFromMap(nodeProhibitions, nodeProhibition.getNodeId(), prohibition);
+            case ProcessProhibition processProhibition ->
+                removeProhibitionFromMap(processProhibitions, processProhibition.getProcess(), prohibition);
         }
     }
 

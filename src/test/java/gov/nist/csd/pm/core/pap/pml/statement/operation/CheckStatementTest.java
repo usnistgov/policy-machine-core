@@ -34,7 +34,7 @@ class CheckStatementTest {
                
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["assign", "assign_to"]
+                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create", "admin:graph:assignment:descendant:create"]
                 
                 create o "o1" in ["oa1"]
                 create o "o2" in ["oa1"]
@@ -47,12 +47,12 @@ class CheckStatementTest {
         ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
 
         testCheck(ctx, pap, new CheckStatement(
-            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
         testCheck(ctx, pap, new CheckStatement(
-            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), false);
 
@@ -64,17 +64,17 @@ class CheckStatementTest {
 
         ctx = new ExecutionContext(new UserContext(id("u2")), pap);
         testCheck(ctx, pap, new CheckStatement(
-            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), true);
 
         testCheck(ctx, pap, new CheckStatement(
-            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("assign")), STRING_TYPE),
+            ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
         ), true);
 
@@ -100,14 +100,14 @@ class CheckStatementTest {
                 }
                 
                 adminop op1() {
-                    check ["assign"] on [testOp()]
+                    check ["admin:graph:assignment:ascendant:create"] on [testOp()]
                     create PC "pc2"
                 }
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                                
-                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
                 create u "u1" in ["ua1"]                
                 """;

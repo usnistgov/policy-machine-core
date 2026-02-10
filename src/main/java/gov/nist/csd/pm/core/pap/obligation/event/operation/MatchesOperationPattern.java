@@ -44,7 +44,7 @@ public final class MatchesOperationPattern extends OperationPattern {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return String.format("%s%s", opName, onPattern.toFormattedString(indentLevel));
+        return String.format("\"%s\"%s", opName, onPattern.toFormattedString(indentLevel));
     }
 
     @Override

@@ -2,28 +2,36 @@ package gov.nist.csd.pm.core.pap.pml.operation;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.pml.type.TypeStringer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PMLOperationSignature implements PMLStatementSerializable {
 
-    private OperationType type;
-    private String name;
-    private Type<?> returnType;
-    private List<FormalParameter<?>> formalParameters;
+    private final OperationType type;
+    private final String name;
+    private final Type<?> returnType;
+    private final List<FormalParameter<?>> formalParameters;
+    private final List<RequiredCapability> reqCaps;
 
-    public PMLOperationSignature(OperationType type, String name, Type<?> returnType, List<FormalParameter<?>> formalParameters) {
+    public PMLOperationSignature(OperationType type, String name, Type<?> returnType, List<FormalParameter<?>> formalParameters,
+                                 List<RequiredCapability> reqCaps) {
         this.type = type;
         this.name = name;
         this.returnType = returnType;
         this.formalParameters = formalParameters;
+        this.reqCaps = reqCaps;
     }
 
     public OperationType getType() {
@@ -42,6 +50,10 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return formalParameters;
     }
 
+    public List<RequiredCapability> getReqCaps() {
+        return reqCaps;
+    }
+
     protected String serializeFormalArgs() {
         String pml = "";
         for (FormalParameter<?> formalParameter : getFormalParameters()) {
@@ -49,28 +61,63 @@ public class PMLOperationSignature implements PMLStatementSerializable {
                 pml += ", ";
             }
 
-            String annotationStr = "";
-            if (formalParameter instanceof NodeFormalParameter<?> nodeFormalParameter) {
-                AccessRightSet reqCaps = nodeFormalParameter.getAccessRights().getReqCaps();
-
-                annotationStr = "@node" +
-                    (!reqCaps.isEmpty() ?
-                        "(" + reqCaps.stream().map(s -> "\"" + s + "\"").collect(Collectors.joining(", ")) + ") "
-                        : " ");
-            }
-
-            pml += String.format("%s%s %s", annotationStr, TypeStringer.toPMLString(formalParameter.getType()),
+            String annotationStr = formalParameter instanceof NodeFormalParameter<?> ? "@node ": "";
+            pml += String.format("%s%s %s",
+                annotationStr,
+                TypeStringer.toPMLString(formalParameter.getType()),
                 formalParameter.getName());
         }
         return pml;
     }
 
+    private String serializeReqCap(int indentLevel) {
+        List<String> reqCapStrs = new ArrayList<>();
+        for (RequiredCapability reqCap : getReqCaps()) {
+            List<RequiredPrivilege> requiredPrivileges = reqCap.getRequiredPrivileges();
+            List<String> entries = new ArrayList<>();
+            for (RequiredPrivilege requiredPrivilege : requiredPrivileges) {
+                String key;
+                AccessRightSet ars;
+
+                switch (requiredPrivilege) {
+                    case RequiredPrivilegeOnParameter requiredPrivilegeOnParameter -> {
+                        key = requiredPrivilegeOnParameter.param().getName();
+                        ars = requiredPrivilegeOnParameter.getRequired();
+                    }
+                    case RequiredPrivilegeOnNode requiredPrivilegeOnNode -> {
+                        key = String.format("\"%s\"", requiredPrivilegeOnNode.getName());
+                        ars = requiredPrivilegeOnNode.getRequired();
+                    }
+                }
+
+                entries.add(String.format(
+                    "%s: [%s]",
+                    key,
+                    ars.stream()
+                        .map(s -> "\"" + s + "\"")
+                        .collect(Collectors.joining(", "))
+                ));
+            }
+
+            reqCapStrs.add(String.format("@reqcap({%s})", String.join(", ", entries)));
+        }
+
+        if (reqCapStrs.isEmpty()) {
+            return "";
+        }
+
+        return String.format("%s%s\n", indent(indentLevel), String.join("\n", reqCapStrs));
+
+    }
+
     protected String toString(String prefix, int indentLevel) {
+        String reqCapStr = serializeReqCap(indentLevel);
         String argsStr = serializeFormalArgs();
 
         String indent = indent(indentLevel);
         return String.format(
-            "%s%s %s(%s) %s",
+            "%s%s%s %s(%s) %s",
+            reqCapStr,
             indent,
             prefix,
             name,
@@ -86,17 +133,18 @@ public class PMLOperationSignature implements PMLStatementSerializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof PMLOperationSignature signature))
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        return Objects.equals(name, signature.name) && Objects.equals(returnType,
-            signature.returnType) && Objects.equals(formalParameters, signature.formalParameters);
+        }
+        PMLOperationSignature that = (PMLOperationSignature) o;
+        return type == that.type && Objects.equals(name, that.name) && Objects.equals(returnType,
+            that.returnType) && Objects.equals(formalParameters, that.formalParameters)
+            && Objects.equals(reqCaps, that.reqCaps);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, returnType, formalParameters);
+        return Objects.hash(type, name, returnType, formalParameters, reqCaps);
     }
 
     public enum OperationType {

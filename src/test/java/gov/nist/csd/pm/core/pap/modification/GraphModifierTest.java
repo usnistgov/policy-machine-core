@@ -2,8 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import static gov.nist.csd.pm.core.common.graph.node.Properties.NO_PROPERTIES;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_ALL;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.WC_RESOURCE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,22 +10,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.AssignmentCausesLoopException;
 import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
+import gov.nist.csd.pm.core.common.exception.InvalidAssignmentException;
+import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.NodeHasAscendantsException;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
-import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssignmentException;
-import gov.nist.csd.pm.core.common.graph.relationship.InvalidAssociationException;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -413,12 +410,13 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUserAttribute("ua2", ids("pc1"));
             pap.modify().graph().createUser("u1", ids("ua2"));
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
-            pap.modify().prohibitions().createProhibition(
-                    "pro1", 
-                    new ProhibitionSubject(id("ua1")),
-                    new AccessRightSet(), 
-                    true,
-                    List.of(new ContainerCondition(id("oa1"), true))
+            pap.modify().prohibitions().createNodeProhibition(
+                    "pro1",
+                    id("ua1"),
+                    new AccessRightSet(),
+                    Set.of(),
+                    Set.of(id("oa1")),
+                    true
             );
 
             assertThrows(NodeReferencedInProhibitionException.class,
@@ -683,11 +681,11 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                     () -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("write")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
-                WC_ALL)));
+                "admin:*")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
-                WC_RESOURCE)));
+                "resource:*")));
             assertDoesNotThrow(() -> pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(
-                WC_RESOURCE)));
+                "resource:*")));
         }
 
         @Test
@@ -735,17 +733,17 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
 
             Collection<Association> assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));
             Association assoc = assocs.iterator().next();
-            assertEquals(id("ua1"), assoc.getSource());
-            assertEquals(id("oa1"), assoc.getTarget());
-            assertEquals(new AccessRightSet("read"), assoc.getAccessRightSet());
+            assertEquals(id("ua1"), assoc.source());
+            assertEquals(id("oa1"), assoc.target());
+            assertEquals(new AccessRightSet("read"), assoc.arset());
 
             pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read", "write"));
 
             assocs = pap.query().graph().getAssociationsWithSource(id("ua1"));
             assoc = assocs.iterator().next();
-            assertEquals(id("ua1"), assoc.getSource());
-            assertEquals(id("oa1"), assoc.getTarget());
-            assertEquals(new AccessRightSet("read", "write"), assoc.getAccessRightSet());
+            assertEquals(id("ua1"), assoc.source());
+            assertEquals(id("oa1"), assoc.target());
+            assertEquals(new AccessRightSet("read", "write"), assoc.arset());
         }
 
         @Test

@@ -10,17 +10,14 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionExistsException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -34,19 +31,18 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createPolicyClass("pc1");
             pap.modify().graph().createUserAttribute("subject", ids("pc1"));
 
-            pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(), false, List.of());
+            pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet(), Set.of(), Set.of(), false);
 
             assertThrows(
                     ProhibitionExistsException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(), false, List.of()));
+                    () -> pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet(), Set.of(), Set.of(), false));
         }
 
         @Test
         void testProhibitionSubjectDoesNotExistException() {
             assertThrows(
                     NodeDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet(
-                        AdminAccessRights.WC_ALL), false, List.of()));
+                    () -> pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet("admin:*"), Set.of(), Set.of(), false));
         }
 
 
@@ -57,7 +53,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
 
             assertThrows(
                     UnknownAccessRightException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"), false, List.of()));
+                    () -> pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet("read"), Set.of(), Set.of(), false));
         }
 
         @Test
@@ -67,9 +63,8 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
             assertThrows(
                     NodeDoesNotExistException.class,
-                    () -> pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
-                            false,
-                            Collections.singleton(new ContainerCondition(id("oa1"), true))));
+                    () -> pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet("read"),
+                            Set.of(), Set.of(id("oa1")), false));
         }
 
         @Test
@@ -80,24 +75,19 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
-                    true,
-                    List.of(
-                            new ContainerCondition(id("oa1"), true),
-                            new ContainerCondition(id("oa2"), false)
-                    ));
+            pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet("read"),
+                    Set.of(id("oa1")),
+                    Set.of(id("oa2")),
+                    true);
 
             Prohibition p = pap.query().prohibitions().getProhibition("pro1");
             assertEquals("pro1", p.getName());
-            assertEquals(id("subject"), p.getSubject().getNodeId());
+            assertTrue(p instanceof NodeProhibition);
+            assertEquals(id("subject"), ((NodeProhibition) p).getNodeId());
             assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
-            assertTrue(p.isIntersection());
-            assertEquals(2, p.getContainers().size());
-            List<ContainerCondition> expected = List.of(
-                    new ContainerCondition(id("oa1"), true),
-                    new ContainerCondition(id("oa2"), false)
-            );
-            assertTrue(expected.containsAll(p.getContainers()) && p.getContainers().containsAll(expected));
+            assertTrue(p.isConjunctive());
+            assertEquals(Set.of(id("oa1")), p.getInclusionSet());
+            assertEquals(Set.of(id("oa2")), p.getExclusionSet());
         }
 
         @Test
@@ -106,29 +96,29 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
 
             pap.runTx(tx -> {
                 tx.executePML(new UserContext(id("u1")), """
-                    create prohibition "p1"
-                    deny UA "ua1"
-                    access rights ["read"]
-                    on union of {"US project": false}
-                    
-                    create prohibition "p2"
-                    deny UA "ua1"
-                    access rights ["read"]
-                    on union of {"US project": false}
+                    create conj node prohibition "p1"
+                    deny "ua1"
+                    arset ["read"]
+                    include ["US project"]
+
+                    create conj node prohibition "p2"
+                    deny "ua1"
+                    arset ["read"]
+                    include ["US project"]
                     """);
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
                 tx.executePML(new UserContext(id("u1")), """
-                    create prohibition "p3"
-                    deny UA "ua1"
-                    access rights ["read"]
-                    on union of {"US project": false}
-                    
-                    create prohibition "p4"
-                    deny UA "ua1"
-                    access rights ["read"]
-                    on union of {"US project": false}
+                    create conj node prohibition "p3"
+                    deny "ua1"
+                    arset ["read"]
+                    include ["US project"]
+
+                    create conj node prohibition "p4"
+                    deny "ua1"
+                    arset ["read"]
+                    include ["US project"]
                     """);
                 throw new PMException("");
             }));
@@ -158,11 +148,10 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
             pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
-
-            pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(id("subject")), new AccessRightSet("read"),
-                    true, List.of(
-                            new ContainerCondition(id("oa1"), true),
-                            new ContainerCondition(id("oa2"), false)));
+            pap.modify().prohibitions().createNodeProhibition("pro1", id("subject"), new AccessRightSet("read"),
+                    Set.of(id("oa1")),
+                    Set.of(id("oa2")),
+                    true);
 
             assertDoesNotThrow(() -> pap.query().prohibitions().getProhibition("pro1"));
 
@@ -178,15 +167,15 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
 
             pap.runTx(tx -> {
                 tx.executePML(new UserContext(id("u1")), """
-                    create prohibition "p1"
-                    deny UA "ua1"
-                    access rights ["read"]
-                    on union of {"US project": false}
-                    
-                    create prohibition "p2"
-                    deny UA "ua1"
-                    access rights ["read"]
-                    on union of {"US project": false}
+                    create conj node prohibition "p1"
+                    deny "ua1"
+                    arset ["read"]
+                    include ["US project"]
+
+                    create conj node prohibition "p2"
+                    deny "ua1"
+                    arset ["read"]
+                    include ["US project"]
                     """);
             });
 

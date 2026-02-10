@@ -26,7 +26,7 @@ public abstract class PMLFunctionOperation<T> extends Function<T> implements PML
 
 		this.returnType = returnType;
 		this.pmlFormalParameters = formalParameters;
-		this.signature = new PMLOperationSignature(OperationType.FUNCTION, name, returnType, formalParameters);
+		this.signature = new PMLOperationSignature(OperationType.FUNCTION, name, returnType, formalParameters, List.of());
 	}
 
 	public PMLFunctionOperation(String name, Type<T> returnType) {
@@ -34,7 +34,7 @@ public abstract class PMLFunctionOperation<T> extends Function<T> implements PML
 
 		this.returnType = returnType;
 		this.pmlFormalParameters = new ArrayList<>();
-		this.signature = new PMLOperationSignature(OperationType.FUNCTION, name, returnType, new ArrayList<>());
+		this.signature = new PMLOperationSignature(OperationType.FUNCTION, name, returnType, new ArrayList<>(), List.of());
 	}
 
 	public List<FormalParameter<?>> getPmlFormalArgs() {

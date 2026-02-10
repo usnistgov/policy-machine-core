@@ -1,25 +1,29 @@
 package gov.nist.csd.pm.core.pap.operation.graph;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SET_NODE_PROPERTIES;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;
 
 public class SetNodePropertiesOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter SET_NODE_PROPS_NODE_ID_PARAM =
-        new NodeIdFormalParameter("id", SET_NODE_PROPERTIES);
+        new NodeIdFormalParameter("id");
 
     public SetNodePropertiesOp() {
         super(
             "set_node_properties",
             BasicTypes.VOID_TYPE,
-            List.of(SET_NODE_PROPS_NODE_ID_PARAM, PROPERTIES_PARAM)
+            List.of(SET_NODE_PROPS_NODE_ID_PARAM, PROPERTIES_PARAM),
+            new RequiredCapability(
+                new RequiredPrivilegeOnParameter(SET_NODE_PROPS_NODE_ID_PARAM, AdminAccessRight.ADMIN_GRAPH_NODE_UPDATE)
+            )
         );
     }
 

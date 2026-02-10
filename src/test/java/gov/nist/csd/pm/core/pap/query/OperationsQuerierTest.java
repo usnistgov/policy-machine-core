@@ -7,13 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.Collection;
@@ -24,29 +23,18 @@ import org.junit.jupiter.api.Test;
 
 public abstract class OperationsQuerierTest extends PAPTestInitializer {
 
-    static AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
+    static AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
-        }
-
-        @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws
-                                                                                                     PMException {
         }
     };
 
-    static AdminOperation<Void> op2 = new AdminOperation<>("op2", VOID_TYPE, List.of()) {
+    static AdminOperation<Void> op2 = new AdminOperation<>("op2", VOID_TYPE, List.of(), List.of()) {
         @Override
         public Void execute(PAP pap, Args args) throws PMException {
             return null;
-        }
-
-        @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws
-                                                                                                     PMException {
-
         }
     };
 
@@ -73,15 +61,10 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         Collection<String> adminOperationNames = pap.query().operations().getOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
 
-        pap.plugins().addOperation(pap.query().operations(), new AdminOperation<>("op3", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(new AdminOperation<>("op3", VOID_TYPE, List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
-            }
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
             }
         });
 
@@ -101,7 +84,7 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
             Operation<?> actual = pap.query().operations().getOperation(op1.getName());
             assertEquals(op1, actual);
 
-            pap.plugins().addOperation(pap.query().operations(), op2);
+            pap.plugins().addOperation(op2);
             actual = pap.query().operations().getOperation(op2.getName());
             assertEquals(op2, actual);
         }

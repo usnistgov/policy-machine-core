@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pdp;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -10,6 +10,13 @@ import java.util.Collection;
 import java.util.List;
 
 public class UnauthorizedException extends PMException {
+
+    public static UnauthorizedException of(GraphQuery graphQuery,
+                                           UserContext userContext,
+                                           String operation) throws PMException {
+        String userStr = userString(graphQuery, userContext);
+        return new UnauthorizedException(userStr + " cannot perform operation " + operation);
+    }
 
     public static UnauthorizedException of(GraphQuery graphQuery,
                                            UserContext userContext,

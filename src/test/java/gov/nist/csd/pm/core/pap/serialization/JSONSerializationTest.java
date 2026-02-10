@@ -3,8 +3,8 @@ package gov.nist.csd.pm.core.pap.serialization;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONGraph;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONOperations;

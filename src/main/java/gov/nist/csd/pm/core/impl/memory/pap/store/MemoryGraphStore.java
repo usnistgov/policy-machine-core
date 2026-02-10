@@ -12,8 +12,8 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
@@ -64,21 +64,21 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
         }
 
         for (Association association : incomingAssociations) {
-            Vertex v = policy.graph.get(association.getSource());
+            Vertex v = policy.graph.get(association.source());
             if(v == null) {
                 continue;
             }
 
-            deleteAssociation(association.getSource(), association.getTarget());
+            deleteAssociation(association.source(), association.target());
         }
 
         for (Association association : outgoingAssociations) {
-            Vertex v = policy.graph.get(association.getTarget());
+            Vertex v = policy.graph.get(association.target());
             if(v == null) {
                 continue;
             }
 
-            deleteAssociation(association.getSource(), association.getTarget());
+            deleteAssociation(association.source(), association.target());
         }
 
         policy.graph.remove(id);
@@ -148,8 +148,8 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
         AccessRightSet accessRightSet = new AccessRightSet();
         for (Association association : vertex.getOutgoingAssociations()) {
-            if (association.getTarget() == target) {
-                accessRightSet = association.getAccessRightSet();
+            if (association.target() == target) {
+                accessRightSet = association.arset();
             }
         }
 

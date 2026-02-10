@@ -3,18 +3,17 @@ package gov.nist.csd.pm.core.pdp.modification;
 import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.PROPERTIES_PARAM;
-import static gov.nist.csd.pm.core.pdp.event.EventContextUtil.buildEventContext;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.Properties;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
 import gov.nist.csd.pm.core.pap.operation.graph.AssociateOp;
@@ -59,7 +58,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserAttributeOp op = new CreateUserAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserAttributeOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -69,7 +68,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectAttributeOp op = new CreateObjectAttributeOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectAttributeOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -79,7 +78,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateObjectOp op = new CreateObjectOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateObjectOp.CREATE_O_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateObjectOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -89,7 +88,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         CreateUserOp op = new CreateUserOp();
         Args args = new Args()
             .put(NAME_PARAM, name)
-            .put(CreateUserOp.CREATE_U_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(CreateUserOp.CREATE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
         return executeOp(op, args);
     }
@@ -117,7 +116,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
 
         // build event context before executing or else the node will not exist when the util
         // tries to convert the id to the name
-        EventContext eventContext = buildEventContext(pap, userCtx, op.getName(), args);
+        EventContext eventContext = new EventContext(pap, userCtx, op.getName(), args.toMap());
 
         executeOp(op, args, eventContext);
     }
@@ -174,7 +173,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 
-        eventPublisher.publishEvent(buildEventContext(pap, userCtx, op.getName(), args));
+        eventPublisher.publishEvent(new EventContext(pap, userCtx, op.getName(), args.toMap()));
 
         return ret;
     }

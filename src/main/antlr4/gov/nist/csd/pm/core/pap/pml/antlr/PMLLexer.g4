@@ -1,8 +1,13 @@
 lexer grammar PMLLexer;
 
+DISJ: ('disjunctive' | 'disj');
+CONJ: ('conjunctive' | 'conj');
+INCLUDE: ('inclusion' | 'include');
+EXCLUDE: ('exclusion' | 'exclude');
 ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
 NODE_ARG: '@node';
+REQ_CAP: '@reqcap';
 NODE: 'node';
 CHECK: 'check';
 ROUTINE: 'routine';
@@ -22,7 +27,6 @@ ON: 'on' ;
 IN: 'in' ;
 DO: 'do' ;
 ANY: 'any';
-ASCENDANT_OF: 'ascendant of' ;
 
 INTERSECTION: 'intersection' | 'inter';
 UNION: 'union' ;
@@ -42,7 +46,7 @@ DISSOCIATE: 'dissociate' ;
 DENY: 'deny';
 PROHIBITION: 'prohibition';
 OBLIGATION: 'obligation';
-ACCESS_RIGHTS: 'access rights' ;
+ARSET: 'arset' ;
 
 PC : PC_FRAG ;
 OA : OA_FRAG ;

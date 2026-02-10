@@ -2,20 +2,21 @@ package gov.nist.csd.pm.core.pap.serialization.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.List;
 
 public class JSONPolicy {
 
     private AccessRightSet resourceAccessRights;
     private JSONGraph graph;
-    private List<JSONProhibition> prohibitions;
+    private List<Prohibition> prohibitions;
     private List<JSONObligation> obligations;
     private JSONOperations operations;
 
     public JSONPolicy(AccessRightSet resourceAccessRights,
                       JSONGraph graph,
-                      List<JSONProhibition> prohibitions,
+                      List<Prohibition> prohibitions,
                       List<JSONObligation> obligations,
                       JSONOperations operations) {
         this.resourceAccessRights = resourceAccessRights;
@@ -41,11 +42,11 @@ public class JSONPolicy {
         this.graph = graph;
     }
 
-    public List<JSONProhibition> getProhibitions() {
+    public List<Prohibition> getProhibitions() {
         return prohibitions;
     }
 
-    public void setProhibitions(List<JSONProhibition> prohibitions) {
+    public void setProhibitions(List<Prohibition> prohibitions) {
         this.prohibitions = prohibitions;
     }
 

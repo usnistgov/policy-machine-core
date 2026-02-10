@@ -3,12 +3,28 @@ package gov.nist.csd.pm.core.pap.admin;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.OA;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_BASE_OA;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OBLIGATIONS;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_OPERATIONS;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_PC;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_PROHIBITIONS;
+import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_ROUTINES;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import java.util.Collection;
 
 public class AdminPolicy {
+
+    public static boolean isAdminPolicyAssignment(long asc, long desc) {
+        boolean isBaseToPc = asc == PM_ADMIN_BASE_OA.nodeId() && desc == PM_ADMIN_PC.nodeId();
+        boolean isPcsToBase = asc == PM_ADMIN_POLICY_CLASSES.nodeId() && desc == PM_ADMIN_BASE_OA.nodeId();
+        boolean isOpsToBase = asc == PM_ADMIN_OPERATIONS.nodeId() && desc == PM_ADMIN_BASE_OA.nodeId();
+        boolean isRoutinesToBase = asc == PM_ADMIN_ROUTINES.nodeId() && desc == PM_ADMIN_BASE_OA.nodeId();
+        boolean isObligationsToBase = asc == PM_ADMIN_OBLIGATIONS.nodeId() && desc == PM_ADMIN_BASE_OA.nodeId();
+        boolean isProhibitionsToBase = asc == PM_ADMIN_PROHIBITIONS.nodeId() && desc == PM_ADMIN_BASE_OA.nodeId();
+        return isBaseToPc || isPcsToBase || isOpsToBase || isRoutinesToBase || isObligationsToBase || isProhibitionsToBase;
+    }
 
     public static void verifyAdminPolicy(GraphStore graphStore) throws PMException {
         graphStore.beginTx();

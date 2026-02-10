@@ -24,16 +24,16 @@ class AdminOpDefinitionStatementTest {
                 create ua "ua2" in ["pc1"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["assign"]
+                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create"]
                 
                 create o "o1" in ["oa1"]
                 create o "o2" in ["oa1"]
                 create o "o3" in ["oa1"]
                 
                 adminop op1(string a, []string b) {
-                    check ["assign"] on [a]
-                    check ["assign"] on b
-                    check ["assign"] on ["oa1"]
+                    check ["admin:graph:assignment:ascendant:create"] on [a]
+                    check ["admin:graph:assignment:ascendant:create"] on b
+                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
 
                     create PC "test"
                 }
@@ -67,7 +67,7 @@ class AdminOpDefinitionStatementTest {
                 create ua "ua2" in ["pc1"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["assign"]
+                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create"]
                 
                 create o "o1" in ["oa1"]
                 create o "o2" in ["oa1"]

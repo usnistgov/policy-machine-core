@@ -1,16 +1,14 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.computeSatisfiedProhibitions;
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolveDeniedAccessRights;
-import static gov.nist.csd.pm.core.pap.query.access.AccessRightResolver.resolvePrivileges;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.computeSatisfiedProhibitions;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.resolveDeniedAccessRights;
+import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.resolvePrivileges;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
@@ -88,17 +86,17 @@ public class Explainer {
 				List<ExplainAssociation> explainAssocs = new ArrayList<>();
 
 				for (Association pathAssoc : pathAssocs) {
-					long target = pathAssoc.getTarget();
+					long target = pathAssoc.target();
 					if (target != node.getId()) {
 						continue;
 					}
 
-					Node uaNode = policyStore.graph().getNodeById(pathAssoc.getSource());
+					Node uaNode = policyStore.graph().getNodeById(pathAssoc.source());
 					Set<Path> userPathsToAssoc = userPaths.getOrDefault(uaNode, new HashSet<>());
 
 					explainAssocs.add(new ExplainAssociation(
 							uaNode,
-							pathAssoc.getAccessRightSet(),
+							pathAssoc.arset(),
 							new ArrayList<>(userPathsToAssoc)
 					));
 				}

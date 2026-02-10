@@ -6,24 +6,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class JavaExample {
@@ -40,26 +42,29 @@ public class JavaExample {
         long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
         long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
         pap.modify().graph().createUser("admin_user", List.of(adminId));
-        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRights.ASSIGN_TO));
+        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
 
         long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
         long userInboxes = pap.modify().graph().createObjectAttribute("user inboxes", List.of(pc1Id));
-        pap.modify().graph().associate(adminId, userHomes, new AccessRightSet(AdminAccessRights.WC_ALL));
-        pap.modify().graph().associate(adminId, userInboxes, new AccessRightSet(AdminAccessRights.WC_ALL));
+        pap.modify().graph().associate(adminId, userHomes, AccessRightSet.wildcard());
+        pap.modify().graph().associate(adminId, userInboxes, AccessRightSet.wildcard());
 
         // prohibit the admin user from reading inboxes
-        pap.modify().prohibitions().createProhibition(
+        pap.modify().prohibitions().createNodeProhibition(
             "deny admin on user inboxes",
-            new ProhibitionSubject(adminId),
+            adminId,
             new AccessRightSet("read"),
-            false,
-            List.of(new ContainerCondition(userInboxes, false))
+            Set.of(userInboxes),
+            Set.of(),
+            false
         );
 
         // create resource operation to read a file
-        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", "read"))) {
+        NodeNameFormalParameter nameFormalParameter = new NodeNameFormalParameter("name");
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter),
+            List.of(new RequiredCapability(new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
             @Override
-            protected Void execute(PolicyQuery query, Args args) throws PMException {
+            public Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
             }
         };
@@ -67,12 +72,8 @@ public class JavaExample {
 
         // create a custom administration operation
         FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
-        AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam)) {
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, usersId, AdminAccessRights.ASSIGN_TO);
-            }
+        AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam),
+            List.of(new RequiredCapability(new RequiredPrivilegeOnNode("users", AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -94,7 +95,7 @@ public class JavaExample {
         String pml = """
             create obligation "o1"
             when any user
-            performs create_new_user
+            performs "create_new_user"
             do(ctx) {
                 objName := "welcome " + ctx.args.username
                 inboxName := ctx.args.username + " inbox"

@@ -406,27 +406,24 @@ dissociate "ua1" and "oa1"
 
 ### Create Prohibition
 
-Create a prohibition with:
-- a name
-- a user, user attribute, or process
-- a set of access rights
-- a intersection or union of container conditions
+Create a node or process prohibition. Prohibitions can also be conjunctive or disjunctive.
 
 ```pml
-create prohibition "UserProhibition"
-deny U "u1" 
-access rights ["write", "delete"]
-on intersection of {"container1": false, "container2": true}
+create conjunctive node prohibition "UserProhibition"
+deny "u1" 
+arset ["write", "delete"]
+include ["oa1"]
+exclude ["oa2"]
 
-create prohibition "UAProhibition"
-deny UA "ua1"
-access rights ["write"]
-on union of {"container1": false}
+create disjunctive process prohibition "UAProhibition"
+deny "ua1"
+arset ["write"]
+include ["oa1"]
 
-create prohibition "ProcessProhibition"
-deny process "123"
-access rights ["execute"]
-on intersection of {"container": false}
+create conjunctive prohibition "ProcessProhibition"
+deny "u1" process "123"
+arest ["execute"]
+include ["oa1"]
 ```
 
 ### Delete Prohibition
@@ -529,7 +526,7 @@ delete if exists obligation "ObligationName"
 (string a, int64 b, []string c, map[string]bool d)
 ```
 
-### Node Argument Annotation
+### @node and @reqcap Annotations
 
 The `@node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
 
@@ -539,15 +536,18 @@ The `@node` annotation indicates a parameter represents a node or list of nodes.
 
 ```pml
 resourceop delete_file(@node string filename) {
-    check ["delete"] on [filename]
     delete node filename
 }
 ```
 
-With required capabilities:
+The `@reqcap` annotation precedes an operation definition, and defines a set of capabilities required to execute the operation.
+Multiple `@reqcap` annotations are supported with only one needing to be satisfied to execute the operation.
 
 ```pml
-resourceop delete_file(@node("delete") string filename) { }
+@reqcap({filename: ["delete"]})
+resourceop delete_file(string filename) { 
+    delete node filename
+}
 ```
 
 ### Check Statement
@@ -606,9 +606,11 @@ adminop create_new_user(string username) {
 Resource operations denote an operation on a resource (object). Optionally, return data to the caller.
 
 ```pml
-resourceop read_file(@node("read") string filename) { }
+@reqcap({filename: ["read"]})
+resourceop read_file(@node string filename) { }
 
-resourceop read_file(@node("read") string filename) { 
+@reqcap({filename: ["read"]})
+resourceop read_file(@node string filename) { 
 	return getNode(filename)
 }
 ```
@@ -702,13 +704,14 @@ associate "admin" and "user homes" with ["*"]
 associate "admin" and "user inboxes" with ["*"]  
   
 // prohibit the admin user from reading inboxes  
-create prohibition "deny admin on user inboxes"  
-deny u "admin"  
-access rights ["read"]  
-on union of {"user inboxes": false}  
+create conjunctive node prohibition "deny admin on user inboxes"  
+deny "admin"  
+arset ["read"]  
+include ["user inboxes"]
   
 // create resource operation to read a file  
-resourceop read_file(@node("read") string name) { }  
+@reqcap({name: ["read"]})
+resourceop read_file(@node string name) { }  
   
 // create a custom administration operation  
 adminop create_new_user(string username) {  

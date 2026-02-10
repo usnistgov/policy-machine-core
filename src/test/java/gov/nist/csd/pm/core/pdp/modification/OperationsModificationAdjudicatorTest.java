@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -46,8 +46,8 @@ class OperationsModificationAdjudicatorTest {
 
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["*a"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
+                associate "ua1" and "oa1" with ["admin:*"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
@@ -75,12 +75,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void createAdminOperation() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-            }
-
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 return null;
@@ -95,11 +90,7 @@ class OperationsModificationAdjudicatorTest {
 
     @Test
     void deleteAdminOperation() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of()) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-            }
+        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {

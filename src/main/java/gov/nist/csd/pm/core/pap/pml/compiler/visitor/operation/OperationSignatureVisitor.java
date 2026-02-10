@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionSignatureContext;
@@ -42,6 +43,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
+        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
 
         writeArgsToScope(visitorCtx, args);
 
@@ -49,7 +51,8 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             OperationType.ADMINOP,
             funcName,
             returnType,
-            args
+            args,
+            reqCaps
         );
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);
@@ -63,6 +66,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
+        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
 
         writeArgsToScope(visitorCtx, args);
 
@@ -70,8 +74,8 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             OperationType.RESOURCEOP,
             funcName,
             returnType,
-            args
-        );
+            args,
+            reqCaps);
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);
 
@@ -90,8 +94,8 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             OperationType.ROUTINE,
             funcName,
             returnType,
-            args
-        );
+            args,
+            List.of());
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlRoutineSignature, addToCtx);
 
@@ -110,8 +114,8 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             OperationType.FUNCTION,
             funcName,
             returnType,
-            args
-        );
+            args,
+            List.of());
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlFunctionSignature, addToCtx);
 
@@ -124,6 +128,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
+        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
 
         writeArgsToScope(visitorCtx, args);
 
@@ -131,8 +136,8 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             OperationType.QUERY,
             funcName,
             returnType,
-            args
-        );
+            args,
+            reqCaps);
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);
 

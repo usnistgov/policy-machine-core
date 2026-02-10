@@ -24,8 +24,8 @@ class PMLAdminOperationSignatureTest {
                 new NodeNameFormalParameter("a"),
                 new FormalParameter<>("b", STRING_TYPE),
                 new FormalParameter<>("c", STRING_TYPE)
-            )
-        );
+            ),
+            List.of());
 
         String actual = signature.toFormattedString(0);
         assertEquals(

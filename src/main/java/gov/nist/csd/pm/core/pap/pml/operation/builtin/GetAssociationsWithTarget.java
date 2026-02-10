@@ -6,7 +6,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 import static gov.nist.csd.pm.core.pap.pml.operation.basic.PMLFunctionOperation.NODE_NAME_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
+import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
@@ -26,7 +26,8 @@ public class GetAssociationsWithTarget extends PMLQueryOperation<List<Map<String
         super(
             "getAssociationsWithTarget",
             returnType,
-            List.of(NODE_NAME_PARAM)
+            List.of(NODE_NAME_PARAM),
+            List.of()
         );
     }
 
@@ -39,9 +40,9 @@ public class GetAssociationsWithTarget extends PMLQueryOperation<List<Map<String
         List<Map<String, Object>> associationValues = new ArrayList<>();
         for (Association association : associations) {
             associationValues.add(Map.of(
-                "ua", query.graph().getNodeById(association.getSource()).getName(),
-                "target", query.graph().getNodeById(association.getTarget()).getName(),
-                "arset", new ArrayList<>(association.getAccessRightSet())
+                "ua", query.graph().getNodeById(association.source()).getName(),
+                "target", query.graph().getNodeById(association.target()).getName(),
+                "arset", new ArrayList<>(association.arset())
             ));
         }
 

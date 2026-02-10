@@ -8,16 +8,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -38,14 +37,14 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
 
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
-		            true, List.of(
-		                    new ContainerCondition(id("oa1"), true),
-		                    new ContainerCondition(id("oa2"), false)));
-            pap.modify().prohibitions().createProhibition("label2", new ProhibitionSubject(subject), new AccessRightSet("read"),
-		            true, List.of(
-		                    new ContainerCondition(id("oa3"), true),
-		                    new ContainerCondition(id("oa4"), false)));
+            pap.modify().prohibitions().createNodeProhibition("label1", subject, new AccessRightSet("read"),
+                    Set.of(id("oa1")),
+                    Set.of(id("oa2")),
+                    true);
+            pap.modify().prohibitions().createNodeProhibition("label2", subject, new AccessRightSet("read"),
+                    Set.of(id("oa3")),
+                    Set.of(id("oa4")),
+                    true);
 
             Collection<Prohibition> prohibitions = pap.query().prohibitions().getProhibitions();
             assertEquals(2, prohibitions.size());
@@ -56,26 +55,20 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             for (Prohibition p : prohibitions) {
                 if (p.getName().equals("label1")) {
                     assertEquals("label1", p.getName());
-                    assertEquals(id("subject"), p.getSubject().getNodeId());
+                    assertTrue(p instanceof NodeProhibition);
+                    assertEquals(id("subject"), ((NodeProhibition) p).getNodeId());
                     assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
-                    assertTrue(p.isIntersection());
-                    assertEquals(2, p.getContainers().size());
-                    List<ContainerCondition> expected = List.of(
-                            new ContainerCondition(id("oa1"), true),
-                            new ContainerCondition(id("oa2"), false)
-                    );
-                    assertTrue(expected.containsAll(p.getContainers()) && p.getContainers().containsAll(expected));
+                    assertTrue(p.isConjunctive());
+                    assertEquals(Set.of(id("oa1")), p.getInclusionSet());
+                    assertEquals(Set.of(id("oa2")), p.getExclusionSet());
                 } else if (p.getName().equals("label2")) {
                     assertEquals("label2", p.getName());
-                    assertEquals(id("subject"), p.getSubject().getNodeId());
+                    assertTrue(p instanceof NodeProhibition);
+                    assertEquals(id("subject"), ((NodeProhibition) p).getNodeId());
                     assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
-                    assertTrue(p.isIntersection());
-                    assertEquals(2, p.getContainers().size());
-                    List<ContainerCondition> expected = List.of(
-                            new ContainerCondition(id("oa3"), true),
-                            new ContainerCondition(id("oa4"), false)
-                    );
-                    assertTrue(expected.containsAll(p.getContainers()) && p.getContainers().containsAll(expected));
+                    assertTrue(p.isConjunctive());
+                    assertEquals(Set.of(id("oa3")), p.getInclusionSet());
+                    assertEquals(Set.of(id("oa4")), p.getExclusionSet());
                 } else {
                     fail("unexpected prohibition label " + p.getName());
                 }
@@ -97,28 +90,27 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             long oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject1), new AccessRightSet("read"),
-		            true, List.of(new ContainerCondition(id("oa1"), true),
-		                    new ContainerCondition(id("oa2"), false)));
-            pap.modify().prohibitions().createProhibition("label2", new ProhibitionSubject(subject2), new AccessRightSet("read"),
-		            true, List.of(new ContainerCondition(id("oa3"), true),
-		                    new ContainerCondition(id("oa4"), false)));
+            pap.modify().prohibitions().createNodeProhibition("label1", subject1, new AccessRightSet("read"),
+                    Set.of(id("oa1")),
+                    Set.of(id("oa2")),
+                    true);
+            pap.modify().prohibitions().createNodeProhibition("label2", subject2, new AccessRightSet("read"),
+                    Set.of(id("oa3")),
+                    Set.of(id("oa4")),
+                    true);
 
-            Collection<Prohibition> pros = pap.query().prohibitions().getProhibitionsWithSubject(new ProhibitionSubject(subject1));
+            Collection<Prohibition> pros = pap.query().prohibitions().getNodeProhibitions(subject1);
             assertEquals(1, pros.size());
 
             Prohibition p = pros.iterator().next();
 
             assertEquals("label1", p.getName());
-            assertEquals(subject1, p.getSubject().getNodeId());
+            assertTrue(p instanceof NodeProhibition);
+            assertEquals(subject1, ((NodeProhibition) p).getNodeId());
             assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
-            assertTrue(p.isIntersection());
-            assertEquals(2, p.getContainers().size());
-            List<ContainerCondition> expected = List.of(
-                    new ContainerCondition(id("oa1"), true),
-                    new ContainerCondition(id("oa2"), false)
-            );
-            assertTrue(expected.containsAll(p.getContainers()) && p.getContainers().containsAll(expected));
+            assertTrue(p.isConjunctive());
+            assertEquals(Set.of(id("oa1")), p.getInclusionSet());
+            assertEquals(Set.of(id("oa2")), p.getExclusionSet());
         }
     }
 
@@ -138,24 +130,23 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
             long oa4 = pap.modify().graph().createObjectAttribute("oa4", List.of(pc1));
             pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-            pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
-		            true, List.of(new ContainerCondition(id("oa1"), true),
-		                    new ContainerCondition(id("oa2"), false)));
-            pap.modify().prohibitions().createProhibition("label2", new ProhibitionSubject(subject), new AccessRightSet("read"),
-		            true, List.of(new ContainerCondition(id("oa3"), true),
-		                    new ContainerCondition(id("oa4"), false)));
+            pap.modify().prohibitions().createNodeProhibition("label1", subject, new AccessRightSet("read"),
+                    Set.of(id("oa1")),
+                    Set.of(id("oa2")),
+                    true);
+            pap.modify().prohibitions().createNodeProhibition("label2", subject, new AccessRightSet("read"),
+                    Set.of(id("oa3")),
+                    Set.of(id("oa4")),
+                    true);
 
             Prohibition p = pap.query().prohibitions().getProhibition("label1");
             assertEquals("label1", p.getName());
-            assertEquals(subject, p.getSubject().getNodeId());
+            assertTrue(p instanceof NodeProhibition);
+            assertEquals(subject, ((NodeProhibition) p).getNodeId());
             assertEquals(new AccessRightSet("read"), p.getAccessRightSet());
-            assertTrue(p.isIntersection());
-            assertEquals(2, p.getContainers().size());
-            List<ContainerCondition> expected = List.of(
-                    new ContainerCondition(id("oa1"), true),
-                    new ContainerCondition(id("oa2"), false)
-            );
-            assertTrue(expected.containsAll(p.getContainers()) && p.getContainers().containsAll(expected));
+            assertTrue(p.isConjunctive());
+            assertEquals(Set.of(id("oa1")), p.getInclusionSet());
+            assertEquals(Set.of(id("oa2")), p.getExclusionSet());
         }
     }
 
@@ -166,8 +157,8 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         pap.modify().operations().setResourceAccessRights(new AccessRightSet("read", "write"));
 
-        pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(subject), new AccessRightSet("read"),
-            true, List.of(new ContainerCondition(oa1, true)));
+        pap.modify().prohibitions().createNodeProhibition("label1", subject, new AccessRightSet("read"),
+            Set.of(oa1), Set.of(), true);
 
         assertTrue(pap.query().prohibitions().prohibitionExists("label1"));
         assertFalse(pap.query().prohibitions().prohibitionExists("label2"));
@@ -179,12 +170,12 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
 
         long ua2 = pap.modify().graph().createUserAttribute("ua2", List.of(id("ua1")));
         long ua3 = pap.modify().graph().createUserAttribute("ua3", List.of(ua2));
-        pap.modify().graph().assign(id("u1"), Collections.singleton(ua3));
+        pap.modify().graph().assign(id("u1"), Set.of(ua3));
 
-        pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(ua2), new AccessRightSet("read"),
-		        true, List.of(new ContainerCondition(id("US project"), true)));
-        pap.modify().prohibitions().createProhibition("label2", new ProhibitionSubject(ua3), new AccessRightSet("read"),
-		        true, List.of(new ContainerCondition(id("US project"), true)));
+        pap.modify().prohibitions().createNodeProhibition("label1", ua2, new AccessRightSet("read"),
+                Set.of(id("US project")), Set.of(), true);
+        pap.modify().prohibitions().createNodeProhibition("label2", ua3, new AccessRightSet("read"),
+                Set.of(id("US project")), Set.of(), true);
 
         Collection<Prohibition> prohibitions = pap.query().prohibitions().getInheritedProhibitionsFor(id("u1"));
         assertEquals(2, prohibitions.size());
@@ -194,10 +185,10 @@ public abstract class ProhibitionsQuerierTest extends PAPTestInitializer {
     void testGetProhibitionsForContainer() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.modify().prohibitions().createProhibition("label1", new ProhibitionSubject(id("ua1")), new AccessRightSet("read"),
-		        true, List.of(new ContainerCondition(id("US project"), true)));
-        pap.modify().prohibitions().createProhibition("label2", new ProhibitionSubject(id("ua1")), new AccessRightSet("read"),
-		        true, List.of(new ContainerCondition(id("US project"), true)));
+        pap.modify().prohibitions().createNodeProhibition("label1", id("ua1"), new AccessRightSet("read"),
+                Set.of(id("US project")), Set.of(), true);
+        pap.modify().prohibitions().createNodeProhibition("label2", id("ua1"), new AccessRightSet("read"),
+                Set.of(id("US project")), Set.of(), true);
 
 
         Collection<Prohibition> prohibitions = pap.query().prohibitions().getProhibitionsWithContainer(id("US project"));

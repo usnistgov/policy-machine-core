@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
@@ -430,15 +430,15 @@ public class ExecutionTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
 
         String input = """
-                create prohibition "p1"
-                deny UA "ua1"
-                access rights ["read"]
-                on union of {"oa1": false}
+                create conj node prohibition "p1"
+                deny "ua1"
+                arset ["read"]
+                include ["oa1"]
                 
-                create prohibition "p2"
-                deny UA "ua1"
-                access rights ["read"]
-                on union of {"oa1": false}
+                create conj node prohibition "p2"
+                deny "ua1"
+                arset ["read"]
+                include ["oa1"]
                 """;
         pap.executePML(new TestUserContext("u1"), input);
 

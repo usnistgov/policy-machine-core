@@ -21,7 +21,7 @@ public class Env extends PMLFunctionOperation<String> {
 	}
 
 	@Override
-	protected String execute(Args args) throws PMException {
+    public String execute(Args args) throws PMException {
 		return System.getenv(args.get(KEY_PARAM));
 	}
 }

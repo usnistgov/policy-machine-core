@@ -14,7 +14,8 @@ public class Id extends PMLQueryOperation<Long> {
         super(
             "id",
             LONG_TYPE,
-            List.of(NAME_PARAM)
+            List.of(NAME_PARAM),
+            List.of()
         );
     }
 

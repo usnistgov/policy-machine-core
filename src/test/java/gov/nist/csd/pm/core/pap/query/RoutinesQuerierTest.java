@@ -48,7 +48,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         Collection<String> names = pap.query().operations().getOperationNames();
         assertEquals(Set.of("r1", "r2", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"), new HashSet<>(names));
 
-        pap.plugins().addOperation(pap.query().operations(), new Routine<>("r3", VOID_TYPE, List.of()) {
+        pap.plugins().addOperation(new Routine<>("r3", VOID_TYPE, List.of()) {
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
                 return null;
@@ -71,7 +71,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
             Operation<?> actual = pap.query().operations().getOperation(r1.getName());
             assertEquals(r1, actual);
 
-            pap.plugins().addOperation(pap.query().operations(), r2);
+            pap.plugins().addOperation(r2);
             actual = pap.query().operations().getOperation(r2.getName());
             assertEquals(r2, actual);
         }

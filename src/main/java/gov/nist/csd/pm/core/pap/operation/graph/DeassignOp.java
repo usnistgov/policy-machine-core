@@ -1,30 +1,34 @@
 package gov.nist.csd.pm.core.pap.operation.graph;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DEASSIGN_FROM;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;
 
 public class DeassignOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DEASSIGN_ASCENDANT_PARAM =
-        new NodeIdFormalParameter("ascendant", DEASSIGN);
+        new NodeIdFormalParameter("ascendant");
 
     public static final NodeIdListFormalParameter DEASSIGN_DESCENDANTS_PARAM =
-        new NodeIdListFormalParameter("descendants", DEASSIGN_FROM);
+        new NodeIdListFormalParameter("descendants");
 
     public DeassignOp() {
         super(
             "deassign",
             BasicTypes.VOID_TYPE,
-            List.of(DEASSIGN_ASCENDANT_PARAM, DEASSIGN_DESCENDANTS_PARAM)
+            List.of(DEASSIGN_ASCENDANT_PARAM, DEASSIGN_DESCENDANTS_PARAM),
+            new RequiredCapability(
+                new RequiredPrivilegeOnParameter(DEASSIGN_ASCENDANT_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_DELETE),
+                new RequiredPrivilegeOnParameter(DEASSIGN_DESCENDANTS_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE)
+            )
         );
     }
 

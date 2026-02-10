@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_A;
 import static gov.nist.csd.pm.core.pap.PAPTest.ARG_B;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_POLICY_CLASS;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -15,15 +14,15 @@ import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifier.CannotDeletePluginOperationException;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.List;
@@ -32,12 +31,7 @@ import org.junit.jupiter.api.Test;
 
 public abstract class OperationsModifierTest extends PAPTestInitializer {
 
-    static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of()) {
-        @Override
-        public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-
-        }
-
+    static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of(), List.of()) {
         @Override
         public Object execute(PAP pap, Args args) throws PMException {
             return null;
@@ -50,7 +44,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testAdminAccessRightExistsException() {
             assertThrows(AdminAccessRightExistsException.class, () ->
-                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(CREATE_POLICY_CLASS)));
+                    pap.modify().operations().setResourceAccessRights(new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)));
         }
 
         @Test
@@ -81,7 +75,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
                     () -> pap.modify().operations().createOperation(testOp));
 
             pap.modify().operations().deleteOperation(testOp.getName());
-            pap.plugins().addOperation(pap.query().operations(), testOp);
+            pap.plugins().addOperation(testOp);
             assertThrows(OperationExistsException.class,
                 () -> pap.modify().operations().createOperation(testOp));
         }
@@ -154,7 +148,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             });
 
             pap.modify().operations().deleteOperation(routine1.getName());
-            pap.plugins().addOperation(pap.query().operations(), routine1);
+            pap.plugins().addOperation(routine1);
             assertThrows(OperationExistsException.class,
                 () -> pap.modify().operations().createOperation(routine1));
         }
@@ -192,7 +186,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
             pap.modify().operations().deleteOperation("routine1");
             assertFalse(pap.query().operations().getOperations().contains(routine1));
 
-            pap.plugins().addOperation(pap.query().operations(), routine1);
+            pap.plugins().addOperation(routine1);
             assertTrue(pap.query().operations().getOperations().contains(routine1));
             assertThrows(CannotDeletePluginOperationException.class, () ->
                 pap.modify().operations().deleteOperation(routine1.getName()));

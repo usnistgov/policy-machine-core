@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.AUTHOR_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.EVENT_PATTERN_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.obligation.ObligationOp.OBLIGATION_RESPONSE_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp.AUTHOR_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp.EVENT_PATTERN_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp.OBLIGATION_RESPONSE_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;

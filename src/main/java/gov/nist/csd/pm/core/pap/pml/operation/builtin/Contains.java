@@ -24,7 +24,7 @@ public class Contains extends PMLFunctionOperation<Boolean> {
     }
 
     @Override
-    protected Boolean execute(Args args) throws PMException {
+    public Boolean execute(Args args) throws PMException {
         List<Object> valueArr = args.get(ARR_PARAM);
         Object element = args.get(ELEMENT_PARAM);
         return valueArr.contains(element);

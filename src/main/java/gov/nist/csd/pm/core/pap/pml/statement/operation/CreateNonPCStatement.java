@@ -1,21 +1,17 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp.CREATE_OA_DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp.CREATE_O_DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp.CREATE_UA_DESCENDANTS_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp.CREATE_U_DESCENDANTS_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.graph.CreateNodeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectAttributeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateObjectOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateUserAttributeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.CreateUserOp;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.ArrayList;
@@ -47,7 +43,7 @@ public class CreateNonPCStatement extends OperationStatement {
 
         return new Args()
             .put(NAME_PARAM, name)
-            .put(getDescendantsFormalParam(nodeType), descIds);
+            .put(CreateNodeOp.CREATE_NODE_DESCENDANTS_PARAM, descIds);
     }
 
     @Override
@@ -77,14 +73,4 @@ public class CreateNonPCStatement extends OperationStatement {
             default -> new CreateUserOp();
         };
     }
-
-    private static NodeIdListFormalParameter getDescendantsFormalParam(NodeType type) {
-        return switch (type) {
-            case OA -> CREATE_OA_DESCENDANTS_PARAM;
-            case O -> CREATE_O_DESCENDANTS_PARAM;
-            case UA -> CREATE_UA_DESCENDANTS_PARAM;
-            default -> CREATE_U_DESCENDANTS_PARAM;
-        };
-    }
-
 } 

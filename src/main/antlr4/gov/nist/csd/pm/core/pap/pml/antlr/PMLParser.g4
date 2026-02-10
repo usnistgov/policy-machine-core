@@ -79,7 +79,7 @@ basicSubjectPatternExpr:
 // operation
 operationPattern:
     ANY OPERATION #AnyOperation
-    | (opName=ID onPattern?) #OperationPatternFunc ;
+    | (opName=stringLit onPattern?) #OperationPatternFunc ;
 onPattern: ON OPEN_PAREN argNames? CLOSE_PAREN onPatternBlock? ;
 onPatternBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 argNames: ID (COMMA ID)*;
@@ -91,18 +91,13 @@ responseBlock:
     OPEN_CURLY statement* CLOSE_CURLY ;
 
 createProhibitionStatement:
-    CREATE PROHIBITION name=expression
-    DENY (U | UA | PROCESS) subject=expression
-    ACCESS_RIGHTS accessRights=expression
-    ON (INTERSECTION|UNION) OF containers=expression ;
-
-/*
-uncomment for operaiton prohibitions
-createProhibitionStatement:
-    CREATE PROHIBITION name=expression
-    DENY subject=expression
-    (ACCESS_RIGHTS accessRights=expression ON containers=expression) #Arset
-    | (OPERATION op=expression ON argPatterns=patternMap) #Operation ;*/
+    CREATE type=(CONJ | DISJ)
+    entity=(NODE | PROCESS) PROHIBITION name=expression
+    DENY node=expression (PROCESS process=expression)?
+    ARSET arset=expression
+    (INCLUDE inclusionSet=expression)?
+    (EXCLUDE exclusionSet=expression)?
+  ;
 
 setNodePropertiesStatement:
     SET_PROPERTIES OF name=expression TO properties=expression ;
@@ -144,16 +139,18 @@ resourceOpDefinitionStatement: resourceOpSignature basicAndCheckStatementBlock? 
 routineDefinitionStatement: routineSignature statementBlock ;
 functionDefinitionStatement: functionSignature basicStatementBlock ;
 
-adminOpSignature: ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-queryOpSignature: QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-resourceOpSignature: RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
+adminOpSignature: reqCapList? ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+queryOpSignature: reqCapList? QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+resourceOpSignature: reqCapList? RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
-operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
-operationFormalParam: nodeArgAnnotation? variableType ID reqCap=stringArrayLit?;
+reqCapList: reqCap+ ;
+reqCap: REQ_CAP OPEN_PAREN (OPEN_CURLY reqCapEntry (COMMA reqCapEntry)*? CLOSE_CURLY) CLOSE_PAREN ;
+reqCapEntry:(param=ID | node=stringLit) COLON arset=stringArrayLit ;
 
-nodeArgAnnotation: NODE_ARG (OPEN_PAREN (stringLit (COMMA stringLit)*)? CLOSE_PAREN)? ;
+operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
+operationFormalParam: NODE_ARG? variableType ID paramReqCap=stringArrayLit?;
 
 adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
 adminOpStatement:
@@ -207,7 +204,8 @@ expression:
     | literal #LiteralExpression
     | EXCLAMATION expression #NegateExpression
     | OPEN_PAREN expression CLOSE_PAREN #ParenExpression
-	| left=expression PLUS right=expression #PlusExpression
+    | expression index #IndexExpression
+    | left=expression PLUS right=expression #PlusExpression
     | left=expression (EQUALS | NOT_EQUALS) right=expression #EqualsExpression
     | left=expression (LOGICAL_AND | LOGICAL_OR) right=expression #LogicalExpression ;
 expressionList: expression (COMMA expression)* ;
@@ -226,7 +224,7 @@ stringArrayLit: OPEN_BRACKET (stringLit (COMMA stringLit)*)? CLOSE_BRACKET ;
 mapLit: OPEN_CURLY (element (COMMA element)*)? CLOSE_CURLY ;
 element: key=expression COLON value=expression ;
 
-variableReference: ID (index)* ;
+variableReference: ID ;
 
 index:
     OPEN_BRACKET key=expression CLOSE_BRACKET #BracketIndex
@@ -253,6 +251,10 @@ idIndex:
     | IN
     | DO
     | ANY
+    | DISJ
+    | CONJ
+    | INCLUDE
+    | EXCLUDE
     | INTERSECTION
     | UNION
     | PROCESS
@@ -267,6 +269,7 @@ idIndex:
     | DISSOCIATE
     | DENY
     | PROHIBITION
+    | ARSET
     | OBLIGATION
     | USER
     | NODE
@@ -290,6 +293,7 @@ idIndex:
     | BOOL_TYPE
     | VOID_TYPE
     | ARRAY_TYPE
+    | INT64_TYPE
     | NIL_LIT
     | TRUE
     | FALSE

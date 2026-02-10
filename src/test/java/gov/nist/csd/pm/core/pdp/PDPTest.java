@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pdp;
 
 import static gov.nist.csd.pm.core.pap.PAPTest.testAdminPolicy;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.CREATE_OBJECT_ATTRIBUTE;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
@@ -15,9 +14,6 @@ import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -27,6 +23,8 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -34,9 +32,9 @@ import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class PDPTest {
@@ -60,12 +58,12 @@ class PDPTest {
                 () -> pdp.runTx(
                         new TestUserContext("u1"),
                         policy -> {
-                            policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(CREATE_OBJECT_ATTRIBUTE));
+                            policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
                             return null;
                         }
                 )
         );
-        assertEquals("{user: u1} missing required access rights {associate} on {target: ua1}", e.getMessage());
+        assertEquals("{user: u1} cannot perform operation associate", e.getMessage());
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
@@ -112,10 +110,9 @@ class PDPTest {
         long oa1 = pap.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         pap.modify().graph().createObject("o1", List.of(oa1));
 
-        pap.modify().prohibitions().createProhibition("pro1", new ProhibitionSubject(u1),
+        pap.modify().prohibitions().createNodeProhibition("pro1", u1,
                 new AccessRightSet("read"),
-                true,
-                Collections.singleton(new ContainerCondition(id("oa1"), false)));
+                Set.of(id("oa1")), Set.of(), true);
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
             pdp.bootstrap(new PolicyBootstrapper() {
@@ -174,8 +171,11 @@ class PDPTest {
         pap.executePML(new TestUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 
-                resourceop read_file(@node("read") string name) {}
-                resourceop write_file(@node("write") string name) {}
+                @reqcap({name: ["read"]})
+                resourceop read_file(@node string name) {}
+                
+                @reqcap({name: ["write"]})
+                resourceop write_file(@node string name) {}
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -208,15 +208,15 @@ class PDPTest {
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["assign"]
-                associate "ua1" and "oa2" with ["assign_to"]
+                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" and "oa2" with ["admin:graph:assignment:descendant:create"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 
                 adminop op1() string {
-                    check ["assign_to"] on ["oa2"]
+                    check ["admin:graph:assignment:descendant:create"] on ["oa2"]
                     create pc "test"
                     return "test"
                 }
@@ -246,7 +246,8 @@ class PDPTest {
                 
                 set resource access rights ["read", "write"]
                 
-                resourceop read_file(@node("read") int64 id) {}
+                @reqcap({id: ["read"]})
+                resourceop read_file(@node int64 id) {}
 
                 """);
         PDP pdp = new PDP(pap);
@@ -312,7 +313,7 @@ class PDPTest {
                 create oa "oa2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and "oa1" with ["create_object"]
+                associate "ua1" and "oa1" with ["admin:graph:node:create"]
                 
                 routine routine1() {
                     foreach x in ["oa1", "oa2"] {
@@ -338,7 +339,7 @@ class PDPTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["create_object"]
+                associate "ua1" and "oa1" with ["admin:graph:node:create"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -366,8 +367,8 @@ class PDPTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["create_object"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*a"]
+                associate "ua1" and "oa1" with ["admin:graph:node:create"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -380,7 +381,7 @@ class PDPTest {
                 
                 create obligation "o1"
                     when any user
-                    performs create_user_attribute
+                    performs "create_user_attribute"
                     do(ctx) {
                         create pc "test"
                     }
@@ -403,7 +404,7 @@ class PDPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and PM_ADMIN_BASE_OA with ["create_policy_class", "create_object_attribute"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 
                 create u "u1" in ["ua1"]
                 
@@ -413,7 +414,7 @@ class PDPTest {
                 
                 create obligation "obl1"
                     when any user
-                    performs op1
+                    performs "op1"
                     do(ctx) {
                         create oa "oa_" + ctx.args.name in [ctx.args.name]
                     }

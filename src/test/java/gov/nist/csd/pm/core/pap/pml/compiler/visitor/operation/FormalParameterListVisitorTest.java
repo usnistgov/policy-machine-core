@@ -24,7 +24,7 @@ class FormalParameterListVisitorTest {
     @Test
     void testOperationFormalParameterList() throws PMException {
         String pml = """
-            @node("read", "write") string a, string b
+            @node string a, string b
             """;
         OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
 
@@ -35,7 +35,7 @@ class FormalParameterListVisitorTest {
         assertEquals(2, actual.size());
         assertEquals(
             List.of(
-                new NodeNameFormalParameter("a", "read", "write"),
+                new NodeNameFormalParameter("a"),
                 new FormalParameter<>("b", STRING_TYPE)
             ),
             actual
@@ -45,7 +45,7 @@ class FormalParameterListVisitorTest {
     @Test
     void testOperationFormalParameterListNoArs() throws PMException {
         String pml = """
-            @node() string a, string b
+            @node string a, string b
             """;
         OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
 

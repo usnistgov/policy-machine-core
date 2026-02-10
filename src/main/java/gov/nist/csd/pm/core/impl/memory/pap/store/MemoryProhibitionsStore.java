@@ -2,14 +2,15 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.store.ProhibitionsStore;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 public class MemoryProhibitionsStore extends MemoryStore implements ProhibitionsStore {
 
@@ -18,17 +19,33 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
     }
 
     @Override
-    public void createProhibition(String name,
-                                  ProhibitionSubject subject,
-                                  AccessRightSet accessRightSet,
-                                  boolean intersection,
-                                  Collection<ContainerCondition> containerConditions) {
-        Prohibition p = new Prohibition(
-                name,
-                subject,
-                accessRightSet,
-                intersection,
-                containerConditions.stream().toList()
+    public void createNodeProhibition(String name,
+                                      long nodeId,
+                                      AccessRightSet accessRightSet,
+                                      Set<Long> inclusionSet,
+                                      Set<Long> exclusionSet,
+                                      boolean isConjunctive) throws PMException {
+        Prohibition p = new NodeProhibition(
+            name,
+            nodeId, accessRightSet, inclusionSet, exclusionSet, isConjunctive
+        );
+
+        policy.addProhibition(p);
+
+        txCmdTracker.trackOp(tx, new TxCmd.CreateProhibitionTxCmd(p));
+    }
+
+    @Override
+    public void createProcessProhibition(String name,
+                                         long userId,
+                                         String process,
+                                         AccessRightSet accessRightSet,
+                                         Set<Long> inclusionSet,
+                                         Set<Long> exclusionSet,
+                                         boolean isConjunctive) throws PMException {
+        Prohibition p = new ProcessProhibition(
+            name,
+            userId, process, accessRightSet, inclusionSet, exclusionSet, isConjunctive
         );
 
         policy.addProhibition(p);
@@ -46,13 +63,21 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
     }
 
     @Override
-    public Map<Long, Collection<Prohibition>> getNodeProhibitions() throws PMException {
-        return policy.nodeProhibitions;
+    public Collection<Prohibition> getAllProhibitions() throws PMException {
+        List<Prohibition> all = new ArrayList<>();
+        policy.nodeProhibitions.forEach((id, pros) -> all.addAll(pros));
+        policy.processProhibitions.forEach((id, pros) -> all.addAll(pros));
+        return all;
     }
 
     @Override
-    public Map<String, Collection<Prohibition>> getProcessProhibitions() throws PMException {
-        return policy.processProhibitions;
+    public Collection<Prohibition> getNodeProhibitions(long nodeId) throws PMException {
+        return policy.nodeProhibitions.getOrDefault(nodeId, new ArrayList<>());
+    }
+
+    @Override
+    public Collection<Prohibition> getProcessProhibitions(String process) throws PMException {
+        return policy.processProhibitions.getOrDefault(process, new ArrayList<>());
     }
 
     @Override
@@ -88,13 +113,4 @@ public class MemoryProhibitionsStore extends MemoryStore implements Prohibitions
         }
     }
 
-    @Override
-    public Collection<Prohibition> getProhibitionsWithNode(long subject) throws PMException {
-        return policy.nodeProhibitions.getOrDefault(subject, new ArrayList<>());
-    }
-
-    @Override
-    public Collection<Prohibition> getProhibitionsWithProcess(String subject) throws PMException {
-        return policy.processProhibitions.getOrDefault(subject, new ArrayList<>());
-    }
 }

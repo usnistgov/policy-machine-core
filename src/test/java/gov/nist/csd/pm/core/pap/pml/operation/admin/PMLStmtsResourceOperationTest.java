@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.util.TestUserContext;
@@ -22,9 +22,9 @@ class PMLStmtsResourceOperationTest {
     void testNonPMLResourceOpInvokedInPML() throws PMException {
         MemoryPAP memoryPAP = new MemoryPAP();
         memoryPAP.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
-        memoryPAP.modify().operations().createOperation(new ResourceOperation<>("op1", STRING_TYPE, List.of()) {
+        memoryPAP.modify().operations().createOperation(new ResourceOperation<>("op1", STRING_TYPE, List.of(), List.of()) {
             @Override
-            protected String execute(PolicyQuery query, Args args) throws PMException {
+            public String execute(PolicyQuery query, Args args) throws PMException {
                 return "test";
             }
         });

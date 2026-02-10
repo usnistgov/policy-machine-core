@@ -1,9 +1,7 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -43,7 +41,7 @@ public class CachedTargetEvaluator extends TargetEvaluator {
             firstLevelDescs.addAll(targetCtx.getAttributeIds());
         }
 
-        Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userDagResult.prohibitions());
+        Set<Long> userProhibitionTargets = collectUserProhibitionAttributes(userDagResult.prohibitions());
         Set<Long> visitedProhibitionTargets = new LongOpenHashSet();
 
         // Use cached visitedNodes instead of creating a new one

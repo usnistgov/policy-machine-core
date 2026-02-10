@@ -11,18 +11,18 @@ public class JSONOperations {
     private List<String> resource;
     private List<String> routine;
     private List<String> query;
-    private List<String> basic;
+    private List<String> function;
 
     public JSONOperations(List<String> admin,
                           List<String> resource,
                           List<String> routine,
                           List<String> query,
-                          List<String> basic) {
+                          List<String> function) {
         this.admin = admin;
         this.resource = resource;
         this.routine = routine;
         this.query = query;
-        this.basic = basic;
+        this.function = function;
     }
 
     public JSONOperations() {
@@ -60,17 +60,17 @@ public class JSONOperations {
         this.query = query;
     }
 
-    public List<String> getBasic() {
-        return basic;
+    public List<String> getFunction() {
+        return function;
     }
 
-    public void setBasic(List<String> basic) {
-        this.basic = basic;
+    public void setFunction(List<String> function) {
+        this.function = function;
     }
 
     public List<String> getAll() {
         List<String> all = new ArrayList<>();
-        Stream.of(admin, resource, routine, query, basic)
+        Stream.of(admin, resource, routine, query, function)
             .filter(Objects::nonNull)
             .forEach(all::addAll);
         return all;

@@ -2,12 +2,11 @@ package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.Visitor;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.graph.relationship.Association;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.pap.dag.BreadthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -54,7 +53,7 @@ public class UserEvaluator {
 	private Set<Prohibition> initializeProcessProhibitions(UserContext userContext) throws PMException {
 		Set<Prohibition> prohibitions = new HashSet<>();
 		if (userContext.getProcess() != null) {
-			prohibitions.addAll(policyStore.prohibitions().getProhibitionsWithProcess(userContext.getProcess()));
+			prohibitions.addAll(policyStore.prohibitions().getProcessProhibitions(userContext.getProcess()));
 		}
 		return prohibitions;
 	}
@@ -75,7 +74,7 @@ public class UserEvaluator {
 	}
 
 	private void collectNodeProhibitions(long nodeId, Set<Prohibition> reachedProhibitions) throws PMException {
-		Collection<Prohibition> nodeProhibitions = policyStore.prohibitions().getProhibitionsWithNode(nodeId);
+		Collection<Prohibition> nodeProhibitions = policyStore.prohibitions().getNodeProhibitions(nodeId);
 		reachedProhibitions.addAll(nodeProhibitions);
 	}
 
@@ -95,8 +94,8 @@ public class UserEvaluator {
 	private void collectAssociationsIntoBorderTargets(Collection<Association> associations, 
 													 Map<Long, AccessRightSet> borderTargets) {
 		for (Association association : associations) {
-			long targetId = association.getTarget();
-			AccessRightSet associationRights = association.getAccessRightSet();
+			long targetId = association.target();
+			AccessRightSet associationRights = association.arset();
 			
 			AccessRightSet existingRights = borderTargets.computeIfAbsent(targetId, k -> new AccessRightSet());
 			existingRights.addAll(associationRights);

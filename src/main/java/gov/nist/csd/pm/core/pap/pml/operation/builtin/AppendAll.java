@@ -23,7 +23,7 @@ public class AppendAll extends PMLFunctionOperation<List<Object>> {
     }
 
     @Override
-    protected List<Object> execute(Args args) throws PMException {
+    public List<Object> execute(Args args) throws PMException {
         List<Object> valueArr = args.get(DST_PARAM);
         List<Object> srcValue = args.get(SRC_LIST_PARAM);
 

@@ -39,6 +39,7 @@ class OperationInvokeExpressionTest {
 
 	static PMLStmtsAdminOperation voidFunc = new PMLStmtsAdminOperation("voidFunc", new VoidType(),
             List.of(a, b),
+        List.of(),
             new PMLStatementBlock(List.of(
                             new CreatePolicyClassStatement(new VariableReferenceExpression<>("a", STRING_TYPE)),
                             new CreatePolicyClassStatement(new VariableReferenceExpression<>("b", STRING_TYPE))
@@ -46,6 +47,7 @@ class OperationInvokeExpressionTest {
     static PMLStmtsAdminOperation stringFunc = new PMLStmtsAdminOperation("stringFunc",
             STRING_TYPE,
             List.of(a, b),
+        List.of(),
             new PMLStatementBlock(List.of(
                     new VariableAssignmentStatement("x", false, new StringLiteralExpression("test")),
                     new ReturnStatement(new StringLiteralExpression("test_ret"))

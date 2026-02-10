@@ -205,14 +205,14 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.13</version>
+            <version>1.5.25</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>2025.04.0</version>
+            <version>2026.01.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.neo4j</groupId>

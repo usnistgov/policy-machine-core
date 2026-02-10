@@ -8,7 +8,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
-import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.ArrayList;
@@ -17,13 +16,12 @@ import java.util.List;
 
 public class GetAdjacentDescendants extends PMLQueryOperation<List<String>> {
 
-    private static final Type<?> returnType = ListType.of(STRING_TYPE);
-
     public GetAdjacentDescendants() {
         super(
-                "getAdjacentDescendants",
-                ListType.of(STRING_TYPE),
-                List.of(NODE_NAME_PARAM)
+            "getAdjacentDescendants",
+            ListType.of(STRING_TYPE),
+            List.of(NODE_NAME_PARAM),
+            List.of()
         );
     }
 

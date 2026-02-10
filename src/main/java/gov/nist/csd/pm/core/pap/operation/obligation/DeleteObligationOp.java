@@ -1,27 +1,25 @@
 package gov.nist.csd.pm.core.pap.operation.obligation;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DELETE_OBLIGATION;
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
-public class DeleteObligationOp extends ObligationOp {
+public class DeleteObligationOp extends AdminOperation<Void> {
 
     public DeleteObligationOp() {
         super(
             "delete_obligation",
-            List.of(NAME_PARAM)
+            VOID_TYPE,
+            List.of(NAME_PARAM),
+            AdminPolicyNode.PM_ADMIN_OBLIGATIONS,
+            AdminAccessRight.ADMIN_OBLIGATION_DELETE
         );
-    }
-
-    @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        pap.privilegeChecker().check(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_OBLIGATIONS.nodeId()), DELETE_OBLIGATION);
     }
 
     @Override

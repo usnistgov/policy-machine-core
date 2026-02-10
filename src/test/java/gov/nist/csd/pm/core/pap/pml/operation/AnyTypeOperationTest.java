@@ -14,17 +14,14 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.TestPMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
-import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.OperationInvokeExpression;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class AnyTypeOperationTest {
@@ -37,8 +34,8 @@ public class AnyTypeOperationTest {
             STRING_TYPE,
             List.of(
                 new FormalParameter<>("arg", ANY_TYPE)
-            )
-        );
+            ),
+            List.of());
 
         CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addOperation("testOp", functionSignature);
@@ -68,8 +65,8 @@ public class AnyTypeOperationTest {
             OperationType.FUNCTION,
             "returningOp",
             ANY_TYPE,  
-            List.of()
-        );
+            List.of(),
+            List.of());
 
         CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addOperation("returningOp", functionSignature);
@@ -106,8 +103,8 @@ public class AnyTypeOperationTest {
             Arrays.asList(
                 new FormalParameter<>("arrayArg", ListType.of(ANY_TYPE)),
                 new FormalParameter<>("mapArg", MapType.of(STRING_TYPE, ANY_TYPE))
-            )
-        );
+            ),
+            List.of());
 
         CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addOperation("listMapFunction", functionSignature);
@@ -142,8 +139,8 @@ public class AnyTypeOperationTest {
             List.of(
                 new FormalParameter<>("complexArg",
                     MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)))
-            )
-        );
+            ),
+            List.of());
 
         CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addOperation("nestedFunction", functionSignature);
@@ -176,8 +173,8 @@ public class AnyTypeOperationTest {
             Arrays.asList(
                 new FormalParameter<>("stringArg", STRING_TYPE),
                 new FormalParameter<>("objectArg", ANY_TYPE)
-            )
-        );
+            ),
+            List.of());
 
         CompileScope scope = new CompileScope(new MemoryPAP());
         scope.addOperation("anyParamFunction", operationSignature);

@@ -13,11 +13,16 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -42,20 +47,25 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
-                create prohibition "pro1"
-                deny U "u2"
-                access rights ["assign"]
-                on union of {PM_ADMIN_BASE_OA: false}
+                create conj node prohibition "pro1"
+                deny "u2"
+                arset ["admin:graph:assignment:ascendant:create"]
+                include [PM_ADMIN_BASE_OA]
                 """);
 
-        AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), "assign");
-            }
-
+        AdminOperation<?> op1 = new AdminOperation<>(
+            "op1",
+            VOID_TYPE,
+            List.of(ARGA, ARGB, ARGC),
+            new RequiredCapability(
+                new RequiredPrivilegeOnNode(
+                    AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName(),
+                    new AccessRightSet("admin:graph:assignment:ascendant:create")
+                )
+            )
+        ) {
             @Override
             public Void execute(PAP pap, Args actualArgs) throws PMException {
                 String a = actualArgs.get(ARGA);
@@ -129,15 +139,15 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["assign"]
+                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
-                create prohibition "pro1"
-                deny U "u2"
-                access rights ["assign"]
-                on union of {PM_ADMIN_BASE_OA: false}
+                create conj node prohibition "pro1"
+                deny "u2"
+                arset ["admin:graph:assignment:ascendant:create"]
+                include [PM_ADMIN_BASE_OA]
                 
                 adminop op1(string a, []string b, map[string]string c) {
-                    check ["assign"] on [PM_ADMIN_BASE_OA]
+                    check ["admin:graph:assignment:ascendant:create"] on [PM_ADMIN_BASE_OA]
                     create pc "1" + a
                 
                     foreach x in b {
@@ -206,12 +216,6 @@ public class PMLTest {
             )
         ));
     }
-
-    /*
-     - test retunr {} with return type
-     - test return in root PML with value and withou -- without value in if
-     - test reasingemtn of variable value type
-     */
 
     @Test
     void testEmptyValueIsCorrectlyAssignedTheOperationReturnType() throws PMException {
@@ -290,7 +294,7 @@ public class PMLTest {
             
             create obligation "o1"
             when any user
-            performs test on () {
+            performs "test" on () {
                 a := getAdjacentAscendants("123")
                 b := test()
             }
@@ -348,6 +352,22 @@ public class PMLTest {
         pap.modify().graph().createPolicyClass("a");
         o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
         assertEquals(o, "a");
+    }
+
+    @Test
+    void testIndexExpressionAsStatementCausesCompilationError() throws PMException {
+        MemoryPAP pap = new MemoryPAP();
+        pap.executePML(new UserContext(-1), """
+                create pc "pc1"
+                """);
+
+        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), """
+                getNode("pc1")
+                """));
+
+        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(-1), """
+                getNode("pc1").name
+                """));
     }
 
     @Test
@@ -417,5 +437,36 @@ public class PMLTest {
 
         PMLCompiler pmlCompiler = new PMLCompiler();
         assertDoesNotThrow(() -> pmlCompiler.compilePML(new MemoryPAP(), pml));
+    }
+
+    @Test
+    void testReqCap() throws PMException {
+        String pml = """
+            set resource access rights ["read"]
+            
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            create oa "oa1" in ["pc1"]
+            create o "o1" in ["oa1"]
+            create oa "oa2" in ["pc1"]
+            create o "o2" in ["oa2"]
+            
+            associate "ua1" and "oa1" with ["read"]
+            associate "ua1" and "oa2" with ["read"]
+            
+            @reqcap({file: ["read"]})
+            @reqcap({"o2": ["read"]})
+            resourceop read_file(@node string file) { }
+            """;
+        PAP pap = new TestPAP();
+        pap.executePML(null, pml);
+        Operation<?> readFile = pap.query().operations().getOperation("read_file");
+
+        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
+
+        pap.modify().graph().dissociate(id("ua1"), id("oa1"));
+
+        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
     }
 }

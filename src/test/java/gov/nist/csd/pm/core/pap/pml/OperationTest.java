@@ -81,6 +81,7 @@ public class OperationTest {
     @Test
     void testResourceOperationCheckBlock() throws PMException {
         String pml = """
+            set resource access rights ["read"]
             create pc "pc1"
             create ua "ua1" in ["pc1"]
             create u "u1" in ["ua1"]

@@ -90,24 +90,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminAccessRights;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 public class JavaExample {
@@ -124,39 +126,44 @@ public class JavaExample {
         long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
         long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
         pap.modify().graph().createUser("admin_user", List.of(adminId));
-        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRights.ASSIGN_TO));
+        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
 
         long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
         long userInboxes = pap.modify().graph().createObjectAttribute("user inboxes", List.of(pc1Id));
-        pap.modify().graph().associate(adminId, userHomes, new AccessRightSet(AdminAccessRights.WC_ALL));
-        pap.modify().graph().associate(adminId, userInboxes, new AccessRightSet(AdminAccessRights.WC_ALL));
+        pap.modify().graph().associate(adminId, userHomes, AccessRightSet.wildcard());
+        pap.modify().graph().associate(adminId, userInboxes, AccessRightSet.wildcard());
 
         // prohibit the admin user from reading inboxes
-        pap.modify().prohibitions().createProhibition(
+        pap.modify().prohibitions().createNodeProhibition(
             "deny admin on user inboxes",
-            new ProhibitionSubject(adminId),
+            adminId,
             new AccessRightSet("read"),
-            false,
-            List.of(new ContainerCondition(userInboxes, false))
+            Set.of(userInboxes),
+            Set.of(),
+            false
         );
 
         // create resource operation to read a file
-        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(new NodeNameFormalParameter("name", "read"))) {
+        NodeNameFormalParameter nameFormalParameter = new NodeNameFormalParameter("name");
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter),
+            List.of(new RequiredCapability(new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
             @Override
-            protected Void execute(PolicyQuery query, Args args) throws PMException {
+            public Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
             }
         };
         pap.modify().operations().createOperation(resourceOp);
 
+        /*
+        (policyQuery, userCtx, args) -> policyQuery.access()
+                .computePrivileges(userCtx, new TargetContext(usersId))
+                .contains(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE.toString())))
+         */
+
         // create a custom administration operation
         FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
-        AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam)) {
-
-            @Override
-            public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                pap.privilegeChecker().check(userCtx, usersId, AdminAccessRights.ASSIGN_TO);
-            }
+        AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam),
+            List.of(new RequiredCapability(new RequiredPrivilegeOnNodeId(usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -178,7 +185,7 @@ public class JavaExample {
         String pml = """
             create obligation "o1"
             when any user
-            performs create_new_user
+            performs "create_new_user"
             do(ctx) {
                 objName := "welcome " + ctx.args.username
                 inboxName := ctx.args.username + " inbox"
@@ -195,7 +202,7 @@ public class JavaExample {
         epp.subscribeTo(pdp);
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        pdp.adjudicateAdminOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
+        pdp.adjudicateOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
 
         // check admin operation and obligation response was successful
         assertTrue(pap.query().graph().nodeExists("testUser home"));
@@ -206,7 +213,7 @@ public class JavaExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateAdminOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+            () -> pdp.adjudicateOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
         );
     }
 }
@@ -234,38 +241,39 @@ public class PMLExample {
     String pml = """
         // set resource access rights
         set resource access rights ["read", "write"]
-                
+        
         // create initial graph config
         create pc "pc1"
         create ua "users" in ["pc1"]
         create ua "admin" in ["pc1"]
         // the admin_user will be created automatically during bootstrapping 
         assign "admin_user" to ["admin"]
-        associate "admin" and "users" with ["assign_to"]
-                
+        associate "admin" and "users" with ["admin:graph:assignment:descendant:create"]
+        
         create oa "user homes" in ["pc1"]
         create oa "user inboxes" in ["pc1"]
         associate "admin" and "user homes" with ["*"]
         associate "admin" and "user inboxes" with ["*"]
-                
+        
         // prohibit the admin user from reading inboxes
-        create prohibition "deny admin on user inboxes"
-        deny u "admin"
-        access rights ["read"]
-        on union of {"user inboxes": false}
-                
+        create conj node prohibition "deny admin on user inboxes"
+        deny "admin"
+        arset ["read"]
+        include ["user inboxes"]
+        
         // create resource operation to read a file
-        resourceop read_file(@node("read") string name) { }
-                
+        @reqcap({name: ["read"]})
+        resourceop read_file(@node string name) { }
+        
         // create a custom administration operation
         adminop create_new_user(string username) {
-            check ["assign_to"] on ["users"]
-            
+            check ["admin:graph:assignment:descendant:create"] on ["users"]
+        
             create u username in ["users"]
             create oa username + " home" in ["user homes"]
             create oa username + " inbox" in ["user inboxes"]
         }
-                
+        
         // - create an obligation on the custom admin operation that when ever a user is created, add an object to their
         // inbox titled "hello " + username
         // - obligations require the use of PML to define responses, so they may be serialized
@@ -273,7 +281,7 @@ public class PMLExample {
         // operations in the response
         create obligation "o1"
         when any user
-        performs create_new_user
+        performs "create_new_user"
         do(ctx) {
             objName := "welcome " + ctx.args.username
             inboxName := ctx.args.username + " inbox"
@@ -317,7 +325,6 @@ public class PMLExample {
         );
     }
 }
-
 ```
 
 ## Operations

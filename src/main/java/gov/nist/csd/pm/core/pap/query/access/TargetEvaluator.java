@@ -6,14 +6,12 @@ import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLA
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.dag.Propagator;
-import gov.nist.csd.pm.core.common.graph.dag.TargetDagResult;
-import gov.nist.csd.pm.core.common.graph.dag.UserDagResult;
 import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.pap.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -98,7 +96,7 @@ public class TargetEvaluator {
 			firstLevelDescs.addAll(targetCtx.getAttributeIds());
 		}
 
-		Set<Long> userProhibitionTargets = collectUserProhibitionTargets(userDagResult.prohibitions());
+		Set<Long> userProhibitionTargets = collectUserProhibitionAttributes(userDagResult.prohibitions());
 		Map<Long, Map<Long, AccessRightSet>> visitedNodes = new Long2ObjectOpenHashMap<>();
 		Set<Long> visitedProhibitionTargets = new LongOpenHashSet();
 
@@ -202,14 +200,14 @@ public class TargetEvaluator {
 		targetContext.setTargetId(targetId);
 	}
 
-	protected Set<Long> collectUserProhibitionTargets(Set<Prohibition> prohibitions) {
-		Set<Long> userProhibitionTargets = new HashSet<>();
+	protected Set<Long> collectUserProhibitionAttributes(Set<Prohibition> prohibitions) {
+		Set<Long> userProhibitionAttrs = new HashSet<>();
 		for (Prohibition prohibition : prohibitions) {
-			for (ContainerCondition containerCondition : prohibition.getContainers()) {
-				userProhibitionTargets.add(containerCondition.getId());
-			}
+			userProhibitionAttrs.addAll(prohibition.getInclusionSet());
+			userProhibitionAttrs.addAll(prohibition.getExclusionSet());
 		}
-		return userProhibitionTargets;
+
+		return userProhibitionAttrs;
 	}
 
 	protected record TraversalState(Collection<Long> firstLevelDescs,

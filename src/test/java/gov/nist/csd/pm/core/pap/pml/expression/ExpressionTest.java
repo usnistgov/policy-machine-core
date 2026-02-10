@@ -94,8 +94,8 @@ class ExpressionTest {
             OperationType.FUNCTION,
             "test",
             STRING_TYPE,
-            List.of()
-        );
+            List.of(),
+            List.of());
         compileScope.addOperation("test", signature);
         VisitorContext visitorContext = new VisitorContext(compileScope);
 

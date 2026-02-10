@@ -18,7 +18,8 @@ public class Name extends PMLQueryOperation<String> {
         super(
             "name",
             STRING_TYPE,
-            List.of(NODE_ID_PARAM)
+            List.of(NODE_ID_PARAM),
+            List.of()
         );
     }
 

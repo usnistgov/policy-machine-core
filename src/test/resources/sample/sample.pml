@@ -40,15 +40,18 @@ routine deleteAllProjects(string locProjectOA) {
     }
 }
 
-adminop deleteReadme(@node("delete_readme") string projectReadme) {
+@reqcap({projectReadme: ["delete_readme"]})
+adminop deleteReadme(@node string projectReadme) {
     delete node projectReadme
 }
 
-adminop deleteProject(@node("delete_project") string projectName) {
+@reqcap({projectName: ["delete_project"]})
+adminop deleteProject(@node string projectName) {
     delete node projectName
 }
 
-adminop createProject(string projectName, @node("assign_to") string locProjectAttr) {
+@reqcap({locProjectAttr: ["assign_to"]})
+adminop createProject(string projectName, @node string locProjectAttr) {
    create oa projectName in ["project", locProjectAttr]
    create o projectName + " README" in [projectName]
 }
@@ -58,15 +61,15 @@ adminop createProjectAdmin(string projectName) {
     create UA uaName in ["writer"]
     associate uaName and projectName with ["*"]
 
-    create prohibition "deny admin delete README"
-    deny UA uaName
-    access rights ["delete_readme"]
-    on union of {projectName: false}
+    create conj node prohibition "deny admin delete README"
+    deny uaName
+    arset ["delete_readme"]
+    include [projectName]
 }
 
 create obligation "create us project admin"
     when any user
-    performs createProject on (locProjectAttr) {
+    performs "createProject" on (locProjectAttr) {
       return locProjectAttr == "US project"
     }
     do(ctx) {
@@ -75,7 +78,7 @@ create obligation "create us project admin"
 
 create obligation "create eu project admin"
     when any user
-    performs createProject on (locProjectAttr) {
+    performs "createProject" on (locProjectAttr) {
         return locProjectAttr == "EU project"
     }
     do(ctx) {

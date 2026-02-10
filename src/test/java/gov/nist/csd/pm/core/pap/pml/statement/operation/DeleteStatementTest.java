@@ -10,21 +10,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
-import gov.nist.csd.pm.core.common.prohibition.ContainerCondition;
-import gov.nist.csd.pm.core.common.prohibition.ProhibitionSubject;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class DeleteStatementTest {
@@ -47,11 +45,10 @@ class DeleteStatementTest {
                 new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                 new ObligationResponse("e", List.of())
         );
-        pap.modify().prohibitions().createProhibition("p1",
-                                    new ProhibitionSubject(id("ua1")),
+        pap.modify().prohibitions().createNodeProhibition("p1",
+                id("ua1"),
 		        new AccessRightSet("read"),
-		        true,
-		        Collections.singleton(new ContainerCondition(id("oa1"), true)));
+		        Set.of(), Set.of(id("oa1")), true);
 
         stmt2.execute(new ExecutionContext(userContext, pap), pap);
         stmt3.execute(new ExecutionContext(userContext, pap), pap);

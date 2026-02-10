@@ -1,8 +1,5 @@
 package gov.nist.csd.pm.core.pdp;
 
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.DESERIALIZE_POLICY;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.RESET;
-import static gov.nist.csd.pm.core.pap.admin.AdminAccessRights.SERIALIZE_POLICY;
 
 import gov.nist.csd.pm.core.common.event.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
@@ -15,6 +12,7 @@ import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
@@ -26,10 +24,10 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.ContinueResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
-import gov.nist.csd.pm.core.pdp.event.EventContextUtil;
 import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.List;
@@ -162,11 +160,11 @@ public class PDPTx implements OperationExecutor {
 
             // if the operation is an Admin or Resource operation publish the event for EPPs
             if (operation instanceof AdminOperation<?> || operation instanceof ResourceOperation<?>) {
-                eventPublisher.publishEvent(EventContextUtil.buildEventContext(
+                eventPublisher.publishEvent(new EventContext(
                     pap,
                     userCtx,
                     operation.getName(),
-                    args
+                    args.toMap()
                 ));
             }
 
@@ -175,21 +173,36 @@ public class PDPTx implements OperationExecutor {
 
         @Override
         public void reset() throws PMException {
-            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), RESET);
+            if(!pap.query()
+                .access()
+                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                .contains(AdminAccessRight.ADMIN_POLICY_RESET.toString())) {
+                throw UnauthorizedException.of(pap.query().graph(), userCtx, "reset");
+            }
 
             pap.reset();
         }
 
         @Override
         public String serialize(PolicySerializer serializer) throws PMException {
-            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), SERIALIZE_POLICY);
+            if(!pap.query()
+                .access()
+                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                .contains(AdminAccessRight.ADMIN_POLICY_SERIALIZE.toString())) {
+                throw UnauthorizedException.of(pap.query().graph(), userCtx, "serialize");
+            }
 
             return pap.serialize(serializer);
         }
 
         @Override
         public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
-            privilegeChecker().check(userCtx, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), DESERIALIZE_POLICY);
+            if(!pap.query()
+                .access()
+                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                .contains(AdminAccessRight.ADMIN_POLICY_DESERIALIZE.toString())) {
+                throw UnauthorizedException.of(pap.query().graph(), userCtx, "deserialize");
+            }
 
             pap.deserialize(input, policyDeserializer);
         }

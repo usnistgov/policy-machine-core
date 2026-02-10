@@ -27,7 +27,8 @@ public class Search extends PMLQueryOperation<List<Map<String, Object>>> {
         super(
                 "search",
                 ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)),
-                List.of(TYPE_PARAM, PROPERTIES_PARAM)
+                List.of(TYPE_PARAM, PROPERTIES_PARAM),
+            List.of()
         );
     }
 

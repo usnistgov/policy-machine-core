@@ -1,12 +1,13 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.ARSET_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.CONTAINERS_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.INTERSECTION_PARAM;
-import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.SUBJECT_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.EXCLUSION_SET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.INCLUSION_SET_PARAM;
+import static gov.nist.csd.pm.core.pap.operation.prohibition.ProhibitionOp.NODE_ID_PARAM;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
+import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
@@ -27,12 +28,16 @@ public class DeleteProhibitionStatement extends DeleteStatement {
 
         Prohibition prohibition = pap.query().prohibitions().getProhibition(name);
 
+        long nodeId = switch (prohibition) {
+            case NodeProhibition nodeProhibition -> nodeProhibition.getNodeId();
+            case ProcessProhibition processProhibition -> processProhibition.getUserId();
+        };
+
         return new Args()
             .put(NAME_PARAM, prohibition.getName())
-            .put(SUBJECT_PARAM, prohibition.getSubject())
-            .put(ARSET_PARAM, new ArrayList<>(prohibition.getAccessRightSet()))
-            .put(INTERSECTION_PARAM, prohibition.isIntersection())
-            .put(CONTAINERS_PARAM, new ArrayList<>(prohibition.getContainers()));
+            .put(NODE_ID_PARAM, nodeId)
+            .put(INCLUSION_SET_PARAM, new ArrayList<>(prohibition.getInclusionSet()))
+            .put(EXCLUSION_SET_PARAM, new ArrayList<>(prohibition.getExclusionSet()));
     }
 
     @Override

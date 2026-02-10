@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.pap.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import java.util.Collection;
 
 public class GraphStoreDFS extends DepthFirstGraphWalker {

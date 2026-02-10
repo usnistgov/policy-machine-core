@@ -3,33 +3,28 @@ package gov.nist.csd.pm.core.pap.operation;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.relationship.AccessRightSet;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
-import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract sealed class Operation<R> implements Serializable permits AdminOperation, ResourceOperation, QueryOperation, Routine,
-    Function {
+public abstract sealed class Operation<R> implements Serializable permits AdminOperation, ResourceOperation,
+    QueryOperation, Routine, Function {
 
     private static final long serialVersionUID = 1L;
     public static final FormalParameter<String> NAME_PARAM = new FormalParameter<>("name", STRING_TYPE);
@@ -40,11 +35,24 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
     protected final String name;
     protected final Type<R> returnType;
     protected final List<FormalParameter<?>> parameters;
+    protected final List<RequiredCapability> requiredCapabilities;
 
-    public Operation(String name, Type<R> returnType, List<FormalParameter<?>> parameters) {
+    public Operation(String name, Type<R> returnType, List<FormalParameter<?>> parameters, List<RequiredCapability> requiredCapabilities) {
         this.name = name;
         this.returnType = returnType;
         this.parameters = parameters;
+        this.requiredCapabilities = requiredCapabilities;
+    }
+
+    public Operation(String name, Type<R> returnType, List<FormalParameter<?>> parameters,
+                     RequiredCapability requiredCapability, RequiredCapability... requiredCapabilities) {
+        this.name = name;
+        this.returnType = returnType;
+        this.parameters = parameters;
+
+        this.requiredCapabilities = new ArrayList<>();
+        this.requiredCapabilities.add(requiredCapability);
+        this.requiredCapabilities.addAll(List.of(requiredCapabilities));
     }
 
     /**
@@ -67,6 +75,10 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
 
     public List<FormalParameter<?>> getFormalParameters() {
         return parameters;
+    }
+
+    public List<RequiredCapability> getRequiredCapabilities() {
+        return requiredCapabilities;
     }
 
     /**
@@ -93,110 +105,88 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
      * @param pap The PAP object used to query the access state of the policy.
      * @param userCtx The user trying to execute the operation.
      * @param args The args passed to the operation.
+     * @throws UnauthorizedException if the user does not satisfy the required capabilities of the operation.
      * @throws PMException If there is an error checking access.
      */
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        List<FormalParameter<?>> formalParameters = getFormalParameters();
-        for (FormalParameter<?> formalParameter : formalParameters) {
-            switch (formalParameter) {
-                case NodeIdFormalParameter nodeIdFormalParameter ->
-                    check(pap, userCtx, nodeIdFormalParameter, args.get(nodeIdFormalParameter));
-                case NodeIdListFormalParameter nodeIdListFormalParameter -> {
-                    for (long id : args.get(nodeIdListFormalParameter)) {
-                        check(pap, userCtx, nodeIdListFormalParameter, id);
-                    }
-                }
-                case NodeNameFormalParameter nodeNameFormalParameter ->
-                    check(pap, userCtx, nodeNameFormalParameter, pap.query().graph().getNodeId(args.get(nodeNameFormalParameter)));
-                case NodeNameListFormalParameter nodeNameListFormalParameter -> {
-                    for (String name : args.get(nodeNameListFormalParameter)) {
-                        check(pap, userCtx, nodeNameListFormalParameter, pap.query().graph().getNodeId(name));
-                    }
-                }
-                case null, default -> {}
+        if (requiredCapabilities.isEmpty()) {
+            return;
+        }
+
+        for (RequiredCapability reqCap : requiredCapabilities) {
+            if (reqCap.isSatisfied(pap, userCtx, args)) {
+                return;
             }
         }
+
+        throw UnauthorizedException.of(pap.query().graph(), userCtx, getName());
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Operation<?> operation)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        Operation<?> operation = (Operation<?>) o;
         return Objects.equals(name, operation.name) && Objects.equals(returnType, operation.returnType)
-            && Objects.equals(parameters, operation.parameters);
+            && Objects.equals(parameters, operation.parameters) && Objects.equals(requiredCapabilities,
+            operation.requiredCapabilities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, returnType, parameters);
-    }
-
-    private void check(PAP pap, UserContext userCtx, NodeFormalParameter<?> nodeFormalParameter, long id) throws PMException {
-        TargetContext targetCtx = new TargetContext(id);
-        AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-        check(pap.query().graph(), userCtx, targetCtx, nodeFormalParameter.getAccessRights(), privs);
-    }
-
-    private void check(GraphQuery graphQuery,
-                       UserContext user,
-                       TargetContext target,
-                       RequiredCapabilities reqCap,
-                       AccessRightSet userPrivileges) throws PMException {
-        AccessRightSet reqCaps = reqCap.getReqCaps();
-        if(userPrivileges.containsAll(reqCaps)) {
-            return;
-        }
-
-        throw UnauthorizedException.of(graphQuery, user, target, userPrivileges, reqCaps);
+        return Objects.hash(name, returnType, parameters, requiredCapabilities);
     }
 
     private Args validateAndPrepareArgs(Map<String, Object> rawArgs, boolean checkMissing) {
         Map<String, FormalParameter<?>> paramMap = parameters.stream()
             .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
 
-        Set<String> expectedKeys = paramMap.keySet();
-        Set<String> actualKeys = rawArgs.keySet();
+        checkUnexpectedArgs(rawArgs.keySet(), paramMap.keySet());
+        if (checkMissing) {
+            checkMissingArgs(rawArgs.keySet(), paramMap.keySet());
+        }
 
-        // check for unexpected args
+        return new Args(buildTypeSafeArgs(rawArgs, paramMap));
+    }
+
+    private void checkUnexpectedArgs(Set<String> actualKeys, Set<String> expectedKeys) {
         Set<String> unexpected = new HashSet<>(actualKeys);
         unexpected.removeAll(expectedKeys);
         if (!unexpected.isEmpty()) {
             throw new IllegalArgumentException(
                 String.format("unexpected args provided for function '%s': %s", name, unexpected));
         }
+    }
 
-        // check for missing args
-        if (checkMissing) {
-            Set<String> missing = new HashSet<>(expectedKeys);
-            missing.removeAll(actualKeys);
-            if (!missing.isEmpty()) {
-                throw new IllegalArgumentException(
-                    String.format("missing required arguments for function '%s': %s", name, missing));
-            }
+    private void checkMissingArgs(Set<String> actualKeys, Set<String> expectedKeys) {
+        Set<String> missing = new HashSet<>(expectedKeys);
+        missing.removeAll(actualKeys);
+        if (!missing.isEmpty()) {
+            throw new IllegalArgumentException(
+                String.format("missing required arguments for function '%s': %s", name, missing));
         }
+    }
 
-        // build type safe map
+    private Map<FormalParameter<?>, Object> buildTypeSafeArgs(Map<String, Object> rawArgs,
+                                                              Map<String, FormalParameter<?>> paramMap) {
         Map<FormalParameter<?>, Object> argsWithFormalParams = new HashMap<>();
-
-        for (Map.Entry<String, Object> entry : rawArgs.entrySet()) {
-            String key = entry.getKey();
+        for (Entry<String, Object> entry : rawArgs.entrySet()) {
+            FormalParameter<?> param = paramMap.get(entry.getKey());
             Object value = entry.getValue();
-            Type<?> valueType = Type.resolveTypeOfObject(value);
-            FormalParameter<?> param = paramMap.get(key);
-
-            if (value != null && !param.getType().isCastableTo(valueType)) {
-                throw new IllegalArgumentException(
-                    String.format("Invalid type for argument '%s'. Expected %s but got %s",
-                        key, param.getType().getClass().getSimpleName(), valueType.getClass().getSimpleName()));
-            }
-
+            validateArgType(entry.getKey(), param, value);
             argsWithFormalParams.put(param, value);
         }
 
-        return new Args(argsWithFormalParams);
+        return argsWithFormalParams;
+    }
+
+    private void validateArgType(String argName, FormalParameter<?> param, Object value) {
+        if (value != null && !param.getType().isCastableTo(Type.resolveTypeOfObject(value))) {
+            throw new IllegalArgumentException(
+                String.format("Invalid type for argument '%s'. Expected %s but got %s",
+                    argName, param.getType().getClass().getSimpleName(),
+                    Type.resolveTypeOfObject(value).getClass().getSimpleName()));
+        }
     }
 }

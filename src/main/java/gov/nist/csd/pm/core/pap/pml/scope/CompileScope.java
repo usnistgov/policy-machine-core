@@ -4,9 +4,9 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminOperations;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
+import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
@@ -114,23 +114,23 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
         return operationSignatures;
     }
 
-    private static PMLOperationSignature createOperationSignature(Operation<?> func) {
-        return switch (func) {
+    private static PMLOperationSignature createOperationSignature(Operation<?> op) {
+        return switch (op) {
             case Function<?> function -> new PMLOperationSignature(
-                OperationType.FUNCTION, func.getName(), func.getReturnType(), func.getFormalParameters()
-            );
+                OperationType.FUNCTION, op.getName(), op.getReturnType(), op.getFormalParameters(),
+                function.getRequiredCapabilities());
             case QueryOperation<?> queryOperation -> new PMLOperationSignature(
-                OperationType.QUERY, func.getName(), func.getReturnType(), func.getFormalParameters()
-            );
+                OperationType.QUERY, op.getName(), op.getReturnType(), op.getFormalParameters(),
+                queryOperation.getRequiredCapabilities());
             case AdminOperation<?> adminOperation -> new PMLOperationSignature(
-                OperationType.ADMINOP, func.getName(), func.getReturnType(), func.getFormalParameters()
-            );
+                OperationType.ADMINOP, op.getName(), op.getReturnType(), op.getFormalParameters(),
+                adminOperation.getRequiredCapabilities());
             case Routine<?> routine -> new PMLOperationSignature(
-                OperationType.ROUTINE, func.getName(), func.getReturnType(), func.getFormalParameters()
-            );
+                OperationType.ROUTINE, op.getName(), op.getReturnType(), op.getFormalParameters(),
+                routine.getRequiredCapabilities());
             case ResourceOperation<?> resourceOperation -> new PMLOperationSignature(
-                OperationType.RESOURCEOP, func.getName(), func.getReturnType(), func.getFormalParameters()
-            );
+                OperationType.RESOURCEOP, op.getName(), op.getReturnType(), op.getFormalParameters(),
+                resourceOperation.getRequiredCapabilities());
         };
     }
 }

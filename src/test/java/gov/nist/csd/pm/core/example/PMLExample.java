@@ -24,7 +24,7 @@ public class PMLExample {
         create ua "admin" in ["pc1"]
         // the admin_user will be created automatically during bootstrapping 
         assign "admin_user" to ["admin"]
-        associate "admin" and "users" with ["assign_to"]
+        associate "admin" and "users" with ["admin:graph:assignment:descendant:create"]
         
         create oa "user homes" in ["pc1"]
         create oa "user inboxes" in ["pc1"]
@@ -32,17 +32,18 @@ public class PMLExample {
         associate "admin" and "user inboxes" with ["*"]
         
         // prohibit the admin user from reading inboxes
-        create prohibition "deny admin on user inboxes"
-        deny u "admin"
-        access rights ["read"]
-        on union of {"user inboxes": false}
+        create conj node prohibition "deny admin on user inboxes"
+        deny "admin"
+        arset ["read"]
+        include ["user inboxes"]
         
         // create resource operation to read a file
-        resourceop read_file(@node("read") string name) { }
+        @reqcap({name: ["read"]})
+        resourceop read_file(@node string name) { }
         
         // create a custom administration operation
         adminop create_new_user(string username) {
-            check ["assign_to"] on ["users"]
+            check ["admin:graph:assignment:descendant:create"] on ["users"]
             
             create u username in ["users"]
             create oa username + " home" in ["user homes"]
@@ -56,7 +57,7 @@ public class PMLExample {
         // operations in the response
         create obligation "o1"
         when any user
-        performs create_new_user
+        performs "create_new_user"
         do(ctx) {
             objName := "welcome " + ctx.args.username
             inboxName := ctx.args.username + " inbox"

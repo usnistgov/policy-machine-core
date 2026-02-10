@@ -31,8 +31,8 @@ class OperationInvokeStmtVisitorTest {
         OperationType.FUNCTION,
         "func1",
         STRING_TYPE,
-        List.of(a, b, c)
-    );
+        List.of(a, b, c),
+        List.of());
 
     OperationInvokeExpression<String> expected = new OperationInvokeExpression(
         signature.getName(),
@@ -114,8 +114,8 @@ class OperationInvokeStmtVisitorTest {
             OperationType.FUNCTION,
             "func1",
             STRING_TYPE,
-            List.of()
-        );
+            List.of(),
+            List.of());
 
         CompileScope compileScope = new CompileScope(new MemoryPAP());
         compileScope.addOperation("func1", signature);
