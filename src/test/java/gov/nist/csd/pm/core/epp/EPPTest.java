@@ -47,7 +47,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import it.unimi.dsi.fastutil.longs.LongList;
@@ -238,7 +238,7 @@ class EPPTest {
                         return contains(descendants, id("oa1"))
                     }
                     do(ctx) {
-                        name := ctx.opName
+                        name := ctx.op_name
                         create PC name
 
                         name = ctx.args.name

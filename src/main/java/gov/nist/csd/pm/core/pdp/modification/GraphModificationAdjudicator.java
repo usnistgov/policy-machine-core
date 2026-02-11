@@ -13,6 +13,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.AssignOp;
@@ -27,6 +28,8 @@ import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.OperationDenied;
+import gov.nist.csd.pm.core.pdp.PDPEventPublisher;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,9 +38,9 @@ import java.util.Map;
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
     private final PAP pap;
-    private final EventPublisher eventPublisher;
+    private final PDPEventPublisher eventPublisher;
 
-    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher) {
+    public GraphModificationAdjudicator(UserContext userCtx, PAP pap, PDPEventPublisher eventPublisher) {
         super(pap, userCtx);
         this.userCtx = userCtx;
         this.pap = pap;
@@ -114,11 +117,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
             .put(Operation.TYPE_PARAM, node.getType().toString())
             .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
-        // build event context before executing or else the node will not exist when the util
-        // tries to convert the id to the name
-        EventContext eventContext = new EventContext(pap, userCtx, op.getName(), args.toMap());
-
-        executeOp(op, args, eventContext);
+        executeOp(op, args);
     }
 
     @Override
@@ -162,18 +161,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         executeOp(op, args);
     }
 
-    private <R> void executeOp(AdminOperation<R> op, Args args, EventContext eventContext) throws PMException {
-        op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
-
-        eventPublisher.publishEvent(eventContext);
-    }
-
     private <R> R executeOp(AdminOperation<R> op, Args args) throws PMException {
-        op.canExecute(pap, userCtx, args);
-        R ret = op.execute(pap, args);
+        try {
+            op.canExecute(pap, userCtx, args);
+        } catch (UnauthorizedException e) {
+            eventPublisher.publishOperationDeniedEvent(pap, userCtx, op.getName(), args);
 
-        eventPublisher.publishEvent(new EventContext(pap, userCtx, op.getName(), args.toMap()));
+            throw e;
+        }
+
+        EventContext eventCtx = new EventContext(pap, userCtx, op.getName(), args.toMap());
+        R ret = op.execute(pap, args);
+        eventPublisher.publishEvent(eventCtx);
 
         return ret;
     }

@@ -2,8 +2,10 @@ package gov.nist.csd.pm.core.pdp;
 
 
 import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
@@ -152,8 +154,15 @@ public class PDPTx implements OperationExecutor {
                 return routine.execute(this, args);
             }
 
-            // check if user can execute the operation
-            operation.canExecute(pap, userCtx, args);
+            try {
+                // check if user can execute the operation
+                operation.canExecute(pap, userCtx, args);
+            } catch (UnauthorizedException e) {
+                // publish the operation denied event
+                eventPublisher.publishOperationDeniedEvent(pap, userCtx, operation.getName(), args);
+
+                throw e;
+            }
 
             // execute the operation
             Object result = operation.execute(pap, args);

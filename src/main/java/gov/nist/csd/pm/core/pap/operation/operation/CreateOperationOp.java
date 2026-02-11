@@ -16,7 +16,7 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import java.util.List;
 
 public class CreateOperationOp extends AdminOperation<Void>  {

@@ -37,12 +37,12 @@ public class PMLOperationsTest {
                     when any user
                     performs any operation
                     do(ctx) {
-                    	name := ctx.opName
+                    	name := ctx.op_name
                     	if nodeExists(name) {
                     		return
                     	}
                     	
-                        op1(ctx.opName)
+                        op1(ctx.op_name)
                     }
                 """;
 		MemoryPAP pap = new TestPAP();

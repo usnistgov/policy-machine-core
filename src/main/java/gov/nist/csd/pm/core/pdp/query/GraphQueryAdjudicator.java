@@ -13,7 +13,7 @@ import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 import java.util.Collection;

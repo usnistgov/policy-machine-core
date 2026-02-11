@@ -11,7 +11,6 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

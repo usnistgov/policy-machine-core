@@ -22,7 +22,7 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

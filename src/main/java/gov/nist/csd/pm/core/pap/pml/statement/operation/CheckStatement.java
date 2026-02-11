@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import java.util.List;
 import java.util.Objects;
 

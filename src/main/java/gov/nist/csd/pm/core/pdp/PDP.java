@@ -17,14 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PDP implements EventPublisher, AccessAdjudication {
+public class PDP extends PDPEventPublisher implements AccessAdjudication {
 
     protected final PAP pap;
-    protected final List<EventSubscriber> eventSubscribers;
 
     public PDP(PAP pap) {
+        super();
         this.pap = pap;
-        this.eventSubscribers = new ArrayList<>();
     }
 
     /**
@@ -36,7 +35,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
      */
     public <T> T runTx(UserContext userCtx, PDPTxRunner<T> txRunner) throws PMException {
         return TxRunner.runTx(pap, () -> {
-            PDPTx pdpTx = new PDPTx(userCtx, pap, eventSubscribers);
+            PDPTx pdpTx = new PDPTx(userCtx, pap, getEpps());
             return txRunner.run(pdpTx);
         });
     }
@@ -56,23 +55,6 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
         pap.bootstrap(bootstrapper);
-    }
-
-    @Override
-    public void addEventSubscriber(EventSubscriber processor) {
-        eventSubscribers.add(processor);
-    }
-
-    @Override
-    public void removeEventSubscriber(EventSubscriber processor) {
-        eventSubscribers.remove(processor);
-    }
-
-    @Override
-    public void publishEvent(EventContext event) throws PMException {
-        for (EventSubscriber listener : eventSubscribers) {
-            listener.processEvent(event);
-        }
     }
 
     @Override

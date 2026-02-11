@@ -106,7 +106,7 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,7 +126,8 @@ public class JavaExample {
         long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
         long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
         pap.modify().graph().createUser("admin_user", List.of(adminId));
-        pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
+        pap.modify().graph()
+            .associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
 
         long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
         long userInboxes = pap.modify().graph().createObjectAttribute("user inboxes", List.of(pc1Id));
@@ -145,8 +146,10 @@ public class JavaExample {
 
         // create resource operation to read a file
         NodeNameFormalParameter nameFormalParameter = new NodeNameFormalParameter("name");
-        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter),
-            List.of(new RequiredCapability(new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
+        ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE,
+            List.of(nameFormalParameter),
+            List.of(new RequiredCapability(
+                new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
             @Override
             public Void execute(PolicyQuery query, Args args) throws PMException {
                 return null;
@@ -163,7 +166,8 @@ public class JavaExample {
         // create a custom administration operation
         FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
         AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam),
-            List.of(new RequiredCapability(new RequiredPrivilegeOnNodeId(usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
+            List.of(new RequiredCapability(
+                new RequiredPrivilegeOnNodeId(usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -213,7 +217,8 @@ public class JavaExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+            () -> pdp.adjudicateOperation(new UserContext(testUserId), "create_new_user",
+                Map.of("username", "testUser2"))
         );
     }
 }
@@ -233,11 +238,12 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import org.junit.jupiter.api.Test;
 
 public class PMLExample {
+
     String pml = """
         // set resource access rights
         set resource access rights ["read", "write"]
@@ -288,6 +294,7 @@ public class PMLExample {
             create o objName in [inboxName]
         }
         """;
+
     @Test
     void testPMLExample() throws PMException {
         PAP pap = new MemoryPAP();

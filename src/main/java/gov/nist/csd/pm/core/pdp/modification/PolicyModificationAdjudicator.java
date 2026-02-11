@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.PDPEventPublisher;
 
 public class PolicyModificationAdjudicator implements PolicyModification {
 
@@ -12,7 +13,7 @@ public class PolicyModificationAdjudicator implements PolicyModification {
     private final ObligationsModificationAdjudicator obligations;
     private final OperationsModificationAdjudicator operations;
 
-    public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, EventPublisher eventPublisher) {
+    public PolicyModificationAdjudicator(UserContext userCtx, PAP pap, PDPEventPublisher eventPublisher) {
         this.graph = new GraphModificationAdjudicator(userCtx, pap, eventPublisher);
         this.prohibitions = new ProhibitionsModificationAdjudicator(userCtx, pap);
         this.obligations = new ObligationsModificationAdjudicator(userCtx, pap);

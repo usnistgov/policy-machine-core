@@ -29,7 +29,7 @@ import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pap.operation.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.ArrayList;
