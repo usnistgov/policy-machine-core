@@ -22,8 +22,10 @@ public abstract class Adjudicator {
         AccessRightSet requiredSet = new AccessRightSet(required);
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetCtx);
 
-        if (!computed.containsAll(requiredSet) || (requiredSet.isEmpty() && computed.isEmpty())) {
-            throw UnauthorizedException.of(pap.query().graph(), userCtx, targetCtx, computed, requiredSet);
+        if (computed.containsAll(requiredSet) && !computed.isEmpty()) {
+            return;
         }
+
+        throw UnauthorizedException.of(pap.query().graph(), userCtx, targetCtx, computed, requiredSet);
     }
 }

@@ -4,7 +4,7 @@ import static gov.nist.csd.pm.core.pap.operation.Operation.ARSET_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.NAME_PARAM;
 import static gov.nist.csd.pm.core.pap.operation.Operation.PROPERTIES_PARAM;
 
-import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -27,6 +27,7 @@ import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -114,11 +115,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
             .put(Operation.TYPE_PARAM, node.getType().toString())
             .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
 
-        // build event context before executing or else the node will not exist when the util
-        // tries to convert the id to the name
-        EventContext eventContext = new EventContext(pap, userCtx, op.getName(), args.toMap());
-
-        executeOp(op, args, eventContext);
+        executeOp(op, args);
     }
 
     @Override
@@ -162,18 +159,18 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         executeOp(op, args);
     }
 
-    private <R> void executeOp(AdminOperation<R> op, Args args, EventContext eventContext) throws PMException {
-        op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
-
-        eventPublisher.publishEvent(eventContext);
-    }
-
     private <R> R executeOp(AdminOperation<R> op, Args args) throws PMException {
-        op.canExecute(pap, userCtx, args);
+        try {
+            op.canExecute(pap, userCtx, args);
+        } catch (UnauthorizedException e) {
+            eventPublisher.publishEvent(EventContext.fromUserContext(pap, userCtx, false, op.getName(), args.toMap()));
+
+            throw e;
+        }
+
         R ret = op.execute(pap, args);
 
-        eventPublisher.publishEvent(new EventContext(pap, userCtx, op.getName(), args.toMap()));
+        eventPublisher.publishEvent(EventContext.fromUserContext(pap, userCtx, true, op.getName(), args.toMap()));
 
         return ret;
     }

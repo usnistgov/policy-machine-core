@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.obligation.response;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
-import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
@@ -72,6 +72,7 @@ public class ObligationResponse implements Serializable {
         map.put("user", eventCtx.user().getName());
         map.put("attrs", eventCtx.user().getAttrs());
         map.put("process", eventCtx.user().getProcess());
+        map.put("granted", eventCtx.granted());
         map.put("opName", eventCtx.opName());
         map.put("args", eventCtx.args());
 

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.common.event;
+package gov.nist.csd.pm.core.epp;
 
 import java.util.List;
 import java.util.Objects;

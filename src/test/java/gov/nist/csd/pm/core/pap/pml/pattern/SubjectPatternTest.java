@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventContextUser;
+import gov.nist.csd.pm.core.epp.EventContext;
+import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -170,6 +170,7 @@ class SubjectPatternTest {
         EPP epp = new EPP(pdp, memoryPAP);
         epp.processEvent(new EventContext(
             new EventContextUser("u1"),
+            true,
             "test",
             Map.of()
         ));

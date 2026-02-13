@@ -23,7 +23,7 @@ public class PMLExample {
         create ua "users" in ["pc1"]
         create ua "admin" in ["pc1"]
         // the admin_user will be created automatically during bootstrapping 
-        assign "admin_user" to ["admin"]
+        assign "admin_user" to ["admin", "users"]
         associate "admin" and "users" with ["admin:graph:assignment:descendant:create"]
         
         create oa "user homes" in ["pc1"]
@@ -80,9 +80,10 @@ public class PMLExample {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
+
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        long adminId = pap.query().graph().getNodeId("admin");
-        pdp.executePML(new UserContext(adminId), """
+        long adminUserId = pap.query().graph().getNodeId("admin_user");
+        pdp.executePML(new UserContext(adminUserId), """
             create_new_user("testUser")
             """);
 

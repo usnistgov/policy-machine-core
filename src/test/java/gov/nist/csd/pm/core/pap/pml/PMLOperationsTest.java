@@ -23,7 +23,9 @@ public class PMLOperationsTest {
 		String pml = """
                 create PC "pc1"
                 create UA "ua1" in ["pc1"]
-                create U "u1" in ["ua1"]
+                create UA "ua2" in ["pc1"]
+                create U "u1" in ["ua1", "ua2"]
+                associate "ua1" and "ua2" with ["*"]
                 create OA "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
@@ -67,9 +69,11 @@ public class PMLOperationsTest {
 		String pml = """
                 create PC "pc1"
                 create UA "ua1" in ["pc1"]
-                create U "u1" in ["ua1"]
+                create UA "ua2" in ["pc1"]
+                create U "u1" in ["ua1", "ua2"]
                 create OA "oa1" in ["pc1"]
                 associate "ua1" and "oa1" with ["*"]
+                associate "ua1" and "ua2" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 routine op1(string name) {
@@ -146,7 +150,9 @@ public class PMLOperationsTest {
 		String pml = """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
+                associate "ua1" and "ua2" with ["*"]
                 associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
                 
                 routine routine1() {

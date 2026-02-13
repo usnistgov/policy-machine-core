@@ -25,10 +25,10 @@ public final class RequiredPrivilegeOnNode extends RequiredPrivilege{
 
     @Override
     public boolean isSatisfied(PAP pap, UserContext userCtx, Args args) throws PMException {
-        return pap.query()
+        AccessRightSet arset = pap.query()
             .access()
-            .computePrivileges(userCtx, new TargetContext(pap.query().graph().getNodeId(name)))
-            .containsAll(getRequired());
+            .computePrivileges(userCtx, new TargetContext(pap.query().graph().getNodeId(name)));
+        return !arset.isEmpty() && arset.containsAll(getRequired());
     }
 
     public String getName() {

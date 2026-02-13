@@ -406,7 +406,9 @@ class PDPTest {
                 
                 associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
+                associate "ua1" and "ua2" with ["*"]
                 
                 adminop op1(string name) {
                     create pc name

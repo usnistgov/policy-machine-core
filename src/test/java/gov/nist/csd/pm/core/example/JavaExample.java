@@ -41,7 +41,7 @@ public class JavaExample {
         long pc1Id = pap.modify().graph().createPolicyClass("pc1");
         long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
         long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
-        pap.modify().graph().createUser("admin_user", List.of(adminId));
+        long adminUserId = pap.modify().graph().createUser("admin_user", List.of(adminId, usersId));
         pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
 
         long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
@@ -102,7 +102,7 @@ public class JavaExample {
                 create o objName in [inboxName]
             }
             """;
-        pap.executePML(new UserContext(adminId), pml);
+        pap.executePML(new UserContext(adminUserId), pml);
 
         // create a PDP to run transactions
         PDP pdp = new PDP(pap);
@@ -112,7 +112,7 @@ public class JavaExample {
         epp.subscribeTo(pdp);
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        pdp.adjudicateOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
+        pdp.adjudicateOperation(new UserContext(adminUserId), "create_new_user", Map.of("username", "testUser"));
 
         // check admin operation and obligation response was successful
         assertTrue(pap.query().graph().nodeExists("testUser home"));
