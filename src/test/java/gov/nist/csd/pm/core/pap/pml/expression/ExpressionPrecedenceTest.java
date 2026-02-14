@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -55,7 +56,7 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testDotIndexBindsTighterThanNegate() throws Exception {
+    void testDotIndexHigherThanNegate() throws Exception {
         addBoolMapVar("a");
 
         Expression<?> result = compile("!a.b");
@@ -65,7 +66,7 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testBracketIndexBindsTighterThanNegate() throws Exception {
+    void testBracketIndexHigherThanNegate() throws Exception {
         addBoolMapVar("a");
 
         Expression<?> result = compile("!a[\"k\"]");
@@ -75,7 +76,7 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testNegateBindsTighterThanLogicalAnd() throws Exception {
+    void testNegateHigherThanLogicalAnd() throws Exception {
         addBoolVar("a");
         addBoolVar("b");
 
@@ -88,20 +89,20 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testNegateBindsTighterThanLogicalOr() throws Exception {
+    void testNegateHigherThanLogicalOr() throws Exception {
         addBoolVar("a");
         addBoolVar("b");
 
         Expression<?> result = compile("!a || b");
 
         LogicalExpression logical = assertInstanceOf(LogicalExpression.class, result);
-        assertTrue(!logical.isAnd());
+        assertFalse(logical.isAnd());
         assertInstanceOf(NegatedExpression.class, logical.getLeft());
         assertEquals(new VariableReferenceExpression<>("b", BOOLEAN_TYPE), logical.getRight());
     }
 
     @Test
-    void testLogicalAndBindsTighterThanLogicalOr() throws Exception {
+    void testLogicalAndHigherThanLogicalOr() throws Exception {
         addBoolVar("a");
         addBoolVar("b");
         addBoolVar("c");
@@ -109,7 +110,7 @@ class ExpressionPrecedenceTest {
         Expression<?> result = compile("a || b && c");
 
         LogicalExpression or = assertInstanceOf(LogicalExpression.class, result);
-        assertTrue(!or.isAnd());
+        assertFalse(or.isAnd());
         assertEquals(new VariableReferenceExpression<>("a", BOOLEAN_TYPE), or.getLeft());
 
         LogicalExpression and = assertInstanceOf(LogicalExpression.class, or.getRight());
@@ -119,7 +120,7 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testEqualsBindsTighterThanLogicalAnd() throws Exception {
+    void testEqualsHigherThanLogicalAnd() throws Exception {
         addBoolVar("a");
         addStringVar("b");
         addStringVar("c");
@@ -133,7 +134,7 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testPlusBindsTighterThanEquals() throws Exception {
+    void testPlusHigherThanEquals() throws Exception {
         addStringVar("a");
         addStringVar("b");
         addStringVar("c");
@@ -155,7 +156,7 @@ class ExpressionPrecedenceTest {
     }
 
     @Test
-    void testIndexBindsTighterThanPlus() throws Exception {
+    void testIndexHigherThanPlus() throws Exception {
         addStringMapVar("a");
         addStringMapVar("b");
 
@@ -188,7 +189,7 @@ class ExpressionPrecedenceTest {
         Expression<?> result = compile("a || b && c == d + e");
 
         LogicalExpression or = assertInstanceOf(LogicalExpression.class, result);
-        assertTrue(!or.isAnd());
+        assertFalse(or.isAnd());
         assertEquals(new VariableReferenceExpression<>("a", BOOLEAN_TYPE), or.getLeft());
 
         LogicalExpression and = assertInstanceOf(LogicalExpression.class, or.getRight());
