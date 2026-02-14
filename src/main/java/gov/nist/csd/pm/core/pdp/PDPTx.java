@@ -216,17 +216,7 @@ public class PDPTx implements OperationExecutor {
             }
 
             // check if user can execute the operation
-            try {
-                operation.canExecute(pap, userCtx, args);
-            } catch (UnauthorizedException e) {
-                throw e.withEventContext(EventContext.fromUserContext(
-                    pap,
-                    userCtx,
-                    false,
-                    operation.getName(),
-                    args.toMap()
-                ));
-            }
+            operation.canExecute(pap, userCtx, args);
 
             // execute the operation
             Object result = operation.execute(pap, args);

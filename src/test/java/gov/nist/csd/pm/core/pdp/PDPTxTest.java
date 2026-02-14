@@ -167,52 +167,6 @@ class PDPTxTest {
     }
 
     @Test
-    void test_whenResourceOperationUnauth_EventTriggeredAndGrantedFalse() throws PMException {
-        String pml = """
-            set resource access rights ["read"]
-            
-            create pc "pc1"
-            create ua "ua1" in ["pc1"]
-            create ua "ua2" in ["pc1"]
-            create oa "oa1" in ["pc1"]
-            create u "u1" in ["ua1"]
-            create u "u2" in ["ua1", "ua2"]
-            create o "o1" in ["oa1"]
-            
-            associate "@super" and "ua1" with ["*"]
-            associate "@super" and "ua2" with ["*"]
-            associate "@super" and "oa1" with ["*"]
-            
-            @reqcap({n: ["read"]})
-            resourceop read_file(@node string n) { }
-            
-            create obligation "obl1"
-            when any user
-            performs any operation
-            do(ctx) {
-                if !ctx.granted {
-                    create pc "pc2"
-                }
-            }
-            """;
-        PAP testPAP = new TestPAP();
-        testPAP.bootstrap(new PMLBootstrapperWithSuper(pml));
-
-        PDP pdp = new PDP(testPAP);
-        EPP epp = new EPP(pdp, testPAP);
-        epp.subscribeTo(pdp);
-
-        UnauthorizedException e = assertThrows(
-            UnauthorizedException.class,
-            () -> pdp.adjudicateOperation(new UserContext(id("u1")), "read_file",
-                Map.of("n", "o1"))
-        );
-        assertEquals("{user: u1} cannot perform operation read_file", e.getMessage());
-        System.out.println(testPAP.query().graph().search(NodeType.ANY, new HashMap<>()));
-        assertTrue(testPAP.query().graph().nodeExists("pc2"));
-    }
-
-    @Test
     void test_whenResourceOperationGranted_EventNotTriggered() {
 
     }

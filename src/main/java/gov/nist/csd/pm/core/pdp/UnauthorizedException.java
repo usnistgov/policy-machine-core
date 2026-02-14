@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pdp;
 
-import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
@@ -11,17 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class UnauthorizedException extends PMException {
-
-    private EventContext eventContext;
-
-    public UnauthorizedException withEventContext(EventContext eventContext) {
-        this.eventContext = eventContext;
-        return this;
-    }
-
-    public EventContext getEventContext() {
-        return eventContext;
-    }
 
     public static UnauthorizedException of(GraphQuery graphQuery,
                                            UserContext userContext,

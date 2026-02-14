@@ -72,7 +72,6 @@ public class ObligationResponse implements Serializable {
         map.put("user", eventCtx.user().getName());
         map.put("attrs", eventCtx.user().getAttrs());
         map.put("process", eventCtx.user().getProcess());
-        map.put("granted", eventCtx.granted());
         map.put("opName", eventCtx.opName());
         map.put("args", eventCtx.args());
 

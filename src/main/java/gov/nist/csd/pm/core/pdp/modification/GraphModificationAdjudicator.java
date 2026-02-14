@@ -160,12 +160,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
     }
 
     private <R> R executeOp(AdminOperation<R> op, Args args) throws PMException {
-        try {
-            op.canExecute(pap, userCtx, args);
-        } catch (UnauthorizedException e) {
-            throw e.withEventContext(EventContext.fromUserContext(pap, userCtx, false, op.getName(), args.toMap()));
-        }
-
+        op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 
         eventPublisher.publishEvent(EventContext.fromUserContext(pap, userCtx, true, op.getName(), args.toMap()));

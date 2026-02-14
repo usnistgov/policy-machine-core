@@ -31,7 +31,6 @@ public class CreatePolicyClassOp extends CreateNodeOp {
     @Override
     public Long execute(PAP pap, Args args) throws PMException {
         String name = args.get(NAME_PARAM);
-        System.out.println("creating pc " + name);
         return createNode(pap, name, List.of());
     }
 }
