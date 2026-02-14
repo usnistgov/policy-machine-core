@@ -163,9 +163,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         try {
             op.canExecute(pap, userCtx, args);
         } catch (UnauthorizedException e) {
-            eventPublisher.publishEvent(EventContext.fromUserContext(pap, userCtx, false, op.getName(), args.toMap()));
-
-            throw e;
+            throw e.withEventContext(EventContext.fromUserContext(pap, userCtx, false, op.getName(), args.toMap()));
         }
 
         R ret = op.execute(pap, args);

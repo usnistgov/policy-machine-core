@@ -141,13 +141,15 @@ public class PDPTx implements OperationExecutor {
         if (user.isUser()) {
             RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(user.getName(), new AccessRightSet());
             if(!reqPriv.isSatisfied(txExecutor.pap, txExecutor.userCtx, args)) {
-                throw UnauthorizedException.of(txExecutor.userCtx + " has no privileges on user " + user.getName());
+                throw UnauthorizedException.of("cannot respond to event: " + txExecutor.userCtx +
+                    " has no privileges on user " + user.getName());
             }
         } else {
             for (String attr : user.getAttrs()) {
                 RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(attr, new AccessRightSet());
                 if(!reqPriv.isSatisfied(txExecutor.pap, txExecutor.userCtx, args)) {
-                    throw UnauthorizedException.of(txExecutor.userCtx + " has no privileges on user attribute " + user.getName());
+                    throw UnauthorizedException.of("cannot respond to event: " + txExecutor.userCtx +
+                        " has no privileges on user attribute " + user.getName());
                 }
             }
         }
@@ -167,7 +169,8 @@ public class PDPTx implements OperationExecutor {
         for (NodeFormalParameter<?> nodeParam : nodeParams) {
             RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(nodeParam, new AccessRightSet());
             if(!reqPriv.isSatisfied(txExecutor.pap, txExecutor.userCtx, args)) {
-                throw UnauthorizedException.of(txExecutor.userCtx + " has no privileges on arg " + nodeParam.getName());
+                throw UnauthorizedException.of("cannot respond to event: " + txExecutor.userCtx +
+                    " has no privileges on arg " + nodeParam.getName());
             }
         }
     }
@@ -213,7 +216,17 @@ public class PDPTx implements OperationExecutor {
             }
 
             // check if user can execute the operation
-            operation.canExecute(pap, userCtx, args);
+            try {
+                operation.canExecute(pap, userCtx, args);
+            } catch (UnauthorizedException e) {
+                throw e.withEventContext(EventContext.fromUserContext(
+                    pap,
+                    userCtx,
+                    false,
+                    operation.getName(),
+                    args.toMap()
+                ));
+            }
 
             // execute the operation
             Object result = operation.execute(pap, args);

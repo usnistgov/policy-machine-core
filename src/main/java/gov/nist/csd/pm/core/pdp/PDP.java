@@ -80,20 +80,40 @@ public class PDP implements EventPublisher, AccessAdjudication {
         Operation<?> op = pap.query().operations().getOperation(resourceOperation);
         Args args = op.validateAndPrepareArgs(rawAgs);
 
-        return runTx(user, tx -> executeOperation(user, tx, op, args));
+        try {
+            return runTx(user, tx -> executeOperation(user, tx, op, args));
+        } catch (UnauthorizedException e) {
+            publishDeniedEventIfPresent(e);
+            throw e;
+        }
     }
 
     @Override
     public void adjudicateRoutine(UserContext user, List<OperationRequest> operationRequests) throws PMException {
-        runTx(user, tx -> {
-            for (OperationRequest request : operationRequests) {
-                Operation<?> op = pap.query().operations().getOperation(request.op());
-                Args args = op.validateAndPrepareArgs(request.args());
-                executeOperation(user, tx, op, args);
-            }
+        try {
+            runTx(user, tx -> {
+                for (OperationRequest request : operationRequests) {
+                    Operation<?> op = pap.query().operations().getOperation(request.op());
+                    Args args = op.validateAndPrepareArgs(request.args());
+                    executeOperation(user, tx, op, args);
+                }
 
-            return null;
-        });
+                return null;
+            });
+        } catch (UnauthorizedException e) {
+            publishDeniedEventIfPresent(e);
+            throw e;
+        }
+    }
+
+    private void publishDeniedEventIfPresent(UnauthorizedException e) throws PMException {
+        EventContext eventContext = e.getEventContext();
+        if (eventContext != null) {
+            TxRunner.runTx(pap, () -> {
+                publishEvent(eventContext);
+                return null;
+            });
+        }
     }
 
     private Object executeOperation(UserContext user, PDPTx pdpTx, Operation<?> operation, Args args) throws PMException {

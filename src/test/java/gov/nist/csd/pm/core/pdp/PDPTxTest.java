@@ -2,12 +2,16 @@ package gov.nist.csd.pm.core.pdp;
 
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.epp.EventContextUser;
+import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
@@ -15,8 +19,10 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
+import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapperWithSuper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -158,5 +164,56 @@ class PDPTxTest {
             UnauthorizedException.class,
             () -> epp.processEvent(new EventContext(new EventContextUser("u2"), true, "read_file", Map.of("n", "oa1")))
         );
+    }
+
+    @Test
+    void test_whenResourceOperationUnauth_EventTriggeredAndGrantedFalse() throws PMException {
+        String pml = """
+            set resource access rights ["read"]
+            
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create ua "ua2" in ["pc1"]
+            create oa "oa1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            create u "u2" in ["ua1", "ua2"]
+            create o "o1" in ["oa1"]
+            
+            associate "@super" and "ua1" with ["*"]
+            associate "@super" and "ua2" with ["*"]
+            associate "@super" and "oa1" with ["*"]
+            
+            @reqcap({n: ["read"]})
+            resourceop read_file(@node string n) { }
+            
+            create obligation "obl1"
+            when any user
+            performs any operation
+            do(ctx) {
+                if !ctx.granted {
+                    create pc "pc2"
+                }
+            }
+            """;
+        PAP testPAP = new TestPAP();
+        testPAP.bootstrap(new PMLBootstrapperWithSuper(pml));
+
+        PDP pdp = new PDP(testPAP);
+        EPP epp = new EPP(pdp, testPAP);
+        epp.subscribeTo(pdp);
+
+        UnauthorizedException e = assertThrows(
+            UnauthorizedException.class,
+            () -> pdp.adjudicateOperation(new UserContext(id("u1")), "read_file",
+                Map.of("n", "o1"))
+        );
+        assertEquals("{user: u1} cannot perform operation read_file", e.getMessage());
+        System.out.println(testPAP.query().graph().search(NodeType.ANY, new HashMap<>()));
+        assertTrue(testPAP.query().graph().nodeExists("pc2"));
+    }
+
+    @Test
+    void test_whenResourceOperationGranted_EventNotTriggered() {
+
     }
 }
