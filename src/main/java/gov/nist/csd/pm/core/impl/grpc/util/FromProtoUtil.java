@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.impl.grpc.pap;
+package gov.nist.csd.pm.core.impl.grpc.util;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -12,7 +12,6 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.proto.v1.pdp.query.Param;
 import gov.nist.csd.pm.proto.v1.pdp.query.ParamType;
-import gov.nist.csd.pm.proto.v1.pdp.query.Signature;
 import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;

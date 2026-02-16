@@ -161,9 +161,4 @@ class PDPTxTest {
             () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
         );
     }
-
-    @Test
-    void test_whenResourceOperationGranted_EventNotTriggered() {
-
-    }
 }
