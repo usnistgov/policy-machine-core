@@ -18,6 +18,10 @@ public class UnauthorizedException extends PMException {
         return new UnauthorizedException(userStr + " cannot perform operation " + operation);
     }
 
+    public static UnauthorizedException of(String message) throws PMException {
+        return new UnauthorizedException(message);
+    }
+
     public static UnauthorizedException of(GraphQuery graphQuery,
                                            UserContext userContext,
                                            TargetContext targetContext,

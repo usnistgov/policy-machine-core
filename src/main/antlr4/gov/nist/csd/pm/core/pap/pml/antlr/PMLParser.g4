@@ -202,12 +202,13 @@ expression:
     operationInvoke #OperationInvokeExpression
     | variableReference #VariableReferenceExpression
     | literal #LiteralExpression
-    | EXCLAMATION expression #NegateExpression
     | OPEN_PAREN expression CLOSE_PAREN #ParenExpression
     | expression index #IndexExpression
+    | EXCLAMATION expression #NegateExpression
     | left=expression PLUS right=expression #PlusExpression
     | left=expression (EQUALS | NOT_EQUALS) right=expression #EqualsExpression
-    | left=expression (LOGICAL_AND | LOGICAL_OR) right=expression #LogicalExpression ;
+    | left=expression LOGICAL_AND right=expression #LogicalAndExpression
+    | left=expression LOGICAL_OR right=expression #LogicalOrExpression ;
 expressionList: expression (COMMA expression)* ;
 
 literal:

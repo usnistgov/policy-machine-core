@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -65,7 +63,9 @@ class EPPTest {
         pap.executePML(u1, """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
+                associate "ua1" and "ua2" with ["*"]
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
@@ -177,7 +177,8 @@ class EPPTest {
 
         assertDoesNotThrow(() -> pdp.adjudicateOperation(new UserContext(id("u1")), "read_file",
             Map.of("name", "oa1")));
-        assertTrue(pap.query().graph().nodeExists("oa1pc1"));
+        // resource operation events sent via pep not pdp
+        assertFalse(pap.query().graph().nodeExists("oa1pc1"));
     }
 
     @Test
@@ -191,7 +192,9 @@ class EPPTest {
                 create pc "pc1"
                 create oa "oa1" in ["pc1"]
                 create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
+                associate "ua1" and "ua2" with ["*"]
                 associate "ua1" and "oa1" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 create obligation "test"
@@ -225,7 +228,9 @@ class EPPTest {
         String pml = """                
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
+                associate "ua1" and "ua2" with ["*"]
                 create oa "oa1" in ["pc1"]
                 
                 associate "ua1" and "oa1" with ["admin:*"]
@@ -339,9 +344,11 @@ class EPPTest {
         String pml = """                
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
                 create oa "oa1" in ["pc1"]
                 
+                associate "ua1" and "ua2" with ["*"]
                 associate "ua1" and "oa1" with ["admin:*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:*"]
                 
@@ -377,9 +384,11 @@ class EPPTest {
         String pml = """                
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua2" in ["pc1"]
+                create u "u1" in ["ua1", "ua2"]
                 create oa "oa1" in ["pc1"]
                 
+                associate "ua1" and "ua2" with ["*"]
                 associate "ua1" and "oa1" with ["admin:*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:node:create"]
                 
@@ -409,9 +418,11 @@ class EPPTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
-                create u "u1" in ["ua1"]
+                create ua "ua3" in ["pc1"]
+                create u "u1" in ["ua1", "ua3"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
+                associate "ua1" and "ua3" with ["*"]
                 associate "ua1" and "oa1" with ["admin:*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
@@ -483,7 +494,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(List.of(id("ua2")));
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
@@ -509,7 +520,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(List.of(id("ua2")));
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
@@ -532,7 +543,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(id("u1"));
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
@@ -560,7 +571,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(id("u1"));
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
@@ -588,7 +599,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(id("u1"), "");
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))
@@ -706,7 +717,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(id("u1"), "");
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", id("a"), "descendants", List.of(id("b")))
@@ -743,7 +754,7 @@ class EPPTest {
 
         UserContext userCtx = new UserContext(id("u1"), "");
 
-        EventContext eventContext = new EventContext(
+        EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
             "assign",
             Map.of("ascendant", "a", "descendants", List.of("b"))

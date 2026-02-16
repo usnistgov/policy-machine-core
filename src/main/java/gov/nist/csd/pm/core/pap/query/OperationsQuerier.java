@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PluginRegistry;
+import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -42,9 +43,9 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     public Operation<?> getOperation(String name) throws PMException {
         if (pluginRegistry.pluginExists(name)) {
             return pluginRegistry.getOperation(name);
-        }
-
-        if (!store.operations().operationExists(name)) {
+        } else if (AdminOperations.isAdminOperation(name)) {
+            return AdminOperations.get(name);
+        } else if (!store.operations().operationExists(name)) {
             throw new OperationDoesNotExistException(name);
         }
 

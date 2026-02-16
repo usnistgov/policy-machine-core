@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.common.event;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EventContext;
 
 /**
  * Interface for processing EventContexts.

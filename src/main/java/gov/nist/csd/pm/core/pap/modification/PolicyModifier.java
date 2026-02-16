@@ -2,9 +2,6 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
 
-/**
- * PolicyStore is an abstract class that outlines the expected behavior of a backend implementation.
- */
 public class PolicyModifier implements PolicyModification {
 
     private final GraphModifier graphModifier;

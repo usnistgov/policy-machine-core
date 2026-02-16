@@ -62,7 +62,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testSuccess() throws PMException {
             pap.modify().operations().createOperation(testOp);
 
-            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getOperation("assign"));
+            assertDoesNotThrow(() -> pap.query().operations().getOperation(testOp.getName()));
         }
 
         @Test
@@ -215,7 +215,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testCannotDeleteBuiltinOperation() {
             assertDoesNotThrow(() -> pap.modify().operations().deleteOperation("assign"));
-            assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getOperation("assign"));
+            assertDoesNotThrow(() -> pap.query().operations().getOperation("assign"));
         }
     }
 }

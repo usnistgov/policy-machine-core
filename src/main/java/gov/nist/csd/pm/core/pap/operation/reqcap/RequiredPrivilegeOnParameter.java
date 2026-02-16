@@ -57,11 +57,10 @@ public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
         };
     }
 
-    private boolean hasRequiredPrivileges(PAP pap, UserContext userCtx, long id, AccessRightSet required) throws
-                                                                                                          PMException {
+    private boolean hasRequiredPrivileges(PAP pap, UserContext userCtx, long id, AccessRightSet required) throws PMException {
         TargetContext targetCtx = new TargetContext(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
-        return privs.containsAll(required);
+        return !privs.isEmpty() && privs.containsAll(required);
     }
 
     public NodeFormalParameter<?> param() {

@@ -2,9 +2,14 @@ package gov.nist.csd.pm.core.pdp;
 
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EPP;
+import gov.nist.csd.pm.core.epp.EventContext;
+import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
@@ -15,6 +20,7 @@ import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class PDPTxTest {
@@ -88,5 +94,71 @@ class PDPTxTest {
         PDPTx pdpTx = new PDPTx(new UserContext(u1), pap, List.of());
         long oa1 = pdpTx.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         assertDoesNotThrow(() -> pdpTx.modify().graph().createObjectAttribute("oa2", List.of(oa1)));
+    }
+
+    @Test
+    void testObligationAuthorNoPrivilegesOnEventContextUser() throws PMException {
+        String pml = """
+            resourceop read_file(@node string n) { }
+            
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create oa "oa1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            create u "u2" in ["ua1"]
+            """;
+
+        TestPAP testPAP = new TestPAP();
+        testPAP.executePML(null, pml);
+
+        testPAP.executePML(new TestUserContext("u1"), """
+            create obligation "o1"
+            when any user 
+            performs any operation
+            do(ctx) {
+            
+            }
+            """);
+
+        PDP pdp = new PDP(testPAP);
+        EPP epp = new EPP(pdp, testPAP);
+        assertThrows(
+            UnauthorizedException.class,
+            () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
+        );
+    }
+
+    @Test
+    void testObligationAuthorNoPrivilegesOnEventContextArgs() throws PMException {
+        String pml = """
+            resourceop read_file(@node string n) { }
+            
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create ua "ua2" in ["pc1"]
+            create oa "oa1" in ["pc1"]
+            create u "u1" in ["ua1"]
+            create u "u2" in ["ua1", "ua2"]
+            associate "ua1" and "ua2" with ["*"]
+            """;
+
+        TestPAP testPAP = new TestPAP();
+        testPAP.executePML(null, pml);
+
+        testPAP.executePML(new TestUserContext("u1"), """
+            create obligation "o1"
+            when any user 
+            performs any operation
+            do(ctx) {
+            
+            }
+            """);
+
+        PDP pdp = new PDP(testPAP);
+        EPP epp = new EPP(pdp, testPAP);
+        assertThrows(
+            UnauthorizedException.class,
+            () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
+        );
     }
 }

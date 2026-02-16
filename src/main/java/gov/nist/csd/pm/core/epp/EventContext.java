@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.common.event;
+package gov.nist.csd.pm.core.epp;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -12,20 +12,14 @@ import java.util.Objects;
 
 public record EventContext(EventContextUser user, String opName, Map<String, Object> args) {
 
-    public EventContext(PAP pap, UserContext userCtx, String opName, Map<String, Object> args) throws PMException {
-        this(buildEventContextUser(userCtx, pap), opName, args);
-    }
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof EventContext(EventContextUser user1, String name, Map<String, Object> args1))) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        return Objects.equals(opName, name) && Objects.equals(user, user1)
-            && Objects.equals(args, args1);
+        EventContext that = (EventContext) o;
+        return Objects.equals(opName, that.opName) && Objects.equals(user,
+            that.user) && Objects.equals(args, that.args);
     }
 
     @Override
@@ -33,10 +27,14 @@ public record EventContext(EventContextUser user, String opName, Map<String, Obj
         return Objects.hash(user, opName, args);
     }
 
-    private static EventContextUser buildEventContextUser(UserContext userCtx, PAP pap) throws PMException {
+    public static EventContext fromUserContext(PAP pap,
+                                               UserContext userCtx,
+                                               String opName,
+                                               Map<String, Object> args) throws PMException {
+        EventContextUser user;
         if (userCtx.isUserDefined()) {
             Node node = pap.query().graph().getNodeById(userCtx.getUser());
-            return new EventContextUser(node.getName(), userCtx.getProcess());
+            user = new EventContextUser(node.getName(), userCtx.getProcess());
         } else {
             Collection<Long> attributeIds = userCtx.getAttributeIds();
             List<String> attributeNames = new ArrayList<>();
@@ -45,7 +43,13 @@ public record EventContext(EventContextUser user, String opName, Map<String, Obj
                 attributeNames.add(node.getName());
             }
 
-            return new EventContextUser(attributeNames, userCtx.getProcess());
+            user = new EventContextUser(attributeNames, userCtx.getProcess());
         }
+
+        return new EventContext(
+            user,
+            opName,
+            args
+        );
     }
 }

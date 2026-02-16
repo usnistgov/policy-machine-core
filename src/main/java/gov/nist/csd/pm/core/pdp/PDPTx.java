@@ -1,19 +1,24 @@
 package gov.nist.csd.pm.core.pdp;
 
 
-import gov.nist.csd.pm.core.common.event.EventContext;
+import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.scope.ExecuteScope;
@@ -30,6 +35,7 @@ import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PDPTx implements OperationExecutor {
@@ -109,7 +115,60 @@ public class PDPTx implements OperationExecutor {
      * @throws PMException If an exception occurs while executing the obligation response.
      */
     public void executeObligationResponse(EventContext eventCtx, ObligationResponse response) throws PMException {
+        // check that the user has any privileges on the event context nodes to avoid leaking information
+        canExecuteObligationResponse(eventCtx);
+
+        // execute response
         response.execute(txExecutor, txExecutor.userCtx, eventCtx);
+    }
+
+    private void canExecuteObligationResponse(EventContext eventCtx) throws PMException {
+        String opName = eventCtx.opName();
+        Operation<?> operation = txExecutor.pap.query().operations().getOperation(opName);
+        Args args = Args.of(operation, eventCtx.args());
+
+        checkRequiredPrivilegesOnEventUser(eventCtx.user(), args);
+
+        checkRequiredPrivilegesOnEventArgs(operation.getFormalParameters(), args);
+    }
+
+    private void checkRequiredPrivilegesOnEventUser(EventContextUser user, Args args) throws PMException {
+        // check for privileges on the user
+        if (user.isUser()) {
+            RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(user.getName(), new AccessRightSet());
+            if(!reqPriv.isSatisfied(txExecutor.pap, txExecutor.userCtx, args)) {
+                throw UnauthorizedException.of("cannot respond to event: " + txExecutor.userCtx +
+                    " has no privileges on user " + user.getName());
+            }
+        } else {
+            for (String attr : user.getAttrs()) {
+                RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(attr, new AccessRightSet());
+                if(!reqPriv.isSatisfied(txExecutor.pap, txExecutor.userCtx, args)) {
+                    throw UnauthorizedException.of("cannot respond to event: " + txExecutor.userCtx +
+                        " has no privileges on user attribute " + user.getName());
+                }
+            }
+        }
+    }
+
+    private void checkRequiredPrivilegesOnEventArgs(List<FormalParameter<?>> params, Args args) throws PMException {
+        // identify node formal params and check for privs
+        List<NodeFormalParameter<?>> nodeParams = new ArrayList<>();
+        for (FormalParameter<?> fp : params) {
+            if (!(fp instanceof NodeFormalParameter<?> nodeFormalParameter)) {
+                continue;
+            }
+
+            nodeParams.add(nodeFormalParameter);
+        }
+
+        for (NodeFormalParameter<?> nodeParam : nodeParams) {
+            RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(nodeParam, new AccessRightSet());
+            if(!reqPriv.isSatisfied(txExecutor.pap, txExecutor.userCtx, args)) {
+                throw UnauthorizedException.of("cannot respond to event: " + txExecutor.userCtx +
+                    " has no privileges on arg " + nodeParam.getName());
+            }
+        }
     }
 
     private static class TxExecutor extends PAP {
@@ -158,9 +217,10 @@ public class PDPTx implements OperationExecutor {
             // execute the operation
             Object result = operation.execute(pap, args);
 
-            // if the operation is an Admin or Resource operation publish the event for EPPs
-            if (operation instanceof AdminOperation<?> || operation instanceof ResourceOperation<?>) {
-                eventPublisher.publishEvent(new EventContext(
+            // if the operation is an Admin publish the event for EPPs
+            // resource operation events are published by the PEP after the RAP succeeds
+            if (operation instanceof AdminOperation<?>) {
+                eventPublisher.publishEvent(EventContext.fromUserContext(
                     pap,
                     userCtx,
                     operation.getName(),

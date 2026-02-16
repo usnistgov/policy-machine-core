@@ -21,7 +21,8 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ExpressionListContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.IndexContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.IndexExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.Int64LiteralContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalAndExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalOrExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
@@ -141,11 +142,19 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     }
 
     @Override
-    public Expression<?> visitLogicalExpression(LogicalExpressionContext ctx) {
+    public Expression<?> visitLogicalAndExpression(LogicalAndExpressionContext ctx) {
         Expression<Boolean> left = ExpressionVisitor.compile(visitorCtx, ctx.left, BOOLEAN_TYPE);
         Expression<Boolean> right = ExpressionVisitor.compile(visitorCtx, ctx.right, BOOLEAN_TYPE);
 
-        return new LogicalExpression(left, right, ctx.LOGICAL_AND() != null);
+        return new LogicalExpression(left, right, true);
+    }
+
+    @Override
+    public Expression<?> visitLogicalOrExpression(LogicalOrExpressionContext ctx) {
+        Expression<Boolean> left = ExpressionVisitor.compile(visitorCtx, ctx.left, BOOLEAN_TYPE);
+        Expression<Boolean> right = ExpressionVisitor.compile(visitorCtx, ctx.right, BOOLEAN_TYPE);
+
+        return new LogicalExpression(left, right, false);
     }
 
     @Override

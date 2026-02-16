@@ -7,8 +7,8 @@ import static gov.nist.csd.pm.core.util.TestIdGenerator.ids;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.csd.pm.core.common.event.EventContext;
-import gov.nist.csd.pm.core.common.event.EventContextUser;
+import gov.nist.csd.pm.core.epp.EventContext;
+import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -152,7 +152,9 @@ class CreateObligationStatementTest {
         String pml = """
             create pc "pc1"
             create ua "ua1" in ["pc1"]
-            create u "u1" in ["ua1"]
+            create ua "ua2" in ["pc1"]
+            create u "u1" in ["ua1", "ua2"]
+            associate "ua1" and "ua2" with ["*"]
             
             associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
             
