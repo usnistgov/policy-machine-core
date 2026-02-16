@@ -11,15 +11,12 @@ import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
@@ -40,7 +37,6 @@ import gov.nist.csd.pm.core.pdp.modification.PolicyModificationAdjudicator;
 import gov.nist.csd.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PDPTx implements OperationExecutor {
 
@@ -227,7 +223,6 @@ public class PDPTx implements OperationExecutor {
                 eventPublisher.publishEvent(EventContext.fromUserContext(
                     pap,
                     userCtx,
-                    true,
                     operation.getName(),
                     args.toMap()
                 ));

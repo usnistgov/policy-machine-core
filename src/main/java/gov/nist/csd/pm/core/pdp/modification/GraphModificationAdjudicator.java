@@ -27,7 +27,6 @@ import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -163,7 +162,7 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
         op.canExecute(pap, userCtx, args);
         R ret = op.execute(pap, args);
 
-        eventPublisher.publishEvent(EventContext.fromUserContext(pap, userCtx, true, op.getName(), args.toMap()));
+        eventPublisher.publishEvent(EventContext.fromUserContext(pap, userCtx, op.getName(), args.toMap()));
 
         return ret;
     }

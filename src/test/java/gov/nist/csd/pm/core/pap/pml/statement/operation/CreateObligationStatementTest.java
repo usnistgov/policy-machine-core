@@ -180,13 +180,11 @@ class CreateObligationStatementTest {
         EPP epp = new EPP(pdp, pap);
         epp.processEvent(new EventContext(
             new EventContextUser("u1"),
-            true,
             "op1",
             new HashMap<>()
         ));
         epp.processEvent(new EventContext(
             new EventContextUser("u1"),
-            true,
             "op2",
             new HashMap<>()
         ));

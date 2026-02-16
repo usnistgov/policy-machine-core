@@ -7,11 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.epp.EventContextUser;
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
@@ -19,10 +17,8 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
-import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapperWithSuper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -128,7 +124,7 @@ class PDPTxTest {
         EPP epp = new EPP(pdp, testPAP);
         assertThrows(
             UnauthorizedException.class,
-            () -> epp.processEvent(new EventContext(new EventContextUser("u2"), true, "read_file", Map.of("n", "oa1")))
+            () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
         );
     }
 
@@ -162,7 +158,7 @@ class PDPTxTest {
         EPP epp = new EPP(pdp, testPAP);
         assertThrows(
             UnauthorizedException.class,
-            () -> epp.processEvent(new EventContext(new EventContextUser("u2"), true, "read_file", Map.of("n", "oa1")))
+            () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
         );
     }
 

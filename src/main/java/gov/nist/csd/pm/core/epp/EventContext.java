@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public record EventContext(EventContextUser user, boolean granted, String opName, Map<String, Object> args) {
+public record EventContext(EventContextUser user, String opName, Map<String, Object> args) {
 
     @Override
     public boolean equals(Object o) {
@@ -18,16 +18,19 @@ public record EventContext(EventContextUser user, boolean granted, String opName
             return false;
         }
         EventContext that = (EventContext) o;
-        return granted == that.granted && Objects.equals(opName, that.opName) && Objects.equals(user,
+        return Objects.equals(opName, that.opName) && Objects.equals(user,
             that.user) && Objects.equals(args, that.args);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, granted, opName, args);
+        return Objects.hash(user, opName, args);
     }
 
-    public static EventContext fromUserContext(PAP pap, UserContext userCtx, boolean granted, String opName, Map<String, Object> args) throws PMException {
+    public static EventContext fromUserContext(PAP pap,
+                                               UserContext userCtx,
+                                               String opName,
+                                               Map<String, Object> args) throws PMException {
         EventContextUser user;
         if (userCtx.isUserDefined()) {
             Node node = pap.query().graph().getNodeById(userCtx.getUser());
@@ -45,7 +48,6 @@ public record EventContext(EventContextUser user, boolean granted, String opName
 
         return new EventContext(
             user,
-            granted,
             opName,
             args
         );

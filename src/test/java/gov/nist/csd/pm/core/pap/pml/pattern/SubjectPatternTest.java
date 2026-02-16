@@ -170,7 +170,6 @@ class SubjectPatternTest {
         EPP epp = new EPP(pdp, memoryPAP);
         epp.processEvent(new EventContext(
             new EventContextUser("u1"),
-            true,
             "test",
             Map.of()
         ));
