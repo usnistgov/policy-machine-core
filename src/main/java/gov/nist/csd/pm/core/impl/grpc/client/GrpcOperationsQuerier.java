@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.impl.grpc.pap;
+package gov.nist.csd.pm.core.impl.grpc.client;
 
 import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -20,9 +20,7 @@ import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServ
 import io.grpc.StatusRuntimeException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class GrpcOperationsQuerier implements OperationsQuery {
 
@@ -41,107 +39,55 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
     @Override
     public Collection<Operation<?>> getOperations() {
+        GetAllOperationSignaturesResponse response = blockingStub.getAllOperationSignatures(
+            GetAllOperationSignaturesRequest.newBuilder().build());
+
         List<Operation<?>> operations = new ArrayList<>();
-
-        for (Signature sig : blockingStub.getResourceOperationSignatures(
-                GetResourceOperationSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            operations.add(toResourceOperation(sig));
+        for (Signature sig : response.getSignatureList()) {
+            operations.add(toOperation(sig));
         }
-        for (Signature sig : blockingStub.getAdminOperationSignatures(
-                GetAdminOperationSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            operations.add(toAdminOperation(sig));
-        }
-        for (Signature sig : blockingStub.getRoutineSignatures(
-                GetRoutineSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            operations.add(toRoutine(sig));
-        }
-        for (Signature sig : blockingStub.getQuerySignatures(
-                GetQuerySignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            operations.add(toQueryOperation(sig));
-        }
-        for (Signature sig : blockingStub.getFunctionSignatures(
-                GetFunctionSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            operations.add(toFunction(sig));
-        }
-
         return operations;
     }
 
     @Override
     public Collection<String> getOperationNames() {
-        Set<String> names = new HashSet<>();
+        GetAllOperationSignaturesResponse response = blockingStub.getAllOperationSignatures(
+            GetAllOperationSignaturesRequest.newBuilder().build());
 
-        for (Signature sig : blockingStub.getResourceOperationSignatures(
-                GetResourceOperationSignaturesRequest.newBuilder().build()).getSignaturesList()) {
+        List<String> names = new ArrayList<>();
+        for (Signature sig : response.getSignatureList()) {
             names.add(sig.getName());
         }
-        for (Signature sig : blockingStub.getAdminOperationSignatures(
-                GetAdminOperationSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            names.add(sig.getName());
-        }
-        for (Signature sig : blockingStub.getRoutineSignatures(
-                GetRoutineSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            names.add(sig.getName());
-        }
-        for (Signature sig : blockingStub.getQuerySignatures(
-                GetQuerySignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            names.add(sig.getName());
-        }
-        for (Signature sig : blockingStub.getFunctionSignatures(
-                GetFunctionSignaturesRequest.newBuilder().build()).getSignaturesList()) {
-            names.add(sig.getName());
-        }
-
         return names;
     }
 
     @Override
     public Operation<?> getOperation(String name) {
-        if (!getOperationNames().contains(name)) {
-            return null;
-        }
-
-        try {
-            GetResourceOperationSignatureResponse response = blockingStub.getResourceOperationSignature(
-                GetResourceOperationSignatureRequest.newBuilder().setName(name).build());
-            return toResourceOperation(response.getSignature());
-        } catch (Exception e) {
-        }
-
-        try {
-            GetAdminOperationSignatureResponse response = blockingStub.getAdminOperationSignature(
-                GetAdminOperationSignatureRequest.newBuilder().setName(name).build());
-            return toAdminOperation(response.getSignature());
-        } catch (StatusRuntimeException e) {
-        }
-
-        try {
-            GetRoutineSignatureResponse response = blockingStub.getRoutineSignature(
-                GetRoutineSignatureRequest.newBuilder().setName(name).build());
-            return toRoutine(response.getSignature());
-        } catch (StatusRuntimeException e) {
-        }
-
-        try {
-            GetQuerySignatureResponse response = blockingStub.getQuerySignature(
-                GetQuerySignatureRequest.newBuilder().setName(name).build());
-            return toQueryOperation(response.getSignature());
-        } catch (StatusRuntimeException e) {
-        }
-
-        try {
-            GetFunctionSignatureResponse response = blockingStub.getFunctionSignature(
-                GetFunctionSignatureRequest.newBuilder().setName(name).build());
-            return toFunction(response.getSignature());
-        } catch (StatusRuntimeException e) {
-        }
-
-        throw new IllegalStateException("operation \"" + name + "\" was in getOperationNames() but was not found.");
+        GetOperationSignatureResponse response = blockingStub.getOperationSignature(
+            GetOperationSignatureRequest.newBuilder().setName(name).build());
+        return toOperation(response.getSignature());
     }
 
     @Override
     public boolean operationExists(String operationName) {
-        return getOperations().stream().map(Operation::getName).toList().contains(operationName);
+        try {
+            blockingStub.getOperationSignature(
+                GetOperationSignatureRequest.newBuilder().setName(operationName).build());
+            return true;
+        } catch (StatusRuntimeException e) {
+            return false;
+        }
+    }
+
+    private static Operation<?> toOperation(Signature sig) {
+        return switch (sig.getOperationType()) {
+            case RESOURCE -> toResourceOperation(sig);
+            case ADMIN -> toAdminOperation(sig);
+            case ROUTINE -> toRoutine(sig);
+            case QUERY -> toQueryOperation(sig);
+            case FUNCTION -> toFunction(sig);
+            default -> toAdminOperation(sig);
+        };
     }
 
     @SuppressWarnings("unchecked")

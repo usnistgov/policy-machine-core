@@ -16,21 +16,15 @@ public class DeleteNodeOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DELETE_NODE_NODE_ID_PARAM =
         new NodeIdFormalParameter("id");
-    public static final NodeIdListFormalParameter DELETE_NODE_DESCENDANTS_PARAM =
-        new NodeIdListFormalParameter("descendants");
-
 
     public DeleteNodeOp() {
         super(
             "delete_node",
             BasicTypes.VOID_TYPE,
-            List.of(DELETE_NODE_NODE_ID_PARAM, TYPE_PARAM, DELETE_NODE_DESCENDANTS_PARAM),
+            List.of(DELETE_NODE_NODE_ID_PARAM),
             new RequiredCapability(
                 new RequiredPrivilegeOnParameter(
                     DELETE_NODE_NODE_ID_PARAM, AdminAccessRight.ADMIN_GRAPH_NODE_DELETE
-                ),
-                new RequiredPrivilegeOnParameter(
-                    DELETE_NODE_DESCENDANTS_PARAM, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_DELETE
                 )
             )
         );

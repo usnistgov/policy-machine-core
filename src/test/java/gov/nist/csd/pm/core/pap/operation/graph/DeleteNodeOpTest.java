@@ -48,9 +48,7 @@ class DeleteNodeOpTest {
 
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = op.validateAndPrepareArgs(Map.of(
-                "id", id("o1"),
-                "type", "O",
-                "descendants", List.of(id("oa1"))
+                "id", id("o1")
         ));
         op.canExecute(pap, new UserContext(id("u1")), args);
     }
@@ -73,9 +71,7 @@ class DeleteNodeOpTest {
 
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = op.validateAndPrepareArgs(Map.of(
-                "id", id("o1"),
-                "type", "O",
-                "descendants", List.of(id("oa1"))
+                "id", id("o1")
         ));
         assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));
     }

@@ -1,11 +1,10 @@
-package gov.nist.csd.pm.core.impl.grpc.pap;
+package gov.nist.csd.pm.core.impl.grpc.client;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.csd.pm.core.pap.graph.Association;
-import gov.nist.csd.pm.core.pap.query.GraphQuerier;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.proto.v1.model.NodeRef;

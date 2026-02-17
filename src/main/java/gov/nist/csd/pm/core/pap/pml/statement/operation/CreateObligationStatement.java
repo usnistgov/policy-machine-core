@@ -83,21 +83,33 @@ public class CreateObligationStatement extends OperationStatement {
         return String.format(
             """
             create obligation %s
-            when %s
-            performs %s
-            do (%s) %s""",
+            %s
+            %s""",
             name,
-            subjectPatternToString(indentLevel, eventPattern.getSubjectPattern()),
-            operationPatternToString(indentLevel, eventPattern.getOperationPattern()),
-            response.getEventCtxVariable(), block.toFormattedString(indentLevel)
+            eventPatternToString(indentLevel, eventPattern),
+            responseToString(indentLevel, response)
         );
     }
 
-    private String subjectPatternToString(int indentLevel, SubjectPattern subjectPattern) {
+    public static String eventPatternToString(int indentLevel, EventPattern eventPattern) {
+        return String.format("""
+            when %s
+            performs %s
+            """, subjectPatternToString(indentLevel, eventPattern.getSubjectPattern()),
+            operationPatternToString(indentLevel, eventPattern.getOperationPattern()));
+    }
+
+    public static String responseToString(int indentLevel, ObligationResponse obligationResponse) {
+        return String.format("do (%s) %s",
+            obligationResponse.getEventCtxVariable(),
+            new PMLStatementBlock(obligationResponse.getStatements()).toFormattedString(indentLevel));
+    }
+
+    private static String subjectPatternToString(int indentLevel, SubjectPattern subjectPattern) {
         return subjectPattern.toFormattedString(indentLevel);
     }
 
-    private String operationPatternToString(int indentLevel, OperationPattern operationPattern) {
+    private static String operationPatternToString(int indentLevel, OperationPattern operationPattern) {
         return operationPattern.toFormattedString(indentLevel);
     }
 

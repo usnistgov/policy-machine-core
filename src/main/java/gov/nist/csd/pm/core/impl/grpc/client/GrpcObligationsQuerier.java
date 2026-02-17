@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.impl.grpc.pap;
+package gov.nist.csd.pm.core.impl.grpc.client;
 
 import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;

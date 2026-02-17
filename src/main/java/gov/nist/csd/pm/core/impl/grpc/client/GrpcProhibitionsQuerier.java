@@ -1,23 +1,20 @@
-package gov.nist.csd.pm.core.impl.grpc.pap;
+package gov.nist.csd.pm.core.impl.grpc.client;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerier;
+import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
+import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.proto.v1.model.NodeRef;
 import gov.nist.csd.pm.proto.v1.pdp.query.*;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class GrpcProhibitionsQuerier extends ProhibitionsQuerier {
+public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;
 
     public GrpcProhibitionsQuerier(PolicyQueryServiceBlockingStub blockingStub) {
-        super(null);
         this.blockingStub = blockingStub;
     }
 

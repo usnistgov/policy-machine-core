@@ -105,14 +105,9 @@ public class GraphModificationAdjudicator extends Adjudicator implements GraphMo
 
     @Override
     public void deleteNode(long id) throws PMException {
-        Node node = pap.query().graph().getNodeById(id);
-        Collection<Long> descendants = pap.query().graph().getAdjacentDescendants(id);
-
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = new Args()
-            .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, id)
-            .put(Operation.TYPE_PARAM, node.getType().toString())
-            .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, new ArrayList<>(descendants));
+            .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, id);
 
         executeOp(op, args);
     }
