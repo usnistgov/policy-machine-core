@@ -24,10 +24,8 @@ class DeleteNodeOpTest {
         DeleteNodeOp op = new DeleteNodeOp();
         assertEquals("delete_node", op.getName());
         assertEquals(VOID_TYPE, op.getReturnType());
-        assertEquals(3, op.getFormalParameters().size());
+        assertEquals(1, op.getFormalParameters().size());
         assertEquals("id", op.getFormalParameters().get(0).getName());
-        assertEquals("type", op.getFormalParameters().get(1).getName());
-        assertEquals("descendants", op.getFormalParameters().get(2).getName());
         assertNotNull(op.getRequiredCapabilities());
         assertFalse(op.getRequiredCapabilities().isEmpty());
     }
@@ -48,9 +46,7 @@ class DeleteNodeOpTest {
 
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = op.validateAndPrepareArgs(Map.of(
-                "id", id("o1"),
-                "type", "O",
-                "descendants", List.of(id("oa1"))
+                "id", id("o1")
         ));
         op.canExecute(pap, new UserContext(id("u1")), args);
     }
@@ -73,9 +69,7 @@ class DeleteNodeOpTest {
 
         DeleteNodeOp op = new DeleteNodeOp();
         Args args = op.validateAndPrepareArgs(Map.of(
-                "id", id("o1"),
-                "type", "O",
-                "descendants", List.of(id("oa1"))
+                "id", id("o1")
         ));
         assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));
     }

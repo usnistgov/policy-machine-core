@@ -24,24 +24,18 @@ public class DeleteNodeStatement extends DeleteStatement {
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         // prepare for execution by replacing the name arg with the ID arg
         String name = nameExpression.execute(ctx, pap);
+        GraphQuery graph = pap.query().graph();
 
+        long nodeId;
         try {
-            GraphQuery graph = pap.query().graph();
-            long nodeId = graph.getNodeId(name);
-            NodeType nodeType = graph.getNodeById(nodeId).getType();
-            List<Long> descendants = new ArrayList<>(graph.getAdjacentDescendants(nodeId));
-            
-            return new Args()
-                .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, nodeId)
-                .put(TYPE_PARAM, nodeType.toString())
-                .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, descendants);
+            nodeId = graph.getNodeId(name);
         } catch (NodeDoesNotExistException e) {
             // if the node does not exist no error needs to occur, as the PAP will not error either
-            return new Args()
-                .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, 0L)
-                .put(TYPE_PARAM, NodeType.U.toString())
-                .put(DeleteNodeOp.DELETE_NODE_DESCENDANTS_PARAM, List.of());
+            nodeId = 0;
         }
+
+        return new Args()
+            .put(DeleteNodeOp.DELETE_NODE_NODE_ID_PARAM, nodeId);
     }
 
     @Override

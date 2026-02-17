@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.proto.v1.pdp.query.Param;
 import gov.nist.csd.pm.proto.v1.pdp.query.ParamType;
 import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
@@ -49,6 +50,18 @@ public class FromProtoUtil {
                 new UserContext(resolveNodeRefIdList(pap, userCtxProto.getUserAttributes().getNodesList()), process);
             case USER_NOT_SET ->
                 throw new IllegalArgumentException("user context not set");
+        };
+    }
+
+    public static TargetContext fromTargetContextProto(PAP pap,
+                                                       gov.nist.csd.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
+        return switch (targetCtxProto.getTargetCase()) {
+            case TARGET_NODE ->
+                new TargetContext(resolveNodeRefId(pap, targetCtxProto.getTargetNode()));
+            case TARGET_ATTRIBUTES ->
+                new TargetContext(resolveNodeRefIdList(pap, targetCtxProto.getTargetAttributes().getNodesList()));
+            case TARGET_NOT_SET ->
+                throw new IllegalArgumentException("target context not set");
         };
     }
 
@@ -179,22 +192,22 @@ public class FromProtoUtil {
         }
     }
 
-    public static Association fromProtoAssociation(gov.nist.csd.pm.proto.v1.model.Association proto) {
+    public static Association fromAssociationProto(gov.nist.csd.pm.proto.v1.model.Association proto) {
         long source = proto.getUa().getId();
         long target = proto.getTarget().getId();
         AccessRightSet arset = new AccessRightSet(proto.getArsetList());
         return new Association(source, target, arset);
     }
 
-    public static Subgraph fromProtoSubgraph(gov.nist.csd.pm.proto.v1.pdp.query.Subgraph proto) {
+    public static Subgraph fromSubgraphProto(gov.nist.csd.pm.proto.v1.pdp.query.Subgraph proto) {
         Node node = fromProtoNode(proto.getNode());
         List<Subgraph> subgraphs = proto.getSubgraphsList().stream()
-            .map(FromProtoUtil::fromProtoSubgraph)
+            .map(FromProtoUtil::fromSubgraphProto)
             .collect(Collectors.toList());
         return new Subgraph(node, subgraphs);
     }
 
-    public static Obligation fromProtoObligation(gov.nist.csd.pm.proto.v1.model.Obligation proto) {
+    public static Obligation fromObligationProto(gov.nist.csd.pm.proto.v1.model.Obligation proto) {
         Obligation obligation = new Obligation();
         obligation.setName(proto.getName());
         if (proto.hasAuthor()) {
@@ -247,7 +260,6 @@ public class FromProtoUtil {
 
         return converted;
     }
-
 
     public static Object fromValue(Value value) {
         return switch (value.getDataCase()) {

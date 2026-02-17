@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap.obligation.event;
 
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -43,12 +44,5 @@ public class EventPattern implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(subjectPattern, operationPattern);
-    }
-
-    @Override
-    public String toString() {
-        return "EventPattern[" +
-                "subjectPattern=" + subjectPattern + ", " +
-                "operationPattern=" + operationPattern + ']';
     }
 }
