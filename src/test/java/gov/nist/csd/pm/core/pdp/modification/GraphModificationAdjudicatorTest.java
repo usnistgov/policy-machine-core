@@ -173,9 +173,7 @@ class GraphModificationAdjudicatorTest {
 
         EventContext expected = new EventContext(new EventContextUser("u1"), new DeleteNodeOp().getName(),
             new HashMap<>(Map.of(
-                "id", id("o1"),
-                "type", NodeType.O.toString(),
-                "descendants", new ArrayList<>(ids("oa1"))
+                "id", id("o1")
             ))
         );
         EventContext actual = testEventProcessor.getEventContext();

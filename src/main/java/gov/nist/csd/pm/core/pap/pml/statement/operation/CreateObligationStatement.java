@@ -94,8 +94,8 @@ public class CreateObligationStatement extends OperationStatement {
     public static String eventPatternToString(int indentLevel, EventPattern eventPattern) {
         return String.format("""
             when %s
-            performs %s
-            """, subjectPatternToString(indentLevel, eventPattern.getSubjectPattern()),
+            performs %s""",
+            subjectPatternToString(indentLevel, eventPattern.getSubjectPattern()),
             operationPatternToString(indentLevel, eventPattern.getOperationPattern()));
     }
 
