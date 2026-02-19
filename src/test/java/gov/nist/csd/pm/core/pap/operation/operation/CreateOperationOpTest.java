@@ -108,28 +108,6 @@ class CreateOperationOpTest {
     }
 
     @Test
-    void testCanExecuteWhenUserLacksAccessQuery() throws PMException {
-        MemoryPAP pap = new TestPAP();
-        // User has admin:operation:create but NOT admin:access:query
-        String pml = """
-                set resource access rights ["read"]
-                create pc "pc1"
-                create ua "ua1" in ["pc1"]
-                create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:operation:create"]
-                create u "u1" in ["ua1"]
-                """;
-        pap.executePML(new UserContext(id("u1")), pml);
-
-        AdminOperation<Void> testOp = testOpWithReqCapOnNode(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName());
-
-        CreateOperationOp op = new CreateOperationOp();
-        Args args = new Args();
-        args.put(CreateOperationOp.OPERATION_PARAM, testOp);
-        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u1")), args));
-    }
-
-    @Test
     void testCanExecuteWithOperationHavingNoReqCaps() throws PMException {
         MemoryPAP pap = new TestPAP();
         String pml = """

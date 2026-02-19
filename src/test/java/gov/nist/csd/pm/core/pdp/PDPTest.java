@@ -171,10 +171,14 @@ class PDPTest {
         pap.executePML(new TestUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 
-                @reqcap({name: ["read"]})
+                @reqcap({
+                    require ["read"] on [name]
+                })
                 resourceop read_file(@node string name) {}
-                
-                @reqcap({name: ["write"]})
+
+                @reqcap({
+                    require ["write"] on [name]
+                })
                 resourceop write_file(@node string name) {}
                 
                 create pc "pc1"
@@ -215,8 +219,10 @@ class PDPTest {
                 create u "u2" in ["ua2"]
                 create o "o1" in ["oa1"]
                 
+                @reqcap({
+                    require ["admin:graph:assignment:descendant:create"] on ["oa2"]
+                })
                 adminop op1() string {
-                    check ["admin:graph:assignment:descendant:create"] on ["oa2"]
                     create pc "test"
                     return "test"
                 }
@@ -246,7 +252,9 @@ class PDPTest {
                 
                 set resource access rights ["read", "write"]
                 
-                @reqcap({id: ["read"]})
+                @reqcap({
+                    require ["read"] on [name(id)]
+                })
                 resourceop read_file(@node int64 id) {}
 
                 """);

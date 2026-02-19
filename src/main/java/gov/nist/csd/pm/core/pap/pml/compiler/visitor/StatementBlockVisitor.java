@@ -3,14 +3,6 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementBlockContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpStatementContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicAndCheckStatementBlockContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicAndCheckStatementContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicOrAdminOpStatementContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.BasicResourceOpStatementContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckAdminOpStatementContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.CheckResourceOpStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OnPatternBlockContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
@@ -25,64 +17,26 @@ import java.util.List;
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
     private final Type<?> returnType;
+    private final boolean allowQueryOps;
 
-    public StatementBlockVisitor(VisitorContext visitorCtx, Type<?> returnType) {
+    public StatementBlockVisitor(VisitorContext visitorCtx, Type<?> returnType, boolean allowQueryOps) {
         super(visitorCtx);
         this.returnType = returnType;
-    }
-
-    @Override
-    public Result visitAdminOpStatementBlock(AdminOpStatementBlockContext ctx) {
-        List<AdminOpStatementContext> adminOpStatementContexts = ctx.adminOpStatement();
-        List<PMLStatement<?>> stmts = new ArrayList<>();
-        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
-
-        for (AdminOpStatementContext adminOpStatementContext : adminOpStatementContexts) {
-            if (adminOpStatementContext instanceof BasicOrAdminOpStatementContext basicOrOp) {
-                stmts.add(statementVisitor.visitStatement(basicOrOp.statement()));
-            } else if (adminOpStatementContext instanceof CheckAdminOpStatementContext check){
-                stmts.add(statementVisitor.visitCheckStatement(check.checkStatement()));
-            }
-        }
-
-        try {
-            boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
-            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
-        } catch (PMException e) {
-            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
-        }
-    }
-
-    @Override
-    public Result visitBasicAndCheckStatementBlock(BasicAndCheckStatementBlockContext ctx) {
-        if (ctx == null) {
-            return new Result(true, new PMLStatementBlock());
-        }
-
-        List<BasicAndCheckStatementContext> resourceOpStatement = ctx.basicAndCheckStatement();
-        List<PMLStatement<?>> stmts = new ArrayList<>();
-        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
-
-        for (BasicAndCheckStatementContext resourceOpStatementContext : resourceOpStatement) {
-            if (resourceOpStatementContext instanceof BasicResourceOpStatementContext basic) {
-                stmts.add(statementVisitor.visitBasicStatement(basic.basicStatement()));
-            } else if (resourceOpStatementContext instanceof CheckResourceOpStatementContext check){
-                stmts.add(statementVisitor.visitCheckStatement(check.checkStatement()));
-            }
-        }
-
-        try {
-            boolean allPathsReturned = checkAllPathsReturned(visitorCtx, stmts, returnType);
-            return new Result(allPathsReturned, new PMLStatementBlock(stmts));
-        } catch (PMException e) {
-            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
-        }
+        this.allowQueryOps = allowQueryOps;
     }
 
     @Override
     public Result visitBasicStatementBlock(PMLParser.BasicStatementBlockContext ctx) {
         List<PMLStatement<?>> stmts = new ArrayList<>();
-        StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyFunctionsOnly());
+
+        VisitorContext localCtx;
+        if (allowQueryOps) {
+            localCtx = visitorCtx.copyFunctionsAndQueriesOnly();
+        } else {
+            localCtx = visitorCtx.copyFunctionsOnly();
+        }
+
+        StatementVisitor statementVisitor = new StatementVisitor(localCtx);
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
             PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
             stmts.add(pmlStatement);

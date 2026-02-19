@@ -3,7 +3,6 @@ package gov.nist.csd.pm.core.impl.grpc.client;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;

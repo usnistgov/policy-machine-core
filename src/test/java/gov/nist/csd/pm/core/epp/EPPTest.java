@@ -152,7 +152,9 @@ class EPPTest {
                 
                 set resource access rights ["read"]
                 
-                @reqcap({name: ["read"]})
+                @reqcap({
+                    require ["read"] on [name]
+                })
                 resourceop read_file(@node string name)
                 
                 create oa "oa1" in ["pc1"]
@@ -426,9 +428,10 @@ class EPPTest {
                 associate "ua1" and "oa1" with ["admin:*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
+                @reqcap({
+                    require ["admin:graph:assignment:ascendant:create"] on ["oa1"]
+                })
                 adminop op1() {
-                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
-
                     create pc "test_pc"
                 }
                 

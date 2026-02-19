@@ -73,6 +73,11 @@ public class PMLOperationSignature implements PMLStatementSerializable {
     private String serializeReqCap(int indentLevel) {
         List<String> reqCapStrs = new ArrayList<>();
         for (RequiredCapability reqCap : getReqCaps()) {
+            if (reqCap instanceof PMLRequiredCapabilityFunc pmlRequiredCapabilityFunc) {
+                reqCapStrs.add(pmlRequiredCapabilityFunc.toFormattedString(indentLevel));
+                continue;
+            }
+
             List<RequiredPrivilege> requiredPrivileges = reqCap.getRequiredPrivileges();
             List<String> entries = new ArrayList<>();
             for (RequiredPrivilege requiredPrivilege : requiredPrivileges) {

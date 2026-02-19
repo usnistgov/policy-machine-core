@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.csd.pm.core.epp.EventContext;
-import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
+import gov.nist.csd.pm.core.epp.EventContext;
+import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.LogicalSubjectPatternExpression;

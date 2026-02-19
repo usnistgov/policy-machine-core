@@ -9,7 +9,7 @@ RESOURCE_OP: 'resourceop';
 NODE_ARG: '@node';
 REQ_CAP: '@reqcap';
 NODE: 'node';
-CHECK: 'check';
+REQUIRE: 'require';
 ROUTINE: 'routine';
 FUNCTION: 'function';
 OPERATION: 'operation';

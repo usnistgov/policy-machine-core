@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.statement;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,10 +19,11 @@ import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.CheckStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.RequireStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -39,11 +41,11 @@ class OperationDefinitionStatementTest {
             List.of(a, b),
             List.of(),
             new PMLStatementBlock(
-                new CheckStatement(
+                new RequireStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),
                     ArrayLiteralExpression.of(List.of(new VariableReferenceExpression<>("a", STRING_TYPE)), STRING_TYPE)
                 ),
-                new CheckStatement(
+                new RequireStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar2")), STRING_TYPE),
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("node")), STRING_TYPE)
                 ),
@@ -53,16 +55,16 @@ class OperationDefinitionStatementTest {
 
         assertEquals("""
                              adminop op1(@node string a, string b) string {
-                                 check ["ar1"] on [a]
-                                 check ["ar2"] on ["node"]
+                                 require ["ar1"] on [a]
+                                 require ["ar2"] on ["node"]
                                  return "test"
                              }""",
             stmt.toFormattedString(0));
 
         assertEquals("""
                                  adminop op1(@node string a, string b) string {
-                                     check ["ar1"] on [a]
-                                     check ["ar2"] on ["node"]
+                                     require ["ar1"] on [a]
+                                     require ["ar2"] on ["node"]
                                      return "test"
                                  }
                              """,
@@ -104,11 +106,11 @@ class OperationDefinitionStatementTest {
             List.of(a, b),
             List.of(),
             new PMLStatementBlock(
-                new CheckStatement(
+                new RequireStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar1")), STRING_TYPE),
                     ArrayLiteralExpression.of(List.of(new VariableReferenceExpression<>("a", STRING_TYPE)), STRING_TYPE)
                 ),
-                new CheckStatement(
+                new RequireStatement(
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("ar2")), STRING_TYPE),
                     ArrayLiteralExpression.of(List.of(new StringLiteralExpression("node")), STRING_TYPE)
 
@@ -119,8 +121,8 @@ class OperationDefinitionStatementTest {
 
         assertEquals("""
                              adminop func1(@node string a, string b) {
-                                 check ["ar1"] on [a]
-                                 check ["ar2"] on ["node"]
+                                 require ["ar1"] on [a]
+                                 require ["ar2"] on ["node"]
                                  return
                              }""",
             stmt.toFormattedString(0));
@@ -177,5 +179,26 @@ class OperationDefinitionStatementTest {
                 """;
         PAP pap = new TestPAP();
         assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(0), pml));
+    }
+
+    @Test
+    void testFunctionWithRequireStmt() throws PMException {
+        String pml = """
+            set resource access rights ["read"]
+            function f() {
+                require ["read"] on ["oa1"]
+            }           
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create ua "ua2" in ["pc1"]
+            create oa "oa1" in ["pc1"]
+            create u "u1" in ["ua1", "ua2"]
+            associate "ua1" and "ua2" with ["*"]
+            associate "ua1" and "oa1" with ["*"]
+            """;
+        TestPAP pap = new TestPAP();
+        pap.executePML(null, pml);
+        PDP pdp = new PDP(pap);
+        pdp.runTx(new UserContext(id("u1")), pdpTx -> pdpTx.executePML("f()"));
     }
 }

@@ -40,17 +40,23 @@ routine deleteAllProjects(string locProjectOA) {
     }
 }
 
-@reqcap({projectReadme: ["delete_readme"]})
+@reqcap({
+    require ["delete_readme"] on [projectReadme]
+})
 adminop deleteReadme(@node string projectReadme) {
     delete node projectReadme
 }
 
-@reqcap({projectName: ["delete_project"]})
+@reqcap({
+    require ["delete_project"] on [projectName]
+})
 adminop deleteProject(@node string projectName) {
     delete node projectName
 }
 
-@reqcap({locProjectAttr: ["assign_to"]})
+@reqcap({
+    require ["assign_to"] on [locProjectAttr]
+})
 adminop createProject(string projectName, @node string locProjectAttr) {
    create oa projectName in ["project", locProjectAttr]
    create o projectName + " README" in [projectName]

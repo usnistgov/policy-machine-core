@@ -30,11 +30,12 @@ class AdminOpDefinitionStatementTest {
                 create o "o2" in ["oa1"]
                 create o "o3" in ["oa1"]
                 
+                @reqcap({
+                    require ["admin:graph:assignment:ascendant:create"] on [a]
+                    require ["admin:graph:assignment:ascendant:create"] on b
+                    require ["admin:graph:assignment:ascendant:create"] on ["oa1"]
+                })
                 adminop op1(string a, []string b) {
-                    check ["admin:graph:assignment:ascendant:create"] on [a]
-                    check ["admin:graph:assignment:ascendant:create"] on b
-                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
-
                     create PC "test"
                 }
                 """;

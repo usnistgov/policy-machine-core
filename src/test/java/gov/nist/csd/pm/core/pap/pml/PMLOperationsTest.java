@@ -30,8 +30,10 @@ public class PMLOperationsTest {
                 associate "ua1" and "oa1" with ["*"]
                 associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
                 
+                @reqcap({
+                    require ["admin:graph:assignment:ascendant:create"] on ["oa1"]
+                })
                 adminop op1(string name) {
-                    check ["admin:graph:assignment:ascendant:create"] on ["oa1"]
                     create pc name
                 }
                 

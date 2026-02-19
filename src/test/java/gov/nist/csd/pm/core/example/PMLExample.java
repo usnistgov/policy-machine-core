@@ -38,13 +38,16 @@ public class PMLExample {
         include ["user inboxes"]
         
         // create resource operation to read a file
-        @reqcap({name: ["read"]})
+        @reqcap({
+            require ["read"] on [name]
+        })
         resourceop read_file(@node string name) { }
         
         // create a custom administration operation
+        @reqcap({
+            require ["admin:graph:assignment:descendant:create"] on ["users"]
+        })
         adminop create_new_user(string username) {
-            check ["admin:graph:assignment:descendant:create"] on ["users"]
-            
             create u username in ["users"]
             create oa username + " home" in ["user homes"]
             create oa username + " inbox" in ["user inboxes"]

@@ -13,11 +13,11 @@ import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Objects;
 
-public class CheckStatement extends PMLStatement<VoidResult> {
+public class RequireStatement extends PMLStatement<VoidResult> {
     private final Expression<List<String>> arsExpr;
     private final Expression<List<String>> targetExpr;
 
-    public CheckStatement(Expression<List<String>> arsExpr, Expression<List<String>> targetExpr) {
+    public RequireStatement(Expression<List<String>> arsExpr, Expression<List<String>> targetExpr) {
         this.arsExpr = arsExpr;
         this.targetExpr = targetExpr;
     }
@@ -46,14 +46,14 @@ public class CheckStatement extends PMLStatement<VoidResult> {
     @Override
     public String toFormattedString(int indentLevel) {
         return indent(indentLevel) +
-            "check " + arsExpr.toFormattedString(0) +
+            "require " + arsExpr.toFormattedString(0) +
             " on " + targetExpr.toFormattedString(0);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CheckStatement that)) return false;
+        if (!(o instanceof RequireStatement that)) return false;
         return Objects.equals(arsExpr, that.arsExpr) && Objects.equals(targetExpr, that.targetExpr);
     }
 

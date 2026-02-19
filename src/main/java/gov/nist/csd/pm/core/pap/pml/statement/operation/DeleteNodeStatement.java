@@ -1,18 +1,13 @@
 package gov.nist.csd.pm.core.pap.pml.statement.operation;
 
-import static gov.nist.csd.pm.core.pap.operation.Operation.TYPE_PARAM;
-
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DeleteNodeStatement extends DeleteStatement {
 
