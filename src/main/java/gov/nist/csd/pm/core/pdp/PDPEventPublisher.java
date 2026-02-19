@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.core.pdp;
 
-import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.common.event.EventPublisher;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EventContext;
 import java.util.List;
 
 public class PDPEventPublisher implements EventPublisher {

@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.obligation.event;
 
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -7,7 +7,6 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import java.util.List;

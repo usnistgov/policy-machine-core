@@ -1,8 +1,8 @@
 package gov.nist.csd.pm.core.pdp.modification;
 
-import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EventContext;
 
 public class TestEventSubscriber implements EventSubscriber {
 

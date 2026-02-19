@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation;
 
 import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;

@@ -15,7 +15,6 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.BracketIndexExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.DotIndexExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpression;

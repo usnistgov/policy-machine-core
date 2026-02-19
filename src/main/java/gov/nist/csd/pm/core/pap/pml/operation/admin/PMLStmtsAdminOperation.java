@@ -9,7 +9,6 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 

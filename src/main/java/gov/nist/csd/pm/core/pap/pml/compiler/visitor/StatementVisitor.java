@@ -4,9 +4,9 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.RequireStatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationDefinitionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationSignatureVisitor;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.RequireStatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 
