@@ -40,16 +40,6 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
     }
 
     @Override
-    public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        /*
-        make reqcap PMLReqCap
-        all i need to do is resolve the names
-
-
-         */
-    }
-
-    @Override
     public String toFormattedString(int indentLevel) {
         return String.format(
                 "%s%s",

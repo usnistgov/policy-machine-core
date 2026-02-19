@@ -20,6 +20,7 @@ basicStatement: (
     | operationInvokeStatement
     | ifStatement
     | functionDefinitionStatement
+    | requireStatement
 ) ;
 
 adminOperationStatement: (
@@ -133,9 +134,9 @@ varSpec: ID ASSIGN_EQUALS expression;
 
 variableAssignmentStatement: ID PLUS? ASSIGN_EQUALS expression;
 
-adminOpDefinitionStatement: adminOpSignature adminOpStatementBlock ;
-queryOpDefinitionStatement: queryOpSignature basicAndCheckStatementBlock ;
-resourceOpDefinitionStatement: resourceOpSignature basicAndCheckStatementBlock? ;
+adminOpDefinitionStatement: adminOpSignature statementBlock ;
+queryOpDefinitionStatement: queryOpSignature basicStatementBlock ;
+resourceOpDefinitionStatement: resourceOpSignature basicStatementBlock? ;
 routineDefinitionStatement: routineSignature statementBlock ;
 functionDefinitionStatement: functionSignature basicStatementBlock ;
 
@@ -146,30 +147,17 @@ routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=v
 functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
 reqCapList: reqCap+ ;
-reqCap: REQ_CAP OPEN_PAREN (OPEN_CURLY reqCapEntry (COMMA reqCapEntry)*? CLOSE_CURLY) CLOSE_PAREN ;
-reqCapEntry:(param=ID | node=stringLit) COLON arset=stringArrayLit ;
+reqCap: REQ_CAP OPEN_PAREN basicStatementBlock CLOSE_PAREN ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
 operationFormalParam: NODE_ARG? variableType ID paramReqCap=stringArrayLit?;
-
-adminOpStatementBlock: OPEN_CURLY adminOpStatement* CLOSE_CURLY ;
-adminOpStatement:
-  statement #BasicOrAdminOpStatement
-  | checkStatement #CheckAdminOpStatement
-  ;
-
-basicAndCheckStatementBlock: OPEN_CURLY basicAndCheckStatement* CLOSE_CURLY ;
-basicAndCheckStatement:
-  basicStatement #BasicResourceOpStatement
-  | checkStatement #CheckResourceOpStatement
-  ;
 
 formalParamList: (formalParam (COMMA formalParam)*)? ;
 formalParam: variableType ID;
 
 returnStatement: RETURN expression?;
 
-checkStatement: CHECK ar=expression ON target=expression ;
+requireStatement: REQUIRE ar=expression ON target=expression ;
 basicStatementBlock: OPEN_CURLY basicStatement* CLOSE_CURLY ;
 
 idArr: OPEN_BRACKET (ID (COMMA ID)*)? CLOSE_BRACKET ;
@@ -241,7 +229,7 @@ idIndex:
     | RESOURCE_OP
     | QUERY
     | FUNCTION
-    | CHECK
+    | REQUIRE
     | ROUTINE
     | CREATE
     | DELETE

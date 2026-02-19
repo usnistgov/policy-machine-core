@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class RequiredCapabilityFunc extends RequiredCapability {
@@ -21,7 +22,7 @@ public class RequiredCapabilityFunc extends RequiredCapability {
     }
 
     @FunctionalInterface
-    public interface RequiredCapabilityFuncExecutor {
+    public interface RequiredCapabilityFuncExecutor extends Serializable {
         boolean isSatisfied(PAP pap, UserContext userCtx, Args args);
     }
 }

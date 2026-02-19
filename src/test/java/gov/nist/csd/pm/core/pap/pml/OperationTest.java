@@ -86,8 +86,10 @@ public class OperationTest {
             create ua "ua1" in ["pc1"]
             create u "u1" in ["ua1"]
             
+            @reqcap({
+                require ["read"] on [PM_ADMIN_BASE_OA]
+            })
             resourceop res1() {
-                check ["read"] on [PM_ADMIN_BASE_OA]
             }
             """;
 

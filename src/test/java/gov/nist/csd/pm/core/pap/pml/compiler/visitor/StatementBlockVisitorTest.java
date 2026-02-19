@@ -32,7 +32,7 @@ class StatementBlockVisitorTest {
         );
         VisitorContext visitorContext = new VisitorContext(testGlobalScope);
         assertDoesNotThrow(
-                () -> new StatementBlockVisitor(visitorContext, STRING_TYPE)
+                () -> new StatementBlockVisitor(visitorContext, STRING_TYPE, true)
                         .visitStatementBlock(ctx)
         );
     }

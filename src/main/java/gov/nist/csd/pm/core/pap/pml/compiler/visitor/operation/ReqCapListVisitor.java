@@ -1,24 +1,27 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+
+import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilege;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapabilityFunc;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ReqCapContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ReqCapEntryContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ReqCapListContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringArrayLitContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringLitContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ReqCapListVisitor extends PMLBaseVisitor<List<RequiredCapability>> {
 
@@ -56,21 +59,30 @@ public class ReqCapListVisitor extends PMLBaseVisitor<List<RequiredCapability>> 
 
         @Override
         public RequiredCapability visitReqCap(ReqCapContext ctx) {
-            List<RequiredPrivilege> requiredPrivileges = new ArrayList<>();
+            PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseBasicStatementBlock(
+                visitorCtx,
+                ctx.basicStatementBlock(),
+                VOID_TYPE,
+                args,
+                true
+            );
 
-            for (ReqCapEntryContext entryCtx : ctx.reqCapEntry()) {
-                AccessRightSet arset = parseArsetExpression(entryCtx.arset);
+            return new RequiredCapabilityFunc((pap, userCtx, opArg) -> {
+                try {
+                    ExecutionContext execCtx = pap.buildExecutionContext(userCtx);
 
-                if (entryCtx.param != null) {
-                    String paramName = entryCtx.param.getText();
-                    NodeFormalParameter<?> formalParameter = findNodeFormalParameter(paramName);
-                    requiredPrivileges.add(new RequiredPrivilegeOnParameter(formalParameter, arset));
-                } else {
-                    requiredPrivileges.add(new RequiredPrivilegeOnNode(ExpressionVisitor.removeQuotes(entryCtx.node), arset));
+                    // add args to execution context since they aren't passed to execute
+                    Map<String, Object> map = opArg.toMap();
+                    for (Map.Entry<String, Object> e : map.entrySet()) {
+                        execCtx.scope().addVariable(e.getKey(), e.getValue());
+                    }
+
+                    pmlStatementBlock.execute(execCtx, pap);
+                    return true;
+                } catch (PMException e) {
+                    return false;
                 }
-            }
-
-            return new RequiredCapability(requiredPrivileges);
+            });
         }
 
         private NodeFormalParameter<?> findNodeFormalParameter(String name) {

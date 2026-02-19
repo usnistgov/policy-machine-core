@@ -4,7 +4,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.CheckStatementVisitor;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.RequireStatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationDefinitionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationSignatureVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
@@ -147,7 +147,7 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     @Override
-    public PMLStatement<?> visitCheckStatement(PMLParser.CheckStatementContext ctx) {
-        return new CheckStatementVisitor(visitorCtx).visitCheckStatement(ctx);
+    public PMLStatement<?> visitRequireStatement(PMLParser.RequireStatementContext ctx) {
+        return new RequireStatementVisitor(visitorCtx).visitRequireStatement(ctx);
     }
 }

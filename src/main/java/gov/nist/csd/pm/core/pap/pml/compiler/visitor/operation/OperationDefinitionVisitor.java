@@ -33,9 +33,9 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
     public AdminOpDefinitionStatement visitAdminOpDefinitionStatement(AdminOpDefinitionStatementContext ctx) {
         PMLOperationSignature signature = operationSignatureVisitor.visitAdminOpSignature(ctx.adminOpSignature());
 
-        PMLStatementBlock body = StatementBlockParser.parseAdminOpStatementBlock(
+        PMLStatementBlock body = StatementBlockParser.parseStatementBlock(
             visitorCtx,
-            ctx.adminOpStatementBlock(),
+            ctx.statementBlock(),
             signature.getReturnType(),
             signature.getFormalParameters()
         );
@@ -54,12 +54,18 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
         PMLOperationSignature resourceOpSignature =
             operationSignatureVisitor.visitResourceOpSignature(ctx.resourceOpSignature());
 
-        PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseBasicOrCheckStatements(
-            visitorCtx.copyFunctionsAndQueriesOnly(),
-            ctx.basicAndCheckStatementBlock(),
-            resourceOpSignature.getReturnType(),
-            resourceOpSignature.getFormalParameters()
-        );
+        PMLStatementBlock pmlStatementBlock;
+        if (ctx.basicStatementBlock() != null) {
+            pmlStatementBlock = StatementBlockParser.parseBasicStatementBlock(
+                visitorCtx.copyFunctionsAndQueriesOnly(),
+                ctx.basicStatementBlock(),
+                resourceOpSignature.getReturnType(),
+                resourceOpSignature.getFormalParameters(),
+                true
+            );
+        } else {
+            pmlStatementBlock = new PMLStatementBlock();
+        }
 
         return new ResourceOpDefinitionStatement(new PMLStmtsResourceOperation<>(
             resourceOpSignature.getName(),
@@ -97,7 +103,8 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
             visitorCtx,
             ctx.basicStatementBlock(),
             signature.getReturnType(),
-            signature.getFormalParameters()
+            signature.getFormalParameters(),
+            false
         );
 
         return new FunctionDefinitionStatement(new PMLStmtsFunctionOperation<>(
@@ -112,11 +119,12 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
     public QueryOperationDefinitionStatement visitQueryOpDefinitionStatement(QueryOpDefinitionStatementContext ctx) {
         PMLOperationSignature signature = operationSignatureVisitor.visitQueryOpSignature(ctx.queryOpSignature());
 
-        PMLStatementBlock body = StatementBlockParser.parseBasicOrCheckStatements(
+        PMLStatementBlock body = StatementBlockParser.parseBasicStatementBlock(
             visitorCtx.copyFunctionsAndQueriesOnly(),
-            ctx.basicAndCheckStatementBlock(),
+            ctx.basicStatementBlock(),
             signature.getReturnType(),
-            signature.getFormalParameters()
+            signature.getFormalParameters(),
+            true
         );
 
         return new QueryOperationDefinitionStatement(new PMLStmtsQueryOperation<>(
