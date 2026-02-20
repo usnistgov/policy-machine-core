@@ -24,12 +24,12 @@ public class PMLExample {
         create ua "admin" in ["pc1"]
         // the admin_user will be created automatically during bootstrapping 
         assign "admin_user" to ["admin", "users"]
-        associate "admin" and "users" with ["admin:graph:assignment:descendant:create"]
+        associate "admin" to "users" with ["admin:graph:assignment:descendant:create"]
         
         create oa "user homes" in ["pc1"]
         create oa "user inboxes" in ["pc1"]
-        associate "admin" and "user homes" with ["*"]
-        associate "admin" and "user inboxes" with ["*"]
+        associate "admin" to "user homes" with ["*"]
+        associate "admin" to "user inboxes" with ["*"]
         
         // prohibit the admin user from reading inboxes
         create conj node prohibition "deny admin on user inboxes"

@@ -29,7 +29,7 @@ class PMLBootstrapperTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 
                 assign "u1" to ["ua1"]
                 

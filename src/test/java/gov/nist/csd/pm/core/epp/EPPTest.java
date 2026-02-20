@@ -65,7 +65,7 @@ class EPPTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1", "ua2"]
-                associate "ua1" and "ua2" with ["*"]
+                associate "ua1" to "ua2" with ["*"]
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
@@ -160,8 +160,8 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
+                associate "ua1" to "oa1" with ["read"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
                 create obligation "obl1"
                     when any user
@@ -196,9 +196,9 @@ class EPPTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1", "ua2"]
-                associate "ua1" and "ua2" with ["*"]
-                associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
+                associate "ua1" to "ua2" with ["*"]
+                associate "ua1" to "oa1" with ["*"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["*"]
                 create obligation "test"
                     when any user
                     performs "create_object_attribute"
@@ -232,11 +232,11 @@ class EPPTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1", "ua2"]
-                associate "ua1" and "ua2" with ["*"]
+                associate "ua1" to "ua2" with ["*"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["admin:*"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua1" to "oa1" with ["admin:*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
                 
                 create obligation "test"
                     when any user
@@ -350,9 +350,9 @@ class EPPTest {
                 create u "u1" in ["ua1", "ua2"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "ua2" with ["*"]
-                associate "ua1" and "oa1" with ["admin:*"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:*"]
+                associate "ua1" to "ua2" with ["*"]
+                associate "ua1" to "oa1" with ["admin:*"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:graph:*"]
                 
                 create obligation "test"
                     when any user
@@ -390,9 +390,9 @@ class EPPTest {
                 create u "u1" in ["ua1", "ua2"]
                 create oa "oa1" in ["pc1"]
                 
-                associate "ua1" and "ua2" with ["*"]
-                associate "ua1" and "oa1" with ["admin:*"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:graph:node:create"]
+                associate "ua1" to "ua2" with ["*"]
+                associate "ua1" to "oa1" with ["admin:*"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:graph:node:create"]
                 
                 create obligation "test"
                     when any user
@@ -424,9 +424,9 @@ class EPPTest {
                 create u "u1" in ["ua1", "ua3"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "ua3" with ["*"]
-                associate "ua1" and "oa1" with ["admin:*"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["admin:*"]
+                associate "ua1" to "ua3" with ["*"]
+                associate "ua1" to "oa1" with ["admin:*"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
                 @reqcap({
                     require ["admin:graph:assignment:ascendant:create"] on ["oa1"]

@@ -47,7 +47,7 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
                 create conj node prohibition "pro1"
                 deny "u2"
@@ -139,7 +139,7 @@ public class PMLTest {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
                 
                 create conj node prohibition "pro1"
                 deny "u2"
@@ -454,8 +454,8 @@ public class PMLTest {
             create oa "oa2" in ["pc1"]
             create o "o2" in ["oa2"]
             
-            associate "ua1" and "oa1" with ["read"]
-            associate "ua1" and "oa2" with ["read"]
+            associate "ua1" to "oa1" with ["read"]
+            associate "ua1" to "oa2" with ["read"]
             
             @reqcap({
                 require ["read"] on [file]

@@ -32,7 +32,7 @@ class PDPTxTest {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
                 """);
         PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, u2::reset);
@@ -50,7 +50,7 @@ class PDPTxTest {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
                 """);
         PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.serialize(new JSONSerializer()));
@@ -68,7 +68,7 @@ class PDPTxTest {
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
                 """);
 
         String serialize = "create pc \"test\"";
@@ -137,7 +137,7 @@ class PDPTxTest {
             create oa "oa1" in ["pc1"]
             create u "u1" in ["ua1"]
             create u "u2" in ["ua1", "ua2"]
-            associate "ua1" and "ua2" with ["*"]
+            associate "ua1" to "ua2" with ["*"]
             """;
 
         TestPAP testPAP = new TestPAP();

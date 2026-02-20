@@ -47,9 +47,9 @@ public class ExecutionTest {
                 create U username in ["ua1"]
                 assign username to ["ua2", "ua3"]
                 
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua2" and "oa2" with ["read", "write"]
-                associate "ua3" and "oa3" with ["read", "write"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                associate "ua2" to "oa2" with ["read", "write"]
+                associate "ua3" to "oa3" with ["read", "write"]
                 """;
         pap.executePML(new TestUserContext("u1"), input);
 
@@ -87,7 +87,7 @@ public class ExecutionTest {
                 pap.query().graph().getAssociationsWithSource(id("ua3")).iterator().next());
 
         input = """
-                dissociate "ua1" and "oa1"
+                dissociate "ua1" from "oa1"
                 """;
         pap.executePML(new TestUserContext("u1"), input);
         assertTrue(pap.query().graph().getAssociationsWithSource(id("ua1")).isEmpty());

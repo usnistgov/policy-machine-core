@@ -33,7 +33,7 @@ class RequiredCapabilityTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create", "admin:graph:node:delete"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create", "admin:graph:node:delete"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -60,7 +60,7 @@ class RequiredCapabilityTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 create u "u1" in ["ua1"]
                 """;
 

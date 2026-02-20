@@ -90,18 +90,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
+import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNodeId;
+import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -125,7 +125,7 @@ public class JavaExample {
         long pc1Id = pap.modify().graph().createPolicyClass("pc1");
         long usersId = pap.modify().graph().createUserAttribute("users", List.of(pc1Id));
         long adminId = pap.modify().graph().createUserAttribute("admin", List.of(pc1Id));
-        pap.modify().graph().createUser("admin_user", List.of(adminId));
+        long adminUserId = pap.modify().graph().createUser("admin_user", List.of(adminId, usersId));
         pap.modify().graph().associate(adminId, usersId, new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE));
 
         long userHomes = pap.modify().graph().createObjectAttribute("user homes", List.of(pc1Id));
@@ -154,16 +154,10 @@ public class JavaExample {
         };
         pap.modify().operations().createOperation(resourceOp);
 
-        /*
-        (policyQuery, userCtx, args) -> policyQuery.access()
-                .computePrivileges(userCtx, new TargetContext(usersId))
-                .contains(AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE.toString())))
-         */
-
         // create a custom administration operation
         FormalParameter<String> usernameParam = new FormalParameter<>("username", STRING_TYPE);
         AdminOperation<?> adminOp = new AdminOperation<>("create_new_user", VOID_TYPE, List.of(usernameParam),
-            List.of(new RequiredCapability(new RequiredPrivilegeOnNodeId(usersId, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
+            List.of(new RequiredCapability(new RequiredPrivilegeOnNode("users", AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
             public Void execute(PAP pap, Args args) throws PMException {
@@ -192,7 +186,7 @@ public class JavaExample {
                 create o objName in [inboxName]
             }
             """;
-        pap.executePML(new UserContext(adminId), pml);
+        pap.executePML(new UserContext(adminUserId), pml);
 
         // create a PDP to run transactions
         PDP pdp = new PDP(pap);
@@ -202,7 +196,7 @@ public class JavaExample {
         epp.subscribeTo(pdp);
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        pdp.adjudicateOperation(new UserContext(adminId), "create_new_user", Map.of("username", "testUser"));
+        pdp.adjudicateOperation(new UserContext(adminUserId), "create_new_user", Map.of("username", "testUser"));
 
         // check admin operation and obligation response was successful
         assertTrue(pap.query().graph().nodeExists("testUser home"));
@@ -217,6 +211,7 @@ public class JavaExample {
         );
     }
 }
+
 ```
 
 ### PML
@@ -247,13 +242,13 @@ public class PMLExample {
         create ua "users" in ["pc1"]
         create ua "admin" in ["pc1"]
         // the admin_user will be created automatically during bootstrapping 
-        assign "admin_user" to ["admin"]
-        associate "admin" and "users" with ["admin:graph:assignment:descendant:create"]
+        assign "admin_user" to ["admin", "users"]
+        associate "admin" to "users" with ["admin:graph:assignment:descendant:create"]
         
         create oa "user homes" in ["pc1"]
         create oa "user inboxes" in ["pc1"]
-        associate "admin" and "user homes" with ["*"]
-        associate "admin" and "user inboxes" with ["*"]
+        associate "admin" to "user homes" with ["*"]
+        associate "admin" to "user inboxes" with ["*"]
         
         // prohibit the admin user from reading inboxes
         create conj node prohibition "deny admin on user inboxes"
@@ -262,13 +257,16 @@ public class PMLExample {
         include ["user inboxes"]
         
         // create resource operation to read a file
-        @reqcap({name: ["read"]})
+        @reqcap({
+            require ["read"] on [name]
+        })
         resourceop read_file(@node string name) { }
         
         // create a custom administration operation
+        @reqcap({
+            require ["admin:graph:assignment:descendant:create"] on ["users"]
+        })
         adminop create_new_user(string username) {
-            check ["admin:graph:assignment:descendant:create"] on ["users"]
-        
             create u username in ["users"]
             create oa username + " home" in ["user homes"]
             create oa username + " inbox" in ["user inboxes"]
@@ -304,9 +302,10 @@ public class PMLExample {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
+
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        long adminId = pap.query().graph().getNodeId("admin");
-        pdp.executePML(new UserContext(adminId), """
+        long adminUserId = pap.query().graph().getNodeId("admin_user");
+        pdp.executePML(new UserContext(adminUserId), """
             create_new_user("testUser")
             """);
 
@@ -325,6 +324,7 @@ public class PMLExample {
         );
     }
 }
+
 ```
 
 ## Operations

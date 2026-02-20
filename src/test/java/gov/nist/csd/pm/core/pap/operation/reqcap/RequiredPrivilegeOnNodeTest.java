@@ -26,7 +26,7 @@ class RequiredPrivilegeOnNodeTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -47,7 +47,7 @@ class RequiredPrivilegeOnNodeTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -68,7 +68,7 @@ class RequiredPrivilegeOnNodeTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);

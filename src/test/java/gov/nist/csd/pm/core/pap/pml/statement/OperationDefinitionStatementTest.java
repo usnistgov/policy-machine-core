@@ -193,8 +193,8 @@ class OperationDefinitionStatementTest {
             create ua "ua2" in ["pc1"]
             create oa "oa1" in ["pc1"]
             create u "u1" in ["ua1", "ua2"]
-            associate "ua1" and "ua2" with ["*"]
-            associate "ua1" and "oa1" with ["*"]
+            associate "ua1" to "ua2" with ["*"]
+            associate "ua1" to "oa1" with ["*"]
             """;
         TestPAP pap = new TestPAP();
         pap.executePML(null, pml);

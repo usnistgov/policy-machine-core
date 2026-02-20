@@ -152,9 +152,9 @@ class SubjectPatternTest {
                 create u "u1" in ["ua1", "ua3"]
                 create u "u2" in ["ua2"]
                 
-                associate "ua1" and "ua2" with ["*"]
-                associate "ua1" and "ua3" with ["*"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
+                associate "ua1" to "ua2" with ["*"]
+                associate "ua1" to "ua3" with ["*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["*"]
                 
                 create obligation "ob1"
                     when user in "ua2"

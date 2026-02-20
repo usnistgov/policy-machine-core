@@ -50,7 +50,7 @@ create, delete, if exists
 rule, when, performs, on, in, do, any, ascendant of
 intersection, inter, union, process
 set resource access rights, assign, deassign, from, set properties, of, to
-associate, and, with, dissociate
+associate, to, with, dissociate
 deny, prohibition, obligation, access rights
 PC, OA, UA, U, O, user, node
 break, default, map, else, const, if, range, continue, foreach, return, var
@@ -395,13 +395,13 @@ deassign "childNode" from ["parentNode1", "parentNode2"]
 Create an association.
 
 ```pml
-associate "ua1" and "oa1" with ["read", "write"]
+associate "ua1" to "oa1" with ["read", "write"]
 ```
 
 ### Dissociate
 
 ```pml
-dissociate "ua1" and "oa1"
+dissociate "ua1" from "oa1"
 ```
 
 ### Create Prohibition
@@ -544,18 +544,21 @@ The `@reqcap` annotation precedes an operation definition, and defines a set of 
 Multiple `@reqcap` annotations are supported with only one needing to be satisfied to execute the operation.
 
 ```pml
-@reqcap({filename: ["delete"]})
+@reqcap({
+    require ["delete"] on [filename]
+})
 resourceop delete_file(string filename) { 
     delete node filename
 }
 ```
 
-### Check Statement
+### Require Statement
 
-To customize the authorization check for an operation, use the `check` statement. The `check` statement is executed in the body of the operation and checks if the invoking user has all access rights on each target node. Execution will be halted and roledback if a check statement fails. **Note:** The `check` statement can only be used in `adminop`, `resourceop`, and `query` operations.
+To customize the authorization check for an operation, use the `require` statement.
+**Note:** The `require` statement can only be used in `adminop`, `resourceop`, and `query` operations.
 
 ```pml
-check ["read", "write"] on ["targetNode1", "targetNode2"]
+require ["read", "write"] on ["targetNode1", "targetNode2"]
 ```
 
 ### Return Types
@@ -606,10 +609,14 @@ adminop create_new_user(string username) {
 Resource operations denote an operation on a resource (object). Optionally, return data to the caller.
 
 ```pml
-@reqcap({filename: ["read"]})
+@reqcap({
+    require ["read"] on [filename]
+})
 resourceop read_file(@node string filename) { }
 
-@reqcap({filename: ["read"]})
+@reqcap({
+    require ["read"] on [filename]
+})
 resourceop read_file(@node string filename) { 
 	return getNode(filename)
 }
@@ -696,12 +703,12 @@ create ua "users" in ["pc1"]
 create ua "admin" in ["pc1"]  
 // the admin_user will be created automatically during bootstrapping 
 assign "admin_user" to ["admin"]  
-associate "admin" and "users" with ["assign_to"]  
+associate "admin" to "users" with ["assign_to"]  
   
 create oa "user homes" in ["pc1"]  
 create oa "user inboxes" in ["pc1"]  
-associate "admin" and "user homes" with ["*"]  
-associate "admin" and "user inboxes" with ["*"]  
+associate "admin" to "user homes" with ["*"]  
+associate "admin" to "user inboxes" with ["*"]  
   
 // prohibit the admin user from reading inboxes  
 create conjunctive node prohibition "deny admin on user inboxes"  
@@ -710,7 +717,9 @@ arset ["read"]
 include ["user inboxes"]
   
 // create resource operation to read a file  
-@reqcap({name: ["read"]})
+@reqcap({
+    require ["read"] on [filename]
+})
 resourceop read_file(@node string name) { }  
   
 // create a custom administration operation  

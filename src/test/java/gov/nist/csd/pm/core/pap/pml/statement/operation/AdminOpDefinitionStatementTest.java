@@ -24,7 +24,7 @@ class AdminOpDefinitionStatementTest {
                 create ua "ua2" in ["pc1"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" to "oa1" with ["admin:graph:assignment:ascendant:create"]
                 
                 create o "o1" in ["oa1"]
                 create o "o2" in ["oa1"]
@@ -68,7 +68,7 @@ class AdminOpDefinitionStatementTest {
                 create ua "ua2" in ["pc1"]
                 create u "u2" in ["ua2"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" to "oa1" with ["admin:graph:assignment:ascendant:create"]
                 
                 create o "o1" in ["oa1"]
                 create o "o2" in ["oa1"]

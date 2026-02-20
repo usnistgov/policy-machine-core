@@ -33,7 +33,7 @@ class RequireStatementTest {
 
                 create oa "oa1" in ["pc1"]
 
-                associate "ua1" and "oa1" with ["admin:graph:assignment:ascendant:create", "admin:graph:assignment:descendant:create"]
+                associate "ua1" to "oa1" with ["admin:graph:assignment:ascendant:create", "admin:graph:assignment:descendant:create"]
 
                 create o "o1" in ["oa1"]
                 create o "o2" in ["oa1"]
@@ -108,7 +108,7 @@ class RequireStatementTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
 
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:assignment:ascendant:create"]
 
                 create u "u1" in ["ua1"]
                 """;

@@ -44,8 +44,8 @@ class DeleteProhibitionOpTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "ua2" with ["admin:prohibition:node:delete"]
-                associate "ua1" and "oa1" with ["admin:prohibition:inclusion:delete"]
+                associate "ua1" to "ua2" with ["admin:prohibition:node:delete"]
+                associate "ua1" to "oa1" with ["admin:prohibition:inclusion:delete"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -74,7 +74,7 @@ class DeleteProhibitionOpTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 """;
