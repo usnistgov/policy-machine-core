@@ -25,10 +25,10 @@ public class PMLOperationsTest {
                 create UA "ua1" in ["pc1"]
                 create UA "ua2" in ["pc1"]
                 create U "u1" in ["ua1", "ua2"]
-                associate "ua1" and "ua2" with ["*"]
+                associate "ua1" to "ua2" with ["*"]
                 create OA "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
+                associate "ua1" to "oa1" with ["*"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 @reqcap({
                     require ["admin:graph:assignment:ascendant:create"] on ["oa1"]
@@ -74,9 +74,9 @@ public class PMLOperationsTest {
                 create UA "ua2" in ["pc1"]
                 create U "u1" in ["ua1", "ua2"]
                 create OA "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["*"]
-                associate "ua1" and "ua2" with ["*"]
-                associate "ua1" and PM_ADMIN_POLICY_CLASSES with ["*"]
+                associate "ua1" to "oa1" with ["*"]
+                associate "ua1" to "ua2" with ["*"]
+                associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 routine op1(string name) {
                     if !nodeExists(name) {
@@ -154,8 +154,8 @@ public class PMLOperationsTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create u "u1" in ["ua1", "ua2"]
-                associate "ua1" and "ua2" with ["*"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
+                associate "ua1" to "ua2" with ["*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["*"]
                 
                 routine routine1() {
                     op1()

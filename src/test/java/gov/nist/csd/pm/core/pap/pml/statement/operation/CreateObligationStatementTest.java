@@ -154,9 +154,9 @@ class CreateObligationStatementTest {
             create ua "ua1" in ["pc1"]
             create ua "ua2" in ["pc1"]
             create u "u1" in ["ua1", "ua2"]
-            associate "ua1" and "ua2" with ["*"]
+            associate "ua1" to "ua2" with ["*"]
             
-            associate "ua1" and PM_ADMIN_BASE_OA with ["*"]
+            associate "ua1" to PM_ADMIN_BASE_OA with ["*"]
             
             resourceop op1()
             resourceop op2()

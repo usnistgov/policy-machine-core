@@ -9,9 +9,9 @@ create pc "RBAC"
 
     create OA "project" in ["RBAC"]
 
-    associate "reader" and "project" with ["read"]
-    associate "writer" and "project" with ["write"]
-    associate "deleter" and "project" with ["write"]
+    associate "reader" to "project" with ["read"]
+    associate "writer" to "project" with ["write"]
+    associate "deleter" to "project" with ["write"]
 
 create pc "Location"
 
@@ -21,8 +21,8 @@ create pc "Location"
     create OA "US project" in ["Location"]
     create OA "EU project" in ["Location"]
 
-    associate "US user" and "US project" with ["*"]
-    associate "EU user" and "EU project" with ["*"]
+    associate "US user" to "US project" with ["*"]
+    associate "EU user" to "EU project" with ["*"]
 
 create U "us_reader1" in ["reader", "US user"]
 create U "us_writer1" in ["writer", "US user"]
@@ -65,7 +65,7 @@ adminop createProject(string projectName, @node string locProjectAttr) {
 adminop createProjectAdmin(string projectName) {
     uaName := projectName + " admin"
     create UA uaName in ["writer"]
-    associate uaName and projectName with ["*"]
+    associate uaName to projectName with ["*"]
 
     create conj node prohibition "deny admin delete README"
     deny uaName

@@ -208,7 +208,7 @@
       "@reqcap({\n    require [\"delete_readme\"] on [projectReadme]\n})\nadminop deleteReadme(@node string projectReadme) {\n    delete node projectReadme\n}",
       "@reqcap({\n    require [\"delete_project\"] on [projectName]\n})\nadminop deleteProject(@node string projectName) {\n    delete node projectName\n}",
       "@reqcap({\n    require [\"assign_to\"] on [locProjectAttr]\n})\nadminop createProject(string projectName, @node string locProjectAttr) {\n   create oa projectName in [\"project\", locProjectAttr]\n   create o projectName + \" README\" in [projectName]\n}",
-      "adminop createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName and projectName with [\"*\"]\n\n    create conj node prohibition \"deny admin delete README\"\n    deny uaName\n    arset [\"delete_readme\"]\n    include [projectName]\n}"
+      "adminop createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName to projectName with [\"*\"]\n\n    create conj node prohibition \"deny admin delete README\"\n    deny uaName\n    arset [\"delete_readme\"]\n    include [projectName]\n}"
     ],
     "routines": [
       "routine deleteAllProjects(string locProjectOA) {\n    foreach project in getAdjacentAscendants(locProjectOA) {\n        deleteReadme(project + \" README\")\n        deleteProject(project)\n    }\n}"

@@ -42,7 +42,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
-                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua1" to "oa1" with ["read", "write"]
                 
                 create u "u1" in ["ua1"]
                 create o "o1" in ["oa1"]
@@ -69,7 +69,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create oa "oa2" in ["oa1"]
                 create oa "oa3" in ["oa1"]
                 
-                associate "ua1" and "oa2" with ["read", "write"]
+                associate "ua1" to "oa2" with ["read", "write"]
                 
                 create u "u1" in ["ua1"]
                 create o "o1" in ["oa2", "oa3"]
@@ -105,9 +105,9 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
                 
-                associate "ua1" and "oa2" with ["read", "write"]
-                associate "ua1" and "oa2-1" with ["read", "write"]
-                associate "ua1" and "oa3-1" with ["read", "write"]
+                associate "ua1" to "oa2" with ["read", "write"]
+                associate "ua1" to "oa2-1" with ["read", "write"]
+                associate "ua1" to "oa3-1" with ["read", "write"]
 
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
@@ -143,15 +143,15 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua1" to "oa1" with ["read", "write"]
                 create pc "pc2"
                 create ua "ua2" in ["pc2"]
                 create oa "oa2" in ["pc2"]
                 create oa "oa3" in ["oa2"]
                 create oa "oa4" in ["pc2"]
 
-                associate "ua2" and "oa2" with ["read", "write"]
-                associate "ua2" and "oa4" with ["read"]
+                associate "ua2" to "oa2" with ["read", "write"]
+                associate "ua2" to "oa4" with ["read"]
                 
                 create u "u1" in ["ua1", "ua2"]
                 create o "o1" in ["oa1", "oa3"]
@@ -181,13 +181,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua1" to "oa1" with ["read", "write"]
                 
                 create pc "pc2"
                 create ua "ua2" in ["pc2"]
                 create oa "oa2" in ["pc2"]
                 create oa "oa3" in ["oa2"]
-                associate "ua2" and "oa2" with ["read", "write"]
+                associate "ua2" to "oa2" with ["read", "write"]
                     
                 create u "u1" in ["ua1", "ua2"]
                 create o "o1" in ["oa1", "oa3"]
@@ -295,14 +295,14 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create oa "oa2" in ["oa1"]
                 create oa "oa3" in ["oa1"]
                 
-                associate "ua2" and "oa2" with ["read"]
-                associate "ua3" and "oa3" with ["read"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua2" to "oa2" with ["read"]
+                associate "ua3" to "oa3" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 
                 create pc "pc2"
                 create ua "ua4" in ["pc2"]
                 create oa "oa4" in ["pc2"]
-                associate "ua4" and "oa4" with ["read"]
+                associate "ua4" to "oa4" with ["read"]
                 
                 create U "u1" in ["ua2", "ua3", "ua4"]
                 create O "o1" in ["oa2", "oa3", "oa4"]
@@ -402,8 +402,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     create oa "oa1" in ["pc1"]
                     create oa "oa2" in ["oa1"]
 
-                    associate "ua1" and "oa1" with ["write"]
-                    associate "ua1" and "oa2" with ["read"]
+                    associate "ua1" to "oa1" with ["write"]
+                    associate "ua1" to "oa2" with ["read"]
                
                 create U "u1" in ["ua1"]
                 """;
@@ -446,7 +446,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     create oa "oa1" in ["pc1"]
                     create oa "oa2" in ["oa1"]
 
-                    associate "ua1" and "oa1" with ["write"]
+                    associate "ua1" to "oa1" with ["write"]
                
                 create U "u1" in ["ua2"]
                 create O "o1" in ["oa1"]
@@ -486,13 +486,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
 
-                    associate "ua1" and "oa1" with ["write"]
+                    associate "ua1" to "oa1" with ["write"]
                     
                 create pc "pc2"
                     create UA "ua2" in ["pc2"]
                     create OA "oa2" in ["pc2"]
                     
-                    associate "ua2" and "oa2" with ["read"]
+                    associate "ua2" to "oa2" with ["read"]
                
                 create U "u1" in ["ua1", "ua2"]
                 create O "o1" in ["oa1", "oa2"]
@@ -546,13 +546,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
 
-                    associate "ua1" and "oa1" with ["read", "write"]
+                    associate "ua1" to "oa1" with ["read", "write"]
                     
                 create pc "pc2"
                     create UA "ua2" in ["pc2"]
                     create OA "oa2" in ["pc2"]
                     
-                    associate "ua2" and "oa2" with ["read", "write"]
+                    associate "ua2" to "oa2" with ["read", "write"]
                
                 create U "u1" in ["ua1", "ua2"]
                 create O "o1" in ["oa1", "oa2"]
@@ -603,13 +603,13 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                     create UA "ua1" in ["pc1"]
                     create oa "oa1" in ["pc1"]
 
-                    associate "ua1" and "oa1" with ["read", "write"]
+                    associate "ua1" to "oa1" with ["read", "write"]
                     
                 create pc "pc2"
                     create UA "ua2" in ["pc2"]
                     create OA "oa2" in ["pc2"]
                     
-                    associate "ua2" and "oa2" with ["read"]
+                    associate "ua2" to "oa2" with ["read"]
                
                 create U "u1" in ["ua1", "ua2"]
                 create O "o1" in ["oa1", "oa2"]
@@ -665,7 +665,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
 
-                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua1" to "oa1" with ["read", "write"]
                
                 
                 create u "u1" in ["ua1"]
@@ -716,8 +716,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                    
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["oa1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua2" and "oa2" with ["read"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                associate "ua2" to "oa2" with ["read"]
                 
                 create u "u1" in ["ua1", "ua2"]
                 """;
@@ -740,8 +740,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua2" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                associate "ua2" to "oa1" with ["read"]
                 
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
@@ -766,8 +766,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua1" and "oa2" with ["read"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                associate "ua1" to "oa2" with ["read"]
                 
                 create u "u1" in ["ua1"]
                 create o "o1" in ["oa1"]
@@ -816,7 +816,7 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read", "write"]
+                associate "ua1" to "oa1" with ["read", "write"]
                 
                 create u "u1" in ["ua1"]
                 create o "o1" in ["oa1"]
@@ -1565,8 +1565,8 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc2"]
                 
-                associate "ua1" and "oa1" with ["read", "write"]
-                associate "ua2" and "oa2" with ["read"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                associate "ua2" to "oa2" with ["read"]
 
                 create u "u1" in ["ua1", "ua2"]                
                 create o "o1" in ["oa1", "oa2"]                

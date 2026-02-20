@@ -32,8 +32,8 @@ class PrivilegeCheckerTest {
                             create oa "oa1" in ["pc1"]
                             create oa "oa2" in ["pc1"]
 
-                            associate "ua1" and "oa1" with ["read", "write"]
-                            associate "ua1" and PM_ADMIN_BASE_OA with ["read"]
+                            associate "ua1" to "oa1" with ["read", "write"]
+                            associate "ua1" to PM_ADMIN_BASE_OA with ["read"]
 
                         create U "u1" in ["ua1"]
                         create U "u2" in ["ua2"]

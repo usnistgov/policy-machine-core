@@ -41,8 +41,8 @@ class AssociateOpTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "ua2" with ["admin:graph:association:ua:create"]
-                associate "ua1" and "oa1" with ["admin:graph:association:target:create"]
+                associate "ua1" to "ua2" with ["admin:graph:association:ua:create"]
+                associate "ua1" to "oa1" with ["admin:graph:association:target:create"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -65,7 +65,7 @@ class AssociateOpTest {
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 """;

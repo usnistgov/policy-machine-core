@@ -27,7 +27,7 @@ class RequiredPrivilegeOnParameterTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -51,7 +51,7 @@ class RequiredPrivilegeOnParameterTest {
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -76,8 +76,8 @@ class RequiredPrivilegeOnParameterTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and "oa2" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
+                associate "ua1" to "oa2" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -102,8 +102,8 @@ class RequiredPrivilegeOnParameterTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
-                associate "ua1" and "oa2" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
+                associate "ua1" to "oa2" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
         pap.executePML(new UserContext(id("u1")), pml);
@@ -128,7 +128,7 @@ class RequiredPrivilegeOnParameterTest {
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
-                associate "ua1" and "oa1" with ["read"]
+                associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
 

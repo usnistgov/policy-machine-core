@@ -26,7 +26,7 @@ class AssociateStmtVisitorTest {
     void testSuccess() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
                 """
-                associate "a" and "b" with ["c", "d"]
+                associate "a" to "b" with ["c", "d"]
                 """);
         PMLStatement<?> stmt = new AssociateStmtVisitor(visitorCtx).visit(ctx);
         assertEquals(0, visitorCtx.errorLog().getErrors().size());
@@ -40,21 +40,21 @@ class AssociateStmtVisitorTest {
     void testInvalidExpressions() throws PMException {
         testCompilationError(
                 """
-                associate ["a"] and "b" with ["c", "d"]
+                associate ["a"] to "b" with ["c", "d"]
                 """, visitorCtx, 1,
                 "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
-                associate "a" and ["b"] with ["c", "d"]
+                associate "a" to ["b"] with ["c", "d"]
                 """, visitorCtx, 1,
                 "expected expression type string, got []string"
         );
 
         testCompilationError(
                 """
-                associate "a" and "b" with "c"
+                associate "a" to "b" with "c"
                 """, visitorCtx, 1,
                 "expected expression type []string, got string"
         );

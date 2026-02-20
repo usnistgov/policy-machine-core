@@ -63,7 +63,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     }
                     do(ctx) {
-                        associate "@super" and ctx.args.name with ["admin:*"]
+                        associate "@super" to ctx.args.name with ["admin:*"]
                     }
                     
                     create obligation "grant_super_on_new_oa_assigned_to_pc"
@@ -79,7 +79,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     }
                     do(ctx) {
-                        associate "@super" and ctx.args.name with ["admin:*"]
+                        associate "@super" to ctx.args.name with ["admin:*"]
                     }
                     
                     create obligation "grant_super_on_attr_assigned_to_pc"
@@ -96,7 +96,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     } 
                     do(ctx) {
-                        associate "@super" and name(ctx.args.ascendant) with ["admin:*"]
+                        associate "@super" to name(ctx.args.ascendant) with ["admin:*"]
                     }                    
                     """;
             // execute the obligation pml

@@ -110,10 +110,10 @@ deassignStatement:
     DEASSIGN ascendantNode=expression FROM descendantNodes=expression ;
 
 associateStatement:
-    ASSOCIATE ua=expression AND target=expression WITH accessRights=expression ;
+    ASSOCIATE ua=expression TO target=expression WITH accessRights=expression ;
 
 dissociateStatement:
-    DISSOCIATE ua=expression AND target=expression ;
+    DISSOCIATE ua=expression FROM target=expression ;
 
 setResourceAccessRightsStatement:
     SET_RESOURCE_ACCESS_RIGHTS accessRightsArr=expression;
@@ -253,7 +253,6 @@ idIndex:
     | OF
     | TO
     | ASSOCIATE
-    | AND
     | WITH
     | DISSOCIATE
     | DENY

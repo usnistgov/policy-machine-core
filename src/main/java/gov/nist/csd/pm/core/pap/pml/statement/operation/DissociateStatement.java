@@ -36,7 +36,7 @@ public class DissociateStatement extends OperationStatement {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + String.format("dissociate %s and %s", uaExpr, targetExpr);
+        return indent(indentLevel) + String.format("dissociate %s from %s", uaExpr, targetExpr);
     }
 
     @Override

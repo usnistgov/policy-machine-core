@@ -64,12 +64,12 @@ class GraphModificationAdjudicatorTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                associate "ua1" and "oa1" with ["admin:*"]
-                associate "ua1" and "oa2" with ["admin:*"]
-                associate "ua1" and PM_ADMIN_BASE_OA with ["admin:*"]
-                associate "ua3" and "ua1" with ["admin:*"]
-                associate "ua1" and "ua4" with ["admin:*"]
-                associate "ua1" and "ua3" with ["admin:*"]
+                associate "ua1" to "oa1" with ["admin:*"]
+                associate "ua1" to "oa2" with ["admin:*"]
+                associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
+                associate "ua3" to "ua1" with ["admin:*"]
+                associate "ua1" to "ua4" with ["admin:*"]
+                associate "ua1" to "ua3" with ["admin:*"]
                 
                 create u "u1" in ["ua1", "ua3"]
                 create u "u2" in ["ua2"]

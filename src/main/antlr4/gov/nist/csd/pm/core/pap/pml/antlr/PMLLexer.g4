@@ -40,7 +40,6 @@ SET_PROPERTIES: 'set properties' ;
 OF: 'of' ;
 TO: 'to' ;
 ASSOCIATE: 'associate' ;
-AND: 'and' ;
 WITH: 'with' ;
 DISSOCIATE: 'dissociate' ;
 DENY: 'deny';

@@ -42,12 +42,12 @@ class GetAssociationsWithSourceTest {
             create ua "ua1" in ["pc1"]
             create ua "ua2" in ["pc1"]
             create oa "oa1" in ["pc1"]
-            associate "ua1" and "oa1" with ["*"]
+            associate "ua1" to "oa1" with ["*"]
             
             assocs := getAssociationsWithSource("ua1")
             
             foreach assoc in assocs {
-                associate "ua2" and "oa1" with assoc.arset
+                associate "ua2" to "oa1" with assoc.arset
             }
            
             """;

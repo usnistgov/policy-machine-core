@@ -53,7 +53,7 @@ public class AssociateStatement extends OperationStatement {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return indent(indentLevel) + String.format("associate %s and %s with %s",
+        return indent(indentLevel) + String.format("associate %s to %s with %s",
                 ua, target, accessRights);
     }
 

@@ -50,7 +50,7 @@ create, delete, if exists
 rule, when, performs, on, in, do, any, ascendant of
 intersection, inter, union, process
 set resource access rights, assign, deassign, from, set properties, of, to
-associate, and, with, dissociate
+associate, to, with, dissociate
 deny, prohibition, obligation, access rights
 PC, OA, UA, U, O, user, node
 break, default, map, else, const, if, range, continue, foreach, return, var
@@ -395,13 +395,13 @@ deassign "childNode" from ["parentNode1", "parentNode2"]
 Create an association.
 
 ```pml
-associate "ua1" and "oa1" with ["read", "write"]
+associate "ua1" to "oa1" with ["read", "write"]
 ```
 
 ### Dissociate
 
 ```pml
-dissociate "ua1" and "oa1"
+dissociate "ua1" from "oa1"
 ```
 
 ### Create Prohibition
@@ -703,12 +703,12 @@ create ua "users" in ["pc1"]
 create ua "admin" in ["pc1"]  
 // the admin_user will be created automatically during bootstrapping 
 assign "admin_user" to ["admin"]  
-associate "admin" and "users" with ["assign_to"]  
+associate "admin" to "users" with ["assign_to"]  
   
 create oa "user homes" in ["pc1"]  
 create oa "user inboxes" in ["pc1"]  
-associate "admin" and "user homes" with ["*"]  
-associate "admin" and "user inboxes" with ["*"]  
+associate "admin" to "user homes" with ["*"]  
+associate "admin" to "user inboxes" with ["*"]  
   
 // prohibit the admin user from reading inboxes  
 create conjunctive node prohibition "deny admin on user inboxes"  

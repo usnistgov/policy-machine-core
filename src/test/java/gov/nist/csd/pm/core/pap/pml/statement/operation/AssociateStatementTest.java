@@ -53,11 +53,11 @@ class AssociateStatementTest {
                 buildArrayLiteral("read")
         );
         assertEquals(
-                "associate \"ua1\" and \"oa1\" with [\"read\"]",
+                "associate \"ua1\" to \"oa1\" with [\"read\"]",
                 stmt.toFormattedString(0)
         );
         assertEquals(
-                "    associate \"ua1\" and \"oa1\" with [\"read\"]",
+                "    associate \"ua1\" to \"oa1\" with [\"read\"]",
                 stmt.toFormattedString(1)
         );
     }
