@@ -86,6 +86,12 @@ public class ToProtoUtil {
             .build();
     }
 
+    public static NodeRef toNodeRefProto(String name) {
+        return NodeRef.newBuilder()
+            .setName(name)
+            .build();
+    }
+
     public static EventContext toEventContextProto(gov.nist.csd.pm.core.epp.EventContext eventContext) {
         gov.nist.csd.pm.proto.v1.epp.EventContext.Builder builder = gov.nist.csd.pm.proto.v1.epp.EventContext.newBuilder();
 
