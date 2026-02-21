@@ -10,34 +10,21 @@ import java.util.Map;
 public class GrpcResourcePDP {
 
     private final ManagedChannel managedChannel;
+    private final String user;
+    private final String process;
 
-    public GrpcResourcePDP(ManagedChannel managedChannel) {
+    public GrpcResourcePDP(ManagedChannel managedChannel, String user, String process) {
         this.managedChannel = managedChannel;
+        this.user = user;
+        this.process = process;
     }
 
-    public Adjudicator withUser(String user, String process) {
-        return new Adjudicator(managedChannel, user, process);
-    }
+    public void adjudicateOperation(String name, Map<String, Object> args) {
+        ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub stub =
+            ResourceAdjudicationServiceGrpc.newBlockingStub(managedChannel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
+        GrpcResourceAdjudicationService service = new GrpcResourceAdjudicationService(stub);
 
-    public static class Adjudicator {
-
-        private final ManagedChannel managedChannel;
-        private final String user;
-        private final String process;
-
-        public Adjudicator(ManagedChannel managedChannel, String user, String process) {
-            this.managedChannel = managedChannel;
-            this.user = user;
-            this.process = process;
-        }
-
-        public void adjudicateOperation(String name, Map<String, Object> args) {
-            ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub stub =
-                ResourceAdjudicationServiceGrpc.newBlockingStub(managedChannel)
-                    .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
-            GrpcResourceAdjudicationService service = new GrpcResourceAdjudicationService(stub);
-
-            service.adjudicateResourceOperation(name, args);
-        }
+        service.adjudicateResourceOperation(name, args);
     }
 }
