@@ -1,10 +1,6 @@
 package gov.nist.csd.pm.core.impl.grpc.client;
 
-import gov.nist.csd.pm.core.pap.modification.GraphModification;
-import gov.nist.csd.pm.core.pap.modification.ObligationsModification;
-import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.modification.PolicyModification;
-import gov.nist.csd.pm.core.pap.modification.ProhibitionsModification;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
 
