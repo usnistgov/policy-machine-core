@@ -4,7 +4,7 @@ import io.grpc.ManagedChannel;
 
 public class GrpcPDP {
 
-    private final ManagedChannel adminAdjudicationChannel;
+    private final ManagedChannel adminChannel;
     private final ManagedChannel resourceChannel;
     private final ManagedChannel policyQueryChannel;
     private final ManagedChannel eppChannel;
@@ -15,25 +15,25 @@ public class GrpcPDP {
     }
 
     // All four channels explicit
-    public GrpcPDP(ManagedChannel adminAdjudicationChannel,
+    public GrpcPDP(ManagedChannel adminChannel,
                    ManagedChannel resourceChannel,
-                   ManagedChannel policyQueryChannel,
+                   ManagedChannel queryChannel,
                    ManagedChannel eppChannel) {
-        this.adminAdjudicationChannel = adminAdjudicationChannel;
+        this.adminChannel = adminChannel;
         this.resourceChannel          = resourceChannel;
-        this.policyQueryChannel       = policyQueryChannel;
+        this.policyQueryChannel       = queryChannel;
         this.eppChannel               = eppChannel;
     }
 
     private GrpcPDP(Builder builder) {
-        this.adminAdjudicationChannel = builder.adminAdjudicationChannel;
+        this.adminChannel = builder.adminAdjudicationChannel;
         this.resourceChannel          = builder.resourceChannel;
         this.policyQueryChannel       = builder.policyQueryChannel;
         this.eppChannel               = builder.eppChannel;
     }
 
     public GrpcAdminPDP admin(String user, String process) {
-        return new GrpcAdminPDP(adminAdjudicationChannel, user, process);
+        return new GrpcAdminPDP(adminChannel, user, process);
     }
 
     public GrpcResourcePDP resource(String user, String process) {
