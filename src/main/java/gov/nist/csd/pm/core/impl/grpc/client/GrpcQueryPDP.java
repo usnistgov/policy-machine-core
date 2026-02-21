@@ -8,7 +8,6 @@ import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.query.SelfAccessQuery;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import io.grpc.ManagedChannel;
@@ -25,31 +24,31 @@ public class GrpcQueryPDP implements PolicyQuery {
     }
 
     @Override
-    public AccessQuery access() {
+    public GrpcAccessQuerier access() {
         return grpcPolicyQuerier.access();
     }
 
-    public SelfAccessQuery selfAccess(UserContext userCtx) {
-        return grpcPolicyQuerier.selfAccess(userCtx);
+    public SelfAccessQuery selfAccess() {
+        return grpcPolicyQuerier.selfAccess();
     }
 
     @Override
-    public GraphQuery graph() {
+    public GrpcGraphQuerier graph() {
         return grpcPolicyQuerier.graph();
     }
 
     @Override
-    public ProhibitionsQuery prohibitions() {
+    public GrpcProhibitionsQuerier prohibitions() {
         return grpcPolicyQuerier.prohibitions();
     }
 
     @Override
-    public ObligationsQuery obligations() {
+    public GrpcObligationsQuerier obligations() {
         return grpcPolicyQuerier.obligations();
     }
 
     @Override
-    public OperationsQuery operations() {
+    public GrpcOperationsQuerier operations() {
         return grpcPolicyQuerier.operations();
     }
 }

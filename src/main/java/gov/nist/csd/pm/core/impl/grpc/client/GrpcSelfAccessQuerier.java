@@ -5,22 +5,19 @@ import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.csd.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pdp.query.SelfAccessQuery;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeAdjacentAscendantPrivilegesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeAdjacentAscendantPrivilegesResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeAdjacentDescendantPrivilegesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeAdjacentDescendantPrivilegesResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeDeniedPrivilegesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeDeniedPrivilegesResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputePersonalObjectSystemRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputePersonalObjectSystemResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputePrivilegesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputePrivilegesResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeSubgraphPrivilegesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.ComputeSubgraphPrivilegesResponse;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeAdjacentAscendantPrivilegesRequest;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeAdjacentAscendantPrivilegesResponse;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeAdjacentDescendantPrivilegesRequest;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeAdjacentDescendantPrivilegesResponse;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputePersonalObjectSystemRequest;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputePersonalObjectSystemResponse;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputePrivilegesRequest;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputePrivilegesResponse;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeSubgraphPrivilegesRequest;
+import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeSubgraphPrivilegesResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,86 +25,100 @@ import java.util.Map;
 public class GrpcSelfAccessQuerier implements SelfAccessQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;
-    private final UserContext userCtx;
 
-    public GrpcSelfAccessQuerier(PolicyQueryServiceBlockingStub blockingStub, UserContext userCtx) {
+    public GrpcSelfAccessQuerier(PolicyQueryServiceBlockingStub blockingStub) {
         this.blockingStub = blockingStub;
-        this.userCtx = userCtx;
     }
 
     @Override
     public AccessRightSet computePrivileges(TargetContext targetCtx) {
-        ComputePrivilegesRequest request = ComputePrivilegesRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx))
+        SelfComputePrivilegesRequest request = SelfComputePrivilegesRequest.newBuilder()
             .setTargetCtx(ToProtoUtil.toTargetContextProto(targetCtx))
             .build();
-        ComputePrivilegesResponse response = blockingStub.computePrivileges(request);
+        SelfComputePrivilegesResponse response = blockingStub.selfComputePrivileges(request);
+        return new AccessRightSet(response.getPrivilegesList());
+    }
+
+    public AccessRightSet computePrivileges(long id) {
+        SelfComputePrivilegesRequest request = SelfComputePrivilegesRequest.newBuilder()
+            .setTargetCtx(ToProtoUtil.toTargetContextProto(new TargetContext(id)))
+            .build();
+        SelfComputePrivilegesResponse response = blockingStub.selfComputePrivileges(request);
+        return new AccessRightSet(response.getPrivilegesList());
+    }
+
+    public AccessRightSet computePrivileges(String name) {
+        SelfComputePrivilegesRequest request = SelfComputePrivilegesRequest.newBuilder()
+            .setTargetCtx(gov.nist.csd.pm.proto.v1.pdp.query.TargetContext.newBuilder()
+                .setTargetNode(ToProtoUtil.toNodeRefProto(name))
+            )
+            .build();
+        SelfComputePrivilegesResponse response = blockingStub.selfComputePrivileges(request);
         return new AccessRightSet(response.getPrivilegesList());
     }
 
     @Override
     public List<AccessRightSet> computePrivileges(List<TargetContext> targetCtxs) {
-        ComputePrivilegesRequest.Builder builder = ComputePrivilegesRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx));
-
         List<AccessRightSet> sets = new ArrayList<>();
         for (TargetContext targetCtx : targetCtxs) {
-            ComputePrivilegesRequest request = builder
-                .setTargetCtx(ToProtoUtil.toTargetContextProto(targetCtx))
-                .build();
-            ComputePrivilegesResponse response = blockingStub.computePrivileges(request);
-            sets.add(new AccessRightSet(response.getPrivilegesList()));
+            sets.add(computePrivileges(targetCtx));
         }
-
         return sets;
     }
 
     @Override
     public AccessRightSet computeDeniedPrivileges(TargetContext targetCtx) {
-        ComputeDeniedPrivilegesRequest request = ComputeDeniedPrivilegesRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx))
-            .setTargetCtx(ToProtoUtil.toTargetContextProto(targetCtx))
-            .build();
-        ComputeDeniedPrivilegesResponse response = blockingStub.computeDeniedPrivileges(request);
-        return new AccessRightSet(response.getPrivilegesList());
+        throw new UnsupportedOperationException("selfComputeDeniedPrivileges not supported");
     }
 
     @Override
     public SubgraphPrivileges computeSubgraphPrivileges(long root) {
-        ComputeSubgraphPrivilegesRequest request = ComputeSubgraphPrivilegesRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx))
+        SelfComputeSubgraphPrivilegesRequest request = SelfComputeSubgraphPrivilegesRequest.newBuilder()
             .setRoot(ToProtoUtil.toNodeRefProto(root))
             .build();
-        ComputeSubgraphPrivilegesResponse response = blockingStub.computeSubgraphPrivileges(request);
+        SelfComputeSubgraphPrivilegesResponse response = blockingStub.selfComputeSubgraphPrivileges(request);
+        return FromProtoUtil.fromProtoSubgraphPrivileges(response.getSubgraphPrivileges());
+    }
+
+    public SubgraphPrivileges computeSubgraphPrivileges(String root) {
+        SelfComputeSubgraphPrivilegesRequest request = SelfComputeSubgraphPrivilegesRequest.newBuilder()
+            .setRoot(ToProtoUtil.toNodeRefProto(root))
+            .build();
+        SelfComputeSubgraphPrivilegesResponse response = blockingStub.selfComputeSubgraphPrivileges(request);
         return FromProtoUtil.fromProtoSubgraphPrivileges(response.getSubgraphPrivileges());
     }
 
     @Override
     public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(long root) {
-        ComputeAdjacentAscendantPrivilegesRequest request = ComputeAdjacentAscendantPrivilegesRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx))
+        SelfComputeAdjacentAscendantPrivilegesRequest request = SelfComputeAdjacentAscendantPrivilegesRequest.newBuilder()
             .setRoot(ToProtoUtil.toNodeRefProto(root))
             .build();
-        ComputeAdjacentAscendantPrivilegesResponse response = blockingStub.computeAdjacentAscendantPrivileges(request);
+        SelfComputeAdjacentAscendantPrivilegesResponse response = blockingStub.selfComputeAdjacentAscendantPrivileges(request);
+        return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
+    }
+
+    public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(String root) {
+        SelfComputeAdjacentAscendantPrivilegesRequest request = SelfComputeAdjacentAscendantPrivilegesRequest.newBuilder()
+            .setRoot(ToProtoUtil.toNodeRefProto(root))
+            .build();
+        SelfComputeAdjacentAscendantPrivilegesResponse response = blockingStub.selfComputeAdjacentAscendantPrivileges(request);
         return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
     }
 
     @Override
     public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(long root) {
-        ComputeAdjacentDescendantPrivilegesRequest request = ComputeAdjacentDescendantPrivilegesRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx))
+        SelfComputeAdjacentDescendantPrivilegesRequest request = SelfComputeAdjacentDescendantPrivilegesRequest.newBuilder()
             .setRoot(ToProtoUtil.toNodeRefProto(root))
             .build();
-        ComputeAdjacentDescendantPrivilegesResponse response = blockingStub.computeAdjacentDescendantPrivileges(request);
+        SelfComputeAdjacentDescendantPrivilegesResponse response = blockingStub.selfComputeAdjacentDescendantPrivileges(request);
         return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
     }
 
     @Override
     public Map<Node, AccessRightSet> computePersonalObjectSystem() {
-        ComputePersonalObjectSystemRequest request = ComputePersonalObjectSystemRequest.newBuilder()
-            .setUserCtx(ToProtoUtil.toUserContextProto(userCtx))
+        SelfComputePersonalObjectSystemRequest request = SelfComputePersonalObjectSystemRequest.newBuilder()
             .build();
-        ComputePersonalObjectSystemResponse response = blockingStub.computePersonalObjectSystem(request);
+        SelfComputePersonalObjectSystemResponse response = blockingStub.selfComputePersonalObjectSystem(request);
         return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
     }
 }
