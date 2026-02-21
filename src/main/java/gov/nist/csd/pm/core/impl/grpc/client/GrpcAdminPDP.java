@@ -11,6 +11,7 @@ import gov.nist.csd.pm.proto.v1.pdp.adjudication.ExecutePMLRequest;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.ExecutePMLResponse;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.OperationRequest;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.RoutineRequest;
+import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
 import java.util.ArrayList;

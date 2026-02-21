@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.List;
 import java.util.Map;
 
-public class SelfAccessQueryAdjudicator extends Adjudicator {
+public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAccessQuery {
 
 	public SelfAccessQueryAdjudicator(PAP pap, UserContext userCtx) {
 		super(pap, userCtx);
