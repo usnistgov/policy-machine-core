@@ -28,7 +28,7 @@ public class GrpcQueryPDP implements PolicyQuery {
         return grpcPolicyQuerier.access();
     }
 
-    public SelfAccessQuery selfAccess() {
+    public GrpcSelfAccessQuerier selfAccess() {
         return grpcPolicyQuerier.selfAccess();
     }
 
