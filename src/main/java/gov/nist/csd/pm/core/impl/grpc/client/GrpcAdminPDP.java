@@ -23,82 +23,95 @@ import java.util.Map;
 
 public class GrpcAdminPDP {
 
-    private ManagedChannel managedChannel;
-    private String user;
-    private String process;
+    private final ManagedChannel managedChannel;
 
-    public GrpcAdminPDP(ManagedChannel managedChannel, String user, String process) {
+    public GrpcAdminPDP(ManagedChannel managedChannel) {
         this.managedChannel = managedChannel;
-        this.user = user;
-        this.process = process;
     }
 
-    public Object adjudicateOperation(String name, Map<String, Object> args) {
-        AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
+    public Adjudicator withUser(String user, String process) {
+        return new Adjudicator(managedChannel, user, process);
+    }
 
-        OperationRequest request = OperationRequest.newBuilder()
-            .setName(name)
-            .setArgs(ToProtoUtil.toValueMapProto(args))
-            .build();
+    public static class Adjudicator {
 
-        AdjudicateOperationResponse response = stub.adjudicateOperation(request);
+        private final ManagedChannel managedChannel;
+        private final String user;
+        private final String process;
 
-        if (response.hasValue()) {
-            return FromProtoUtil.fromValue(response.getValue());
+        public Adjudicator(ManagedChannel managedChannel, String user, String process) {
+            this.managedChannel = managedChannel;
+            this.user = user;
+            this.process = process;
         }
 
-        return null;
-    }
+        public Object adjudicateOperation(String name, Map<String, Object> args) {
+            AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
 
-    public void adjudicateRoutine(List<gov.nist.csd.pm.core.pdp.adjudication.OperationRequest> operations) {
-        AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
+            OperationRequest request = OperationRequest.newBuilder()
+                .setName(name)
+                .setArgs(ToProtoUtil.toValueMapProto(args))
+                .build();
 
-        List<OperationRequest> requestProtos = new ArrayList<>();
-        for (gov.nist.csd.pm.core.pdp.adjudication.OperationRequest req : operations) {
-            requestProtos.add(OperationRequest.newBuilder()
-                .setName(req.op())
-                .setArgs(ToProtoUtil.toValueMapProto(req.args()))
-                .build());
+            AdjudicateOperationResponse response = stub.adjudicateOperation(request);
+
+            if (response.hasValue()) {
+                return FromProtoUtil.fromValue(response.getValue());
+            }
+
+            return null;
         }
 
-        RoutineRequest request = RoutineRequest.newBuilder()
-            .addAllOperations(requestProtos)
-            .build();
+        public void adjudicateRoutine(List<gov.nist.csd.pm.core.pdp.adjudication.OperationRequest> operations) {
+            AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
 
-        stub.adjudicateRoutine(request);
-    }
+            List<OperationRequest> requestProtos = new ArrayList<>();
+            for (gov.nist.csd.pm.core.pdp.adjudication.OperationRequest req : operations) {
+                requestProtos.add(OperationRequest.newBuilder()
+                    .setName(req.op())
+                    .setArgs(ToProtoUtil.toValueMapProto(req.args()))
+                    .build());
+            }
 
-    public Object executePML(String pml) {
-        AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
+            RoutineRequest request = RoutineRequest.newBuilder()
+                .addAllOperations(requestProtos)
+                .build();
 
-        ExecutePMLRequest request = ExecutePMLRequest.newBuilder()
-            .setPml(pml)
-            .build();
-
-        ExecutePMLResponse response = stub.executePML(request);
-
-        if (response.hasValue()) {
-            return FromProtoUtil.fromValue(response.getValue());
+            stub.adjudicateRoutine(request);
         }
 
-        return null;
-    }
+        public Object executePML(String pml) {
+            AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
 
-    public GrpcPolicyModifier modify() {
-        return new GrpcPolicyModifier(AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process))));
-    }
+            ExecutePMLRequest request = ExecutePMLRequest.newBuilder()
+                .setPml(pml)
+                .build();
 
-    public GrpcPolicyQuerier query() {
-        return new GrpcPolicyQuerier(PolicyQueryServiceGrpc.newBlockingStub(managedChannel)
-            .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process))));
-    }
+            ExecutePMLResponse response = stub.executePML(request);
 
-    public void processEvent(EventContext eventCtx) throws PMException {
-        new GrpcEventSubscriber(EPPServiceGrpc.newBlockingStub(managedChannel))
-            .processEvent(eventCtx);
+            if (response.hasValue()) {
+                return FromProtoUtil.fromValue(response.getValue());
+            }
+
+            return null;
+        }
+
+        public GrpcPolicyModifier modify() {
+            return new GrpcPolicyModifier(AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process))));
+        }
+
+        public GrpcPolicyQuerier query() {
+            return new GrpcPolicyQuerier(PolicyQueryServiceGrpc.newBlockingStub(managedChannel)
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process))));
+        }
+
+        public void processEvent(EventContext eventCtx) throws PMException {
+            new GrpcEventSubscriber(EPPServiceGrpc.newBlockingStub(managedChannel))
+                .processEvent(eventCtx);
+        }
     }
 }

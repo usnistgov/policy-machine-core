@@ -9,22 +9,35 @@ import java.util.Map;
 
 public class GrpcResourcePDP {
 
-    private ManagedChannel managedChannel;
-    private String user;
-    private String process;
+    private final ManagedChannel managedChannel;
 
-    public GrpcResourcePDP(ManagedChannel managedChannel, String user, String process) {
+    public GrpcResourcePDP(ManagedChannel managedChannel) {
         this.managedChannel = managedChannel;
-        this.user = user;
-        this.process = process;
     }
 
-    public void adjudicateOperation(String name, Map<String, Object> args) {
-        ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub stub =
-            ResourceAdjudicationServiceGrpc.newBlockingStub(managedChannel)
-                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
-        GrpcResourceAdjudicationService service = new GrpcResourceAdjudicationService(stub);
+    public Adjudicator withUser(String user, String process) {
+        return new Adjudicator(managedChannel, user, process);
+    }
 
-        service.adjudicateResourceOperation(name, args);
+    public static class Adjudicator {
+
+        private final ManagedChannel managedChannel;
+        private final String user;
+        private final String process;
+
+        public Adjudicator(ManagedChannel managedChannel, String user, String process) {
+            this.managedChannel = managedChannel;
+            this.user = user;
+            this.process = process;
+        }
+
+        public void adjudicateOperation(String name, Map<String, Object> args) {
+            ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub stub =
+                ResourceAdjudicationServiceGrpc.newBlockingStub(managedChannel)
+                    .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
+            GrpcResourceAdjudicationService service = new GrpcResourceAdjudicationService(stub);
+
+            service.adjudicateResourceOperation(name, args);
+        }
     }
 }

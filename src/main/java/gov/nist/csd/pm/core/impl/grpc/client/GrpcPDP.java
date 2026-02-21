@@ -4,17 +4,17 @@ import io.grpc.ManagedChannel;
 
 public class GrpcPDP {
 
-    private ManagedChannel managedChannel;
+    private final ManagedChannel managedChannel;
 
     public GrpcPDP(ManagedChannel managedChannel) {
         this.managedChannel = managedChannel;
     }
 
-    public GrpcResourcePDP resource(String user, String process) {
-        return new GrpcResourcePDP(managedChannel, user, process);
+    public GrpcResourcePDP resource() {
+        return new GrpcResourcePDP(managedChannel);
     }
 
-    public GrpcAdminPDP admin(String user, String process) {
-        return new GrpcAdminPDP(managedChannel, user, process);
+    public GrpcAdminPDP admin() {
+        return new GrpcAdminPDP(managedChannel);
     }
 }
