@@ -48,7 +48,7 @@ class AssociateOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         AssociateOp op = new AssociateOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "ua", id("ua2"),
                 "target", id("oa1"),
                 "arset", List.of("read")
@@ -72,7 +72,7 @@ class AssociateOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         AssociateOp op = new AssociateOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "ua", id("ua2"),
                 "target", id("oa1"),
                 "arset", List.of("read")

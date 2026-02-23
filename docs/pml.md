@@ -526,7 +526,7 @@ delete if exists obligation "ObligationName"
 (string a, int64 b, []string c, map[string]bool d)
 ```
 
-### @node and @reqcap Annotations
+### @node, @reqcap, and @eventctx Annotations
 
 The `@node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
 
@@ -551,6 +551,10 @@ resourceop delete_file(string filename) {
     delete node filename
 }
 ```
+
+The `@eventctx` annotation also precedes the operation definition and defines the parameters that will be available in an 
+event context as a result of the operation being sent to the EPP. If this annotation is omitted, then the parameters in 
+the operation signature are used. You can add additional params as well as omit certain params found in the signature.
 
 ### Require Statement
 

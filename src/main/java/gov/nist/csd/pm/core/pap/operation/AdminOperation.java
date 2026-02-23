@@ -32,4 +32,21 @@ public abstract non-sealed class AdminOperation<R> extends Operation<R> {
                           AdminAccessRight ar) {
         super(name, returnType, parameters, new RequiredCapability(new RequiredPrivilegeOnNode(target.nodeName(), ar)));
     }
+
+    public AdminOperation(String name,
+                          Type<R> returnType,
+                          List<FormalParameter<?>> parameters,
+                          List<FormalParameter<?>> eventParameters,
+                          List<RequiredCapability> requiredCapabilities) {
+        super(name, returnType, parameters, eventParameters, requiredCapabilities);
+    }
+
+    public AdminOperation(String name,
+                          Type<R> returnType,
+                          List<FormalParameter<?>> parameters,
+                          List<FormalParameter<?>> eventParameters,
+                          RequiredCapability requiredCapability,
+                          RequiredCapability... requiredCapabilities) {
+        super(name, returnType, parameters, eventParameters, requiredCapability, requiredCapabilities);
+    }
 }

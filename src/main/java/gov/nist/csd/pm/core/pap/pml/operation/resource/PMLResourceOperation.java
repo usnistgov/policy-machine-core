@@ -26,6 +26,15 @@ public abstract class PMLResourceOperation<T> extends ResourceOperation<T> imple
         this.signature = new PMLOperationSignature(OperationType.RESOURCEOP, name, returnType, formalParameters, reqCaps);
     }
 
+    public PMLResourceOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters,
+                                List<FormalParameter<?>> eventParameters, List<RequiredCapability> reqCaps) {
+        super(name, returnType, new ArrayList<>(formalParameters), eventParameters, reqCaps);
+
+        this.returnType = returnType;
+        this.pmlFormalParameters = formalParameters;
+        this.signature = new PMLOperationSignature(OperationType.RESOURCEOP, name, returnType, formalParameters, eventParameters, reqCaps);
+    }
+
     public List<FormalParameter<?>> getPmlFormalArgs() {
         return pmlFormalParameters;
     }

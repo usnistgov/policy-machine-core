@@ -25,6 +25,16 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
         this.body = body;
     }
 
+    public PMLStmtsAdminOperation(String name,
+                                  Type<T> returnType,
+                                  List<FormalParameter<?>> formalParameters,
+                                  List<FormalParameter<?>> eventParameters,
+                                  List<RequiredCapability> requiredCapabilities,
+                                  PMLStatementBlock body) {
+        super(name, returnType, formalParameters, eventParameters, requiredCapabilities);
+        this.body = body;
+    }
+
     public PMLStatementBlock getBody() {
         return body;
     }

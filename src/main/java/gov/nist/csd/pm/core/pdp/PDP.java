@@ -78,7 +78,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
     @Override
     public Object adjudicateOperation(UserContext user, String resourceOperation, Map<String, Object> rawAgs) throws PMException {
         Operation<?> op = pap.query().operations().getOperation(resourceOperation);
-        Args args = op.validateAndPrepareArgs(rawAgs);
+        Args args = op.validateArgs(rawAgs);
 
         return runTx(user, tx -> executeOperation(user, tx, op, args));
     }
@@ -88,7 +88,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         runTx(user, tx -> {
             for (OperationRequest request : operationRequests) {
                 Operation<?> op = pap.query().operations().getOperation(request.op());
-                Args args = op.validateAndPrepareArgs(request.args());
+                Args args = op.validateArgs(request.args());
                 executeOperation(user, tx, op, args);
             }
 

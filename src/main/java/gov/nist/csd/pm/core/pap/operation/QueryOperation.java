@@ -26,6 +26,23 @@ public abstract non-sealed class QueryOperation<R> extends Operation<R> {
         super(name, returnType, parameters, requiredCapability, requiredCapabilities);
     }
 
+    public QueryOperation(String name,
+                          Type<R> returnType,
+                          List<FormalParameter<?>> parameters,
+                          List<FormalParameter<?>> eventParameters,
+                          List<RequiredCapability> requiredCapabilities) {
+        super(name, returnType, parameters, eventParameters, requiredCapabilities);
+    }
+
+    public QueryOperation(String name,
+                          Type<R> returnType,
+                          List<FormalParameter<?>> parameters,
+                          List<FormalParameter<?>> eventParameters,
+                          RequiredCapability req,
+                          RequiredCapability... rest) {
+        super(name, returnType, parameters, eventParameters, req, rest);
+    }
+
     public abstract R execute(PolicyQuery query, Args args) throws PMException;
 
     @Override

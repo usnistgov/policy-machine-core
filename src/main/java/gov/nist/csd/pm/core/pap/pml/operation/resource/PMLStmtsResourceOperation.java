@@ -25,6 +25,16 @@ public class PMLStmtsResourceOperation<T> extends PMLResourceOperation<T> implem
         this.body = body;
     }
 
+    public PMLStmtsResourceOperation(String name,
+                                  Type<T> returnType,
+                                  List<FormalParameter<?>> formalParameters,
+                                  List<FormalParameter<?>> eventParameters,
+                                  List<RequiredCapability> requiredCapabilities,
+                                  PMLStatementBlock body) {
+        super(name, returnType, formalParameters, eventParameters, requiredCapabilities);
+        this.body = body;
+    }
+
     public PMLStatementBlock getBody() {
         return body;
     }

@@ -57,6 +57,4 @@ class CreateObligationStmtVisitorTest {
                 "expected expression type string, got []string"
                 );
     }
-
-
 }

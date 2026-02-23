@@ -10,9 +10,11 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OnPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
@@ -26,12 +28,9 @@ import gov.nist.csd.pm.core.pdp.PDPTx;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class EPP implements EventSubscriber {
 
@@ -82,25 +81,24 @@ public class EPP implements EventSubscriber {
         }
 
         MatchesOperationPattern matchesOpPattern = (MatchesOperationPattern) operationPattern;
+        if (!opName.equals(matchesOpPattern.getOpName())) {
+            return false;
+        }
 
-        return opName.equals(matchesOpPattern.getOpName()) &&
-            argsMatch(userCtx, pdpTx, args, matchesOpPattern.getOnPattern());
+        return argsMatch(userCtx, pdpTx, opName, args, matchesOpPattern.getOnPattern());
     }
 
     private boolean argsMatch(UserContext userCtx,
                               PDPTx pdpTx,
+                              String opName,
                               Map<String, Object> rawArgs,
                               OnPattern onPattern) throws PMException {
         PMLStmtsRoutine<Boolean> matchFunc = onPattern.func();
 
-        // need to pas only the args that the matching operation expects which could be a subset of the
-        // params defined in the operation and passed in rawArgs
-        List<FormalParameter<?>> formalParameters = matchFunc.getFormalParameters();
-        HashMap<String, Object> matchFuncArgs = new HashMap<>(rawArgs);
-        Set<String> paramNames = formalParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
-        matchFuncArgs.keySet().removeIf(argName -> !paramNames.contains(argName));
-
-        Args args = matchFunc.validateAndPrepareSubsetArgs(matchFuncArgs);
+        // get the matching functions corresponding operation and ensure that the provided
+        // args are a subset of the defined event parameters
+        Operation<?> matchFuncOp = pap.query().operations().getOperation(opName);
+        Args args = matchFuncOp.validateEventContextArgs(rawArgs);
 
         // first, check the user has any privileges on each node in the event context args - any privilege works
         checkAccessOnEventContextArgs(userCtx, args.getMap());
@@ -116,9 +114,13 @@ public class EPP implements EventSubscriber {
                                                Map<FormalParameter<?>, Object> argsMap) throws PMException {
         for (Entry<FormalParameter<?>, Object> entry : argsMap.entrySet()) {
             FormalParameter<?> formalParameter = entry.getKey();
+            if (!(formalParameter instanceof NodeFormalParameter<?> nodeFormalParameter)) {
+                continue;
+            }
+
             Object value = entry.getValue();
 
-            switch (formalParameter) {
+            switch (nodeFormalParameter) {
                 case NodeIdFormalParameter nodeId ->
                     check(userCtx, new TargetContext((long) value));
                 case NodeIdListFormalParameter nodeIdList -> {
@@ -134,9 +136,6 @@ public class EPP implements EventSubscriber {
                     for (String name : nameList) {
                         check(userCtx, new TargetContext(pap.query().graph().getNodeId(name)));
                     }
-                }
-                default -> {
-                    return;
                 }
             }
         }

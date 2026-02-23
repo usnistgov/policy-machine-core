@@ -44,7 +44,7 @@ class DeleteNodeOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         DeleteNodeOp op = new DeleteNodeOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "id", id("o1")
         ));
         op.canExecute(pap, new UserContext(id("u1")), args);
@@ -67,7 +67,7 @@ class DeleteNodeOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         DeleteNodeOp op = new DeleteNodeOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "id", id("o1")
         ));
         assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));

@@ -26,6 +26,23 @@ public abstract non-sealed class ResourceOperation<T> extends Operation<T> {
         super(name, returnType, parameters, requiredCapability, requiredCapabilities);
     }
 
+    public ResourceOperation(String name,
+                             Type<T> returnType,
+                             List<FormalParameter<?>> parameters,
+                             List<FormalParameter<?>> eventParameters,
+                             List<RequiredCapability> requiredCapabilities) {
+        super(name, returnType, parameters, eventParameters, requiredCapabilities);
+    }
+
+    public ResourceOperation(String name,
+                             Type<T> returnType,
+                             List<FormalParameter<?>> parameters,
+                             List<FormalParameter<?>> eventParameters,
+                             RequiredCapability req,
+                             RequiredCapability... rest) {
+        super(name, returnType, parameters, eventParameters, req, rest);
+    }
+
     public abstract T execute(PolicyQuery query, Args args) throws PMException;
 
     @Override

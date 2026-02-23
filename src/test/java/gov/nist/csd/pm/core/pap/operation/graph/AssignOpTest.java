@@ -46,7 +46,7 @@ class AssignOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         AssignOp op = new AssignOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "ascendant", id("o1"),
                 "descendants", List.of(id("oa1"))
         ));
@@ -70,7 +70,7 @@ class AssignOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         AssignOp op = new AssignOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "ascendant", id("o1"),
                 "descendants", List.of(id("oa1"))
         ));

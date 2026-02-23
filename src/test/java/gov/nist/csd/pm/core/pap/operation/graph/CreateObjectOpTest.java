@@ -45,7 +45,7 @@ class CreateObjectOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreateObjectOp op = new CreateObjectOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "name", "o1",
                 "descendants", List.of(id("oa1"))
         ));
@@ -68,7 +68,7 @@ class CreateObjectOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreateObjectOp op = new CreateObjectOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "name", "o1",
                 "descendants", List.of(id("oa1"))
         ));

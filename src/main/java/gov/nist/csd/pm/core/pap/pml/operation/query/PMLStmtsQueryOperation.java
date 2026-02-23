@@ -25,6 +25,16 @@ public class PMLStmtsQueryOperation<T> extends PMLQueryOperation<T> implements P
         this.stmts = stmts;
     }
 
+    public PMLStmtsQueryOperation(String operationName,
+                                  Type<T> returnType,
+                                  List<FormalParameter<?>> parameters,
+                                  List<FormalParameter<?>> eventParameters,
+                                  List<RequiredCapability> requiredCapabilities,
+                                  PMLStatementBlock stmts) {
+        super(operationName, returnType, parameters, eventParameters, requiredCapabilities);
+        this.stmts = stmts;
+    }
+
     public PMLStatementBlock getStmts() {
         return stmts;
     }

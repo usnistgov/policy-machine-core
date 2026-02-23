@@ -35,12 +35,14 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
     protected final String name;
     protected final Type<R> returnType;
     protected final List<FormalParameter<?>> parameters;
+    protected final List<FormalParameter<?>> eventParameters;
     protected final List<RequiredCapability> requiredCapabilities;
 
     public Operation(String name, Type<R> returnType, List<FormalParameter<?>> parameters, List<RequiredCapability> requiredCapabilities) {
         this.name = name;
         this.returnType = returnType;
         this.parameters = parameters;
+        this.eventParameters = new ArrayList<>(parameters);
         this.requiredCapabilities = requiredCapabilities;
     }
 
@@ -49,12 +51,39 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         this.name = name;
         this.returnType = returnType;
         this.parameters = parameters;
-
+        this.eventParameters = new ArrayList<>(parameters);
         this.requiredCapabilities = new ArrayList<>();
         this.requiredCapabilities.add(requiredCapability);
         this.requiredCapabilities.addAll(List.of(requiredCapabilities));
     }
 
+    public Operation(String name,
+                     Type<R> returnType,
+                     List<FormalParameter<?>> parameters,
+                     List<FormalParameter<?>> eventParameters,
+                     List<RequiredCapability> requiredCapabilities) {
+        this.name = name;
+        this.returnType = returnType;
+        this.parameters = parameters;
+        this.eventParameters = eventParameters;
+        this.requiredCapabilities = requiredCapabilities;
+    }
+
+    public Operation(String name,
+                     Type<R> returnType,
+                     List<FormalParameter<?>> parameters,
+                     List<FormalParameter<?>> eventParameters,
+                     RequiredCapability requiredCapability,
+                     RequiredCapability... requiredCapabilities) {
+        this.name = name;
+        this.returnType = returnType;
+        this.parameters = parameters;
+        this.eventParameters = eventParameters;
+        this.requiredCapabilities = new ArrayList<>();
+        this.requiredCapabilities.add(requiredCapability);
+        this.requiredCapabilities.addAll(List.of(requiredCapabilities));
+    }
+    
     /**
      * Execute the function with the given arguments and PAP object. This method allows for modification and querying of
      * the underlying policy.
@@ -81,23 +110,47 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         return requiredCapabilities;
     }
 
+    public List<FormalParameter<?>> getEventParameters() {
+        return eventParameters;
+    }
+
     /**
      * Convert the given map of raw args to an Arg object with type checking on arg values.
      * @param rawArgs The raw args to validate and prepare.
      * @return An Args object.
      */
-    public Args validateAndPrepareArgs(Map<String, Object> rawArgs) {
-        return validateAndPrepareArgs(rawArgs, true);
+    public Args validateArgs(Map<String, Object> rawArgs) {
+        Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
+        Set<String> parameterNames = new HashSet<>(parameters.stream().map(FormalParameter::getName).toList());
+
+        // check for required args
+        if (!rawArgNames.containsAll(parameterNames) || !parameterNames.containsAll(rawArgNames)) {
+            throw new IllegalArgumentException("expected args " + parameterNames + ", received " + rawArgNames);
+        }
+
+        Map<String, FormalParameter<?>> paramMap = parameters.stream()
+            .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
+        return new Args(buildTypeSafeArgs(rawArgs, paramMap));
     }
 
     /**
-     * Convert the given map of raw args to an Arg object with type checking on arg values. This method allows for only
-     * a subset of the expected args to be included but will throw an exception for unrecognized args.
+     * Convert the given map of raw args to an Arg object with type checking on arg values. This method allows a subset
+     * of the exepcted event parameters to be present in the rawArgs.
      * @param rawArgs The raw args to validate and prepare.
      * @return An Args object.
      */
-    public Args validateAndPrepareSubsetArgs(Map<String, Object> rawArgs) {
-        return validateAndPrepareArgs(rawArgs, false);
+    public Args validateEventContextArgs(Map<String, Object> rawArgs) {
+        Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
+        Set<String> eventParamNames = new HashSet<>(eventParameters.stream().map(FormalParameter::getName).toList());
+
+        // error on unexpected args - ok if not all required args
+        if (!eventParamNames.containsAll(rawArgNames)) {
+            throw new IllegalArgumentException("expected subset of event context args " + eventParamNames + ", received " + rawArgNames);
+        }
+
+        Map<String, FormalParameter<?>> paramMap = eventParameters.stream()
+            .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
+        return new Args(buildTypeSafeArgs(rawArgs, paramMap));
     }
 
     /**
@@ -136,36 +189,6 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
     @Override
     public int hashCode() {
         return Objects.hash(name, returnType, parameters, requiredCapabilities);
-    }
-
-    private Args validateAndPrepareArgs(Map<String, Object> rawArgs, boolean checkMissing) {
-        Map<String, FormalParameter<?>> paramMap = parameters.stream()
-            .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
-
-        checkUnexpectedArgs(rawArgs.keySet(), paramMap.keySet());
-        if (checkMissing) {
-            checkMissingArgs(rawArgs.keySet(), paramMap.keySet());
-        }
-
-        return new Args(buildTypeSafeArgs(rawArgs, paramMap));
-    }
-
-    private void checkUnexpectedArgs(Set<String> actualKeys, Set<String> expectedKeys) {
-        Set<String> unexpected = new HashSet<>(actualKeys);
-        unexpected.removeAll(expectedKeys);
-        if (!unexpected.isEmpty()) {
-            throw new IllegalArgumentException(
-                String.format("unexpected args provided for function '%s': %s", name, unexpected));
-        }
-    }
-
-    private void checkMissingArgs(Set<String> actualKeys, Set<String> expectedKeys) {
-        Set<String> missing = new HashSet<>(expectedKeys);
-        missing.removeAll(actualKeys);
-        if (!missing.isEmpty()) {
-            throw new IllegalArgumentException(
-                String.format("missing required arguments for function '%s': %s", name, missing));
-        }
     }
 
     private Map<FormalParameter<?>, Object> buildTypeSafeArgs(Map<String, Object> rawArgs,

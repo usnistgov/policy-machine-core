@@ -8,6 +8,7 @@ ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
 NODE_ARG: '@node';
 REQ_CAP: '@reqcap';
+EVENT: '@eventctx';
 NODE: 'node';
 REQUIRE: 'require';
 ROUTINE: 'routine';

@@ -46,7 +46,7 @@ class DissociateOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         DissociateOp op = new DissociateOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "ua", id("ua2"),
                 "target", id("oa1")
         ));
@@ -69,7 +69,7 @@ class DissociateOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         DissociateOp op = new DissociateOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "ua", id("ua2"),
                 "target", id("oa1")
         ));
