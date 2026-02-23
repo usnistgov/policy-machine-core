@@ -168,21 +168,20 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 argNames.addAll(onPatternContext.argNames().ID().stream().map(TerminalNode::getText).collect(Collectors.toSet()));
             }
 
-            // get FormalParameters of the operation, keep only the ones defined in argNames
+            // get event params of the operation, keep only the ones defined in argNames
             List<FormalParameter<?>> patternParams = new ArrayList<>();
             try {
                 PMLOperationSignature operation = visitorCtx.scope().getOperation(opName);
-
-                List<FormalParameter<?>> formalParameters = operation.getFormalParameters();
+                List<FormalParameter<?>> eventParameters = operation.getEventParameters();
 
                 // check that all of the argNames are defined as formal params for the operation
-                Set<String> formalParamNames = formalParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
-                if (!formalParamNames.containsAll(argNames)) {
+                Set<String> eventParamNames = eventParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
+                if (!eventParamNames.containsAll(argNames)) {
                     throw new PMLCompilationRuntimeException(onPatternContext,
-                        "expected arg names " + formalParamNames + " but found " + argNames);
+                        "expected arg names " + eventParamNames + " but found " + argNames);
                 }
 
-                for (FormalParameter<?> formalParam : formalParameters) {
+                for (FormalParameter<?> formalParam : eventParameters) {
                     if (argNames.contains(formalParam.getName())) {
                         patternParams.add(formalParam);
                     }

@@ -140,17 +140,20 @@ resourceOpDefinitionStatement: resourceOpSignature basicStatementBlock? ;
 routineDefinitionStatement: routineSignature statementBlock ;
 functionDefinitionStatement: functionSignature basicStatementBlock ;
 
-adminOpSignature: reqCapList? ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-queryOpSignature: reqCapList? QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-resourceOpSignature: reqCapList? RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
+adminOpSignature: eventArgs? reqCapList? ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+queryOpSignature: eventArgs? reqCapList? QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+resourceOpSignature: eventArgs? reqCapList? RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
+
+eventArgs: EVENT OPEN_PAREN (eventArg (COMMA eventArg)*)? CLOSE_PAREN ;
+eventArg: variableType? ID ;
 
 reqCapList: reqCap+ ;
 reqCap: REQ_CAP OPEN_PAREN basicStatementBlock CLOSE_PAREN ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
-operationFormalParam: NODE_ARG? variableType ID paramReqCap=stringArrayLit?;
+operationFormalParam: NODE_ARG? variableType ID;
 
 formalParamList: (formalParam (COMMA formalParam)*)? ;
 formalParam: variableType ID;

@@ -4,8 +4,12 @@ import static gov.nist.csd.pm.core.util.TestIdGenerator.id;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.epp.EPP;
+import gov.nist.csd.pm.core.epp.EventContext;
+import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
@@ -15,8 +19,10 @@ import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLResourceOperation;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapperWithSuper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.util.TestUserContext;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class OperationTest {
@@ -104,6 +110,34 @@ public class OperationTest {
             pdpTx.executeOperation(res1, new Args());
             return null;
         }));
+    }
+
+    @Test
+    void test_whenArgAddedToEventCtx_argIsAvailableInObligationResponse() throws PMException {
+        String pml = """
+            @eventctx(a, b, string c)
+            resourceop op1(string a, string b)
+           
+            create obligation "o1"
+            when any user
+            performs "op1" on (a, b, c) {
+                return c == "test"
+            }
+            do(ctx) {
+                create pc "pc1"
+            }
+            """;
+        MemoryPAP pap = new TestPAP();
+        pap.bootstrap(new PMLBootstrapperWithSuper(pml));
+        PDP pdp = new PDP(pap);
+        pdp.adjudicateOperation(new UserContext(id("super")), "op1", Map.of("a", "a", "b", "b"));
+        EPP epp = new EPP(pdp, pap);
+        epp.processEvent(new EventContext(
+            new EventContextUser("super"),
+            "op1",
+            Map.of("a", "a", "b", "b", "c", "test")
+        ));
+        assertTrue(pap.query().graph().nodeExists("pc1"));
     }
 
 }

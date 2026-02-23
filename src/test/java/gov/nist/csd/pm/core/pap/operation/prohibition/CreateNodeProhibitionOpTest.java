@@ -51,7 +51,7 @@ class CreateNodeProhibitionOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreateNodeProhibitionOp op = new CreateNodeProhibitionOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "name", "pro1",
                 "node_id", id("ua2"),
                 "arset", List.of("read"),
@@ -78,7 +78,7 @@ class CreateNodeProhibitionOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreateNodeProhibitionOp op = new CreateNodeProhibitionOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "name", "pro1",
                 "node_id", id("ua2"),
                 "arset", List.of("read"),

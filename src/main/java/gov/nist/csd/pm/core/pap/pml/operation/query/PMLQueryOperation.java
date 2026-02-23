@@ -26,6 +26,15 @@ public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements 
         this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, formalParameters, reqCaps);
     }
 
+    public PMLQueryOperation(String name, Type<T> returnType, List<FormalParameter<?>> formalParameters,
+                             List<FormalParameter<?>> eventParameters, List<RequiredCapability> reqCaps) {
+        super(name, returnType, new ArrayList<>(formalParameters), eventParameters, reqCaps);
+
+        this.returnType = returnType;
+        this.pmlFormalParameters = formalParameters;
+        this.signature = new PMLOperationSignature(OperationType.QUERY, name, returnType, formalParameters, eventParameters, reqCaps);
+    }
+
     public PMLQueryOperation(String name, Type<T> returnType, List<RequiredCapability> reqCaps) {
         super(name, returnType, new ArrayList<>(), reqCaps);
 

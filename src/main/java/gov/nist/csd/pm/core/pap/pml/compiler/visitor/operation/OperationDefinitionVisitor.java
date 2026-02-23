@@ -44,6 +44,7 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalParameters(),
+            signature.getEventParameters(),
             signature.getReqCaps(),
             body
         ));
@@ -71,6 +72,7 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
             resourceOpSignature.getName(),
             resourceOpSignature.getReturnType(),
             resourceOpSignature.getFormalParameters(),
+            resourceOpSignature.getEventParameters(),
             resourceOpSignature.getReqCaps(),
             pmlStatementBlock
         ));
@@ -131,6 +133,7 @@ public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefiniti
             signature.getName(),
             signature.getReturnType(),
             signature.getFormalParameters(),
+            signature.getEventParameters(),
             signature.getReqCaps(),
             body
         ));

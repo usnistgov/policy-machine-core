@@ -45,7 +45,7 @@ class SetNodePropertiesOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         SetNodePropertiesOp op = new SetNodePropertiesOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "id", id("o1"),
                 "properties", Map.of("key", "value")
         ));
@@ -69,7 +69,7 @@ class SetNodePropertiesOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         SetNodePropertiesOp op = new SetNodePropertiesOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "id", id("o1"),
                 "properties", Map.of("key", "value")
         ));

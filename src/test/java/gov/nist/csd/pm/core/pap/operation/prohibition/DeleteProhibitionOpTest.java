@@ -61,7 +61,7 @@ class DeleteProhibitionOpTest {
         );
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
-        Args args = op.validateAndPrepareArgs(Map.of("name", "pro1", "node_id", id("ua2"), "inclusion_set", List.of(id("oa1")), "exclusion_set", List.of()));
+        Args args = op.validateArgs(Map.of("name", "pro1", "node_id", id("ua2"), "inclusion_set", List.of(id("oa1")), "exclusion_set", List.of()));
         op.canExecute(pap, new UserContext(id("u1")), args);
     }
 
@@ -91,7 +91,7 @@ class DeleteProhibitionOpTest {
         );
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
-        Args args = op.validateAndPrepareArgs(Map.of("name", "pro1", "node_id", id("ua2"), "inclusion_set", Set.of(id("oa1")), "exclusion_set", Set.of()));
+        Args args = op.validateArgs(Map.of("name", "pro1", "node_id", id("ua2"), "inclusion_set", Set.of(id("oa1")), "exclusion_set", Set.of()));
         assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));
     }
 }

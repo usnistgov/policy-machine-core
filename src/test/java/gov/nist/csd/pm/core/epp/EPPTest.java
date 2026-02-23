@@ -768,4 +768,44 @@ class EPPTest {
         boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
         assertFalse(actual);
     }
+
+    @Test
+    void testSubsetArgsDoMatch() throws PMException {
+        String pml = """
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create ua "ua2" in ["pc1"]
+            create ua "ua3" in ["pc1"]
+            create u "u1" in ["ua2", "ua3"]
+            create u "test" in ["ua1"]
+            associate "ua2" to "ua1" with ["*"]
+            associate "ua3" to "ua2" with ["*"]
+            
+            create obligation "1"
+            when any user
+            performs "assign" on (ascendant) {
+                return ascendant == id("test")
+            }
+            do(ctx) {
+            }
+            """;
+
+        TestPAP pap = new TestPAP();
+        pap.executePML(new UserContext(id("u1")), pml);
+        PDP pdp = new PDP(pap);
+        EPP epp = new EPP(pdp, pap);
+        boolean actual = pdp.runTx(
+            new UserContext(id("u1")),
+            pdpTx -> epp.matches(
+                new UserContext(id("u1")),
+                pdpTx,
+                new EventContext(new EventContextUser("u1"), "assign", Map.of(
+                    "ascendant", id("test"),
+                    "descendants", List.of(id("ua2"))
+                )),
+                pap.query().obligations().getObligation("1").getEventPattern()
+            )
+        );
+        assertTrue(actual);
+    }
 }

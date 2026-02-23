@@ -125,7 +125,7 @@ public class PDPTx implements OperationExecutor {
     private void canExecuteObligationResponse(EventContext eventCtx) throws PMException {
         String opName = eventCtx.opName();
         Operation<?> operation = txExecutor.pap.query().operations().getOperation(opName);
-        Args args = Args.of(operation, eventCtx.args());
+        Args args = operation.validateEventContextArgs(eventCtx.args());
 
         checkRequiredPrivilegesOnEventUser(eventCtx.user(), args);
 

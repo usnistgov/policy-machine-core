@@ -43,7 +43,7 @@ class CreatePolicyClassOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreatePolicyClassOp op = new CreatePolicyClassOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "name", "pc2"
         ));
         op.canExecute(pap, new UserContext(id("u1")), args);
@@ -65,7 +65,7 @@ class CreatePolicyClassOpTest {
         pap.executePML(new UserContext(id("u1")), pml);
 
         CreatePolicyClassOp op = new CreatePolicyClassOp();
-        Args args = op.validateAndPrepareArgs(Map.of(
+        Args args = op.validateArgs(Map.of(
                 "name", "pc2"
         ));
         assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserContext(id("u2")), args));

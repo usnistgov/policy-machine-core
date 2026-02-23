@@ -6,6 +6,8 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpSignatureContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventArgContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventArgsContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpSignatureContext;
@@ -17,7 +19,12 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
 import gov.nist.csd.pm.core.pap.pml.scope.OperationAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.type.TypeResolver;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignature> {
@@ -41,17 +48,19 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
     public PMLOperationSignature visitAdminOpSignature(AdminOpSignatureContext ctx) {
         String funcName = ctx.ID().getText();
         Type<?> returnType = parseReturnType(ctx.returnType);
-        List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
+        List<FormalParameter<?>> formalParameters = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
-        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
+        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, formalParameters).visitReqCapList(ctx.reqCapList());
+        List<FormalParameter<?>> eventParameters = parseEventParameters(ctx.eventArgs(), formalParameters, visitorCtx);
 
-        writeArgsToScope(visitorCtx, args);
+        writeArgsToScope(visitorCtx, formalParameters);
 
         PMLOperationSignature pmlOperationSignature = new PMLOperationSignature(
             OperationType.ADMINOP,
             funcName,
             returnType,
-            args,
+            formalParameters,
+            eventParameters,
             reqCaps
         );
 
@@ -67,6 +76,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
         List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
+        List<FormalParameter<?>> eventParameters = parseEventParameters(ctx.eventArgs(), args, visitorCtx);
 
         writeArgsToScope(visitorCtx, args);
 
@@ -75,6 +85,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             funcName,
             returnType,
             args,
+            eventParameters,
             reqCaps);
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);
@@ -129,6 +140,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
         List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
+        List<FormalParameter<?>> eventParameters = parseEventParameters(ctx.eventArgs(), args, visitorCtx);
 
         writeArgsToScope(visitorCtx, args);
 
@@ -137,11 +149,57 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
             funcName,
             returnType,
             args,
+            eventParameters,
             reqCaps);
 
         addSignatureToCtx(visitorCtx, ctx, funcName, pmlOperationSignature, addToCtx);
 
         return pmlOperationSignature;
+    }
+
+    private List<FormalParameter<?>> parseEventParameters(EventArgsContext ctx,
+                                                      List<FormalParameter<?>> formalParams,
+                                                      VisitorContext visitorCtx) {
+        if (ctx == null) {
+            return new ArrayList<>(formalParams);
+        }
+
+        Map<String, FormalParameter<?>> formalParameters = formalParams.stream()
+            .collect(Collectors.toMap(FormalParameter::getName, fp -> fp));
+
+        List<FormalParameter<?>> result = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+
+        for (EventArgContext eventArgCtx : ctx.eventArg()) {
+            String name = eventArgCtx.ID().getText();
+            if (seen.contains(name)) {
+                visitorCtx.errorLog().addError(eventArgCtx,
+                    String.format("duplicate event arg '%s'", name));
+                continue;
+            }
+            seen.add(name);
+
+            if (eventArgCtx.variableType() != null) { // new
+                if (formalParameters.containsKey(name)) {
+                    visitorCtx.errorLog().addError(eventArgCtx,
+                        String.format("event arg already defined as formal parameter '%s'", name));
+                    continue;
+                }
+
+                Type<?> type = TypeResolver.resolveFromParserCtx(eventArgCtx.variableType());
+                result.add(new FormalParameter<>(name, type));
+            } else { // existing
+                FormalParameter<?> existing = formalParameters.get(name);
+                if (existing == null) {
+                    visitorCtx.errorLog().addError(eventArgCtx,
+                        String.format("event arg '%s' has no type and does not match any formal parameter", name));
+                    continue;
+                }
+                result.add(existing);
+            }
+        }
+
+        return result;
     }
 
     private <U extends ParserRuleContext> void addSignatureToCtx(VisitorContext visitorCtx,
