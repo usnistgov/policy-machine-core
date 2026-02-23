@@ -556,6 +556,20 @@ The `@eventctx` annotation also precedes the operation definition and defines th
 event context as a result of the operation being sent to the EPP. If this annotation is omitted, then the parameters in 
 the operation signature are used. You can add additional params as well as omit certain params found in the signature.
 
+
+```pml
+@reqcap({
+    require ["create"] on ["files"]
+})
+@eventctx(string id, filename)
+resourceop create_file(string filename) { 
+    delete node filename
+}
+```
+
+In the above example, the id param will not be evaluated during adjudication but will bve available in the response
+of an obligation. the filename param will be available in both scenarios.
+
 ### Require Statement
 
 To customize the authorization check for an operation, use the `require` statement.
