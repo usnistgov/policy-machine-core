@@ -32,6 +32,7 @@ import gov.nist.csd.pm.core.pap.query.OperationsQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerier;
+import gov.nist.csd.pm.core.pap.query.SelfAccessQuerier;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
@@ -57,7 +58,8 @@ public class PAP implements OperationExecutor, Transactional {
             new ProhibitionsQuerier(policyStore),
             new ObligationsQuerier(policyStore),
             new OperationsQuerier(policyStore, pluginRegistry),
-            new AccessQuerier(policyStore)
+            new AccessQuerier(policyStore),
+            new SelfAccessQuerier(policyStore)
         );
         this.modifier = new PolicyModifier(
             new GraphModifier(policyStore, new RandomIdGenerator()),

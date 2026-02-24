@@ -6,7 +6,7 @@ import gov.nist.csd.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
-import gov.nist.csd.pm.core.pdp.query.SelfAccessQuery;
+import gov.nist.csd.pm.core.pap.query.SelfAccessQuery;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeAdjacentAscendantPrivilegesRequest;
 import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeAdjacentAscendantPrivilegesResponse;
