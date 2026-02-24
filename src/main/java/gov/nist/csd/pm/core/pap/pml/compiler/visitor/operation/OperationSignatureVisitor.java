@@ -1,23 +1,31 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation;
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.arg.type.VoidType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AdminOpSignatureContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventArgContext;
-import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventArgsContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.AnnotationsContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventCtxAnnotationContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.EventCtxArgContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpSignatureContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ReqCapAnnotationContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ReqCapContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.RoutineSignatureContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.PMLBaseVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLRequiredCapabilityFunc;
 import gov.nist.csd.pm.core.pap.pml.scope.OperationAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.type.TypeResolver;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,8 +58,9 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> formalParameters = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
-        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, formalParameters).visitReqCapList(ctx.reqCapList());
-        List<FormalParameter<?>> eventParameters = parseEventParameters(ctx.eventArgs(), formalParameters, visitorCtx);
+        Annotations annotations = parseAnnotations(ctx.annotations(), formalParameters);
+        List<RequiredCapability> reqCaps = annotations.requiredCapabilities();
+        List<FormalParameter<?>> eventParameters = annotations.eventParameters();
 
         writeArgsToScope(visitorCtx, formalParameters);
 
@@ -75,8 +84,9 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
-        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
-        List<FormalParameter<?>> eventParameters = parseEventParameters(ctx.eventArgs(), args, visitorCtx);
+        Annotations annotations = parseAnnotations(ctx.annotations(), args);
+        List<RequiredCapability> reqCaps = annotations.requiredCapabilities();
+        List<FormalParameter<?>> eventParameters = annotations.eventParameters();
 
         writeArgsToScope(visitorCtx, args);
 
@@ -139,8 +149,9 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         Type<?> returnType = parseReturnType(ctx.returnType);
         List<FormalParameter<?>> args = new FormalParameterListVisitor(visitorCtx)
             .visitOperationFormalParamList(ctx.operationFormalParamList());
-        List<RequiredCapability> reqCaps = new ReqCapListVisitor(visitorCtx, args).visitReqCapList(ctx.reqCapList());
-        List<FormalParameter<?>> eventParameters = parseEventParameters(ctx.eventArgs(), args, visitorCtx);
+        Annotations annotations = parseAnnotations(ctx.annotations(), args);
+        List<RequiredCapability> reqCaps = annotations.requiredCapabilities();
+        List<FormalParameter<?>> eventParameters = annotations.eventParameters();
 
         writeArgsToScope(visitorCtx, args);
 
@@ -157,7 +168,41 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         return pmlOperationSignature;
     }
 
-    private List<FormalParameter<?>> parseEventParameters(EventArgsContext ctx,
+    private record Annotations(List<FormalParameter<?>> eventParameters, List<RequiredCapability> requiredCapabilities) {}
+
+    private Annotations parseAnnotations(List<AnnotationsContext> annotations, List<FormalParameter<?>> formalParams) {
+        List<FormalParameter<?>> eventParams = null;
+        List<RequiredCapability> reqCaps = new ArrayList<>();
+
+        for (AnnotationsContext annotationsContext : annotations) {
+            if (annotationsContext instanceof EventCtxAnnotationContext eventCtxAnnotationCtx) {
+                if (eventParams != null) {
+                    throw new PMLCompilationRuntimeException("only one @eventctx annotation allowed");
+                }
+
+                eventParams = parseEventParameters(eventCtxAnnotationCtx, formalParams, visitorCtx);
+            } else if (annotationsContext instanceof ReqCapAnnotationContext reqCapAnnotationCtx) {
+                RequiredCapability requiredCapability = parseReqCap(reqCapAnnotationCtx.reqCap(), formalParams);
+                reqCaps.add(requiredCapability);
+            }
+        }
+
+        return new Annotations(eventParams, reqCaps);
+    }
+
+    private RequiredCapability parseReqCap(ReqCapContext ctx, List<FormalParameter<?>> formalParams) {
+        PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseBasicStatementBlock(
+            visitorCtx,
+            ctx.basicStatementBlock(),
+            VOID_TYPE,
+            formalParams,
+            true
+        );
+
+        return new PMLRequiredCapabilityFunc(pmlStatementBlock);
+    }
+
+    private List<FormalParameter<?>> parseEventParameters(EventCtxAnnotationContext ctx,
                                                       List<FormalParameter<?>> formalParams,
                                                       VisitorContext visitorCtx) {
         if (ctx == null) {
@@ -170,7 +215,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         List<FormalParameter<?>> result = new ArrayList<>();
         Set<String> seen = new HashSet<>();
 
-        for (EventArgContext eventArgCtx : ctx.eventArg()) {
+        for (EventCtxArgContext eventArgCtx : ctx.eventCtxArgs().eventCtxArg()) {
             String name = eventArgCtx.ID().getText();
             if (seen.contains(name)) {
                 visitorCtx.errorLog().addError(eventArgCtx,

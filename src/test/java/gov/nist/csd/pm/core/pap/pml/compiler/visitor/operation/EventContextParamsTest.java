@@ -21,6 +21,10 @@ public class EventContextParamsTest {
         String pml = """
             @eventctx(a, b, string c)
             resourceop op1(string a, string b)
+            @eventctx(a, string c)
+            resourceop op2(string a, string b)
+            @eventctx(a)
+            resourceop op3(string a, string b)
             """;
 
         TestPAP testPAP = new TestPAP();

@@ -43,7 +43,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         this.name = name;
         this.returnType = returnType;
         this.formalParameters = formalParameters;
-        this.eventParameters = eventParameters;
+        this.eventParameters = eventParameters == null ? new ArrayList<>(formalParameters) : eventParameters;
         this.reqCaps = reqCaps;
     }
 
