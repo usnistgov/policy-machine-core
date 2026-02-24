@@ -2,13 +2,7 @@ package gov.nist.csd.pm.core.impl.grpc.client;
 
 import static gov.nist.csd.pm.core.impl.grpc.client.GrpcHeaders.buildHeaders;
 
-import gov.nist.csd.pm.core.pap.query.AccessQuery;
-import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
-import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
-import gov.nist.csd.pm.core.pdp.query.SelfAccessQuery;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;

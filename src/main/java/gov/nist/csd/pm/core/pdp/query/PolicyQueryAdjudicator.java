@@ -41,6 +41,7 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
         return access;
     }
 
+    @Override
     public SelfAccessQueryAdjudicator selfAccess() {
         return selfAccess;
     }

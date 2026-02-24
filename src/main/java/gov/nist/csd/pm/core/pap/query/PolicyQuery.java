@@ -11,6 +11,11 @@ public interface PolicyQuery {
     AccessQuery access();
 
     /**
+     * @return The AccessQuery implementation.
+     */
+    SelfAccessQuery selfAccess();
+
+    /**
      * @return The GraphQuery implementation.
      */
     GraphQuery graph();
