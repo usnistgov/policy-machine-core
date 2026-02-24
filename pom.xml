@@ -78,7 +78,7 @@
                         com.google.protobuf:protoc:4.28.2:exe:${os.detected.classifier}
                     </protocArtifact>
                     <pluginArtifact>
-                        io.grpc:protoc-gen-grpc-java:1.71.0:exe:${os.detected.classifier}
+                        io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
                     </pluginArtifact>
                 </configuration>
                 <executions>
@@ -117,7 +117,7 @@
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-bom</artifactId>
-                <version>1.71.0</version>
+                <version>${grpc.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -196,14 +196,17 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
         </dependency>
     </dependencies>
 
     <properties>
         <antlr.version>4.13.1</antlr.version>
+        <grpc.version>1.71.0</grpc.version>
     </properties>
 </project>
