@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
-class ReqCapListVisitorTest {
+class ReqCapVisitorTest {
 
     @Test
     void testCallFunctionInReqCap() throws PMException {

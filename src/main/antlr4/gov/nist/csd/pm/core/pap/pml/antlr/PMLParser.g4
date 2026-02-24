@@ -140,16 +140,19 @@ resourceOpDefinitionStatement: resourceOpSignature basicStatementBlock? ;
 routineDefinitionStatement: routineSignature statementBlock ;
 functionDefinitionStatement: functionSignature basicStatementBlock ;
 
-adminOpSignature: eventArgs? reqCapList? ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-queryOpSignature: eventArgs? reqCapList? QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
-resourceOpSignature: eventArgs? reqCapList? RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
+adminOpSignature: annotations* ADMIN_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+queryOpSignature: annotations* QUERY ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType? ;
+resourceOpSignature: annotations* RESOURCE_OP ID OPEN_PAREN operationFormalParamList CLOSE_PAREN returnType=variableType?;
 routineSignature: ROUTINE ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 functionSignature: FUNCTION ID OPEN_PAREN formalParamList CLOSE_PAREN returnType=variableType? ;
 
-eventArgs: EVENT OPEN_PAREN (eventArg (COMMA eventArg)*)? CLOSE_PAREN ;
-eventArg: variableType? ID ;
+annotations:
+  eventCtxArgs #EventCtxAnnotation
+  | reqCap #ReqCapAnnotation
+  ;
+eventCtxArgs: EVENT_CTX OPEN_PAREN (eventCtxArg (COMMA eventCtxArg)*)? CLOSE_PAREN ;
+eventCtxArg: variableType? ID ;
 
-reqCapList: reqCap+ ;
 reqCap: REQ_CAP OPEN_PAREN basicStatementBlock CLOSE_PAREN ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
@@ -288,4 +291,5 @@ idIndex:
     | NIL_LIT
     | TRUE
     | FALSE
+    | EVENT_CTX
     ;
