@@ -64,18 +64,16 @@ eventPattern:
 // subject
 subjectPattern:
     ANY USER #AnyUserPattern
-    | USER subjectPatternExpression #UserPattern;
+    | subjectPatternExpression #UserPattern;
 
 subjectPatternExpression:
-    basicSubjectPatternExpr #BasicSubjectPatternExpression
-    | EXCLAMATION subjectPatternExpression #NegateSubjectPatternExpression
+    EXCLAMATION subjectPatternExpression #NegateSubjectPatternExpression
     | OPEN_PAREN subjectPatternExpression CLOSE_PAREN #ParenSubjectPatternExpression
-    | left=subjectPatternExpression (LOGICAL_AND | LOGICAL_OR) right=subjectPatternExpression #LogicalSubjectPatternExpression ;
-
-basicSubjectPatternExpr:
-    IN stringLit #InSubject
-    | stringLit #UsernameSubject
-    | PROCESS stringLit #ProcessSubject ;
+    | left=subjectPatternExpression (LOGICAL_AND | LOGICAL_OR) right=subjectPatternExpression #LogicalSubjectPatternExpression
+    | USER expression #UsernameSubject
+    | PROCESS expression #ProcessSubject
+    | USER IN expression #InSubject
+    ;
 
 // operation
 operationPattern:

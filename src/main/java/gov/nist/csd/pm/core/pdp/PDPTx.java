@@ -114,12 +114,12 @@ public class PDPTx implements OperationExecutor {
      * @param response The obligation response to execute.
      * @throws PMException If an exception occurs while executing the obligation response.
      */
-    public void executeObligationResponse(EventContext eventCtx, ObligationResponse response) throws PMException {
+    public void executeObligationResponse(EventContext eventCtx, ExecutionContext execCtx, ObligationResponse response) throws PMException {
         // check that the user has any privileges on the event context nodes to avoid leaking information
         canExecuteObligationResponse(eventCtx);
 
         // execute response
-        response.execute(txExecutor, txExecutor.userCtx, eventCtx);
+        response.execute(execCtx, eventCtx);
     }
 
     private void canExecuteObligationResponse(EventContext eventCtx) throws PMException {
@@ -320,7 +320,7 @@ public class PDPTx implements OperationExecutor {
 
         @Override
         public ExecutionContext copy() throws PMException {
-            return new PDPExecutionContext(author, pdpTx, scope);
+            return new PDPExecutionContext(author, pdpTx, scope.copy());
         }
 
         @Override

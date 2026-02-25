@@ -2,30 +2,27 @@ package gov.nist.csd.pm.core.pap.obligation.event.subject;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EventContextUser;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
 public class ProcessSubjectPatternExpression extends SubjectPatternExpression {
 
-    private final String process;
+    private final Expression<String> process;
 
-    public ProcessSubjectPatternExpression(StringLiteralExpression process) {
-        this.process = process.getValue();
-    }
-
-    public ProcessSubjectPatternExpression(String process) {
+    public ProcessSubjectPatternExpression(Expression<String> process) {
         this.process = process;
     }
 
     @Override
-    public boolean matches(EventContextUser value, PolicyQuery query) throws PMException {
-        return value.getProcess().equals(process);
+    public boolean matches(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
+        return user.getProcess().equals(this.process.execute(ctx, pap));
     }
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return "process \"" + (process) + "\"";
+        return "process " + process.toFormattedString(0);
     }
 
     @Override

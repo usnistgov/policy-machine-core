@@ -104,18 +104,13 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
         }
 
         @Override
-        public SubjectPatternExpression visitBasicSubjectPatternExpression(PMLParser.BasicSubjectPatternExpressionContext ctx) {
-            return visit(ctx.basicSubjectPatternExpr());
+        public SubjectPatternExpression visitNegateSubjectPatternExpression(PMLParser.NegateSubjectPatternExpressionContext ctx) {
+            return new NegateSubjectPatternExpression(visit(ctx.subjectPatternExpression()));
         }
 
         @Override
         public SubjectPatternExpression visitParenSubjectPatternExpression(PMLParser.ParenSubjectPatternExpressionContext ctx) {
             return new ParenSubjectPatternExpression(visit(ctx.subjectPatternExpression()));
-        }
-
-        @Override
-        public SubjectPatternExpression visitNegateSubjectPatternExpression(PMLParser.NegateSubjectPatternExpressionContext ctx) {
-            return new NegateSubjectPatternExpression(visit(ctx.subjectPatternExpression()));
         }
 
         @Override
@@ -128,18 +123,18 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
         }
 
         @Override
-        public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
-            return new InSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit()));
-        }
-
-        @Override
         public SubjectPatternExpression visitUsernameSubject(PMLParser.UsernameSubjectContext ctx) {
-            return new UsernamePatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit()));
+            return new UsernamePatternExpression(ExpressionVisitor.compile(visitorCtx, ctx.expression(), STRING_TYPE));
         }
 
         @Override
         public SubjectPatternExpression visitProcessSubject(PMLParser.ProcessSubjectContext ctx) {
-            return new ProcessSubjectPatternExpression(ExpressionVisitor.removeQuotes(ctx.stringLit()));
+            return new ProcessSubjectPatternExpression(ExpressionVisitor.compile(visitorCtx, ctx.expression(), STRING_TYPE));
+        }
+
+        @Override
+        public SubjectPatternExpression visitInSubject(PMLParser.InSubjectContext ctx) {
+            return new InSubjectPatternExpression(ExpressionVisitor.compile(visitorCtx, ctx.expression(), STRING_TYPE));
         }
     }
 

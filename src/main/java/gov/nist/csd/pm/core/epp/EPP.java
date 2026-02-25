@@ -1,6 +1,8 @@
 package gov.nist.csd.pm.core.epp;
 
 
+import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+
 import gov.nist.csd.pm.core.common.event.EventSubscriber;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -10,6 +12,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OnPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
@@ -20,6 +23,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -52,12 +56,17 @@ public class EPP implements EventSubscriber {
             UserContext authorCtx = new UserContext(author);
 
             pdp.runTx(authorCtx, pdpTx -> {
-                if (!matches(authorCtx, pdpTx, eventCtx, obligation.getEventPattern())) {
+                // create an execution context with the event context in scope - all other vars and ops are pre loaded
+                ExecutionContext executionContext = pdpTx.buildExecutionContext(authorCtx);
+                executionContext.scope().addVariable("ctx", eventCtx.toMap());
+
+                // pass a copy of the execution context so the scope does not propagate
+                if (!matches(authorCtx, pdpTx, eventCtx, executionContext.copy(), obligation.getEventPattern())) {
                     return null;
                 }
 
                 // execute the obligation response as the stored author
-                pdpTx.executeObligationResponse(eventCtx, obligation.getResponse());
+                pdpTx.executeObligationResponse(eventCtx, executionContext.copy(), obligation.getResponse());
 
                 return null;
             });
@@ -65,17 +74,36 @@ public class EPP implements EventSubscriber {
         }
     }
 
-    protected boolean matches(UserContext userCtx, PDPTx pdpTx, EventContext eventCtx, EventPattern eventPattern) throws PMException {
-        return eventPattern.getSubjectPattern().matches(eventCtx.user(), pdpTx.query()) &&
-            operationMatches(userCtx, pdpTx, eventCtx.opName(), eventCtx.args(), eventPattern);
+    protected boolean matches(UserContext userCtx,
+                              PDPTx pdpTx,
+                              EventContext eventCtx,
+                              ExecutionContext executionContext,
+                              EventPattern eventPattern) throws PMException {
+        return subjectMatches(pdpTx, executionContext, eventCtx.user(), eventPattern.getSubjectPattern()) &&
+            operationMatches(userCtx, pdpTx, executionContext, eventCtx.opName(), eventCtx.args(), eventPattern.getOperationPattern());
+    }
+
+    private boolean subjectMatches(PDPTx pdpTx,
+                                   ExecutionContext executionContext,
+                                   EventContextUser eventContextUser,
+                                   SubjectPattern subjectPattern) throws PMException {
+        PMLRoutine<?> routine = new PMLRoutine<>("subject_matches", BOOLEAN_TYPE, List.of()) {
+            @Override
+            public Boolean execute(PAP pap, Args args) throws PMException {
+                return subjectPattern.matches(eventContextUser, executionContext, pap);
+            }
+        };
+
+        routine.setCtx(executionContext);
+        return (boolean) pdpTx.executeOperation(routine, new Args());
     }
 
     private boolean operationMatches(UserContext userCtx,
                                      PDPTx pdpTx,
+                                     ExecutionContext executionContext,
                                      String opName,
                                      Map<String, Object> args,
-                                     EventPattern eventPattern) throws PMException {
-        OperationPattern operationPattern = eventPattern.getOperationPattern();
+                                     OperationPattern operationPattern) throws PMException {
         if (operationPattern instanceof AnyOperationPattern) {
             return true;
         }
@@ -85,11 +113,12 @@ public class EPP implements EventSubscriber {
             return false;
         }
 
-        return argsMatch(userCtx, pdpTx, opName, args, matchesOpPattern.getOnPattern());
+        return argsMatch(userCtx, pdpTx, executionContext, opName, args, matchesOpPattern.getOnPattern());
     }
 
     private boolean argsMatch(UserContext userCtx,
                               PDPTx pdpTx,
+                              ExecutionContext executionContext,
                               String opName,
                               Map<String, Object> rawArgs,
                               OnPattern onPattern) throws PMException {
@@ -105,7 +134,6 @@ public class EPP implements EventSubscriber {
 
         // execute the matching operation to determine if event context args match the pattern
         // use the pdptx so that any calls to the querier have privilege checks
-        ExecutionContext executionContext = pdpTx.buildExecutionContext(userCtx);
         matchFunc.setCtx(executionContext);
         return (boolean) pdpTx.executeOperation(matchFunc, args);
     }
