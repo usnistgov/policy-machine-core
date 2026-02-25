@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.operation.param.NodeFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -83,7 +84,7 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         this.requiredCapabilities.add(requiredCapability);
         this.requiredCapabilities.addAll(List.of(requiredCapabilities));
     }
-    
+
     /**
      * Execute the function with the given arguments and PAP object. This method allows for modification and querying of
      * the underlying policy.
@@ -115,27 +116,38 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
     }
 
     /**
-     * Convert the given map of raw args to an Arg object with type checking on arg values.
+     * Convert the given map of raw args to an Arg object with type checking on arg values. Only NodeFormalParameters
+     * are required.
      * @param rawArgs The raw args to validate and prepare.
      * @return An Args object.
      */
     public Args validateArgs(Map<String, Object> rawArgs) {
         Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
-        Set<String> parameterNames = new HashSet<>(parameters.stream().map(FormalParameter::getName).toList());
+        Set<String> allParamNames = new HashSet<>(parameters.stream().map(FormalParameter::getName).toList());
+        Set<String> requiredParamNames = new HashSet<>(parameters.stream()
+            .filter(p -> p instanceof NodeFormalParameter)
+            .map(FormalParameter::getName)
+            .toList());
 
-        // check for required args
-        if (!rawArgNames.containsAll(parameterNames) || !parameterNames.containsAll(rawArgNames)) {
-            throw new IllegalArgumentException("expected args " + parameterNames + ", received " + rawArgNames);
+        // check for unexpected args
+        if (!allParamNames.containsAll(rawArgNames)) {
+            throw new IllegalArgumentException("unexpected args " + rawArgNames + ", expected " + allParamNames);
+        }
+
+        // check for required args (NodeFormalParameters only)
+        if (!rawArgNames.containsAll(requiredParamNames)) {
+            throw new IllegalArgumentException("required args " + requiredParamNames + ", received " + rawArgNames);
         }
 
         Map<String, FormalParameter<?>> paramMap = parameters.stream()
             .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
+
         return new Args(buildTypeSafeArgs(rawArgs, paramMap));
     }
 
     /**
      * Convert the given map of raw args to an Arg object with type checking on arg values. This method allows a subset
-     * of the exepcted event parameters to be present in the rawArgs.
+     * of the expected event parameters to be present in the rawArgs.
      * @param rawArgs The raw args to validate and prepare.
      * @return An Args object.
      */
@@ -143,13 +155,14 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
         Set<String> eventParamNames = new HashSet<>(eventParameters.stream().map(FormalParameter::getName).toList());
 
-        // error on unexpected args - ok if not all required args
+        // error on unexpected args - ok if not all args
         if (!eventParamNames.containsAll(rawArgNames)) {
             throw new IllegalArgumentException("expected subset of event context args " + eventParamNames + ", received " + rawArgNames);
         }
 
         Map<String, FormalParameter<?>> paramMap = eventParameters.stream()
             .collect(Collectors.toMap(FormalParameter::getName, java.util.function.Function.identity()));
+
         return new Args(buildTypeSafeArgs(rawArgs, paramMap));
     }
 
