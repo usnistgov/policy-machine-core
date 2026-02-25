@@ -23,7 +23,7 @@ public class UsernamePatternExpression extends SubjectPatternExpression {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return "\"" + user + "\"";
+        return "user " + user.toFormattedString(0);
     }
 
     @Override

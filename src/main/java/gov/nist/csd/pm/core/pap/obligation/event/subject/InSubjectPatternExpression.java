@@ -35,7 +35,7 @@ public class InSubjectPatternExpression extends SubjectPatternExpression {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return "in \"" + container + "\"";
+        return "user in " + container.toFormattedString(0);
     }
 
     @Override
