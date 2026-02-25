@@ -2,8 +2,9 @@ package gov.nist.csd.pm.core.pap.obligation.event.subject;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EventContextUser;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -32,20 +33,22 @@ public class SubjectPattern implements Serializable, PMLStatementSerializable {
 
     /**
      * Returns true if the given value matches this pattern. If the value is null, then return false.
-     * @param value The value to check against this pattern.
-     * @param query The PolicyQuery object to get policy information relevant to the value and pattern.
+     *
+     * @param user the user.
+     * @param ctx
+     * @param pap  The PolicyQuery object to get policy information relevant to the value and pattern.
      * @return True if the value matches this pattern.
      */
-    public boolean matches(EventContextUser value, PolicyQuery query) throws PMException {
-        if (value == null) {
+    public boolean matches(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
+        if (user == null) {
             return false;
         }
 
-        return matchesInternal(value, query);
+        return matchesInternal(user, ctx, pap);
     }
 
-    public boolean matchesInternal(EventContextUser value, PolicyQuery query) throws PMException {
-        return isAny || subjectPatternExpression.matches(value, query);
+    public boolean matchesInternal(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
+        return isAny || subjectPatternExpression.matches(user, ctx, pap);
     }
 
     @Override

@@ -2,7 +2,8 @@ package gov.nist.csd.pm.core.pap.obligation.event.subject;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EventContextUser;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
@@ -30,9 +31,9 @@ public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
     }
 
     @Override
-    public boolean matches(EventContextUser value, PolicyQuery query) throws PMException {
-        return isAnd ? left.matches(value, query) && right.matches(value, query)
-                : left.matches(value, query) || right.matches(value, query);
+    public boolean matches(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
+        return isAnd ? left.matches(user, ctx, pap) && right.matches(user, ctx, pap)
+                : left.matches(user, ctx,  pap) || right.matches(user, ctx, pap);
     }
 
     @Override

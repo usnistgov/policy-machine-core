@@ -487,7 +487,7 @@ class EPPTest {
     @Test
     void testUserAttributesMatches() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new InSubjectPatternExpression("ua2")),
+            new SubjectPattern(new InSubjectPatternExpression(new StringLiteralExpression("ua2"))),
             new AnyOperationPattern()
         );
 
@@ -505,7 +505,8 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertTrue(actual);
 
     }
@@ -513,7 +514,7 @@ class EPPTest {
     @Test
     void testUserAttributesNotMatches() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new InSubjectPatternExpression("ua1")),
+            new SubjectPattern(new InSubjectPatternExpression(new StringLiteralExpression("ua1"))),
             new AnyOperationPattern()
         );
 
@@ -531,7 +532,8 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertFalse(actual);
     }
 
@@ -554,7 +556,8 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertTrue(actual);
     }
 
@@ -582,14 +585,15 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertFalse(actual);
     }
 
     @Test
     void testUserDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePatternExpression("u2")),
+            new SubjectPattern(new UsernamePatternExpression(new StringLiteralExpression("u2"))),
             new AnyOperationPattern()
         );
 
@@ -610,7 +614,8 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertFalse(actual);
     }
 
@@ -618,8 +623,8 @@ class EPPTest {
     void testUserAndProcessMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePatternExpression("u1"),
-                new ProcessSubjectPatternExpression("p1"),
+                new UsernamePatternExpression(new StringLiteralExpression("u1")),
+                new ProcessSubjectPatternExpression(new StringLiteralExpression("p1")),
                 false
             )),
             new AnyOperationPattern()
@@ -636,7 +641,8 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         UserContext userCtx = new UserContext(id("u1"), "");
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertTrue(actual);
     }
 
@@ -644,8 +650,8 @@ class EPPTest {
     void testUserMatchesProcessDoesNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePatternExpression("u1"),
-                new ProcessSubjectPatternExpression("p1"),
+                new UsernamePatternExpression(new StringLiteralExpression("u1")),
+                new ProcessSubjectPatternExpression(new StringLiteralExpression("p1")),
                 false
             )),
             new AnyOperationPattern()
@@ -662,7 +668,8 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         UserContext userCtx = new UserContext(id("u1"), "p2");
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertTrue(actual);
     }
 
@@ -670,8 +677,8 @@ class EPPTest {
     void testUserAndProcessDoNotMatch() throws PMException {
         EventPattern eventPattern = new EventPattern(
             new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePatternExpression("u2"),
-                new ProcessSubjectPatternExpression("p1"),
+                new UsernamePatternExpression(new StringLiteralExpression("u2")),
+                new ProcessSubjectPatternExpression(new StringLiteralExpression("p1")),
                 false
             )),
             new AnyOperationPattern()
@@ -688,7 +695,8 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         UserContext userCtx = new UserContext(id("u1"), "");
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertFalse(actual);
     }
 
@@ -697,7 +705,7 @@ class EPPTest {
         CompileScope testCompileScope = new CompileScope(new MemoryPAP());
         testCompileScope.addVariable("ascendant", new Variable("ascendant", LONG_TYPE, false));
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePatternExpression("u1")),
+            new SubjectPattern(new UsernamePatternExpression(new StringLiteralExpression("u1"))),
             new MatchesOperationPattern(
                 "assign",
                 Set.of("ascendant"),
@@ -728,7 +736,8 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertTrue(actual);
     }
 
@@ -738,7 +747,7 @@ class EPPTest {
         testCompileScope.addVariable("ascendant", new Variable("ascendant", LONG_TYPE, false));
 
         EventPattern eventPattern = new EventPattern(
-            new SubjectPattern(new UsernamePatternExpression("u1")),
+            new SubjectPattern(new UsernamePatternExpression(new StringLiteralExpression("u1"))),
             new MatchesOperationPattern(
                 "e1",
                 Set.of("ascendant", "descendants"),
@@ -765,7 +774,8 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, eventPattern));
+        boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
+            eventPattern));
         assertFalse(actual);
     }
 
@@ -803,7 +813,7 @@ class EPPTest {
                     "ascendant", id("test"),
                     "descendants", List.of(id("ua2"))
                 )),
-                pap.query().obligations().getObligation("1").getEventPattern()
+                pdpTx.buildExecutionContext(new UserContext(id("u1"))), pap.query().obligations().getObligation("1").getEventPattern()
             )
         );
         assertTrue(actual);

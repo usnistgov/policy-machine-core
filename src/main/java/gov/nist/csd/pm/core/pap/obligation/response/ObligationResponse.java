@@ -36,7 +36,7 @@ public class ObligationResponse implements Serializable {
         return stmts;
     }
 
-    public void execute(PAP pap, UserContext author, EventContext evtCtx) throws PMException {
+    public void execute(ExecutionContext executionCtx, EventContext evtCtx) throws PMException {
         Args args = new Args();
 
         FormalParameter<Map<String, Object>> eventCtxParam = new FormalParameter<>(
@@ -44,9 +44,7 @@ public class ObligationResponse implements Serializable {
             MapType.of(STRING_TYPE, ANY_TYPE)
         );
 
-        args.put(eventCtxParam, eventCtxToMap(evtCtx));
-
-        ExecutionContext executionCtx = pap.buildExecutionContext(author);
+        args.put(eventCtxParam, evtCtx.toMap());
         executionCtx.executeStatements(stmts, args);
     }
 
@@ -65,16 +63,5 @@ public class ObligationResponse implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(stmts, eventCtxVariable);
-    }
-
-    private Map<String, Object> eventCtxToMap(EventContext eventCtx) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("user", eventCtx.user().getName());
-        map.put("attrs", eventCtx.user().getAttrs());
-        map.put("process", eventCtx.user().getProcess());
-        map.put("opName", eventCtx.opName());
-        map.put("args", eventCtx.args());
-
-        return map;
     }
 }

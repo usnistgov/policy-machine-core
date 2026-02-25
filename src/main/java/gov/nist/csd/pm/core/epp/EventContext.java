@@ -6,11 +6,23 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public record EventContext(EventContextUser user, String opName, Map<String, Object> args) {
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("user", user.getName());
+        map.put("attrs", user.getAttrs());
+        map.put("process", user.getProcess());
+        map.put("opName", opName);
+        map.put("args", args);
+
+        return map;
+    }
 
     @Override
     public boolean equals(Object o) {

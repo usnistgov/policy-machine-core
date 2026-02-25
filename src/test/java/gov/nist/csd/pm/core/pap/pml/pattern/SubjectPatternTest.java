@@ -17,6 +17,8 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.ParenSubjectPatternExpr
 import gov.nist.csd.pm.core.pap.obligation.event.subject.ProcessSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpression;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -31,11 +33,12 @@ class SubjectPatternTest {
     void testSubjectPattern() throws PMException {
         MemoryPAP pap = new TestPAP();
         SubjectPattern pattern = new SubjectPattern();
-        assertTrue(pattern.matches(new EventContextUser("test"), pap.query()));
+        ExecutionContext executionContext = pap.buildExecutionContext(null);
+        assertTrue(pattern.matches(new EventContextUser("test"), executionContext, pap));
 
-        pattern = new SubjectPattern(new UsernamePatternExpression("test"));
-        assertTrue(pattern.matches(new EventContextUser("test"), pap.query()));
-        assertFalse(pattern.matches(new EventContextUser("test1"), pap.query()));
+        pattern = new SubjectPattern(new UsernamePatternExpression(new StringLiteralExpression("test")));
+        assertTrue(pattern.matches(new EventContextUser("test"), executionContext, pap));
+        assertFalse(pattern.matches(new EventContextUser("test1"), executionContext, pap));
     }
 
     @Test
@@ -53,9 +56,10 @@ class SubjectPatternTest {
                 performs any operation
                 do(ctx) { }
                 """;
+        ExecutionContext executionContext = pap.buildExecutionContext(null);
         CreateObligationStatement stmt = PatternTestUtil.compileTestCreateObligationStatement(pap, pml);
         assertEquals(new SubjectPattern(), stmt.getEventPattern().getSubjectPattern());
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), pap.query()));
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), executionContext, pap));
 
         pml = """
                 create obligation "ob1" 
@@ -64,54 +68,54 @@ class SubjectPatternTest {
                     do(ctx) { }
                 """;
         stmt = PatternTestUtil.compileTestCreateObligationStatement(pap, pml);
-        assertEquals(new SubjectPattern(new UsernamePatternExpression("u1")), stmt.getEventPattern().getSubjectPattern());
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), pap.query()));
+        assertEquals(new SubjectPattern(new UsernamePatternExpression(new StringLiteralExpression("u1"))), stmt.getEventPattern().getSubjectPattern());
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), executionContext, pap));
 
         pml = """
                 create obligation "ob1"
-                    when user "u1" || "u2"
+                    when user "u1" || user "u2"
                     performs any operation
                     do(ctx) { }
                 """;
         stmt = PatternTestUtil.compileTestCreateObligationStatement(pap, pml);
         assertEquals(new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePatternExpression("u1"),
-                new UsernamePatternExpression("u2"),
+                new UsernamePatternExpression(new StringLiteralExpression("u1")),
+                new UsernamePatternExpression(new StringLiteralExpression("u2")),
                 false
         )), stmt.getEventPattern().getSubjectPattern());
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), pap.query()));
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), executionContext, pap));
 
         pml = """
                 create obligation "ob1"
-                    when user "u1" && in "ua2"
+                    when user "u1" && user in "ua2"
                     performs any operation
                     do(ctx) { }
                 """;
         stmt = PatternTestUtil.compileTestCreateObligationStatement(pap, pml);
         assertEquals(new SubjectPattern(new LogicalSubjectPatternExpression(
-                new UsernamePatternExpression("u1"),
-                new InSubjectPatternExpression("ua2"),
+                new UsernamePatternExpression(new StringLiteralExpression("u1")),
+                new InSubjectPatternExpression(new StringLiteralExpression("ua2")),
                 true
         )), stmt.getEventPattern().getSubjectPattern());
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), pap.query()));
-        assertFalse(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u2"), pap.query()));
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), executionContext, pap));
+        assertFalse(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u2"), executionContext, pap));
 
         pml = """
                 create obligation "ob1"
-                    when user !in "ua1"
+                    when !user in "ua1"
                     performs any operation
                     do(ctx) { }
                 """;
         stmt = PatternTestUtil.compileTestCreateObligationStatement(pap, pml);
         assertEquals(new SubjectPattern(new NegateSubjectPatternExpression(
-                new InSubjectPatternExpression("ua1")
+                new InSubjectPatternExpression(new StringLiteralExpression("ua1"))
         )), stmt.getEventPattern().getSubjectPattern());
-        assertFalse(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), pap.query()));
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u2"), pap.query()));
+        assertFalse(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), executionContext, pap));
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u2"), executionContext, pap));
 
         pml = """
                 create obligation "ob1"
-                    when user ("u1" && in "ua2") || "u2"
+                    when (user "u1" && user in "ua2") || user "u2"
                     performs any operation
                     do(ctx) { }
                 """;
@@ -119,27 +123,27 @@ class SubjectPatternTest {
         assertEquals(new SubjectPattern(new LogicalSubjectPatternExpression(
                 new ParenSubjectPatternExpression(
                         new LogicalSubjectPatternExpression(
-                                new UsernamePatternExpression("u1"),
-                                new InSubjectPatternExpression("ua2"),
+                                new UsernamePatternExpression(new StringLiteralExpression("u1")),
+                                new InSubjectPatternExpression(new StringLiteralExpression("ua2")),
                                 true
                         )
                 ),
-                new UsernamePatternExpression("u2"),
+                new UsernamePatternExpression(new StringLiteralExpression("u2")),
                 false
         )), stmt.getEventPattern().getSubjectPattern());
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), pap.query()));
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u2"), pap.query()));
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1"), executionContext, pap));
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u2"), executionContext, pap));
 
         pml = """
                 create obligation "ob1"
-                    when user process "p1"
+                    when process "p1"
                     performs any operation
                     do(ctx) { }
                 """;
         stmt = PatternTestUtil.compileTestCreateObligationStatement(pap, pml);
-        assertEquals(new SubjectPattern(new ProcessSubjectPatternExpression("p1")), stmt.getEventPattern().getSubjectPattern());
-        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1", "p1"), pap.query()));
-        assertFalse(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1", "p2"), pap.query()));
+        assertEquals(new SubjectPattern(new ProcessSubjectPatternExpression(new StringLiteralExpression("p1"))), stmt.getEventPattern().getSubjectPattern());
+        assertTrue(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1", "p1"), executionContext, pap));
+        assertFalse(stmt.getEventPattern().getSubjectPattern().matches(new EventContextUser("u1", "p2"), executionContext, pap));
     }
 
     @Test

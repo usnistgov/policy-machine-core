@@ -455,15 +455,15 @@ Define the obligation subject pattern using 4 available patterns: `any user`, `<
 when any user           // any user
 when user "u1"          // a user
 when user in "ua1"      // any user ascendant of a user attribute
-when user process "123" // a process
+when process "123" // a process
 ```
 
 **Logical operators** can be used to define the subject pattern.
 
 ```pml
-when user "u1" || "u2"           // u1 or u2   
-when user in "ua1" && !"u2"      // user ascendant of ua1 AND not u2
-when user (in "ua1" || in "ua2") // user ascendant of ua1 OR ua2
+when user "u1" || user "u2"           // u1 or u2   
+when user in "ua1" && ! user "u2"     // user ascendant of ua1 AND not u2
+when (user in "ua1" || user in "ua2") // user ascendant of ua1 OR ua2
 ```
 
 #### Operation Patterns
@@ -471,13 +471,14 @@ when user (in "ua1" || in "ua2") // user ascendant of ua1 OR ua2
 Define the operation(s) that trigger the obligation. See [Query Operation](#query-operation).
 
 ```pml
-performs any operation                       // any operation
-
-performs assign                              // specific operation
-
+performs any operation                        // any operation
+performs assign                               // specific operation
 performs assign on (ascendant, descendants) { // with argument matching
-	// this is an anonymous query operation that uses the provided args from the matched operation defined above
-	// this query op should return a bool value to indicate if the evnt matches or not.
+	// this is an anonymous query operation that 
+	// uses the provided args from the matched 
+	// operation defined above this query op 
+	// should return a bool value to indicate 
+	// if the evnt matches or not.
 	// Example:
 	
 	ascName := name(ascendant)

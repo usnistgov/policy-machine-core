@@ -2,34 +2,34 @@ package gov.nist.csd.pm.core.pap.obligation.event.subject;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EventContextUser;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import java.util.Objects;
 
 public class InSubjectPatternExpression extends SubjectPatternExpression {
 
-    private final String container;
+    private final Expression<String> container;
 
-    public InSubjectPatternExpression(StringLiteralExpression container) {
-        this.container = container.getValue();
-    }
-
-    public InSubjectPatternExpression(String container) {
+    public InSubjectPatternExpression(Expression<String> container) {
         this.container = container;
     }
 
     @Override
-    public boolean matches(EventContextUser value, PolicyQuery query) throws PMException {
-        long contId = query.graph().getNodeId(container);
+    public boolean matches(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
+        String containerName = container.execute(ctx, pap);
 
-        if (value.isUser()) {
-            long userId = query.graph().getNodeId(value.getName());
+        long contId = pap.query().graph().getNodeId(containerName);
+
+        if (user.isUser()) {
+            long userId = pap.query().graph().getNodeId(user.getName());
 
             // check user contained in container
-            return query.graph().isAscendant(userId, contId);
+            return pap.query().graph().isAscendant(userId, contId);
         } else {
             // check if container in attrs
-            return value.getAttrs().contains(container);
+            return user.getAttrs().contains(containerName);
         }
     }
 
