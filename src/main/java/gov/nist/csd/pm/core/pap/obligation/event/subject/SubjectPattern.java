@@ -53,7 +53,7 @@ public class SubjectPattern implements Serializable, PMLStatementSerializable {
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return isAny ? "any user" : "user " + subjectPatternExpression.toFormattedString(indentLevel);
+        return isAny ? "any user" : subjectPatternExpression.toFormattedString(indentLevel);
     }
 
     @Override
