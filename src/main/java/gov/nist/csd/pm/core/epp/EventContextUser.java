@@ -11,30 +11,30 @@ public class EventContextUser {
 
     public EventContextUser(String name, String process) {
         this.name = name;
-        this.attrs = null;
-        this.process = process;
+        this.attrs = List.of();
+        this.process = Objects.requireNonNullElse(process, "");
     }
 
     public EventContextUser(String name) {
         this.name = name;
-        this.attrs = null;
-        this.process = null;
+        this.attrs = List.of();
+        this.process = "";
     }
 
     public EventContextUser(List<String> attrs, String process) {
-        this.name = null;
+        this.name = "";
         this.attrs = attrs;
-        this.process = process;
+        this.process = Objects.requireNonNullElse(process, "");
     }
 
     public EventContextUser(List<String> attrs) {
-        this.name = null;
+        this.name = "";
         this.attrs = attrs;
-        this.process = null;
+        this.process = "";
     }
 
     public boolean isUser() {
-        return name != null;
+        return !name.isEmpty();
     }
 
     public String getName() {
