@@ -472,8 +472,8 @@ Define the operation(s) that trigger the obligation. See [Query Operation](#quer
 
 ```pml
 performs any operation                        // any operation
-performs assign                               // specific operation
-performs assign on (ascendant, descendants) { // with argument matching
+performs "assign"                               // specific operation
+performs "assign" on (ascendant, descendants) { // with argument matching
 	// this is an anonymous query operation that 
 	// uses the provided args from the matched 
 	// operation defined above this query op 
