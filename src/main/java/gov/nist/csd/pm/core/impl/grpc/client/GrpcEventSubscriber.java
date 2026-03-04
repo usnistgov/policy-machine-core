@@ -15,7 +15,7 @@ public class GrpcEventSubscriber implements EventSubscriber {
     }
 
     @Override
-    public void processEvent(EventContext eventCtx) throws PMException {
+    public void processEvent(EventContext eventCtx) {
         eppStub.processEvent(ToProtoUtil.toEventContextProto(eventCtx));
     }
 }

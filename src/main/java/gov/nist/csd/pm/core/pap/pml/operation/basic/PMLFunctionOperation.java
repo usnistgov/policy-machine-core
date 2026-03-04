@@ -14,7 +14,7 @@ import java.util.List;
 
 public abstract class PMLFunctionOperation<T> extends Function<T> implements PMLOperation {
 
-	public static final FormalParameter<String> NODE_NAME_PARAM = new FormalParameter<>("nodeName", STRING_TYPE);
+	public static final FormalParameter<String> NODE_NAME_PARAM = new FormalParameter<>("node_name", STRING_TYPE);
 
 	private final Type<T> returnType;
 	private final List<FormalParameter<?>> pmlFormalParameters;

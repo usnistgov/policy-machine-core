@@ -137,7 +137,7 @@ public abstract class PAPTest extends PAPTestInitializer {
                 })
                 adminop op1(@node string a) {
                     if a == PM_ADMIN_BASE_OA {
-                        op1("ua2")
+                        op1(a="ua2")
                     }
                     
                     create pc a + "_PC"
@@ -145,7 +145,7 @@ public abstract class PAPTest extends PAPTestInitializer {
                 """;
         pap.executePML(new TestUserContext("u1"), pml);
 
-        pap.executePML(new TestUserContext("u1"), "op1(PM_ADMIN_BASE_OA)");
+        pap.executePML(new TestUserContext("u1"), "op1(a=PM_ADMIN_BASE_OA)");
         assertTrue(pap.query().graph().nodeExists("ua2_PC"));
         assertTrue(pap.query().graph().nodeExists("PM_ADMIN:base_PC"));
     }

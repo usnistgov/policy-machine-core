@@ -23,7 +23,7 @@ public class GetAssociationsWithSource extends PMLQueryOperation<List<Map<String
 
     public GetAssociationsWithSource() {
         super(
-                "getAssociationsWithSource",
+                "get_associations_with_source",
                 returnType,
                 List.of(NODE_NAME_PARAM),
             List.of()

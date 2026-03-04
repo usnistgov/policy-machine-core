@@ -23,7 +23,7 @@ class PMLOperationWrapperTest {
                return "op4"
             }
             
-            create pc op1(op2(op3(op4())))
+            create pc op1(a=op2(a=op3(a=op4())))
             """;
 
         MemoryPAP pap = new MemoryPAP();

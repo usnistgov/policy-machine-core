@@ -12,19 +12,20 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 public class OperationInvokeExpression<T> extends Expression<T> {
 
     private final String name;
-    private final List<Expression<?>> actualArgsList;
+    private final Map<String, Expression<?>> actualArgsMap;
     private final Type<T> expectedReturnType;
 
     public OperationInvokeExpression(String name,
-                                     List<Expression<?>> actualArgsList,
+                                     Map<String, Expression<?>> actualArgsMap,
                                      Type<T> expectedReturnType) {
         this.name = name;
-        this.actualArgsList = actualArgsList;
+        this.actualArgsMap = actualArgsMap;
         this.expectedReturnType = expectedReturnType;
     }
 
@@ -32,8 +33,8 @@ public class OperationInvokeExpression<T> extends Expression<T> {
         return name;
     }
 
-    public List<Expression<?>> getActualArgsList() {
-        return actualArgsList;
+    public Map<String, Expression<?>> getActualArgsMap() {
+        return actualArgsMap;
     }
 
     public Type<T> getExpectedReturnType() {
@@ -77,7 +78,7 @@ public class OperationInvokeExpression<T> extends Expression<T> {
     private Args prepareArgExpressions(ExecutionContext ctx, PAP pap, Operation<?> function) throws PMException {
         List<FormalParameter<?>> formalParams = function.getFormalParameters();
 
-        if (actualArgsList.size() != formalParams.size()) {
+        if (actualArgsMap.size() != formalParams.size()) {
             throw new PMLExecutionException("expected " + formalParams.size() + " args for function \""
                 + name + "\", got " + formalParams.size());
         }
@@ -85,7 +86,12 @@ public class OperationInvokeExpression<T> extends Expression<T> {
         Map<FormalParameter<?>, Object> values = new HashMap<>();
         for (int i = 0; i < formalParams.size(); i++) {
             FormalParameter<?> formalParam = formalParams.get(i);
-            Expression<?> argExpr = actualArgsList.get(i);
+
+            if (!actualArgsMap.containsKey(formalParam.getName())) {
+                continue;
+            }
+
+            Expression<?> argExpr = actualArgsMap.get(formalParam.getName());
             Object argValue = argExpr.execute(ctx, pap);
 
             if (!argExpr.getType().isCastableTo(formalParam.getType())) {
@@ -105,11 +111,14 @@ public class OperationInvokeExpression<T> extends Expression<T> {
 
     private String argsToString() {
         StringBuilder s = new StringBuilder();
-        for (Expression<?> arg : actualArgsList) {
+        for (Entry<String, Expression<?>> arg : actualArgsMap.entrySet()) {
+            String name = arg.getKey();
+            Expression<?> argValue = arg.getValue();
+
             if (!s.isEmpty()) {
                 s.append(", ");
             }
-            s.append(arg);
+            s.append(name).append("=").append(argValue);
         }
 
         return s.toString();
@@ -123,12 +132,12 @@ public class OperationInvokeExpression<T> extends Expression<T> {
         if (!(o instanceof OperationInvokeExpression<?> that)) {
             return false;
         }
-        return Objects.equals(name, that.name) && Objects.equals(actualArgsList, that.actualArgsList)
+        return Objects.equals(name, that.name) && Objects.equals(actualArgsMap, that.actualArgsMap)
             && Objects.equals(expectedReturnType, that.expectedReturnType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, actualArgsList, expectedReturnType);
+        return Objects.hash(name, actualArgsMap, expectedReturnType);
     }
 }

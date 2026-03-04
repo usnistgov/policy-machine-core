@@ -8,10 +8,18 @@ public class FormalParameter<T> implements Serializable {
 
 	private final String name;
 	private final Type<T> type;
+	private final boolean required;
 
 	public FormalParameter(String name, Type<T> type) {
 		this.name = name;
 		this.type = type;
+		this.required = true;
+	}
+
+	public FormalParameter(String name, Type<T> type, boolean required) {
+		this.name = name;
+		this.type = type;
+		this.required = required;
 	}
 
 	public String getName() {
@@ -20,6 +28,10 @@ public class FormalParameter<T> implements Serializable {
 
 	public Type<T> getType() {
 		return type;
+	}
+
+	public boolean isRequired() {
+		return required;
 	}
 
 	/**

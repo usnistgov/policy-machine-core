@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class ExpressionTest {
@@ -101,7 +102,7 @@ class ExpressionTest {
 
         Expression<?> expression = ExpressionVisitor.fromString(visitorContext, "test()", STRING_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        assertEquals(new OperationInvokeExpression<>(signature.getName(), List.of(), signature.getReturnType()), expression);
+        assertEquals(new OperationInvokeExpression<>(signature.getName(), Map.of(), signature.getReturnType()), expression);
     }
 
     @Test

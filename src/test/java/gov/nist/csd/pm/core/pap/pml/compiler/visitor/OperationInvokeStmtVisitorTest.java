@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationTyp
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class OperationInvokeStmtVisitorTest {
@@ -36,10 +37,10 @@ class OperationInvokeStmtVisitorTest {
 
     OperationInvokeExpression<String> expected = new OperationInvokeExpression(
         signature.getName(),
-        List.of(
-            new StringLiteralExpression("a"),
-            new StringLiteralExpression("b"),
-            buildArrayLiteral("c", "d")
+        Map.of(
+            "a", new StringLiteralExpression("a"),
+            "b", new StringLiteralExpression("b"),
+            "c", buildArrayLiteral("c", "d")
         ),
         STRING_TYPE
     );
@@ -127,7 +128,7 @@ class OperationInvokeStmtVisitorTest {
 
         OperationInvokeExpression<?> expected = new OperationInvokeExpression(
             signature.getName(),
-            List.of(),
+            Map.of(),
             signature.getReturnType()
         );
 

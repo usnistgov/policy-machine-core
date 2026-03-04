@@ -15,7 +15,7 @@ public class NodeExists extends PMLQueryOperation<Boolean> {
 
     public NodeExists() {
         super(
-                "nodeExists",
+                "node_exists",
                 BOOLEAN_TYPE,
                 List.of(NODE_NAME_PARAM),
             List.of()

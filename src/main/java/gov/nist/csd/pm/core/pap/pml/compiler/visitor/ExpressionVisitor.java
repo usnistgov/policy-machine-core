@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.AnyType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
@@ -24,6 +25,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.Int64LiteralContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalAndExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalOrExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeArgContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PlusExpressionContext;
@@ -58,6 +60,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -176,30 +180,36 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         }
 
         PMLParser.OperationInvokeArgsContext funcCallArgsCtx = ctx.operationInvokeArgs();
-        List<ExpressionContext> argExpressions = new ArrayList<>();
-        PMLParser.ExpressionListContext expressionListContext = funcCallArgsCtx.expressionList();
-        if (expressionListContext != null) {
-            argExpressions = expressionListContext.expression();
+        List<OperationInvokeArgContext> operationInvokeArgs = funcCallArgsCtx.operationInvokeArg();
+        List<FormalParameter<?>> formalParams = operation.getFormalParameters();
+        Map<String, Expression<?>> argExprs = new HashMap<>();
+        for (OperationInvokeArgContext argCtx : operationInvokeArgs) {
+            String paramName = argCtx.ID().getText();
+            FormalParameter<?> formalParam = validateParam(operation.getName(), paramName, formalParams);
+            Expression<?> expr = ExpressionVisitor.compile(visitorCtx, argCtx.expression(), formalParam.getType());
+            argExprs.put(paramName, expr);
         }
 
-        List<FormalParameter<?>> formalArgs = operation.getFormalParameters();
-        if (formalArgs.size() != argExpressions.size()) {
-            throw new PMLCompilationRuntimeException(
-                    ctx,
-                    "wrong number of args for operation call " + funcName + ": " +
-                            "expected " + formalArgs.size() + ", got " + argExpressions.size());
+        Set<String> requiredFormalParameters = operation.getRequiredFormalParameters()
+            .stream()
+            .map(FormalParameter::getName)
+            .collect(Collectors.toSet());
+        if (!argExprs.keySet().containsAll(requiredFormalParameters)) {
+            throw new PMLCompilationRuntimeException(ctx, "required formal parameters: "
+                + requiredFormalParameters + ", got: " + argExprs.keySet());
         }
 
-        List<Expression<?>> args = new ArrayList<>();
-        for (int i = 0; i < formalArgs.size(); i++) {
-            PMLParser.ExpressionContext exprCtx = argExpressions.get(i);
-            FormalParameter<?> formalArg = formalArgs.get(i);
+        return new OperationInvokeExpression<>(funcName, argExprs, operation.getReturnType());
+    }
 
-            Expression<?> expr = ExpressionVisitor.compile(visitorCtx, exprCtx, formalArg.getType());
-            args.add(expr);
+    private FormalParameter<?> validateParam(String opName, String name, List<FormalParameter<?>> formalParams) {
+        for (FormalParameter<?> formalParam : formalParams) {
+            if (formalParam.getName().equals(name)) {
+                return formalParam;
+            }
         }
 
-        return new OperationInvokeExpression<>(funcName, args, operation.getReturnType());
+        throw new IllegalArgumentException("unknown parameter for operation " + opName + ": " + name);
     }
 
     @Override

@@ -19,7 +19,7 @@ public class GetNode extends PMLQueryOperation<Map<String, Object>> {
 
     public GetNode() {
         super(
-                "getNode",
+                "get_node",
                 MapType.of(STRING_TYPE, ANY_TYPE),
                 List.of(NODE_NAME_PARAM),
             List.of()

@@ -13,7 +13,7 @@ public class TestEventSubscriber implements EventSubscriber {
     }
 
     @Override
-    public void processEvent(EventContext eventCtx) throws PMException {
+    public void processEvent(EventContext eventCtx) {
         this.eventContext = eventCtx;
     }
 }

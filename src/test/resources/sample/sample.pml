@@ -30,13 +30,13 @@ create U "us_writer1" in ["writer", "US user"]
 create U "eu_reader1" in ["reader", "EU user"]
 create U "eu_writer1" in ["writer", "EU user"]
 
-createProject("us_project1", "US project")
-createProject("eu_project1", "EU project")
+createProject(projectName="us_project1", locProjectAttr="US project")
+createProject(projectName="eu_project1", locProjectAttr="EU project")
 
 routine deleteAllProjects(string locProjectOA) {
-    foreach project in getAdjacentAscendants(locProjectOA) {
-        deleteReadme(project + " README")
-        deleteProject(project)
+    foreach project in get_adjacent_ascendants(node_name=locProjectOA) {
+        deleteReadme(projectReadme=project + " README")
+        deleteProject(projectName=project)
     }
 }
 
@@ -79,7 +79,7 @@ create obligation "create us project admin"
       return locProjectAttr == "US project"
     }
     do(ctx) {
-        createProjectAdmin(ctx.args.projectName)
+        createProjectAdmin(projectName=ctx.args.projectName)
     }
 
 create obligation "create eu project admin"
@@ -88,5 +88,5 @@ create obligation "create eu project admin"
         return locProjectAttr == "EU project"
     }
     do(ctx) {
-        createProjectAdmin(ctx.args.projectName)
+        createProjectAdmin(projectName=ctx.args.projectName)
     }

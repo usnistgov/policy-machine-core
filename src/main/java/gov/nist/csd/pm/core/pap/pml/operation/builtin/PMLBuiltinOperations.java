@@ -27,10 +27,12 @@ public class PMLBuiltinOperations {
     private static final AppendAll appendAll = new AppendAll();
     private static final Name name = new Name();
     private static final Id id = new Id();
-    private static final GetPolicyClassIds GET_POLICY_CLASS_IDS = new GetPolicyClassIds();
-    private static final SelfAccessComputePrivileges SELF_ACCESS_COMPUTE_PRIVILEGES = new SelfAccessComputePrivileges();
-    private static final SelfAccessComputeAdjacentAscendantPrivileges SELF_ACCESS_COMPUTE_ADJACENT_ASCENDANT_PRIVILEGES =
+    private static final IsNull isNull = new IsNull();
+    private static final GetPolicyClassIds getPolicyClassIds = new GetPolicyClassIds();
+    private static final SelfAccessComputePrivileges selfAccessComputePrivileges = new SelfAccessComputePrivileges();
+    private static final SelfAccessComputeAdjacentAscendantPrivileges selfAccessComputeAdjacentAscendantPrivileges =
         new SelfAccessComputeAdjacentAscendantPrivileges();
+
 
     private static final Map<String, Operation<?>> BUILTIN_OPERATIONS = new HashMap<>();
 
@@ -54,9 +56,11 @@ public class PMLBuiltinOperations {
         BUILTIN_OPERATIONS.put(search.getName(), search);
         BUILTIN_OPERATIONS.put(name.getName(), name);
         BUILTIN_OPERATIONS.put(id.getName(), id);
-        BUILTIN_OPERATIONS.put(GET_POLICY_CLASS_IDS.getName(), GET_POLICY_CLASS_IDS);
-        BUILTIN_OPERATIONS.put(SELF_ACCESS_COMPUTE_PRIVILEGES.getName(), SELF_ACCESS_COMPUTE_PRIVILEGES);
-        BUILTIN_OPERATIONS.put(SELF_ACCESS_COMPUTE_ADJACENT_ASCENDANT_PRIVILEGES.getName(), SELF_ACCESS_COMPUTE_ADJACENT_ASCENDANT_PRIVILEGES);
+        BUILTIN_OPERATIONS.put(getPolicyClassIds.getName(), getPolicyClassIds);
+        BUILTIN_OPERATIONS.put(selfAccessComputePrivileges.getName(), selfAccessComputePrivileges);
+        BUILTIN_OPERATIONS.put(selfAccessComputeAdjacentAscendantPrivileges.getName(),
+            selfAccessComputeAdjacentAscendantPrivileges);
+        BUILTIN_OPERATIONS.put(isNull.getName(), isNull);
     }
 
     public static Map<String, Operation<?>> builtinOperations() {

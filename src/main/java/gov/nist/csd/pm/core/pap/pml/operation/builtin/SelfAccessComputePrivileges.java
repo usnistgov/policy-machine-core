@@ -18,7 +18,7 @@ public class SelfAccessComputePrivileges extends QueryOperation<List<String>> {
         new NodeNameFormalParameter("node_name");
 
     public SelfAccessComputePrivileges() {
-        super("selfAccessComputePrivileges", ListType.of(STRING_TYPE), List.of(NODE_NAME_PARAM), List.of());
+        super("self_compute_privileges", ListType.of(STRING_TYPE), List.of(NODE_NAME_PARAM), List.of());
     }
 
     @Override

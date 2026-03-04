@@ -297,7 +297,7 @@ public class PMLTest {
             create obligation "o1"
             when any user
             performs "test" on () {
-                a := getAdjacentAscendants("123")
+                a := get_adjacent_ascendants(node_name="123")
                 b := test()
             }
             do(ctx) {

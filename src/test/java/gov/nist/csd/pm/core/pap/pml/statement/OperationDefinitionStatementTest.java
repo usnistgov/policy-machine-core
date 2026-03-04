@@ -134,7 +134,7 @@ class OperationDefinitionStatementTest {
         String pml = """
                 var a = "test"
                 var b = "test2"
-                func1(a, b)
+                func1(a=a, b=b)
                 
                 adminop func1(string a, string b) {
                     create PC a
@@ -157,7 +157,7 @@ class OperationDefinitionStatementTest {
                 
                 adminop f2() {
                     a := "test"
-                    f1(a)
+                    f1(a=a)
                 }
                 
                 f2()

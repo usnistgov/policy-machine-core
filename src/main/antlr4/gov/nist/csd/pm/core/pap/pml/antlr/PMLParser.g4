@@ -56,7 +56,7 @@ createObligationStatement:
     eventPattern
     response ;
 
-eventPattern:
+ eventPattern:
   WHEN subjectPattern
   PERFORMS operationPattern
   ;
@@ -149,15 +149,15 @@ annotations:
   | reqCap #ReqCapAnnotation
   ;
 eventCtxArgs: EVENT_CTX OPEN_PAREN (eventCtxArg (COMMA eventCtxArg)*)? CLOSE_PAREN ;
-eventCtxArg: variableType? ID ;
+eventCtxArg: variableType? ID OPTIONAL_PARAM?;
 
 reqCap: REQ_CAP OPEN_PAREN basicStatementBlock CLOSE_PAREN ;
 
 operationFormalParamList: (operationFormalParam (COMMA operationFormalParam)*)? ;
-operationFormalParam: NODE_ARG? variableType ID;
+operationFormalParam: NODE_ARG? variableType ID OPTIONAL_PARAM?;
 
 formalParamList: (formalParam (COMMA formalParam)*)? ;
-formalParam: variableType ID;
+formalParam: variableType ID OPTIONAL_PARAM?;
 
 returnStatement: RETURN expression?;
 
@@ -224,7 +224,8 @@ index:
     | DOT key=idIndex #DotIndex;
 
 operationInvoke: ID operationInvokeArgs ;
-operationInvokeArgs: OPEN_PAREN expressionList? CLOSE_PAREN ;
+operationInvokeArgs: OPEN_PAREN (operationInvokeArg (COMMA operationInvokeArg)*)? CLOSE_PAREN ;
+operationInvokeArg: ID ASSIGN_EQUALS expression ;
 
 idIndex:
     ID

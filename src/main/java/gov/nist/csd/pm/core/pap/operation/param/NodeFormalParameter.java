@@ -6,6 +6,6 @@ public abstract sealed class NodeFormalParameter<T> extends FormalParameter<T>
 	permits NodeIdFormalParameter, NodeIdListFormalParameter, NodeNameFormalParameter, NodeNameListFormalParameter {
 
 	public NodeFormalParameter(String name, Type<T> type) {
-		super(name, type);
+		super(name, type, true);
 	}
 }

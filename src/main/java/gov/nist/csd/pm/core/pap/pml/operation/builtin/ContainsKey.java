@@ -21,7 +21,7 @@ public class ContainsKey extends PMLFunctionOperation<Boolean> {
 
     public ContainsKey() {
         super(
-                "containsKey",
+                "contains_key",
                 BOOLEAN_TYPE,
                 List.of(MAP_PARAM, KEY_PARAM)
         );
