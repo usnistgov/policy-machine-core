@@ -415,12 +415,12 @@ arset ["write", "delete"]
 include ["oa1"]
 exclude ["oa2"]
 
-create disjunctive process prohibition "UAProhibition"
+create disjunctive node prohibition "UAProhibition"
 deny "ua1"
 arset ["write"]
 include ["oa1"]
 
-create conjunctive prohibition "ProcessProhibition"
+create conjunctive process prohibition "ProcessProhibition"
 deny "u1" process "123"
 arest ["execute"]
 include ["oa1"]
