@@ -36,10 +36,10 @@ class IfStatementTest {
                     }
                 }
                 
-                func1("a")
-                func1("b")
-                func1("c")
-                func1("d")
+                func1(s="a")
+                func1(s="b")
+                func1(s="c")
+                func1(s="d")
                 """;
         PAP pap = new TestPAP();
         pap.executePML(new TestUserContext("u1"), pml);

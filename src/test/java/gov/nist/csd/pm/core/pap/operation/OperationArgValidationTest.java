@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Test;
 
 class OperationArgValidationTest {
 
-    private static final FormalParameter<String>     PARAM_A    = new FormalParameter<>("a", STRING_TYPE);
-    private static final FormalParameter<String>     PARAM_B    = new FormalParameter<>("b", STRING_TYPE);
+    private static final FormalParameter<String>     PARAM_A    = new FormalParameter<>("a", STRING_TYPE, false);
+    private static final FormalParameter<String>     PARAM_B    = new FormalParameter<>("b", STRING_TYPE, false);
     private static final FormalParameter<Long>       PARAM_ID   = new FormalParameter<>("id", LONG_TYPE);
     private static final NodeNameFormalParameter     NODE_NAME  = new NodeNameFormalParameter("nodeName");
     private static final NodeIdFormalParameter       NODE_ID    = new NodeIdFormalParameter("nodeId");
@@ -62,7 +62,7 @@ class OperationArgValidationTest {
         }
 
         @Test
-        void missingNonNodeParamSucceeds() {
+        void missingNonRequiredParamSucceeds() {
             Operation<Void> op = opNoEventParams(List.of(NODE_NAME, PARAM_A));
 
             Args args = op.validateArgs(Map.of("nodeName", "n1"));

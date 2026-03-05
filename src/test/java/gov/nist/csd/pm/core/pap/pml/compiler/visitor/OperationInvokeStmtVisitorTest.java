@@ -49,7 +49,7 @@ class OperationInvokeStmtVisitorTest {
     void testSuccess() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
             """
-            func1("a", "b", ["c", "d"])
+            func1(a="a", b="b", c=["c", "d"])
             """);
 
         CompileScope compileScope = new CompileScope(new MemoryPAP());
@@ -85,9 +85,9 @@ class OperationInvokeStmtVisitorTest {
 
         testCompilationError(
             """
-            func1("a", "b")
+            func1(a="a", b="b")
             """, visitorCtx, 1,
-            "wrong number of args for operation call func1: expected 3, got 2"
+            "required formal parameters: [a, b, c], got: [a, b]"
         );
     }
 
@@ -98,7 +98,7 @@ class OperationInvokeStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(compileScope);
         testCompilationError(
             """
-            func1("a", "b", true)
+            func1(a="a", b="b", c=true)
             """, visitorCtx, 1,
             "expected expression type []string, got bool"
         );

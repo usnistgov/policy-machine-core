@@ -342,7 +342,7 @@ public class ExecutionTest {
                     create PC x
                 }
                 
-                testFunc("pc1")
+                testFunc(x="pc1")
                 """;
         PAP pap = new TestPAP();
         
@@ -356,7 +356,7 @@ public class ExecutionTest {
                 }
                 
                 create pc "pc1"
-                testFunc("pc1")
+                testFunc(x="pc1")
                 """;
 
         
@@ -456,7 +456,7 @@ public class ExecutionTest {
                     return s
                 }
                 
-                create PC testFunc("test")
+                create PC testFunc(s="test")
                 """;
 
          PAP pap = new TestPAP();
@@ -473,7 +473,7 @@ public class ExecutionTest {
                     return s
                 }
                 
-                create PC testFunc("test")
+                create PC testFunc(s="test")
                 """;
 
          PAP pap = new TestPAP();

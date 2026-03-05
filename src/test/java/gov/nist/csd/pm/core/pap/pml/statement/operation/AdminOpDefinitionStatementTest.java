@@ -45,7 +45,7 @@ class AdminOpDefinitionStatementTest {
         PDP pdp = new PDP(pap);
         pdp.runTx(new TestUserContext("u1"), tx -> {
             tx.executePML("""
-                op1("o1", ["o2", "o3"])
+                op1(a="o1", b=["o2", "o3"])
                 """);
             return null;
         });
@@ -53,7 +53,7 @@ class AdminOpDefinitionStatementTest {
 
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id("u2")), tx -> {
             tx.executePML("""
-                op1("o1", ["o2", "o3"])
+                op1(a="o1", b=["o2", "o3"])
                 """);
             return null;
         }));
@@ -84,7 +84,7 @@ class AdminOpDefinitionStatementTest {
         PDP pdp = new PDP(pap);
         pdp.runTx(new TestUserContext("u1"), tx -> {
             tx.executePML("""
-                op1("test1", ["o2", "o3"])
+                op1(a="test1", b=["o2", "o3"])
                 """);
             return null;
         });
@@ -92,7 +92,7 @@ class AdminOpDefinitionStatementTest {
 
         pdp.runTx(new UserContext(id("u2")), tx -> {
             tx.executePML("""
-                op1("test2", ["o2", "o3"])
+                op1(a="test2", b=["o2", "o3"])
                 """);
             return null;
         });

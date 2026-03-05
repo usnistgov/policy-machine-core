@@ -481,9 +481,9 @@ performs assign on (ascendant, descendants) { // with argument matching
 	// if the evnt matches or not.
 	// Example:
 	
-	ascName := name(ascendant)
-	descs := getAdjacentDescendants(ascname)
-	return contains(descs, "oa1")
+	ascName := name(id=ascendant)
+	descs := get_adjacent_descendants(node_name=ascname)
+	return contains(arr=descs, element="oa1")
 }
 ```
 

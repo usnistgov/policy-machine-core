@@ -40,7 +40,7 @@ public class PMLOperationTest {
             }
             
             function test() {
-               op1("test")
+               op1(d="test")
             }
             """;
         MemoryPAP memoryPAP = new MemoryPAP();
@@ -55,7 +55,7 @@ public class PMLOperationTest {
             }
             
             function test() {
-               rou1("test")
+               rou1(a="test")
             }
             """;
         MemoryPAP memoryPAP2 = new MemoryPAP();
