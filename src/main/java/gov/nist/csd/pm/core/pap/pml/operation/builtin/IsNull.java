@@ -20,6 +20,6 @@ public class IsNull extends PMLFunctionOperation<Boolean> {
     @Override
     public Boolean execute(Args args) throws PMException {
         Object o = args.get(OBJ_PARAM);
-        return o != null;
+        return o == null;
     }
 }

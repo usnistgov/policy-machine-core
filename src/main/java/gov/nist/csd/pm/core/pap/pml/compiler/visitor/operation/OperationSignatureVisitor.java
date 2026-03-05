@@ -232,7 +232,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
                 }
 
                 Type<?> type = TypeResolver.resolveFromParserCtx(eventArgCtx.variableType());
-                result.add(new FormalParameter<>(name, type));
+                result.add(new FormalParameter<>(name, type, eventArgCtx.OPTIONAL_PARAM() == null));
             } else { // existing
                 FormalParameter<?> existing = formalParameters.get(name);
                 if (existing == null) {
@@ -240,6 +240,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
                         String.format("event arg '%s' has no type and does not match any formal parameter", name));
                     continue;
                 }
+
                 result.add(existing);
             }
         }
