@@ -169,7 +169,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 PMLOperationSignature operation = visitorCtx.scope().getOperation(opName);
                 List<FormalParameter<?>> eventParameters = operation.getEventParameters();
 
-                // check that all of the argNames are defined as formal params for the operation
+                // check that all of the argNames are defined as event params for the operation
                 Set<String> eventParamNames = eventParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
                 if (!eventParamNames.containsAll(argNames)) {
                     throw new PMLCompilationRuntimeException(onPatternContext,
