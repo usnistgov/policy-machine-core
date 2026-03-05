@@ -160,10 +160,11 @@ myMap.key               // dot index (string keys only)
 
 ### Operation Invocation
 
-Call operations with arguments. The argument types must match those of the operation's defined formal parameters.
+Call operations with named arguments. The argument types must match those of the operation's defined formal parameters.
+All arguments that are requried by the operation must be present in the invocation.
 
 ```pml
-operationName(arg1, arg2, arg3)
+operationName(a=arg1, b=arg2, c=arg3)
 ```
 
 ### Arithmetic Expressions
@@ -523,9 +524,12 @@ delete if exists obligation "ObligationName"
 
 ### Formal Parameters
 
+Formal parameters with a `?` appended to the parameter name are denotes as optional.
+
 ```pml
-(string a, int64 b, []string c, map[string]bool d)
+(string a, int64 b, []string c, map[string]bool d?)
 ```
+
 
 ### @node, @reqcap, and @eventctx Annotations
 
