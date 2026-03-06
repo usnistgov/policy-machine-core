@@ -185,8 +185,12 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         Map<String, Expression<?>> argExprs = new HashMap<>();
         for (OperationInvokeArgContext argCtx : operationInvokeArgs) {
             String paramName = argCtx.ID().getText();
-            FormalParameter<?> formalParam = validateParam(operation.getName(), paramName, formalParams);
+            FormalParameter<?> formalParam = validateParam(argCtx, operation.getName(), paramName, formalParams);
             Expression<?> expr = ExpressionVisitor.compile(visitorCtx, argCtx.expression(), formalParam.getType());
+            if (argExprs.containsKey(paramName)) {
+                throw new PMLCompilationRuntimeException(argCtx,
+                    "duplicate argument '" + paramName + "' for operation '" + funcName + "'");
+            }
             argExprs.put(paramName, expr);
         }
 
@@ -202,14 +206,16 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return new OperationInvokeExpression<>(funcName, argExprs, operation.getReturnType());
     }
 
-    private FormalParameter<?> validateParam(String opName, String name, List<FormalParameter<?>> formalParams) {
+    private FormalParameter<?> validateParam(ParserRuleContext argCtx, String opName, String name,
+                                             List<FormalParameter<?>> formalParams) {
         for (FormalParameter<?> formalParam : formalParams) {
             if (formalParam.getName().equals(name)) {
                 return formalParam;
             }
         }
 
-        throw new IllegalArgumentException("unknown parameter for operation " + opName + ": " + name);
+        throw new PMLCompilationRuntimeException(argCtx,
+            "unknown parameter '" + name + "' for operation '" + opName + "'");
     }
 
     @Override

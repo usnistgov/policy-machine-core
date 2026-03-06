@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static gov.nist.csd.pm.core.pap.pml.compiler.visitor.CompilerTestUtil.testCompilationError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -518,5 +519,295 @@ class CreateObligationStmtVisitorTest {
             visitorCtx, 1,
             "expected expression type string, got []string"
         );
+    }
+
+    @Test
+    void testOnClauseWithEventOnlyParam() throws PMException {
+        // eventOnly is an extra event param not present in formal params
+        CompileScope scope = new CompileScope(new MemoryPAP());
+        FormalParameter<String> argA = new FormalParameter<>("argA", STRING_TYPE);
+        FormalParameter<String> eventOnly = new FormalParameter<>("eventOnly", STRING_TYPE);
+        PMLOperationSignature opSig = new PMLOperationSignature(
+            OperationType.RESOURCEOP, "testOp2", VOID_TYPE,
+            List.of(argA),
+            List.of(argA, eventOnly),
+            List.of()
+        );
+        scope.addOperation("testOp2", opSig);
+        VisitorContext visitorCtx = new VisitorContext(scope);
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp2" on(eventOnly) { return true }
+            do(ctx) {}
+            """);
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        PMLStmtsRoutine<Boolean> routine = new PMLStmtsRoutine<>(
+            "", BOOLEAN_TYPE, List.of(),
+            new PMLStatementBlock(List.of(new ReturnStatement(new BoolLiteralExpression(true))))
+        );
+        assertEquals(
+            new CreateObligationStatement(
+                new StringLiteralExpression("o1"),
+                new EventPattern(
+                    new SubjectPattern(),
+                    new MatchesOperationPattern("testOp2", new OnPattern(Set.of("eventOnly"), routine))
+                ),
+                new ObligationResponse("ctx", List.of())
+            ),
+            stmt
+        );
+    }
+
+    @Test
+    void testOnClauseWithFormalAndEventOnlyParams() throws PMException {
+        // on() clause references both the formal-mapped param and the event-only param
+        CompileScope scope = new CompileScope(new MemoryPAP());
+        FormalParameter<String> argA = new FormalParameter<>("argA", STRING_TYPE);
+        FormalParameter<String> eventOnly = new FormalParameter<>("eventOnly", STRING_TYPE);
+        PMLOperationSignature opSig = new PMLOperationSignature(
+            OperationType.RESOURCEOP, "testOp2", VOID_TYPE,
+            List.of(argA),
+            List.of(argA, eventOnly),
+            List.of()
+        );
+        scope.addOperation("testOp2", opSig);
+        VisitorContext visitorCtx = new VisitorContext(scope);
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp2" on(argA, eventOnly) { return true }
+            do(ctx) {}
+            """);
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        PMLStmtsRoutine<Boolean> routine = new PMLStmtsRoutine<>(
+            "", BOOLEAN_TYPE, List.of(),
+            new PMLStatementBlock(List.of(new ReturnStatement(new BoolLiteralExpression(true))))
+        );
+        assertEquals(
+            new CreateObligationStatement(
+                new StringLiteralExpression("o1"),
+                new EventPattern(
+                    new SubjectPattern(),
+                    new MatchesOperationPattern("testOp2", new OnPattern(Set.of("argA", "eventOnly"), routine))
+                ),
+                new ObligationResponse("ctx", List.of())
+            ),
+            stmt
+        );
+    }
+
+    @Test
+    void testOnClauseFormalOnlyParamNotInEventParams_Error() throws PMException {
+        // argB is a formal param but is NOT in event params — referencing it in on() should fail
+        CompileScope scope = new CompileScope(new MemoryPAP());
+        FormalParameter<String> argA = new FormalParameter<>("argA", STRING_TYPE);
+        FormalParameter<String> argB = new FormalParameter<>("argB", STRING_TYPE);
+        PMLOperationSignature opSig = new PMLOperationSignature(
+            OperationType.RESOURCEOP, "testOp3", VOID_TYPE,
+            List.of(argA, argB),
+            List.of(argA),
+            List.of()
+        );
+        scope.addOperation("testOp3", opSig);
+        VisitorContext visitorCtx = new VisitorContext(scope);
+
+        testCompilationError(
+            """
+            create obligation "o1"
+            when any user
+            performs "testOp3" on(argB) { return true }
+            do(ctx) {}
+            """,
+            visitorCtx, 1,
+            "expected arg names [argA] but found [argB]"
+        );
+    }
+
+    @Test
+    void testOnClauseWithOptionalFormalParam() throws PMException {
+        // Optional formal param can be referenced in on() clause
+        // the compiled patternParam must have required=false
+        CompileScope scope = new CompileScope(new MemoryPAP());
+        FormalParameter<String> argA = new FormalParameter<>("argA", STRING_TYPE, true);
+        FormalParameter<String> argB = new FormalParameter<>("argB", STRING_TYPE, false);
+        PMLOperationSignature opSig = new PMLOperationSignature(
+            OperationType.RESOURCEOP, "testOp4", VOID_TYPE,
+            List.of(argA, argB),
+            List.of(argA, argB),
+            List.of()
+        );
+        scope.addOperation("testOp4", opSig);
+        VisitorContext visitorCtx = new VisitorContext(scope);
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp4" on(argB) { return true }
+            do(ctx) {}
+            """);
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        CreateObligationStatement obligStmt = (CreateObligationStatement) stmt;
+        MatchesOperationPattern matchesOp =
+            (MatchesOperationPattern) obligStmt.getEventPattern().getOperationPattern();
+        assertEquals(Set.of("argB"), matchesOp.getOnPattern().patternArgs());
+
+        List<FormalParameter<?>> patternParams = matchesOp.getOnPattern().func().getPmlFormalArgs();
+        assertEquals(1, patternParams.size());
+        assertEquals("argB", patternParams.get(0).getName());
+        assertFalse(patternParams.get(0).isRequired());
+    }
+
+    @Test
+    void testOnClauseWithOptionalEventOnlyParam() throws PMException {
+        // Optional event-only param in on() clause
+        // compiled patternParam must have required=false
+        CompileScope scope = new CompileScope(new MemoryPAP());
+        FormalParameter<String> argA = new FormalParameter<>("argA", STRING_TYPE);
+        FormalParameter<String> optId = new FormalParameter<>("optId", STRING_TYPE, false);
+        PMLOperationSignature opSig = new PMLOperationSignature(
+            OperationType.RESOURCEOP, "testOp5", VOID_TYPE,
+            List.of(argA),
+            List.of(argA, optId),
+            List.of()
+        );
+        scope.addOperation("testOp5", opSig);
+        VisitorContext visitorCtx = new VisitorContext(scope);
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp5" on(optId) { return true }
+            do(ctx) {}
+            """);
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        CreateObligationStatement obligStmt = (CreateObligationStatement) stmt;
+        MatchesOperationPattern matchesOp =
+            (MatchesOperationPattern) obligStmt.getEventPattern().getOperationPattern();
+        assertEquals(Set.of("optId"), matchesOp.getOnPattern().patternArgs());
+
+        List<FormalParameter<?>> patternParams = matchesOp.getOnPattern().func().getPmlFormalArgs();
+        assertEquals(1, patternParams.size());
+        assertEquals("optId", patternParams.get(0).getName());
+        assertFalse(patternParams.get(0).isRequired());
+    }
+
+    @Test
+    void testOnClauseNamedArgNoBlockBody() throws PMException {
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp" on(argA)
+            do(ctx) {}
+            """);
+        VisitorContext visitorCtx = buildScopeWithTestOp();
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        PMLStmtsRoutine<Boolean> returnTrueRoutine = new PMLStmtsRoutine<>(
+            "", BOOLEAN_TYPE, List.of(),
+            new PMLStatementBlock(List.of(new ReturnStatement(new BoolLiteralExpression(true))))
+        );
+        assertEquals(
+            new CreateObligationStatement(
+                new StringLiteralExpression("o1"),
+                new EventPattern(
+                    new SubjectPattern(),
+                    new MatchesOperationPattern("testOp", new OnPattern(Set.of("argA"), returnTrueRoutine))
+                ),
+                new ObligationResponse("ctx", List.of())
+            ),
+            stmt
+        );
+    }
+
+    @Test
+    void testOnClauseEmptyArgsNoBlockBody() throws PMException {
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp" on()
+            do(ctx) {}
+            """);
+        VisitorContext visitorCtx = buildScopeWithTestOp();
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        PMLStmtsRoutine<Boolean> returnTrueRoutine = new PMLStmtsRoutine<>(
+            "", BOOLEAN_TYPE, List.of(),
+            new PMLStatementBlock(List.of(new ReturnStatement(new BoolLiteralExpression(true))))
+        );
+        assertEquals(
+            new CreateObligationStatement(
+                new StringLiteralExpression("o1"),
+                new EventPattern(
+                    new SubjectPattern(),
+                    new MatchesOperationPattern("testOp", new OnPattern(Set.of(), returnTrueRoutine))
+                ),
+                new ObligationResponse("ctx", List.of())
+            ),
+            stmt
+        );
+    }
+
+    @Test
+    void testNestedLogicalSubjectPattern() throws PMException {
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when (user "alice" && user in "ua1") || user "bob"
+            performs any operation
+            do(ctx) {}
+            """);
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+            new CreateObligationStatement(
+                new StringLiteralExpression("o1"),
+                new EventPattern(
+                    new SubjectPattern(new LogicalSubjectPatternExpression(
+                        new ParenSubjectPatternExpression(new LogicalSubjectPatternExpression(
+                            new UsernamePatternExpression(new StringLiteralExpression("alice")),
+                            new InSubjectPatternExpression(new StringLiteralExpression("ua1")),
+                            true
+                        )),
+                        new UsernamePatternExpression(new StringLiteralExpression("bob")),
+                        false
+                    )),
+                    new AnyOperationPattern()
+                ),
+                new ObligationResponse("ctx", List.of())
+            ),
+            stmt
+        );
+    }
+
+    @Test
+    void testOnClauseEventParamAccessibleAsVariable() throws PMException {
+        // A param named in on(argA) must be available as a variable inside the block
+        VisitorContext visitorCtx = buildScopeWithTestOp();
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            create obligation "o1"
+            when any user
+            performs "testOp" on(argA) { return argA == "test" }
+            do(c) {}
+            """);
+        PMLStatement<?> stmt = new CreateObligationStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+
+        CreateObligationStatement obligStmt = (CreateObligationStatement) stmt;
+        MatchesOperationPattern matchesOp =
+            (MatchesOperationPattern) obligStmt.getEventPattern().getOperationPattern();
+        assertEquals(Set.of("argA"), matchesOp.getOnPattern().patternArgs());
     }
 }

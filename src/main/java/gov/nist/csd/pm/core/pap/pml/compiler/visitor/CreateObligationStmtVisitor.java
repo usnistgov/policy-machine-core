@@ -34,8 +34,10 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownOperationInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -185,8 +187,15 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 // remove non query functions from visitor ctx
                 VisitorContext copy = visitorCtx.copyFunctionsAndQueriesOnly();
 
+                PMLParser.OnPatternBlockContext onPatternBlockCtx = onPatternContext.onPatternBlock();
+                if (onPatternBlockCtx == null) {
+                    return new MatchesOperationPattern(opName,
+                        new OnPattern(argNames, new PMLStmtsRoutine<>("", BOOLEAN_TYPE, patternParams,
+                            new PMLStatementBlock(List.of(new ReturnStatement(new BoolLiteralExpression(true)))))));
+                }
+
                 PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseOnStatementBlock(copy,
-                    onPatternContext.onPatternBlock(), BOOLEAN_TYPE, patternParams);
+                    onPatternBlockCtx, BOOLEAN_TYPE, patternParams);
 
                 return new MatchesOperationPattern(
                     opName,

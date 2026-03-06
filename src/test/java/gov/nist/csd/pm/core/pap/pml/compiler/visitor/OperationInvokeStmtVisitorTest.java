@@ -105,6 +105,110 @@ class OperationInvokeStmtVisitorTest {
     }
 
     @Test
+    void testOptionalParamCanBeOmitted() throws PMException {
+        FormalParameter<String> required = new FormalParameter<>("a", STRING_TYPE, true);
+        FormalParameter<String> optional = new FormalParameter<>("b", STRING_TYPE, false);
+        PMLOperationSignature sig = new PMLOperationSignature(
+            OperationType.FUNCTION, "func2", STRING_TYPE,
+            List.of(required, optional),
+            List.of());
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            func2(a="a")
+            """);
+
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func2", sig);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        PMLStatement<?> stmt = new OperationInvokeStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+            new OperationInvokeExpression<>("func2",
+                Map.of("a", new StringLiteralExpression("a")),
+                STRING_TYPE),
+            stmt
+        );
+    }
+
+    @Test
+    void testOptionalParamCanBeProvided() throws PMException {
+        FormalParameter<String> required = new FormalParameter<>("a", STRING_TYPE, true);
+        FormalParameter<String> optional = new FormalParameter<>("b", STRING_TYPE, false);
+        PMLOperationSignature sig = new PMLOperationSignature(
+            OperationType.FUNCTION, "func2", STRING_TYPE,
+            List.of(required, optional),
+            List.of());
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            func2(a="a", b="b")
+            """);
+
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func2", sig);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        PMLStatement<?> stmt = new OperationInvokeStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+            new OperationInvokeExpression<>("func2",
+                Map.of(
+                    "a", new StringLiteralExpression("a"),
+                    "b", new StringLiteralExpression("b")),
+                STRING_TYPE),
+            stmt
+        );
+    }
+
+    @Test
+    void testRequiredParamMissingWhenOptionalPresent() throws PMException {
+        FormalParameter<String> required = new FormalParameter<>("a", STRING_TYPE, true);
+        FormalParameter<String> optional = new FormalParameter<>("b", STRING_TYPE, false);
+        PMLOperationSignature sig = new PMLOperationSignature(
+            OperationType.FUNCTION, "func2", STRING_TYPE,
+            List.of(required, optional),
+            List.of());
+
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func2", sig);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError("""
+            func2(b="b")
+            """, visitorCtx, 1,
+            "required formal parameters: [a], got: [b]"
+        );
+    }
+
+    @Test
+    void testUnknownParamName() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError(
+            """
+            func1(a="a", b="b", c=["c", "d"], unknown="x")
+            """, visitorCtx, 1,
+            "unknown parameter 'unknown' for operation 'func1'"
+        );
+    }
+
+    @Test
+    void testDuplicateArgName() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError(
+            """
+            func1(a="first", a="second", b="b", c=["c", "d"])
+            """, visitorCtx, 1,
+            "duplicate argument 'a' for operation 'func1'"
+        );
+    }
+
+    @Test
     void testNoArgs() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
             """
