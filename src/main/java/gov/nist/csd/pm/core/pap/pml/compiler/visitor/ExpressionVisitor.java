@@ -34,6 +34,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.VariableReferenceContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.pml.expression.EqualsExpression;
@@ -183,15 +184,34 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         List<OperationInvokeArgContext> operationInvokeArgs = funcCallArgsCtx.operationInvokeArg();
         List<FormalParameter<?>> formalParams = operation.getFormalParameters();
         Map<String, Expression<?>> argExprs = new HashMap<>();
+        List<CompileError> argErrors = new ArrayList<>();
         for (OperationInvokeArgContext argCtx : operationInvokeArgs) {
             String paramName = argCtx.ID().getText();
-            FormalParameter<?> formalParam = validateParam(argCtx, operation.getName(), paramName, formalParams);
-            Expression<?> expr = ExpressionVisitor.compile(visitorCtx, argCtx.expression(), formalParam.getType());
+
             if (argExprs.containsKey(paramName)) {
-                throw new PMLCompilationRuntimeException(argCtx,
-                    "duplicate argument '" + paramName + "' for operation '" + funcName + "'");
+                argErrors.add(CompileError.fromParserRuleContext(argCtx,
+                    "duplicate argument '" + paramName + "' for operation '" + funcName + "'"));
+                continue;
             }
-            argExprs.put(paramName, expr);
+
+            FormalParameter<?> formalParam;
+            try {
+                formalParam = validateParam(argCtx, operation.getName(), paramName, formalParams);
+            } catch (PMLCompilationRuntimeException e) {
+                argErrors.addAll(e.getErrors());
+                continue;
+            }
+
+            try {
+                Expression<?> expr = ExpressionVisitor.compile(visitorCtx, argCtx.expression(), formalParam.getType());
+                argExprs.put(paramName, expr);
+            } catch (PMLCompilationRuntimeException e) {
+                argErrors.addAll(e.getErrors());
+            }
+        }
+
+        if (!argErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(argErrors);
         }
 
         Set<String> requiredFormalParameters = operation.getRequiredFormalParameters()

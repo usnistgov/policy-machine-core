@@ -4,6 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OnPatternBlockContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
@@ -37,9 +38,17 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         }
 
         StatementVisitor statementVisitor = new StatementVisitor(localCtx);
+        List<CompileError> stmtErrors = new ArrayList<>();
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
-            PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
-            stmts.add(pmlStatement);
+            try {
+                stmts.add(statementVisitor.visitBasicStatement(statementContext));
+            } catch (PMLCompilationRuntimeException e) {
+                stmtErrors.addAll(e.getErrors());
+            }
+        }
+
+        if (!stmtErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(stmtErrors);
         }
 
         try {
@@ -54,9 +63,17 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     public Result visitOnPatternBlock(OnPatternBlockContext ctx) {
         List<PMLStatement<?>> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx.copyFunctionsAndQueriesOnly());
+        List<CompileError> stmtErrors = new ArrayList<>();
         for (PMLParser.BasicStatementContext statementContext : ctx.basicStatement()) {
-            PMLStatement<?> pmlStatement = statementVisitor.visitBasicStatement(statementContext);
-            stmts.add(pmlStatement);
+            try {
+                stmts.add(statementVisitor.visitBasicStatement(statementContext));
+            } catch (PMLCompilationRuntimeException e) {
+                stmtErrors.addAll(e.getErrors());
+            }
+        }
+
+        if (!stmtErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(stmtErrors);
         }
 
         try {
@@ -71,9 +88,17 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     public Result visitStatementBlock(PMLParser.StatementBlockContext ctx) {
         List<PMLStatement<?>> stmts = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(visitorCtx);
+        List<CompileError> stmtErrors = new ArrayList<>();
         for (PMLParser.StatementContext statementContext : ctx.statement()) {
-            PMLStatement<?> pmlStatement = statementVisitor.visitStatement(statementContext);
-            stmts.add(pmlStatement);
+            try {
+                stmts.add(statementVisitor.visitStatement(statementContext));
+            } catch (PMLCompilationRuntimeException e) {
+                stmtErrors.addAll(e.getErrors());
+            }
+        }
+
+        if (!stmtErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(stmtErrors);
         }
 
         try {

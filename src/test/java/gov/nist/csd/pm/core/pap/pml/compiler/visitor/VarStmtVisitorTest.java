@@ -72,8 +72,24 @@ class VarStmtVisitorTest {
                         x = "a"
                         x = "b"
                      )
-                    """, visitorCtx, 1,
+                    """, visitorCtx, 2,
+                    "variable 'x' already defined in scope",
                     "variable 'x' already defined in scope"
+            );
+        }
+
+        @Test
+        void testMultipleVarSpecErrors() throws PMException {
+            VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+            testCompilationError(
+                """
+                var (
+                    x = unknownVar1
+                    y = unknownVar2
+                )
+                """, visitorCtx, 2,
+                "unknown variable 'unknownVar1' in scope",
+                "unknown variable 'unknownVar2' in scope"
             );
         }
 

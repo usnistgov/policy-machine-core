@@ -3,7 +3,9 @@ package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
@@ -19,6 +21,8 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
     @Override
     public PMLStatement<?> visitIfStatement(PMLParser.IfStatementContext ctx) {
+        List<CompileError> errors = new ArrayList<>();
+
         // if block
         VisitorContext localVisitorCtx = visitorCtx.copy();
         Expression<Boolean> condition = ExpressionVisitor.compile(localVisitorCtx, ctx.condition, BOOLEAN_TYPE);
@@ -26,8 +30,11 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {
         List<PMLStatement<?>> block = new ArrayList<>();
         StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
         for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
-            PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
-            block.add(statement);
+            try {
+                block.add(statementVisitor.visitStatement(stmtCtx));
+            } catch (PMLCompilationRuntimeException e) {
+                errors.addAll(e.getErrors());
+            }
         }
 
         // update outer scoped variables
@@ -43,8 +50,11 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {
             condition = ExpressionVisitor.compile(visitorCtx, elseIfStmtCtx.condition, BOOLEAN_TYPE);
             block = new ArrayList<>();
             for (PMLParser.StatementContext stmtCtx : elseIfStmtCtx.statementBlock().statement()) {
-                PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
-                block.add(statement);
+                try {
+                    block.add(statementVisitor.visitStatement(stmtCtx));
+                } catch (PMLCompilationRuntimeException e) {
+                    errors.addAll(e.getErrors());
+                }
             }
             elseIfs.add(new IfStatement.ConditionalBlock(condition, new PMLStatementBlock(block)));
 
@@ -58,12 +68,19 @@ public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {
         block = new ArrayList<>();
         if (ctx.elseStatement() != null) {
             for (PMLParser.StatementContext stmtCtx : ctx.elseStatement().statementBlock().statement()) {
-                PMLStatement<?> statement = statementVisitor.visitStatement(stmtCtx);
-                block.add(statement);
+                try {
+                    block.add(statementVisitor.visitStatement(stmtCtx));
+                } catch (PMLCompilationRuntimeException e) {
+                    errors.addAll(e.getErrors());
+                }
             }
 
             // update outer scoped variables
             visitorCtx.scope().overwriteFromScope(localVisitorCtx.scope());
+        }
+
+        if (!errors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(errors);
         }
 
         return new IfStatement(ifBlock, elseIfs, new PMLStatementBlock(block));

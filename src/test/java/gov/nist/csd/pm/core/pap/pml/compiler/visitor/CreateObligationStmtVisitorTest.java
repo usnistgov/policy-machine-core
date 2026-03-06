@@ -793,6 +793,47 @@ class CreateObligationStmtVisitorTest {
     }
 
     @Test
+    void testNestedObligationResponseErrors() throws PMException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        testCompilationError(
+            """
+            create obligation "ob1"
+            when any user
+            performs any operation
+            do(evt) {
+                create obligation "ob2"
+                when any user
+                performs any operation
+                do(evt2) {
+                    badOp1()
+                }
+                badOp2()
+            }
+            """, visitorCtx, 2,
+            "unknown operation 'badOp1' in scope",
+            "unknown operation 'badOp2' in scope"
+        );
+    }
+
+    @Test
+    void testMultipleResponseStmtErrors() throws PMException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        testCompilationError(
+            """
+            create obligation "ob1"
+            when any user
+            performs any operation
+            do(evt) {
+                badOp1()
+                badOp2()
+            }
+            """, visitorCtx, 2,
+            "unknown operation 'badOp1' in scope",
+            "unknown operation 'badOp2' in scope"
+        );
+    }
+
+    @Test
     void testOnClauseEventParamAccessibleAsVariable() throws PMException {
         // A param named in on(argA) must be available as a variable inside the block
         VisitorContext visitorCtx = buildScopeWithTestOp();

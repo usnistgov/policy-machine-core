@@ -28,6 +28,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationPatternFuncContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.StatementBlockParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
@@ -236,9 +237,17 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
             StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
 
             List<PMLStatement<?>> stmts = new ArrayList<>();
+            List<CompileError> responseErrors = new ArrayList<>();
             for (PMLParser.StatementContext responseStmtCtx : responseStmtsCtx) {
-                PMLStatement<?> stmt = statementVisitor.visitStatement(responseStmtCtx);
-                stmts.add(stmt);
+                try {
+                    stmts.add(statementVisitor.visitStatement(responseStmtCtx));
+                } catch (PMLCompilationRuntimeException e) {
+                    responseErrors.addAll(e.getErrors());
+                }
+            }
+
+            if (!responseErrors.isEmpty()) {
+                throw new PMLCompilationRuntimeException(responseErrors);
             }
 
             return new ObligationResponse(evtVar, stmts);

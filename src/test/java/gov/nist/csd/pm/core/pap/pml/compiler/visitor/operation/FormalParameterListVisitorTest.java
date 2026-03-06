@@ -104,6 +104,39 @@ class FormalParameterListVisitorTest {
             @node bool a
             """;
         OperationFormalParamListContext ctx1 = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
-        assertThrows(PMLCompilationRuntimeException.class, () -> visitor.visitOperationFormalParamList(ctx1));
+        PMLCompilationRuntimeException ex = assertThrows(PMLCompilationRuntimeException.class,
+            () -> visitor.visitOperationFormalParamList(ctx1));
+        assertEquals(1, ex.getErrors().size());
+        assertEquals("@node annotation cannot be applied to type bool", ex.getErrors().get(0).errorMessage());
+    }
+
+    @Test
+    void testMultipleDuplicateParamNames() throws PMException {
+        String pml = "string a, string a, string b, string b";
+        OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        FormalParameterListVisitor visitor = new FormalParameterListVisitor(visitorCtx);
+
+        PMLCompilationRuntimeException e = assertThrows(
+            PMLCompilationRuntimeException.class,
+            () -> visitor.visitOperationFormalParamList(ctx));
+        assertEquals(2, e.getErrors().size());
+        assertEquals("formal arg 'a' already defined in signature or as a constant",
+            e.getErrors().get(0).errorMessage());
+        assertEquals("formal arg 'b' already defined in signature or as a constant",
+            e.getErrors().get(1).errorMessage());
+    }
+
+    @Test
+    void testMultipleInvalidNodeAnnotationTypes() throws PMException {
+        String pml = "@node bool a, @node bool b";
+        OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        FormalParameterListVisitor visitor = new FormalParameterListVisitor(visitorCtx);
+
+        PMLCompilationRuntimeException e = assertThrows(
+            PMLCompilationRuntimeException.class,
+            () -> visitor.visitOperationFormalParamList(ctx));
+        assertEquals(2, e.getErrors().size());
     }
 }

@@ -209,6 +209,21 @@ class OperationInvokeStmtVisitorTest {
     }
 
     @Test
+    void testMultipleArgTypeErrors() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError(
+            """
+            func1(a=true, b=true, c=["c", "d"])
+            """, visitorCtx, 2,
+            "expected expression type string, got bool",
+            "expected expression type string, got bool"
+        );
+    }
+
+    @Test
     void testNoArgs() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
             """

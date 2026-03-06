@@ -142,6 +142,21 @@ class ForeachStmtVisitorTest {
     }
 
     @Test
+    void testMultipleBodyStmtErrors() throws PMException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        testCompilationError(
+            """
+            foreach x in ["a", "b"] {
+                badOp1()
+                badOp2()
+            }
+            """, visitorCtx, 2,
+            "unknown operation 'badOp1' in scope",
+            "unknown operation 'badOp2' in scope"
+        );
+    }
+
+    @Test
     void testKeyValueOnArrayReturnsError() throws VariableAlreadyDefinedInScopeException {
         VisitorContext visitorCtx = new VisitorContext(testScope);
 

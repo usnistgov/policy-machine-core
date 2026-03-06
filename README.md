@@ -306,7 +306,7 @@ public class PMLExample {
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
         long adminUserId = pap.query().graph().getNodeId("admin_user");
         pdp.executePML(new UserContext(adminUserId), """
-            create_new_user("testUser")
+            create_new_user(username="testUser")
             """);
 
         // check admin operation and obligation response was successful
@@ -319,7 +319,7 @@ public class PMLExample {
         assertThrows(
             UnauthorizedException.class,
             () -> pdp.executePML(new UserContext(testUserId), """
-                create_new_user("testUser2")
+                create_new_user(username="testUser2")
                 """)
         );
     }

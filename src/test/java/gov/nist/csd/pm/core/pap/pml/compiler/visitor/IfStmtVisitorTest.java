@@ -68,6 +68,37 @@ class IfStmtVisitorTest {
     }
 
     @Test
+    void testMultipleBodyStmtErrors() throws PMException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        testCompilationError(
+            """
+            if true {
+                badOp1()
+                badOp2()
+            }
+            """, visitorCtx, 2,
+            "unknown operation 'badOp1' in scope",
+            "unknown operation 'badOp2' in scope"
+        );
+    }
+
+    @Test
+    void testErrorsAcrossBranches() throws PMException {
+        VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
+        testCompilationError(
+            """
+            if true {
+                badOp1()
+            } else {
+                badOp2()
+            }
+            """, visitorCtx, 2,
+            "unknown operation 'badOp1' in scope",
+            "unknown operation 'badOp2' in scope"
+        );
+    }
+
+    @Test
     void testReturnVoidInIf() throws PMException {
         String pml = """
                 adminop f1() {
