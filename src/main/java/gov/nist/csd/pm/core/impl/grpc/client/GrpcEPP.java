@@ -24,17 +24,13 @@ public class GrpcEPP {
     }
 
     public void processEvent(String operation, Map<String, Object> args) {
-        try {
-            new GrpcEventSubscriber(EPPServiceGrpc.newBlockingStub(managedChannel))
-                .processEvent(
-                    new EventContext(
-                        new EventContextUser(user, process),
-                        operation,
-                        args
-                    )
-                );
-        } catch (PMException e) {
-            logger.warn("error processing operation {}", operation, e);
-        }
+        new GrpcEventSubscriber(EPPServiceGrpc.newBlockingStub(managedChannel))
+            .processEvent(
+                new EventContext(
+                    new EventContextUser(user, process),
+                    operation,
+                    args
+                )
+            );
     }
 }

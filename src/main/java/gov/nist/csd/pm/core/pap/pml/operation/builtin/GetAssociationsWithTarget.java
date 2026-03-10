@@ -24,7 +24,7 @@ public class GetAssociationsWithTarget extends PMLQueryOperation<List<Map<String
 
     public GetAssociationsWithTarget() {
         super(
-            "getAssociationsWithTarget",
+            "get_associations_with_target",
             returnType,
             List.of(NODE_NAME_PARAM),
             List.of()

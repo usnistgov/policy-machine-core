@@ -33,7 +33,7 @@ public class AnyTypeOperationTest {
             "testOp",
             STRING_TYPE,
             List.of(
-                new FormalParameter<>("arg", ANY_TYPE)
+                new FormalParameter<>("a", ANY_TYPE)
             ),
             List.of());
 
@@ -42,11 +42,11 @@ public class AnyTypeOperationTest {
         VisitorContext visitorContext = new VisitorContext(scope);
 
         String[] testCalls = {
-            "testOp(\"string value\")",
-            "testOp(\"value2\")",
-            "testOp(true)",
-            "testOp([\"a\", \"b\", \"c\"])",
-            "testOp({\"key\": \"value\"})"
+            "testOp(a=\"string value\")",
+            "testOp(a=\"value2\")",
+            "testOp(a=true)",
+            "testOp(a=[\"a\", \"b\", \"c\"])",
+            "testOp(a={\"key\": \"value\"})"
         };
 
         for (String call : testCalls) {
@@ -101,8 +101,8 @@ public class AnyTypeOperationTest {
             "listMapFunction",
             ANY_TYPE,
             Arrays.asList(
-                new FormalParameter<>("arrayArg", ListType.of(ANY_TYPE)),
-                new FormalParameter<>("mapArg", MapType.of(STRING_TYPE, ANY_TYPE))
+                new FormalParameter<>("a", ListType.of(ANY_TYPE)),
+                new FormalParameter<>("b", MapType.of(STRING_TYPE, ANY_TYPE))
             ),
             List.of());
 
@@ -112,8 +112,8 @@ public class AnyTypeOperationTest {
 
         String functionCall = """
                 listMapFunction(
-                    ["string", "value", true],
-                    {
+                    a=["string", "value", true],
+                    b={
                         "string": "value",
                         "string2": "value2",
                         "boolean": true,
@@ -137,7 +137,7 @@ public class AnyTypeOperationTest {
             "nestedFunction",
             ListType.of(MapType.of(STRING_TYPE, ANY_TYPE)),
             List.of(
-                new FormalParameter<>("complexArg",
+                new FormalParameter<>("a",
                     MapType.of(STRING_TYPE, ListType.of(ANY_TYPE)))
             ),
             List.of());
@@ -147,7 +147,7 @@ public class AnyTypeOperationTest {
         VisitorContext visitorContext = new VisitorContext(scope);
 
         String functionCall = """
-                nestedFunction({
+                nestedFunction(a={
                     "array1": ["one", "two", true],
                     "array2": [{
                         "nested": "value"
@@ -171,8 +171,8 @@ public class AnyTypeOperationTest {
             "anyParamFunction",
             ANY_TYPE,
             Arrays.asList(
-                new FormalParameter<>("stringArg", STRING_TYPE),
-                new FormalParameter<>("objectArg", ANY_TYPE)
+                new FormalParameter<>("a", STRING_TYPE),
+                new FormalParameter<>("b", ANY_TYPE)
             ),
             List.of());
 
@@ -181,10 +181,10 @@ public class AnyTypeOperationTest {
         VisitorContext visitorContext = new VisitorContext(scope);
 
         String[] validCalls = {
-            "anyParamFunction(\"string\", \"value\")",
-            "anyParamFunction(\"string\", true)",
-            "anyParamFunction(\"string\", [\"a\", \"b\", \"c\"])",
-            "anyParamFunction(\"string\", {\"key\": \"value\"})"
+            "anyParamFunction(a=\"string\", b=\"value\")",
+            "anyParamFunction(a=\"string\", b=true)",
+            "anyParamFunction(a=\"string\", b=[\"a\", \"b\", \"c\"])",
+            "anyParamFunction(a=\"string\", b={\"key\": \"value\"})"
         };
 
         for (String call : validCalls) {

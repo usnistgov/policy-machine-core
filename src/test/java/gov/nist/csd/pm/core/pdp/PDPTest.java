@@ -253,7 +253,7 @@ class PDPTest {
                 set resource access rights ["read", "write"]
                 
                 @reqcap({
-                    require ["read"] on [name(id)]
+                    require ["read"] on [name(id=id)]
                 })
                 resourceop read_file(@node int64 id) {}
 

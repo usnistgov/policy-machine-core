@@ -53,9 +53,9 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                     create obligation "grant_super_on_new_ua_assigned_to_pc"
                     when any user
                     performs "create_user_attribute" on (descendants) {
-                        pcs := getPolicyClassIds()
+                        pcs := get_policy_class_ids()
                         foreach pcId in pcs {
-                            if contains(descendants, pcId) {
+                            if contains(arr=descendants, element=pcId) {
                                 return true
                             }
                         }
@@ -69,9 +69,9 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                     create obligation "grant_super_on_new_oa_assigned_to_pc"
                     when any user
                     performs "create_object_attribute" on (descendants) {
-                        pcs := getPolicyClassIds()
+                        pcs := get_policy_class_ids()
                         foreach pcId in pcs {
-                            if contains(descendants, pcId) {
+                            if contains(arr=descendants, element=pcId) {
                                 return true
                             }
                         }
@@ -86,9 +86,9 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                     when any user
                                         
                     performs "assign" on (descendants) {
-                        pcs := getPolicyClassIds()
+                        pcs := get_policy_class_ids()
                         foreach pcId in pcs {
-                            if contains(descendants, pcId) {
+                            if contains(arr=descendants, element=pcId) {
                                 return true
                             }
                         }
@@ -96,7 +96,7 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                         return false
                     } 
                     do(ctx) {
-                        associate "@super" to name(ctx.args.ascendant) with ["admin:*"]
+                        associate "@super" to name(id=ctx.args.ascendant) with ["admin:*"]
                     }                    
                     """;
             // execute the obligation pml

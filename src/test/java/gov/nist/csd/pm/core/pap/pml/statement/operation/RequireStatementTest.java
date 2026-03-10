@@ -116,7 +116,8 @@ class RequireStatementTest {
         PMLCompilationRuntimeException e = assertThrows(
             PMLCompilationRuntimeException.class,
             () -> pap.executePML(new TestUserContext("u1"), pml));
-        assertEquals("unknown operation 'testOp' in scope", e.getMessage());
+        assertEquals(1, e.getErrors().size());
+        assertEquals("unknown operation 'testOp' in scope", e.getErrors().get(0).errorMessage());
     }
 
 }

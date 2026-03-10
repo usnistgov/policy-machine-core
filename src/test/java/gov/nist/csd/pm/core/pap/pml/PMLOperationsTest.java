@@ -42,11 +42,11 @@ public class PMLOperationsTest {
                     performs any operation
                     do(ctx) {
                     	name := ctx.opName
-                    	if nodeExists(name) {
+                    	if node_exists(node_name=name) {
                     		return
                     	}
                     	
-                        op1(ctx.opName)
+                        op1(name=ctx.opName)
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
@@ -79,7 +79,7 @@ public class PMLOperationsTest {
                 associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["*"]
                 
                 routine op1(string name) {
-                    if !nodeExists(name) {
+                    if !node_exists(node_name=name) {
                         create pc name
                     }
                 }
@@ -88,7 +88,7 @@ public class PMLOperationsTest {
                     when any user
                     performs any operation
                     do(ctx) {
-                        op1("test")
+                        op1(name="test")
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
@@ -218,7 +218,7 @@ public class PMLOperationsTest {
 				return a
 			}
 			
-			return ok2("a") + ok2("b")
+			return ok2(a="a") + ok2(a="b")
 		}
 		
 		create pc ok1()
@@ -240,10 +240,10 @@ public class PMLOperationsTest {
 				return
 			}
 			
-			op1("end")
+			op1(x="end")
 		}
 		
-		op1("start")
+		op1(x="start")
 		""";
 
 		PAP pap = new TestPAP();

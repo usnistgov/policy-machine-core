@@ -101,7 +101,7 @@ public class PMLTest {
 
         PDP pdp = new PDP(pap);
         pdp.executePML(new TestUserContext("u1"), """
-                op1("a", ["b", "c"], {"d": "e", "f": "g"})
+                op1(a="a", b=["b", "c"], c={"d": "e", "f": "g"})
                 """);
         assertTrue(pap.query().graph().nodeExists("1a"));
         assertTrue(pap.query().graph().nodeExists("1b"));
@@ -112,11 +112,11 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1g"));
 
         assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext(id("u2")), """
-                op1("a", ["b", "c"], {"d": "e", "f": "g"})
+                op1(a="a", b=["b", "c"], c={"d": "e", "f": "g"})
                 """));
 
         pdp.executePML(new TestUserContext("u1"), """
-                routine1("1", ["2", "3"], {"4": "5", "6": "7"})
+                routine1(a="1", b=["2", "3"], c={"4": "5", "6": "7"})
                 """);
         assertTrue(pap.query().graph().nodeExists("11"));
         assertTrue(pap.query().graph().nodeExists("12"));
@@ -127,7 +127,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("17"));
 
         assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext(id("u2")), """
-                routine1("1", ["2", "3"], {"4": "5", "6": "7"})
+                routine1(a="1", b=["2", "3"], c={"4": "5", "6": "7"})
                 """));
     }
 
@@ -163,7 +163,7 @@ public class PMLTest {
                 }
                 
                 routine routine1(string a, []string b, map[string]string c) {
-                    op1(a, b, c)
+                    op1(a=a, b=b, c=c)
                 }
                 """);
 
@@ -234,8 +234,8 @@ public class PMLTest {
             
             adminop op4([]string a) {}
             
-            op2(op1())
-            op4(op3())
+            op2(a=op1())
+            op4(a=op3())
             """;
         MemoryPAP pap = new MemoryPAP();
         assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
@@ -264,7 +264,7 @@ public class PMLTest {
             
             a := op1()
             a = "test"
-            op2(a)
+            op2(s=a)
             
             """;
         MemoryPAP pap = new MemoryPAP();
@@ -278,7 +278,7 @@ public class PMLTest {
                 return a
             }
             
-            if op1("a") == "a" {
+            if op1(a="a") == "a" {
                 return "a"
             }
             
@@ -297,7 +297,7 @@ public class PMLTest {
             create obligation "o1"
             when any user
             performs "test" on () {
-                a := getAdjacentAscendants("123")
+                a := get_adjacent_ascendants(node_name="123")
                 b := test()
             }
             do(ctx) {
@@ -323,7 +323,7 @@ public class PMLTest {
             adminop test() string { return "test" }
             
             query q1() string {
-                n := getNode("123")
+                n := get_node(node_name="123")
                 return test()
             }
             """;
@@ -341,7 +341,7 @@ public class PMLTest {
     @Test
     void testPMLBlockReturnWithDifferentReturnTypes() throws PMException {
         String pml = """
-            if nodeExists("a") {
+            if node_exists(node_name="a") {
                 return "a"
             }
             
@@ -364,11 +364,11 @@ public class PMLTest {
                 """);
 
         assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), """
-                getNode("pc1")
+                get_node(node_name="pc1")
                 """));
 
         assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(-1), """
-                getNode("pc1").name
+                get_node(node_name="pc1").name
                 """));
     }
 

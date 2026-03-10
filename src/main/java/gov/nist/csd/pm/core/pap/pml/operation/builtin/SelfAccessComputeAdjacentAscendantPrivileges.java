@@ -22,7 +22,7 @@ public class SelfAccessComputeAdjacentAscendantPrivileges extends QueryOperation
         new NodeNameFormalParameter("node_name");
 
     public SelfAccessComputeAdjacentAscendantPrivileges() {
-        super("selfAccessComputeAdjacentAscendantPrivileges", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE)),
+        super("self_compute_adjacent_ascendant_privileges", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE)),
             List.of(NODE_NAME_PARAM), List.of());
     }
 

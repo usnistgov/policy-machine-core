@@ -63,6 +63,10 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return formalParameters;
     }
 
+    public List<FormalParameter<?>> getRequiredFormalParameters() {
+        return formalParameters.stream().filter(FormalParameter::isRequired).toList();
+    }
+
     public List<FormalParameter<?>> getEventParameters() {
         return eventParameters;
     }
@@ -105,10 +109,12 @@ public class PMLOperationSignature implements PMLStatementSerializable {
             }
 
             String annotationStr = formalParameter instanceof NodeFormalParameter<?> ? "@node ": "";
-            pml += String.format("%s%s %s",
+            pml += String.format("%s%s %s%s",
                 annotationStr,
                 TypeStringer.toPMLString(formalParameter.getType()),
-                formalParameter.getName());
+                formalParameter.getName(),
+                formalParameter.isRequired() ? "" : "?"
+            );
         }
         return pml;
     }

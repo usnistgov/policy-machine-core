@@ -35,8 +35,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EPP implements EventSubscriber {
+
+    private static final Logger logger = LoggerFactory.getLogger(EPP.class);
 
     private final PAP pap;
     private final PDP pdp;
@@ -47,30 +51,39 @@ public class EPP implements EventSubscriber {
     }
 
     @Override
-    public void processEvent(EventContext eventCtx) throws PMException {
+    public void processEvent(EventContext eventCtx) {
         // operate on a snapshot of the obligations so that if an obligation is added or removed in the response of
         // a matched obligation, it does not get processed in this invocation
-        Collection<Obligation> obligations = new ArrayList<>(pap.query().obligations().getObligations());
+        Collection<Obligation> obligations = new ArrayList<>();
+        try {
+            obligations = new ArrayList<>(pap.query().obligations().getObligations());
+        } catch (PMException e) {
+            logger.error("error retrieving obligations", e);
+        }
+
         for (Obligation obligation : obligations) {
             long author = obligation.getAuthorId();
             UserContext authorCtx = new UserContext(author);
 
-            pdp.runTx(authorCtx, pdpTx -> {
-                // create an execution context with the event context in scope - all other vars and ops are pre loaded
-                ExecutionContext executionContext = pdpTx.buildExecutionContext(authorCtx);
-                executionContext.scope().addVariable("ctx", eventCtx.toMap());
+            try {
+                pdp.runTx(authorCtx, pdpTx -> {
+                    // create an execution context with the event context in scope - all other vars and ops are pre loaded
+                    ExecutionContext executionContext = pdpTx.buildExecutionContext(authorCtx);
+                    executionContext.scope().addVariable("ctx", eventCtx.toMap());
 
-                // pass a copy of the execution context so the scope does not propagate
-                if (!matches(authorCtx, pdpTx, eventCtx, executionContext.copy(), obligation.getEventPattern())) {
+                    // pass a copy of the execution context so the scope does not propagate
+                    if (!matches(authorCtx, pdpTx, eventCtx, executionContext.copy(), obligation.getEventPattern())) {
+                        return null;
+                    }
+
+                    // execute the obligation response as the stored author
+                    pdpTx.executeObligationResponse(eventCtx, executionContext.copy(), obligation.getResponse());
+
                     return null;
-                }
-
-                // execute the obligation response as the stored author
-                pdpTx.executeObligationResponse(eventCtx, executionContext.copy(), obligation.getResponse());
-
-                return null;
-            });
-
+                });
+            } catch (Exception e) {
+                logger.error("error processing event context {} with obligation {}", eventCtx, obligation.getName(), e);
+            }
         }
     }
 

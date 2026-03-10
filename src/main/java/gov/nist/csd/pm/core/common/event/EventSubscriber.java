@@ -17,10 +17,10 @@ public interface EventSubscriber {
     }
 
     /**
-     * Process the given EventContext.
+     * Process the given EventContext. This method should not throw an exception as EPP errors should not
+     * affect the adjudication of the operation that triggered them.
      * @param eventCtx The event context to process.
-     * @throws PMException If there is an error processing the EventContext.
      */
-    void processEvent(EventContext eventCtx) throws PMException;
+    void processEvent(EventContext eventCtx);
 
 }

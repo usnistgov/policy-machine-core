@@ -44,11 +44,15 @@ class GetAssociationsWithSourceTest {
             create oa "oa1" in ["pc1"]
             associate "ua1" to "oa1" with ["*"]
             
-            assocs := getAssociationsWithSource("ua1")
+            assocs := get_associations_with_source(node_name="ua1")
             
             foreach assoc in assocs {
                 associate "ua2" to "oa1" with assoc.arset
             }
+           
+            create conjunctive node prohibition "p1"
+            deny "ua1"
+            arset ["*"]
            
             """;
         MemoryPAP pap = new TestPAP();

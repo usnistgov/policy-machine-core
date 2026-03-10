@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.scope.PMLScopeException;
@@ -57,12 +58,18 @@ public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
         }
 
         List<PMLStatement<?>> block = new ArrayList<>();
+        List<CompileError> bodyErrors = new ArrayList<>();
         for (PMLParser.StatementContext stmtCtx : ctx.statementBlock().statement()) {
-            PMLStatement<?> statement = new StatementVisitor(localVisitorCtx)
-                    .visitStatement(stmtCtx);
-            block.add(statement);
-
+            try {
+                block.add(new StatementVisitor(localVisitorCtx).visitStatement(stmtCtx));
+            } catch (PMLCompilationRuntimeException e) {
+                bodyErrors.addAll(e.getErrors());
+            }
             visitorCtx.scope().overwriteFromScope(localVisitorCtx.scope());
+        }
+
+        if (!bodyErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(bodyErrors);
         }
 
         return new ForeachStatement(varName, mapValueVarName, iter, block);

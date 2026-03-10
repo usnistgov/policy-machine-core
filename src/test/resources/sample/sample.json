@@ -195,12 +195,12 @@
     {
       "author": 14,
       "name": "create us project admin",
-      "pml": "create obligation \"create us project admin\"\n    when any user\n    performs \"createProject\" on (locProjectAttr) {\n      return locProjectAttr == \"US project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
+      "pml": "create obligation \"create us project admin\"\n    when any user\n    performs \"createProject\" on (locProjectAttr) {\n      return locProjectAttr == \"US project\"\n    }\n    do(ctx) {\n        createProjectAdmin(projectName=ctx.args.projectName)\n    }"
     },
     {
       "author": 14,
       "name": "create eu project admin",
-      "pml": "create obligation \"create eu project admin\"\n    when any user\n    performs \"createProject\" on (locProjectAttr) {\n        return locProjectAttr == \"EU project\"\n    }\n    do(ctx) {\n        createProjectAdmin(ctx.args.projectName)\n    }"
+      "pml": "create obligation \"create eu project admin\"\n    when any user\n    performs \"createProject\" on (locProjectAttr) {\n        return locProjectAttr == \"EU project\"\n    }\n    do(ctx) {\n        createProjectAdmin(projectName=ctx.args.projectName)\n    }"
     }
   ],
   "operations": {
@@ -211,7 +211,7 @@
       "adminop createProjectAdmin(string projectName) {\n    uaName := projectName + \" admin\"\n    create UA uaName in [\"writer\"]\n    associate uaName to projectName with [\"*\"]\n\n    create conj node prohibition \"deny admin delete README\"\n    deny uaName\n    arset [\"delete_readme\"]\n    include [projectName]\n}"
     ],
     "routines": [
-      "routine deleteAllProjects(string locProjectOA) {\n    foreach project in getAdjacentAscendants(locProjectOA) {\n        deleteReadme(project + \" README\")\n        deleteProject(project)\n    }\n}"
+      "routine deleteAllProjects(string locProjectOA) {\n    foreach project in get_adjacent_ascendants(locProjectOA) {\n        deleteReadme(project + \" README\")\n        deleteProject(project)\n    }\n}"
     ]
   }
 }

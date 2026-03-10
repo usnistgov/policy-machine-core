@@ -16,7 +16,7 @@ public class AppendAll extends PMLFunctionOperation<List<Object>> {
 
     public AppendAll() {
         super(
-                "appendAll",
+                "append_all",
                 ListType.of(ANY_TYPE),
                 List.of(DST_PARAM, SRC_LIST_PARAM)
         );

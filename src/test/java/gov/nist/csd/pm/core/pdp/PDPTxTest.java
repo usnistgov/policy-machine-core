@@ -120,8 +120,7 @@ class PDPTxTest {
 
         PDP pdp = new PDP(testPAP);
         EPP epp = new EPP(pdp, testPAP);
-        assertThrows(
-            UnauthorizedException.class,
+        assertDoesNotThrow(
             () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
         );
     }
@@ -154,8 +153,7 @@ class PDPTxTest {
 
         PDP pdp = new PDP(testPAP);
         EPP epp = new EPP(pdp, testPAP);
-        assertThrows(
-            UnauthorizedException.class,
+        assertDoesNotThrow(
             () -> epp.processEvent(new EventContext(new EventContextUser("u2"), "read_file", Map.of("n", "oa1")))
         );
     }

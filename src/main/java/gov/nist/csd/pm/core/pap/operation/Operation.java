@@ -107,6 +107,10 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         return parameters;
     }
 
+    public List<FormalParameter<?>> getRequiredFormalParameters() {
+        return parameters.stream().filter(FormalParameter::isRequired).toList();
+    }
+
     public List<RequiredCapability> getRequiredCapabilities() {
         return requiredCapabilities;
     }
@@ -125,7 +129,7 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
         Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
         Set<String> allParamNames = new HashSet<>(parameters.stream().map(FormalParameter::getName).toList());
         Set<String> requiredParamNames = new HashSet<>(parameters.stream()
-            .filter(p -> p instanceof NodeFormalParameter)
+            .filter(FormalParameter::isRequired)
             .map(FormalParameter::getName)
             .toList());
 
@@ -134,7 +138,7 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
             throw new IllegalArgumentException("unexpected args " + rawArgNames + ", expected " + allParamNames);
         }
 
-        // check for required args (NodeFormalParameters only)
+        // check for required args
         if (!rawArgNames.containsAll(requiredParamNames)) {
             throw new IllegalArgumentException("required args " + requiredParamNames + ", received " + rawArgNames);
         }
@@ -147,7 +151,7 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
 
     /**
      * Convert the given map of raw args to an Arg object with type checking on arg values. This method allows a subset
-     * of the expected event parameters to be present in the rawArgs.
+     * of the required parameters to be present in the rawArgs.
      * @param rawArgs The raw args to validate and prepare.
      * @return An Args object.
      */

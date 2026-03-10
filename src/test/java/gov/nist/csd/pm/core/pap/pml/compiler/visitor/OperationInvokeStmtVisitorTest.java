@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationTyp
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class OperationInvokeStmtVisitorTest {
@@ -36,10 +37,10 @@ class OperationInvokeStmtVisitorTest {
 
     OperationInvokeExpression<String> expected = new OperationInvokeExpression(
         signature.getName(),
-        List.of(
-            new StringLiteralExpression("a"),
-            new StringLiteralExpression("b"),
-            buildArrayLiteral("c", "d")
+        Map.of(
+            "a", new StringLiteralExpression("a"),
+            "b", new StringLiteralExpression("b"),
+            "c", buildArrayLiteral("c", "d")
         ),
         STRING_TYPE
     );
@@ -48,7 +49,7 @@ class OperationInvokeStmtVisitorTest {
     void testSuccess() throws PMException {
         PMLParser.StatementContext ctx = TestPMLParser.parseStatement(
             """
-            func1("a", "b", ["c", "d"])
+            func1(a="a", b="b", c=["c", "d"])
             """);
 
         CompileScope compileScope = new CompileScope(new MemoryPAP());
@@ -84,9 +85,9 @@ class OperationInvokeStmtVisitorTest {
 
         testCompilationError(
             """
-            func1("a", "b")
+            func1(a="a", b="b")
             """, visitorCtx, 1,
-            "wrong number of args for operation call func1: expected 3, got 2"
+            "required formal parameters: [a, b, c], got: [a, b]"
         );
     }
 
@@ -97,9 +98,128 @@ class OperationInvokeStmtVisitorTest {
         VisitorContext visitorCtx = new VisitorContext(compileScope);
         testCompilationError(
             """
-            func1("a", "b", true)
+            func1(a="a", b="b", c=true)
             """, visitorCtx, 1,
             "expected expression type []string, got bool"
+        );
+    }
+
+    @Test
+    void testOptionalParamCanBeOmitted() throws PMException {
+        FormalParameter<String> required = new FormalParameter<>("a", STRING_TYPE, true);
+        FormalParameter<String> optional = new FormalParameter<>("b", STRING_TYPE, false);
+        PMLOperationSignature sig = new PMLOperationSignature(
+            OperationType.FUNCTION, "func2", STRING_TYPE,
+            List.of(required, optional),
+            List.of());
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            func2(a="a")
+            """);
+
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func2", sig);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        PMLStatement<?> stmt = new OperationInvokeStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+            new OperationInvokeExpression<>("func2",
+                Map.of("a", new StringLiteralExpression("a")),
+                STRING_TYPE),
+            stmt
+        );
+    }
+
+    @Test
+    void testOptionalParamCanBeProvided() throws PMException {
+        FormalParameter<String> required = new FormalParameter<>("a", STRING_TYPE, true);
+        FormalParameter<String> optional = new FormalParameter<>("b", STRING_TYPE, false);
+        PMLOperationSignature sig = new PMLOperationSignature(
+            OperationType.FUNCTION, "func2", STRING_TYPE,
+            List.of(required, optional),
+            List.of());
+
+        PMLParser.StatementContext ctx = TestPMLParser.parseStatement("""
+            func2(a="a", b="b")
+            """);
+
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func2", sig);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        PMLStatement<?> stmt = new OperationInvokeStmtVisitor(visitorCtx).visit(ctx);
+        assertEquals(0, visitorCtx.errorLog().getErrors().size());
+        assertEquals(
+            new OperationInvokeExpression<>("func2",
+                Map.of(
+                    "a", new StringLiteralExpression("a"),
+                    "b", new StringLiteralExpression("b")),
+                STRING_TYPE),
+            stmt
+        );
+    }
+
+    @Test
+    void testRequiredParamMissingWhenOptionalPresent() throws PMException {
+        FormalParameter<String> required = new FormalParameter<>("a", STRING_TYPE, true);
+        FormalParameter<String> optional = new FormalParameter<>("b", STRING_TYPE, false);
+        PMLOperationSignature sig = new PMLOperationSignature(
+            OperationType.FUNCTION, "func2", STRING_TYPE,
+            List.of(required, optional),
+            List.of());
+
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func2", sig);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError("""
+            func2(b="b")
+            """, visitorCtx, 1,
+            "required formal parameters: [a], got: [b]"
+        );
+    }
+
+    @Test
+    void testUnknownParamName() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError(
+            """
+            func1(a="a", b="b", c=["c", "d"], unknown="x")
+            """, visitorCtx, 1,
+            "unknown parameter 'unknown' for operation 'func1'"
+        );
+    }
+
+    @Test
+    void testDuplicateArgName() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError(
+            """
+            func1(a="first", a="second", b="b", c=["c", "d"])
+            """, visitorCtx, 1,
+            "duplicate argument 'a' for operation 'func1'"
+        );
+    }
+
+    @Test
+    void testMultipleArgTypeErrors() throws PMException {
+        CompileScope compileScope = new CompileScope(new MemoryPAP());
+        compileScope.addOperation("func1", signature);
+        VisitorContext visitorCtx = new VisitorContext(compileScope);
+
+        testCompilationError(
+            """
+            func1(a=true, b=true, c=["c", "d"])
+            """, visitorCtx, 2,
+            "expected expression type string, got bool",
+            "expected expression type string, got bool"
         );
     }
 
@@ -127,7 +247,7 @@ class OperationInvokeStmtVisitorTest {
 
         OperationInvokeExpression<?> expected = new OperationInvokeExpression(
             signature.getName(),
-            List.of(),
+            Map.of(),
             signature.getReturnType()
         );
 

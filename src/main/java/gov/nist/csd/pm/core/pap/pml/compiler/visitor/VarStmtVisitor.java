@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
 
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
@@ -26,17 +27,22 @@ public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
     @Override
     public PMLStatement<?> visitVarDeclaration(PMLParser.VarDeclarationContext ctx) {
         List<VariableDeclarationStatement.Declaration> decls = new ArrayList<>();
+        List<CompileError> varErrors = new ArrayList<>();
         for (PMLParser.VarSpecContext varSpecContext : ctx.varSpec()) {
-            String varName = varSpecContext.ID().getText();
-            Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, varSpecContext.expression(), ANY_TYPE);
-
             try {
+                String varName = varSpecContext.ID().getText();
+                Expression<Object> expr = ExpressionVisitor.compile(visitorCtx, varSpecContext.expression(), ANY_TYPE);
                 visitorCtx.scope().addVariable(varName, new Variable(varName, expr.getType(), false));
+                decls.add(new VariableDeclarationStatement.Declaration(varName, expr));
+            } catch (PMLCompilationRuntimeException e) {
+                varErrors.addAll(e.getErrors());
             } catch (PMLScopeException e) {
-                throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+                varErrors.add(CompileError.fromParserRuleContext(varSpecContext, e.getMessage()));
             }
+        }
 
-            decls.add(new VariableDeclarationStatement.Declaration(varName, expr));
+        if (!varErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(varErrors);
         }
 
         return new VariableDeclarationStatement(decls);

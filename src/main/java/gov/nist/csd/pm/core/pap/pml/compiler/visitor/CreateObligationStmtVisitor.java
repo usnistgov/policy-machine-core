@@ -28,14 +28,17 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationPatternFuncContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.StatementBlockParser;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.UnknownOperationInScopeException;
 import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
+import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -169,7 +172,7 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 PMLOperationSignature operation = visitorCtx.scope().getOperation(opName);
                 List<FormalParameter<?>> eventParameters = operation.getEventParameters();
 
-                // check that all of the argNames are defined as formal params for the operation
+                // check that all of the argNames are defined as event params for the operation
                 Set<String> eventParamNames = eventParameters.stream().map(FormalParameter::getName).collect(Collectors.toSet());
                 if (!eventParamNames.containsAll(argNames)) {
                     throw new PMLCompilationRuntimeException(onPatternContext,
@@ -185,8 +188,15 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
                 // remove non query functions from visitor ctx
                 VisitorContext copy = visitorCtx.copyFunctionsAndQueriesOnly();
 
+                PMLParser.OnPatternBlockContext onPatternBlockCtx = onPatternContext.onPatternBlock();
+                if (onPatternBlockCtx == null) {
+                    return new MatchesOperationPattern(opName,
+                        new OnPattern(argNames, new PMLStmtsRoutine<>("", BOOLEAN_TYPE, patternParams,
+                            new PMLStatementBlock(List.of(new ReturnStatement(new BoolLiteralExpression(true)))))));
+                }
+
                 PMLStatementBlock pmlStatementBlock = StatementBlockParser.parseOnStatementBlock(copy,
-                    onPatternContext.onPatternBlock(), BOOLEAN_TYPE, patternParams);
+                    onPatternBlockCtx, BOOLEAN_TYPE, patternParams);
 
                 return new MatchesOperationPattern(
                     opName,
@@ -227,9 +237,17 @@ public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligation
             StatementVisitor statementVisitor = new StatementVisitor(localVisitorCtx);
 
             List<PMLStatement<?>> stmts = new ArrayList<>();
+            List<CompileError> responseErrors = new ArrayList<>();
             for (PMLParser.StatementContext responseStmtCtx : responseStmtsCtx) {
-                PMLStatement<?> stmt = statementVisitor.visitStatement(responseStmtCtx);
-                stmts.add(stmt);
+                try {
+                    stmts.add(statementVisitor.visitStatement(responseStmtCtx));
+                } catch (PMLCompilationRuntimeException e) {
+                    responseErrors.addAll(e.getErrors());
+                }
+            }
+
+            if (!responseErrors.isEmpty()) {
+                throw new PMLCompilationRuntimeException(responseErrors);
             }
 
             return new ObligationResponse(evtVar, stmts);

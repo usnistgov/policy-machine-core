@@ -20,7 +20,7 @@ public class HasPropertyValue extends PMLQueryOperation<Boolean> {
 
     public HasPropertyValue() {
         super(
-                "hasPropertyValue",
+                "has_property_value",
                 BOOLEAN_TYPE,
                 List.of(NODE_NAME_PARAM, Env.KEY_PARAM, VALUE_PARAM),
             List.of()

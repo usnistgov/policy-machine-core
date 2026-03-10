@@ -6,6 +6,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.AnyType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
@@ -24,6 +25,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.Int64LiteralContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalAndExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.LogicalOrExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeArgContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.OperationInvokeContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PlusExpressionContext;
@@ -32,6 +34,7 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.VariableReferenceContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.pml.expression.EqualsExpression;
@@ -58,6 +61,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -176,30 +181,61 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         }
 
         PMLParser.OperationInvokeArgsContext funcCallArgsCtx = ctx.operationInvokeArgs();
-        List<ExpressionContext> argExpressions = new ArrayList<>();
-        PMLParser.ExpressionListContext expressionListContext = funcCallArgsCtx.expressionList();
-        if (expressionListContext != null) {
-            argExpressions = expressionListContext.expression();
+        List<OperationInvokeArgContext> operationInvokeArgs = funcCallArgsCtx.operationInvokeArg();
+        List<FormalParameter<?>> formalParams = operation.getFormalParameters();
+        Map<String, Expression<?>> argExprs = new HashMap<>();
+        List<CompileError> argErrors = new ArrayList<>();
+        for (OperationInvokeArgContext argCtx : operationInvokeArgs) {
+            String paramName = argCtx.ID().getText();
+
+            if (argExprs.containsKey(paramName)) {
+                argErrors.add(CompileError.fromParserRuleContext(argCtx,
+                    "duplicate argument '" + paramName + "' for operation '" + funcName + "'"));
+                continue;
+            }
+
+            FormalParameter<?> formalParam;
+            try {
+                formalParam = validateParam(argCtx, operation.getName(), paramName, formalParams);
+            } catch (PMLCompilationRuntimeException e) {
+                argErrors.addAll(e.getErrors());
+                continue;
+            }
+
+            try {
+                Expression<?> expr = ExpressionVisitor.compile(visitorCtx, argCtx.expression(), formalParam.getType());
+                argExprs.put(paramName, expr);
+            } catch (PMLCompilationRuntimeException e) {
+                argErrors.addAll(e.getErrors());
+            }
         }
 
-        List<FormalParameter<?>> formalArgs = operation.getFormalParameters();
-        if (formalArgs.size() != argExpressions.size()) {
-            throw new PMLCompilationRuntimeException(
-                    ctx,
-                    "wrong number of args for operation call " + funcName + ": " +
-                            "expected " + formalArgs.size() + ", got " + argExpressions.size());
+        if (!argErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(argErrors);
         }
 
-        List<Expression<?>> args = new ArrayList<>();
-        for (int i = 0; i < formalArgs.size(); i++) {
-            PMLParser.ExpressionContext exprCtx = argExpressions.get(i);
-            FormalParameter<?> formalArg = formalArgs.get(i);
-
-            Expression<?> expr = ExpressionVisitor.compile(visitorCtx, exprCtx, formalArg.getType());
-            args.add(expr);
+        Set<String> requiredFormalParameters = operation.getRequiredFormalParameters()
+            .stream()
+            .map(FormalParameter::getName)
+            .collect(Collectors.toSet());
+        if (!argExprs.keySet().containsAll(requiredFormalParameters)) {
+            throw new PMLCompilationRuntimeException(ctx, "required formal parameters: "
+                + requiredFormalParameters + ", got: " + argExprs.keySet());
         }
 
-        return new OperationInvokeExpression<>(funcName, args, operation.getReturnType());
+        return new OperationInvokeExpression<>(funcName, argExprs, operation.getReturnType());
+    }
+
+    private FormalParameter<?> validateParam(ParserRuleContext argCtx, String opName, String name,
+                                             List<FormalParameter<?>> formalParams) {
+        for (FormalParameter<?> formalParam : formalParams) {
+            if (formalParam.getName().equals(name)) {
+                return formalParam;
+            }
+        }
+
+        throw new PMLCompilationRuntimeException(argCtx,
+            "unknown parameter '" + name + "' for operation '" + opName + "'");
     }
 
     @Override

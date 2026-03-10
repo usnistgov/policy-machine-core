@@ -20,7 +20,7 @@ public class GetNodeProperties extends QueryOperation<Map<String, String>> {
 
     public GetNodeProperties() {
         super(
-                "getNodeProperties",
+                "get_node_properties",
                 returnType,
                 List.of(NODE_NAME_PARAM),
                 List.of()

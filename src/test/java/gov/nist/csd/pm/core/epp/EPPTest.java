@@ -110,7 +110,7 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(
             u1,
             "op1",
             Map.of("a", "oa1",
@@ -203,7 +203,7 @@ class EPPTest {
                     when any user
                     performs "create_object_attribute"
                     on (descendants) {
-                        return contains(descendants, id("oa1"))
+                        return contains(arr=descendants, element=id(name="oa1"))
                     }
                     do(evtCtx) {
                         create PC "pc2"
@@ -242,7 +242,7 @@ class EPPTest {
                     when any user
                     performs "create_object_attribute"
                     on (descendants) {
-                        return contains(descendants, id("oa1"))
+                        return contains(arr=descendants, element=id(name="oa1"))
                     }
                     do(ctx) {
                         name := ctx.opName
@@ -316,7 +316,7 @@ class EPPTest {
             )
         );
 
-        assertThrows(PMException.class, () -> epp.processEvent(eventCtx));
+        assertDoesNotThrow(() -> epp.processEvent(eventCtx));
 
         assertFalse(pap.query().graph().nodeExists("o2"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
@@ -358,7 +358,7 @@ class EPPTest {
                     when any user
                     performs "create_object_attribute"
                     on (descendants) {
-                        return contains(descendants, id("oa1"))
+                        return contains(arr=descendants, element=id(name="oa1"))
                     }
                     do(evtCtx) {
                         testFunc()
@@ -398,7 +398,7 @@ class EPPTest {
                     when any user
                     performs "create_object_attribute"
                     on (descendants) {
-                        return contains(descendants, id("oa1"))
+                        return contains(arr=descendants, element=id(name="oa1"))
                     }
                     do(evtCtx) {
                         if true {
@@ -714,7 +714,7 @@ class EPPTest {
                     BOOLEAN_TYPE,
                     List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
                     new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), testCompileScope, """
-                        return name(ascendant) == "a"
+                        return name(id=ascendant) == "a"
                         """))
                 )
             )
@@ -756,7 +756,7 @@ class EPPTest {
                     BOOLEAN_TYPE,
                     List.of(AssignOp.ASSIGN_ASCENDANT_PARAM, AssignOp.ASSIGN_DESCENDANTS_PARAM),
                     new PMLStatementBlock(new PMLCompiler().compilePML(new MemoryPAP(), testCompileScope, """
-                        return name(ascendant) == "b"
+                        return name(id=ascendant) == "b"
                         """))
                 )
             )
@@ -794,7 +794,7 @@ class EPPTest {
             create obligation "1"
             when any user
             performs "assign" on (ascendant) {
-                return ascendant == id("test")
+                return ascendant == id(name="test")
             }
             do(ctx) {
             }

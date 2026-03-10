@@ -15,6 +15,7 @@ ROUTINE: 'routine';
 FUNCTION: 'function';
 OPERATION: 'operation';
 QUERY: 'query';
+OPTIONAL_PARAM: '?';
 
 CREATE : 'create' ;
 DELETE : 'delete' ;

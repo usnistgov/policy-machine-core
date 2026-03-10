@@ -64,14 +64,14 @@ class PMLStmtsResourceOperationTest {
             create pc "b"
             
             resourceop op1([]string a) map[string]any {
-                if contains(a, "a") {
-                    return getNode("a")
+                if contains(arr=a, element="a") {
+                    return get_node(node_name="a")
                 }
                 
                 return {}
             }
             
-            return op1(["a", "b"])
+            return op1(a=["a", "b"])
             
             """);
 

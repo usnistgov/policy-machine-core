@@ -30,6 +30,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStateme
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class OperationInvokeExpressionTest {
@@ -66,7 +67,7 @@ class OperationInvokeExpressionTest {
     void testVoidReturnType() throws PMException {
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
-                voidFunc("a", "b")
+                voidFunc(a="a", b="b")
                 """);
 
 
@@ -77,9 +78,9 @@ class OperationInvokeExpressionTest {
         assertEquals(
                 new OperationInvokeExpression<>(
                     voidFunc.getSignature().getName(),
-                    List.of(
-                        new StringLiteralExpression("a"),
-                        new StringLiteralExpression("b")
+                    Map.of(
+                        "a", new StringLiteralExpression("a"),
+                        "b", new StringLiteralExpression("b")
                     ),
                     new VoidType()
                 ),
@@ -115,9 +116,9 @@ class OperationInvokeExpressionTest {
 
         testCompilationError(
                 """
-                voidFunc("a")
+                voidFunc(a="a")
                 """, visitorCtx, 1,
-                "wrong number of args for operation call voidFunc: expected 2, got 1"
+                "required formal parameters: [a, b], got: [a]"
         );
     }
 
@@ -127,7 +128,7 @@ class OperationInvokeExpressionTest {
 
         testCompilationError(
                 """
-                voidFunc("a", ["b", "c"])
+                voidFunc(a="a", b=["b", "c"])
                 """, visitorCtx, 1,
                 "expected expression type string, got []string"
         );
@@ -137,7 +138,7 @@ class OperationInvokeExpressionTest {
     void testExecuteReturnValue() throws PMException {
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
-                stringFunc("a", "b")
+                stringFunc(a="a", b="b")
                 """);
         VisitorContext visitorContext = new VisitorContext(testScope());
 
@@ -153,7 +154,7 @@ class OperationInvokeExpressionTest {
     void testExecuteWithOperationExecutor() throws PMException {
         PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
                 """
-                stringFunc("a", "b")
+                stringFunc(a="a", b="b")
                 """);
         VisitorContext visitorContext = new VisitorContext(testScope());
         Expression e = ExpressionVisitor.compile(visitorContext, ctx, ANY_TYPE);
@@ -176,22 +177,22 @@ class OperationInvokeExpressionTest {
     @Test
     void testChainMethodCall() throws PMException {
         String pml = """
-                a("123")
+                a(x="123")
                 
                 adminop c(string x) string {
                     return "c" + x
                 }
                                 
                 adminop b(string x, string y) {
-                    create PC c(x)
-                    create PC c(y)
+                    create PC c(x=x)
+                    create PC c(x=y)
                 }
                                 
                 adminop a(string x) {
                     x = "x"
                     y := "y"
                                 
-                    b(x, y)
+                    b(x=x, y=y)
                 }
                 """;
         PAP pap = new TestPAP();
@@ -204,7 +205,7 @@ class OperationInvokeExpressionTest {
     void testReassignArgValueInOperationDoesNotUpdateVariableOutsideOfScope() throws PMException {
         String pml = """
                 x := "test"
-                a(x)
+                a(x=x)
                 create pc x
                 adminop a(string x) {
                     x = "x"
