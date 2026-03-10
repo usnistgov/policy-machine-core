@@ -319,8 +319,8 @@ public class PMLExample {
         assertThrows(
             UnauthorizedException.class,
             () -> pdp.executePML(new UserContext(testUserId), """
-                create_new_user(username="testUser2")
-                """)
+            create_new_user(username="testUser2")
+            """)
         );
     }
 }
