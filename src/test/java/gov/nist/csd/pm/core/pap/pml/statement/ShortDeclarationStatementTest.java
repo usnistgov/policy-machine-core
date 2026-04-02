@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ShortDeclarationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import org.junit.jupiter.api.Test;
 
 class ShortDeclarationStatementTest {
@@ -18,7 +19,7 @@ class ShortDeclarationStatementTest {
         ShortDeclarationStatement stmt = new ShortDeclarationStatement(
                 "a", new StringLiteralExpression("test"));
 
-        ExecutionContext ctx = new ExecutionContext(new UserContext(0), new MemoryPAP());
+        ExecutionContext ctx = new ExecutionContext(new UserIdContext(0), new MemoryPAP());
         stmt.execute(ctx, new MemoryPAP());
 
         assertEquals("test", ctx.scope().getVariable("a"));

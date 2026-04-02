@@ -18,8 +18,9 @@ import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ class ReferenceByBracketIndexTest {
             new StringLiteralExpression("b"),
             ListType.of(STRING_TYPE)
         );
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
+        ExecutionContext executionContext = new ExecutionContext(new UserIdContext(0), new MemoryPAP());
         List<String> expected = List.of("1","2");
         Map<String, List<String>> mapValue = Map.of("b", expected);
         executionContext.scope().addVariable("a", mapValue);
@@ -73,7 +74,7 @@ class ReferenceByBracketIndexTest {
                 create PC a["b"]["c"]["d"]
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new UserIdContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("e"));
     }
@@ -93,7 +94,7 @@ class ReferenceByBracketIndexTest {
                 """;
         PAP pap = new TestPAP();
         PMLCompilationException e = assertThrows(PMLCompilationException.class,
-                                                 () -> pap.executePML(new TestUserContext("u1"), pml));
+                                                 () -> pap.executePML(new UsernameContext("u1"), pml));
         assertEquals("expected expression type bool, got string", e.getErrors().get(0).errorMessage());
     }
 
@@ -112,7 +113,7 @@ class ReferenceByBracketIndexTest {
                 """;
         PAP pap = new TestPAP();
         assertThrows(IllegalArgumentException.class,
-                     () -> pap.executePML(new UserContext(0), pml));
+                     () -> pap.executePML(new UserIdContext(0), pml));
     }
 
     @Test
@@ -125,7 +126,7 @@ class ReferenceByBracketIndexTest {
                 create PC a[["a"]]
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new UserIdContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
     }

@@ -15,14 +15,6 @@ public class TargetContext {
 		this.targetId = targetId;
 	}
 
-	public TargetContext(UserContext targetId) {
-		if (targetId.isUserDefined()) {
-			this.targetId = targetId.getUser();
-		} else {
-			this.attributeIds = targetId.getAttributeIds();
-		}
-	}
-
 	public TargetContext(Collection<Long> attributeIds) {
 		this.attributeIds = attributeIds;
 	}

@@ -18,7 +18,9 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainAssociation;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainNode;
@@ -50,9 +52,9 @@ public class FromProtoUtil {
 
         return switch (userCtxProto.getUserCase()) {
             case USER_NODE ->
-                new UserContext(resolveNodeRefId(pap, userCtxProto.getUserNode()), process);
+                new UserIdContext(resolveNodeRefId(pap, userCtxProto.getUserNode()), process);
             case USER_ATTRIBUTES ->
-                new UserContext(resolveNodeRefIdList(pap, userCtxProto.getUserAttributes().getNodesList()), process);
+                new AttributeIdsContext(resolveNodeRefIdList(pap, userCtxProto.getUserAttributes().getNodesList()), process);
             case USER_NOT_SET ->
                 throw new IllegalArgumentException("user context not set");
         };

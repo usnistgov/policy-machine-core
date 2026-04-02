@@ -7,6 +7,11 @@ import static gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp.O
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
+import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
@@ -51,8 +56,16 @@ public class CreateObligationStatement extends OperationStatement {
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap);
 
+        long authorId = switch (ctx.author()) {
+            case UserIdContext c -> c.userId();
+            case UsernameContext c -> pap.query().graph().getNodeByName(c.username()).getId();
+            case AttributeIdsContext c -> c.attributeIds().iterator().next();
+            case AttributeNamesContext c -> pap.query().graph().getNodeByName(c.attributeNames().iterator().next()).getId();
+            case CompositeUserContext c -> throw new PMException("CompositeUserContext cannot be used as an obligation author");
+        };
+
         return new Args()
-            .put(AUTHOR_PARAM, ctx.author().getUser())
+            .put(AUTHOR_PARAM, authorId)
             .put(NAME_PARAM, nameStr)
             .put(EVENT_PATTERN_PARAM, eventPattern)
             .put(OBLIGATION_RESPONSE_PARAM, response);

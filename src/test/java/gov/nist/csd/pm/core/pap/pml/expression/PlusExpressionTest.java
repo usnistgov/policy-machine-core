@@ -16,6 +16,7 @@ import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import org.junit.jupiter.api.Test;
 
 class PlusExpressionTest {
@@ -36,7 +37,7 @@ class PlusExpressionTest {
                 plusExpression
         );
 
-        Object value = plusExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = plusExpression.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 "ab",
                 value
@@ -59,7 +60,7 @@ class PlusExpressionTest {
                 plusExpression
         );
 
-        Object value = plusExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = plusExpression.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 "abc",
                 value

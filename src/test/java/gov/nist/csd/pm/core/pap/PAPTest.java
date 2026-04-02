@@ -21,10 +21,11 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -89,7 +90,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
             pap.modify().operations().createOperation(op);
 
-            pap.executePML(new UserContext(id("u1")), "create ua \"ua4\" in [\"Location\"]\ntestFunc()");
+            pap.executePML(new UserIdContext(id("u1")), "create ua \"ua4\" in [\"Location\"]\ntestFunc()");
             assertTrue(pap.query().graph().nodeExists("ua4"));
             assertTrue(pap.query().graph().nodeExists("pc3"));
         } catch (IOException e) {
@@ -143,9 +144,9 @@ public abstract class PAPTest extends PAPTestInitializer {
                     create pc a + "_PC"
                 }
                 """;
-        pap.executePML(new TestUserContext("u1"), pml);
+        pap.executePML(new UsernameContext("u1"), pml);
 
-        pap.executePML(new TestUserContext("u1"), "op1(a=PM_ADMIN_BASE_OA)");
+        pap.executePML(new UsernameContext("u1"), "op1(a=PM_ADMIN_BASE_OA)");
         assertTrue(pap.query().graph().nodeExists("ua2_PC"));
         assertTrue(pap.query().graph().nodeExists("PM_ADMIN:base_PC"));
     }
@@ -166,7 +167,7 @@ public abstract class PAPTest extends PAPTestInitializer {
                 
                 create u "u1" in ["ua1"]
                 """;
-        assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserContext(id("u1")), pml));
+        assertThrows(NodeDoesNotExistException.class, () -> pap.executePML(new UserIdContext(id("u1")), pml));
     }
 
     @Test

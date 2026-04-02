@@ -10,9 +10,10 @@ import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -50,13 +51,13 @@ public class PMLOperationsTest {
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
-		pap.executePML(new TestUserContext("u1"), pml);
+		pap.executePML(new UsernameContext("u1"), pml);
 
 		PDP pdp = new PDP(pap);
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.runTx(new UserContext(id("u1")), tx -> {
+		pdp.runTx(new UserIdContext(id("u1")), tx -> {
 			tx.modify().graph().createPolicyClass("test2");
 
 			return null;
@@ -92,12 +93,12 @@ public class PMLOperationsTest {
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
-		pap.executePML(new TestUserContext("u1"), pml);
+		pap.executePML(new UsernameContext("u1"), pml);
 
 		PDP pdp = new PDP(pap);
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
-		pdp.runTx(new UserContext(id("u1")), tx -> {
+		pdp.runTx(new UserIdContext(id("u1")), tx -> {
 			tx.modify().graph().createPolicyClass("test2");
 			return null;
 		});
@@ -133,13 +134,13 @@ public class PMLOperationsTest {
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
-		pap.executePML(new TestUserContext("u1"), pml);
+		pap.executePML(new UsernameContext("u1"), pml);
 
 		PDP pdp = new PDP(pap);
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateOperation(new UserContext(id("u1")),
+		pdp.adjudicateOperation(new UserIdContext(id("u1")),
 			"op2",
 			Map.of());
 
@@ -173,13 +174,13 @@ public class PMLOperationsTest {
                     }
                 """;
 		MemoryPAP pap = new TestPAP();
-		pap.executePML(new TestUserContext("u1"), pml);
+		pap.executePML(new UsernameContext("u1"), pml);
 
 		PDP pdp = new PDP(pap);
 		EPP epp = new EPP(pdp, pap);
 		epp.subscribeTo(pdp);
 
-		pdp.adjudicateOperation(new UserContext(id("u1")), "routine1", Map.of());
+		pdp.adjudicateOperation(new UserIdContext(id("u1")), "routine1", Map.of());
 
 		assertTrue(pap.query().graph().nodeExists("pc3"));
 	}
@@ -193,7 +194,7 @@ public class PMLOperationsTest {
 		""";
 
 		PAP pap = new TestPAP();
-		assertThrows(PMException.class, () -> pap.executePML(new TestUserContext("u1"), pml));
+		assertThrows(PMException.class, () -> pap.executePML(new UsernameContext("u1"), pml));
 	}
 
 	@Test
@@ -207,7 +208,7 @@ public class PMLOperationsTest {
 		""";
 
 		PAP pap = new TestPAP();
-		assertThrows(PMException.class, () -> pap.executePML(new TestUserContext("u1"), pml));
+		assertThrows(PMException.class, () -> pap.executePML(new UsernameContext("u1"), pml));
 	}
 
 	@Test
@@ -225,7 +226,7 @@ public class PMLOperationsTest {
 		""";
 
 		PAP pap = new TestPAP();
-		pap.executePML(new TestUserContext("u1"), pml);
+		pap.executePML(new UsernameContext("u1"), pml);
 
 		assertTrue(pap.query().graph().nodeExists("ab"));
 	}
@@ -247,7 +248,7 @@ public class PMLOperationsTest {
 		""";
 
 		PAP pap = new TestPAP();
-		pap.executePML(new TestUserContext("u1"), pml);
+		pap.executePML(new UsernameContext("u1"), pml);
 
 		assertTrue(pap.query().graph().nodeExists("start"));
 		assertTrue(pap.query().graph().nodeExists("end"));

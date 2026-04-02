@@ -2,17 +2,24 @@ package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.Direction;
-import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
+import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.SingleUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,77 +38,55 @@ public class UserEvaluator {
 	 * target of that association as well as the operations in a map. If a target node is reached multiple times, add any
 	 * new operations to the already existing ones.
 	 *
-	 * @return a Map of target nodes that the subject can reach via associations and the operations the user has on each.
+	 * For a CompositeUserContext, returns one UserDagResult per sub-context. For all other contexts,
+	 * returns a single-element list.
+	 *
+	 * @return a UserEvaluationResult containing one UserDagResult per (sub-)context.
 	 */
-	public UserDagResult evaluate(UserContext userContext) throws PMException {
-		userContext.checkExists(policyStore.graph());
-
-		EvaluationState state = initializeEvaluationState(userContext);
-		BreadthFirstGraphWalker bfs = createBreadthFirstWalker(state);
-		executeEvaluation(userContext, bfs);
-
-		return new UserDagResult(state.borderTargets, state.reachedProhibitions);
-	}
-
-	private EvaluationState initializeEvaluationState(UserContext userContext) throws PMException {
-		Map<Long, AccessRightSet> borderTargets = new HashMap<>();
-		Set<Prohibition> reachedProhibitions = initializeProcessProhibitions(userContext);
-		
-		return new EvaluationState(borderTargets, reachedProhibitions);
-	}
-
-	private Set<Prohibition> initializeProcessProhibitions(UserContext userContext) throws PMException {
-		Set<Prohibition> prohibitions = new HashSet<>();
-		if (userContext.getProcess() != null) {
-			prohibitions.addAll(policyStore.prohibitions().getProcessProhibitions(userContext.getProcess()));
-		}
-		return prohibitions;
-	}
-
-	private BreadthFirstGraphWalker createBreadthFirstWalker(EvaluationState state) {
-		Visitor nodeVisitor = createNodeVisitor(state);
-		
-		return new GraphStoreBFS(policyStore.graph())
-				.withDirection(Direction.DESCENDANTS)
-				.withVisitor(nodeVisitor);
-	}
-
-	private Visitor createNodeVisitor(EvaluationState state) {
-		return nodeId -> {
-			collectNodeProhibitions(nodeId, state.reachedProhibitions);
-			collectNodeAssociations(nodeId, state.borderTargets);
+	public UserEvaluationResult evaluate(UserContext userContext) throws PMException {
+		return switch (userContext) {
+			case CompositeUserContext c -> {
+				List<UserDagResult> results = new ArrayList<>();
+				for (SingleUserContext ctx : c.contexts()) {
+					ctx.checkExists(policyStore.graph());
+					results.add(evaluateSingle(ctx));
+				}
+				yield new UserEvaluationResult(results);
+			}
+			case SingleUserContext ctx -> {
+				ctx.checkExists(policyStore.graph());
+				yield new UserEvaluationResult(List.of(evaluateSingle(ctx)));
+			}
 		};
 	}
 
-	private void collectNodeProhibitions(long nodeId, Set<Prohibition> reachedProhibitions) throws PMException {
-		Collection<Prohibition> nodeProhibitions = policyStore.prohibitions().getNodeProhibitions(nodeId);
-		reachedProhibitions.addAll(nodeProhibitions);
-	}
+	private UserDagResult evaluateSingle(SingleUserContext userContext) throws PMException {
+		Map<Long, AccessRightSet> borderTargets = new HashMap<>();
+		Set<Prohibition> reachedProhibitions = new HashSet<>();
 
-	private void collectNodeAssociations(long nodeId, Map<Long, AccessRightSet> borderTargets) throws PMException {
-		Collection<Association> nodeAssociations = policyStore.graph().getAssociationsWithSource(nodeId);
-		collectAssociationsIntoBorderTargets(nodeAssociations, borderTargets);
-	}
-
-	private void executeEvaluation(UserContext userContext, BreadthFirstGraphWalker bfs) throws PMException {
-		if (userContext.isUserDefined()) {
-			bfs.walk(userContext.getUser());
-		} else {
-			bfs.walk(userContext.getAttributeIds());
+		String process = userContext.getProcess();
+		if (process != null && !process.isEmpty()) {
+			reachedProhibitions.addAll(policyStore.prohibitions().getProcessProhibitions(process));
 		}
-	}
 
-	private void collectAssociationsIntoBorderTargets(Collection<Association> associations, 
-													 Map<Long, AccessRightSet> borderTargets) {
-		for (Association association : associations) {
-			long targetId = association.target();
-			AccessRightSet associationRights = association.arset();
-			
-			AccessRightSet existingRights = borderTargets.computeIfAbsent(targetId, k -> new AccessRightSet());
-			existingRights.addAll(associationRights);
-		}
-	}
+		BreadthFirstGraphWalker bfs = new GraphStoreBFS(policyStore.graph())
+				.withDirection(Direction.DESCENDANTS)
+				.withVisitor(nodeId -> {
+					reachedProhibitions.addAll(policyStore.prohibitions().getNodeProhibitions(nodeId));
+					for (Association association : policyStore.graph().getAssociationsWithSource(nodeId)) {
+						borderTargets.computeIfAbsent(association.target(), k -> new AccessRightSet())
+								.addAll(association.arset());
+					}
+				});
 
-	private record EvaluationState(Map<Long, AccessRightSet> borderTargets,
-								   Set<Prohibition> reachedProhibitions) { }
+		Collection<Long> startNodes = switch (userContext) {
+			case AttributeIdsContext ctx -> ctx.getAdjacentDescendants(policyStore.graph());
+			case AttributeNamesContext ctx -> ctx.getAdjacentDescendants(policyStore.graph());
+			case UsernameContext ctx -> List.of(policyStore.graph().getNodeByName(ctx.username()).getId());
+			case UserIdContext ctx -> List.of(ctx.userId());
+		};
+		bfs.walk(startNodes);
+
+		return new UserDagResult(borderTargets, reachedProhibitions);
+	}
 }

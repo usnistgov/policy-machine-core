@@ -28,6 +28,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ class OperationInvokeExpressionTest {
 
         PAP pap = new TestPAP();
         pap.modify().operations().createOperation(voidFunc);
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
+        ExecutionContext executionContext = new ExecutionContext(new UserIdContext(0), pap);
         Object value = e.execute(executionContext, new MemoryPAP());
         assertNull(value);
     }
@@ -164,7 +165,7 @@ class OperationInvokeExpressionTest {
         pap.modify().operations().createOperation(stringFunc);
         ExecutionContext executionContext =
                 new ExecutionContext(
-                        new UserContext(0),
+                        new UserIdContext(0),
                         pap
                 );
         Object value = e.execute(executionContext, pap);
@@ -196,7 +197,7 @@ class OperationInvokeExpressionTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new UserIdContext(0), pml);
         assertTrue(pap.query().graph().nodeExists("cx"));
         assertTrue(pap.query().graph().nodeExists("cy"));
     }
@@ -212,7 +213,7 @@ class OperationInvokeExpressionTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new UserIdContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("x"));
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -231,7 +232,7 @@ class OperationInvokeExpressionTest {
                 a()
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new UserIdContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
 
@@ -249,6 +250,6 @@ class OperationInvokeExpressionTest {
                 
                 op1()
                 """;
-        assertDoesNotThrow(() -> new MemoryPAP().executePML(new UserContext(0), pml));
+        assertDoesNotThrow(() -> new MemoryPAP().executePML(new UserIdContext(0), pml));
     }
 }

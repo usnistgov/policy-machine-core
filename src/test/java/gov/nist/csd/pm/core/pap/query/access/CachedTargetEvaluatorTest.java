@@ -13,6 +13,7 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +51,7 @@ class CachedTargetEvaluatorTest {
             associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:assignment:descendant:create"]
             """;
         pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new UserIdContext(-1), pml);
 
         userDagResult = new UserDagResult(
             Map.of(

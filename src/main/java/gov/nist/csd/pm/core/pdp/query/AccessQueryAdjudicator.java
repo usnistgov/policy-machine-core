@@ -6,11 +6,18 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.AccessQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
+import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.SingleUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +29,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
         check(this.userCtx, targetCtx, AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computePrivileges(userCtx, targetCtx);
@@ -30,7 +37,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public List<AccessRightSet> computePrivileges(UserContext userCtx, List<TargetContext> targetCtxs) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
 
         for (TargetContext targetCtx : targetCtxs) {
             check(this.userCtx, targetCtx, AdminAccessRight.ADMIN_ACCESS_QUERY);
@@ -41,7 +48,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public AccessRightSet computeDeniedPrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
         check(this.userCtx, targetCtx, AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeDeniedPrivileges(userCtx, targetCtx);
@@ -49,7 +56,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
 
         return pap.query().access().computeCapabilityList(userCtx);
     }
@@ -63,14 +70,14 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
 
         return pap.query().access().computeDestinationAttributes(userCtx);
     }
 
     @Override
     public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
         check(this.userCtx, new TargetContext(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeSubgraphPrivileges(userCtx, root);
@@ -78,7 +85,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
         check(this.userCtx, new TargetContext(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
@@ -86,7 +93,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
         check(this.userCtx, new TargetContext(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
@@ -94,7 +101,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public Explain explain(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
         check(this.userCtx, targetCtx, AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().explain(userCtx, targetCtx);
@@ -102,8 +109,31 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     @Override
     public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
-        check(this.userCtx, new TargetContext(userCtx), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        checkOnUserCtx(userCtx);
 
-	    return pap.query().access().computePersonalObjectSystem(userCtx);
+        return pap.query().access().computePersonalObjectSystem(userCtx);
+    }
+
+    private void checkOnUserCtx(UserContext userCtx) throws PMException {
+        switch (userCtx) {
+            case UserIdContext ctx -> check(this.userCtx, new TargetContext(ctx.userId()), AdminAccessRight.ADMIN_ACCESS_QUERY);
+            case AttributeIdsContext ctx -> check(this.userCtx, new TargetContext(ctx.attributeIds()), AdminAccessRight.ADMIN_ACCESS_QUERY);
+            case UsernameContext ctx -> {
+                long id = pap.query().graph().getNodeByName(ctx.username()).getId();
+                check(this.userCtx, new TargetContext(id), AdminAccessRight.ADMIN_ACCESS_QUERY);
+            }
+            case AttributeNamesContext ctx -> {
+                List<Long> ids = new ArrayList<>();
+                for (String name : ctx.attributeNames()) {
+                    ids.add(pap.query().graph().getNodeByName(name).getId());
+                }
+                check(this.userCtx, new TargetContext(ids), AdminAccessRight.ADMIN_ACCESS_QUERY);
+            }
+            case CompositeUserContext ctx -> {
+                for (SingleUserContext sub : ctx.contexts()) {
+                    checkOnUserCtx(sub);
+                }
+            }
+        }
     }
 }

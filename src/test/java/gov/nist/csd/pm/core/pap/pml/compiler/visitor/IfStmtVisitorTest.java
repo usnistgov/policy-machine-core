@@ -18,6 +18,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.IfStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ShortDeclarationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -112,7 +113,7 @@ class IfStmtVisitorTest {
                 f1()
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new UserIdContext(0), pml);
         assertFalse(pap.query().graph().nodeExists("pc1"));
     }
 

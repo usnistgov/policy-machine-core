@@ -5,7 +5,12 @@ import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
+import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -61,18 +66,8 @@ public class UserExplainer {
 		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
 				.withPropagator(propagator);
 
-		List<Long> nodes = new ArrayList<>();
-		if (userCtx.isUserDefined()) {
-			long user = userCtx.getUser();
-			nodes.add(user);
-
-			dfs.walk(user);
-		} else {
-			Collection<Long> attributes = userCtx.getAttributeIds();
-			nodes.addAll(attributes);
-
-			dfs.walk(attributes);
-		}
+		List<Long> nodes = new ArrayList<>(resolveStartNodes(userCtx));
+		dfs.walk(nodes);
 
 		// transform the map so that the key is the last ua in the path pointing to it's paths
 		for (long node : nodes) {
@@ -87,6 +82,28 @@ public class UserExplainer {
 		}
 
 		return associationUAPaths;
+	}
+
+	private Collection<Long> resolveStartNodes(UserContext userCtx) throws PMException {
+		return switch (userCtx) {
+			case UserIdContext c -> List.of(c.userId());
+			case UsernameContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
+			case AttributeIdsContext c -> c.attributeIds();
+			case AttributeNamesContext c -> {
+				List<Long> ids = new ArrayList<>();
+				for (String name : c.attributeNames()) {
+					ids.add(policyStore.graph().getNodeByName(name).getId());
+				}
+				yield ids;
+			}
+			case CompositeUserContext c -> {
+				List<Long> ids = new ArrayList<>();
+				for (UserContext sub : c.contexts()) {
+					ids.addAll(resolveStartNodes(sub));
+				}
+				yield ids;
+			}
+		};
 	}
 
 	private List<Long> getUAsFromTargetPathAssociations(Map<Node, Map<Path, List<Association>>> targetPaths) {

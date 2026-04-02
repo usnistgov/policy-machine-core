@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import org.junit.jupiter.api.Test;
 
 public class PMLOperationTest {
@@ -20,14 +21,14 @@ public class PMLOperationTest {
             }
             """;
         MemoryPAP memoryPAP = new MemoryPAP();
-        memoryPAP.executePML(new UserContext(0), pml);
+        memoryPAP.executePML(new UserIdContext(0), pml);
 
         assertTrue(memoryPAP.query().operations().getOperationNames().contains("test"));
 
         pml = """
             create PC test()
             """;
-        memoryPAP.executePML(new UserContext(0), pml);
+        memoryPAP.executePML(new UserIdContext(0), pml);
 
         assertTrue(memoryPAP.query().graph().nodeExists("test"));
     }
@@ -45,7 +46,7 @@ public class PMLOperationTest {
             """;
         MemoryPAP memoryPAP = new MemoryPAP();
         PMLCompilationException e = assertThrows(PMLCompilationException.class,
-            () -> memoryPAP.executePML(new UserContext(0), pml));
+            () -> memoryPAP.executePML(new UserIdContext(0), pml));
         assertEquals("unknown operation 'op1' in scope",
             e.getErrors().getFirst().errorMessage());
 
@@ -60,7 +61,7 @@ public class PMLOperationTest {
             """;
         MemoryPAP memoryPAP2 = new MemoryPAP();
         e = assertThrows(PMLCompilationException.class,
-            () -> memoryPAP2.executePML(new UserContext(0), pml2));
+            () -> memoryPAP2.executePML(new UserIdContext(0), pml2));
         assertEquals("unknown operation 'rou1' in scope",
             e.getErrors().getFirst().errorMessage());
     }

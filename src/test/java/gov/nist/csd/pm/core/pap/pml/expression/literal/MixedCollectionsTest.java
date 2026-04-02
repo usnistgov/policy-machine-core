@@ -17,7 +17,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 public class MixedCollectionsTest {
 
     private PAP pap = new MemoryPAP();
-    private ExecutionContext executionContext = new ExecutionContext(new TestUserContext("u1"), pap);
+    private ExecutionContext executionContext = new ExecutionContext(new UsernameContext("u1"), pap);
 
     public MixedCollectionsTest() throws PMException {
     }

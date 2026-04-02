@@ -26,6 +26,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ class CreateObligationStatementTest {
         pap.modify().graph().createUser("u2", ids("ua2"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id("u2")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new UserIdContext(id("u2")), pap);
 
         stmt.execute(execCtx, pap);
 
@@ -174,7 +175,7 @@ class CreateObligationStatementTest {
                 }
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new UserIdContext(id("u1")), pml);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);

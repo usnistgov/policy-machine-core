@@ -17,6 +17,7 @@ import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import org.junit.jupiter.api.Test;
 
 class NegatedExpressionTest {
@@ -37,7 +38,7 @@ class NegatedExpressionTest {
                 negatedExpression
         );
 
-        Object value = negatedExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = negatedExpression.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value

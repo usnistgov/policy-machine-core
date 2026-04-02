@@ -39,20 +39,29 @@ public class ToProtoUtil {
             builder.setProcess(userCtx.getProcess());
         }
 
-        if (userCtx.isUserDefined()) {
-            long userId = userCtx.getUser();
-
-            builder.setUserNode(NodeRef.newBuilder().setId(userId).build());
-        } else {
-            Collection<Long> attributeIds = userCtx.getAttributeIds();
-
-            builder.setUserAttributes(
-                NodeRefList.newBuilder()
-                    .addAllNodes(
-                        attributeIds.stream().map(id -> NodeRef.newBuilder().setId(id).build()).toList()
-                    )
-                    .build()
-            );
+        switch (userCtx) {
+            case gov.nist.csd.pm.core.pap.query.model.context.UserIdContext c ->
+                builder.setUserNode(NodeRef.newBuilder().setId(c.userId()).build());
+            case gov.nist.csd.pm.core.pap.query.model.context.UsernameContext c ->
+                builder.setUserNode(NodeRef.newBuilder().setName(c.username()).build());
+            case gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext c ->
+                builder.setUserAttributes(
+                    NodeRefList.newBuilder()
+                        .addAllNodes(
+                            c.attributeIds().stream().map(id -> NodeRef.newBuilder().setId(id).build()).toList()
+                        )
+                        .build()
+                );
+            case gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext c ->
+                builder.setUserAttributes(
+                    NodeRefList.newBuilder()
+                        .addAllNodes(
+                            c.attributeNames().stream().map(name -> NodeRef.newBuilder().setName(name).build()).toList()
+                        )
+                        .build()
+                );
+            case gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext ignored ->
+                throw new IllegalArgumentException("CompositeUserContext cannot be serialized to a single proto UserContext");
         }
 
         return builder.build();

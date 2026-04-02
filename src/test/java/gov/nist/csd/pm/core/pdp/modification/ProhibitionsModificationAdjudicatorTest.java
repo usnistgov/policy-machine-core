@@ -13,10 +13,11 @@ import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class ProhibitionsModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new TestPAP();
 
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -60,8 +61,8 @@ class ProhibitionsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ProhibitionsModificationAdjudicator(new TestUserContext("u1"), pap);
-        fail = new ProhibitionsModificationAdjudicator(new UserContext(id("u2")), pap);
+        ok = new ProhibitionsModificationAdjudicator(new UsernameContext("u1"), pap);
+        fail = new ProhibitionsModificationAdjudicator(new UserIdContext(id("u2")), pap);
     }
 
     @Test

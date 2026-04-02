@@ -12,10 +12,11 @@ import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class ObligationsModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new TestPAP();
 
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -58,8 +59,8 @@ class ObligationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ObligationsModificationAdjudicator(new TestUserContext("u1"), pap);
-        fail = new ObligationsModificationAdjudicator(new UserContext(id("u2")), pap);
+        ok = new ObligationsModificationAdjudicator(new UsernameContext("u1"), pap);
+        fail = new ObligationsModificationAdjudicator(new UserIdContext(id("u2")), pap);
     }
 
 

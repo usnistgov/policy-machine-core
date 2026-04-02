@@ -14,9 +14,10 @@ import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class RequireStatementTest {
     @Test
     void test() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -43,7 +44,7 @@ class RequireStatementTest {
                 create u "u2" in ["ua2"]
                 """);
 
-        ExecutionContext ctx = new ExecutionContext(new TestUserContext("u1"), pap);
+        ExecutionContext ctx = new ExecutionContext(new UsernameContext("u1"), pap);
 
         testRequire(ctx, pap, new RequireStatement(
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
@@ -61,7 +62,7 @@ class RequireStatementTest {
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1")), STRING_TYPE)
         ), false);
 
-        ctx = new ExecutionContext(new UserContext(id("u2")), pap);
+        ctx = new ExecutionContext(new UserIdContext(id("u2")), pap);
         testRequire(ctx, pap, new RequireStatement(
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("admin:graph:assignment:ascendant:create")), STRING_TYPE),
             ArrayLiteralExpression.of(List.of(new StringLiteralExpression("o1"), new StringLiteralExpression("o2")), STRING_TYPE)
@@ -115,7 +116,7 @@ class RequireStatementTest {
         PAP pap = new TestPAP();
         PMLCompilationRuntimeException e = assertThrows(
             PMLCompilationRuntimeException.class,
-            () -> pap.executePML(new TestUserContext("u1"), pml));
+            () -> pap.executePML(new UsernameContext("u1"), pml));
         assertEquals(1, e.getErrors().size());
         assertEquals("unknown operation 'testOp' in scope", e.getErrors().get(0).errorMessage());
     }

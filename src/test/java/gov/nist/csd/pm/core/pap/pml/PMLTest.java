@@ -25,10 +25,11 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ public class PMLTest {
     @Test
     void testCallingNonPMLOperationAndRoutineFromPMLWithArgsAndReturnValue() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -100,7 +101,7 @@ public class PMLTest {
         });
 
         PDP pdp = new PDP(pap);
-        pdp.executePML(new TestUserContext("u1"), """
+        pdp.executePML(new UsernameContext("u1"), """
                 op1(a="a", b=["b", "c"], c={"d": "e", "f": "g"})
                 """);
         assertTrue(pap.query().graph().nodeExists("1a"));
@@ -111,11 +112,11 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext(id("u2")), """
+        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserIdContext(id("u2")), """
                 op1(a="a", b=["b", "c"], c={"d": "e", "f": "g"})
                 """));
 
-        pdp.executePML(new TestUserContext("u1"), """
+        pdp.executePML(new UsernameContext("u1"), """
                 routine1(a="1", b=["2", "3"], c={"4": "5", "6": "7"})
                 """);
         assertTrue(pap.query().graph().nodeExists("11"));
@@ -126,7 +127,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserContext(id("u2")), """
+        assertThrows(UnauthorizedException.class, () -> pdp.executePML(new UserIdContext(id("u2")), """
                 routine1(a="1", b=["2", "3"], c={"4": "5", "6": "7"})
                 """));
     }
@@ -134,7 +135,7 @@ public class PMLTest {
     @Test
     void testCallPMLOperationAndRoutineFromNonPML() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -169,7 +170,7 @@ public class PMLTest {
 
         PDP pdp = new PDP(pap);
         assertDoesNotThrow(() -> pdp.adjudicateOperation(
-            new TestUserContext("u1"),
+            new UsernameContext("u1"),
             "op1",
             Map.of(
                 ARGA.getName(), "a",
@@ -185,7 +186,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("1f"));
         assertTrue(pap.query().graph().nodeExists("1g"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserContext(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserIdContext(id("u2")),
             "op1",
             Map.of(
                 ARGA.getName(), "a",
@@ -194,7 +195,7 @@ public class PMLTest {
             )
         ));
 
-        assertDoesNotThrow(() -> pdp.adjudicateOperation(new TestUserContext("u1"),
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(new UsernameContext("u1"),
             "op1",
             Map.of(
                 ARGA.getName(), "1",
@@ -210,7 +211,7 @@ public class PMLTest {
         assertTrue(pap.query().graph().nodeExists("16"));
         assertTrue(pap.query().graph().nodeExists("17"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserContext(id("u2")), "op1",
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserIdContext(id("u2")), "op1",
             Map.of(
                 ARGA.getName(), "1",
                 ARGB.getName(), List.of("2", "3"),
@@ -238,7 +239,7 @@ public class PMLTest {
             op4(a=op3())
             """;
         MemoryPAP pap = new MemoryPAP();
-        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        assertDoesNotThrow(() -> pap.executePML(new UserIdContext(-1), pml));
 
         String pml2 = """
             adminop op1() map[string]string {
@@ -250,7 +251,7 @@ public class PMLTest {
             op2(op1())
             """;
         MemoryPAP pap2 = new MemoryPAP();
-        assertThrows(PMLCompilationException.class, () -> pap2.executePML(new UserContext(-1), pml2));
+        assertThrows(PMLCompilationException.class, () -> pap2.executePML(new UserIdContext(-1), pml2));
     }
 
     @Test
@@ -268,7 +269,7 @@ public class PMLTest {
             
             """;
         MemoryPAP pap = new MemoryPAP();
-        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        assertDoesNotThrow(() -> pap.executePML(new UserIdContext(-1), pml));
     }
 
     @Test
@@ -285,7 +286,7 @@ public class PMLTest {
             return "b"
             """;
         MemoryPAP pap = new MemoryPAP();
-        Object o = pap.executePML(new UserContext(-1), pml);
+        Object o = pap.executePML(new UserIdContext(-1), pml);
         assertEquals(o, "a");
     }
 
@@ -307,7 +308,7 @@ public class PMLTest {
         MemoryPAP pap = new MemoryPAP();
         PMLCompilationException e = assertThrows(
             PMLCompilationException.class,
-            () -> pap.executePML(new UserContext(-1), pml)
+            () -> pap.executePML(new UserIdContext(-1), pml)
         );
         assertEquals(
             "unknown operation 'test' in scope",
@@ -330,7 +331,7 @@ public class PMLTest {
         MemoryPAP pap = new MemoryPAP();
         PMLCompilationException e = assertThrows(
             PMLCompilationException.class,
-            () -> pap.executePML(new UserContext(-1), pml)
+            () -> pap.executePML(new UserIdContext(-1), pml)
         );
         assertEquals(
             "unknown operation 'test' in scope",
@@ -348,26 +349,26 @@ public class PMLTest {
             return true
             """;
         MemoryPAP pap = new MemoryPAP();
-        Object o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        Object o = assertDoesNotThrow(() -> pap.executePML(new UserIdContext(-1), pml));
         assertEquals(o, true);
 
         pap.modify().graph().createPolicyClass("a");
-        o = assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), pml));
+        o = assertDoesNotThrow(() -> pap.executePML(new UserIdContext(-1), pml));
         assertEquals(o, "a");
     }
 
     @Test
     void testIndexExpressionAsStatementCausesCompilationError() throws PMException {
         MemoryPAP pap = new MemoryPAP();
-        pap.executePML(new UserContext(-1), """
+        pap.executePML(new UserIdContext(-1), """
                 create pc "pc1"
                 """);
 
-        assertDoesNotThrow(() -> pap.executePML(new UserContext(-1), """
+        assertDoesNotThrow(() -> pap.executePML(new UserIdContext(-1), """
                 get_node(node_name="pc1")
                 """));
 
-        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(-1), """
+        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserIdContext(-1), """
                 get_node(node_name="pc1").name
                 """));
     }
@@ -469,10 +470,10 @@ public class PMLTest {
         pap.executePML(null, pml);
         Operation<?> readFile = pap.query().operations().getOperation("read_file");
 
-        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
+        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserIdContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
 
         pap.modify().graph().dissociate(id("ua1"), id("oa1"));
 
-        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
+        assertDoesNotThrow(() -> readFile.canExecute(pap, new UserIdContext(id("u1")), new Args().put(new NodeNameFormalParameter("file"), "o1")));
     }
 }

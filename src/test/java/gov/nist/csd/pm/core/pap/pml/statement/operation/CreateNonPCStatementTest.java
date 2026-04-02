@@ -13,6 +13,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ class CreateNonPCStatementTest {
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua2", ids("pc1"));
         pap.modify().graph().createUser("u2", ids("ua2"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id("u2")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new UserIdContext(id("u2")), pap);
 
         stmt1.execute(execCtx, pap);
         stmt2.execute(execCtx, pap);

@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pdp.bootstrap;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import java.util.List;
 
 public class PMLBootstrapper extends PolicyBootstrapper {
@@ -24,7 +24,7 @@ public class PMLBootstrapper extends PolicyBootstrapper {
             long bootstrapUserId = tx.modify().graph().createUser(bootstrapUser, List.of(ua));
 
             // execute the pml
-            tx.executePML(new UserContext(bootstrapUserId), pml);
+            tx.executePML(new UserIdContext(bootstrapUserId), pml);
 
             // clean up bootstrap policy
             tx.modify().graph().deassign(bootstrapUserId, List.of(ua));

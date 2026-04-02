@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +59,7 @@ class PMLOperationWrapperTest {
 
         });
 
-        pap.executePML(new UserContext(1), pml);
+        pap.executePML(new UserIdContext(1), pml);
 
         assertTrue(pap.query().graph().nodeExists("op4"));
     }

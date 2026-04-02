@@ -28,10 +28,11 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,7 @@ class PDPTest {
         PMException e = assertThrows(
                 PMException.class,
                 () -> pdp.runTx(
-                        new TestUserContext("u1"),
+                        new UsernameContext("u1"),
                         policy -> {
                             policy.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
                             return null;
@@ -151,7 +152,7 @@ class PDPTest {
         pap.modify().graph().associate(ua1, AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
 
         assertThrows(NodeNameExistsException.class, () -> {
-            pdp.runTx(new TestUserContext("u1"), policy -> {
+            pdp.runTx(new UsernameContext("u1"), policy -> {
                 long pc2 = policy.modify().graph().createPolicyClass("pc2");
                 // expect error and rollback
                 policy.modify().graph().createObjectAttribute("oa1", List.of(pc2));
@@ -168,7 +169,7 @@ class PDPTest {
     @Test
     void testAdjudicateOperation() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 set resource access rights ["read", "write"]
                 
                 @reqcap({
@@ -192,13 +193,13 @@ class PDPTest {
 
         PDP pdp = new PDP(pap);
 
-        Object resp = pdp.adjudicateOperation(new TestUserContext("u1"), "read_file",
+        Object resp = pdp.adjudicateOperation(new UsernameContext("u1"), "read_file",
             Map.of("name", "o1"));
         assertNull(resp);
 
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateOperation(new TestUserContext("u1"), "write_file",
+            () -> pdp.adjudicateOperation(new UsernameContext("u1"), "write_file",
                 Map.of("name", "o1"))
         );
     }
@@ -206,7 +207,7 @@ class PDPTest {
     @Test
     void testadjudicateOperation() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), """
+        pap.executePML(new UserIdContext(0), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -231,13 +232,13 @@ class PDPTest {
         PDP pdp = new PDP(pap);
 
         // custom operation
-        Object resp = pdp.adjudicateOperation(new TestUserContext("u1"),
+        Object resp = pdp.adjudicateOperation(new UsernameContext("u1"),
             "op1",
             Map.of());
         assertEquals("test", resp);
 
         // denied
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserContext(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserIdContext(id("u2")),
             "op1",
             Map.of()));
     }
@@ -245,7 +246,7 @@ class PDPTest {
     @Test
     void testAdjudicateDoesNotExist() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), """
+        pap.executePML(new UserIdContext(0), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -260,11 +261,11 @@ class PDPTest {
                 """);
         PDP pdp = new PDP(pap);
         assertThrows(OperationDoesNotExistException.class,
-                () -> pdp.adjudicateOperation(new TestUserContext("u1"),
+                () -> pdp.adjudicateOperation(new UsernameContext("u1"),
                     "op1",
                     Map.of()));
         assertThrows(OperationDoesNotExistException.class,
-                () -> pdp.adjudicateOperation(new TestUserContext("u1"), "write_file", Map.of()));
+                () -> pdp.adjudicateOperation(new UsernameContext("u1"), "write_file", Map.of()));
     }
 
     @Test
@@ -287,7 +288,7 @@ class PDPTest {
             }
 
         });
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 routine routine2() map[string]string {
                     create PC "test2"
                     return {"test2": "test2"}
@@ -296,18 +297,18 @@ class PDPTest {
 
         PDP pdp = new PDP(pap);
 
-        Object response = pdp.adjudicateOperation(new TestUserContext("u1"),
+        Object response = pdp.adjudicateOperation(new UsernameContext("u1"),
             "routine1",
             Map.of(a.getName(), "test"));
         assertEquals("test1", response);
-        response = pdp.adjudicateOperation(new TestUserContext("u1"),
+        response = pdp.adjudicateOperation(new UsernameContext("u1"),
             "routine2", Map.of());
         assertEquals(Map.of("test2", "test2"), response);
 
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserContext(id("u2")),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UserIdContext(id("u2")),
             "routine1",
             Map.of(a.getName(), "test3")));
     }
@@ -332,17 +333,17 @@ class PDPTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+        pap.executePML(new UsernameContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new TestUserContext("u1"),
+        assertThrows(UnauthorizedException.class, () -> pdp.adjudicateOperation(new UsernameContext("u1"),
             "routine1", Map.of()));
     }
 
     @Test
     void testRoutineTx() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -358,7 +359,7 @@ class PDPTest {
                 }
                 """);
         PDP pdp = new PDP(pap);
-        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new TestUserContext("u1"), tx -> {
+        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UsernameContext("u1"), tx -> {
             tx.executePML("r1()");
             return null;
         }));
@@ -370,7 +371,7 @@ class PDPTest {
     @Test
     void testPMLOperationDoesNotPublishEvents() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -398,7 +399,7 @@ class PDPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
-        pdp.adjudicateOperation(new TestUserContext("u1"),
+        pdp.adjudicateOperation(new UsernameContext("u1"),
             "op1", Map.of());
         assertFalse(pap.query().graph().nodeExists("test"));
     }
@@ -406,7 +407,7 @@ class PDPTest {
     @Test
     void testAdjudicateRoutineListOfOperations() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new UsernameContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create oa "oa1" in ["pc1"]
@@ -434,7 +435,7 @@ class PDPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        pdp.adjudicateRoutine(new TestUserContext("u1"), List.of(
+        pdp.adjudicateRoutine(new UsernameContext("u1"), List.of(
                 new OperationRequest("op1", Map.of(NAME_PARAM.getName(), "pc2")),
                 new OperationRequest("op1", Map.of(NAME_PARAM.getName(), "pc3"))
         ));

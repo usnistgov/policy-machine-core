@@ -21,6 +21,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
@@ -168,7 +169,7 @@ class SubjectPatternTest {
                     }
                 """;
         MemoryPAP memoryPAP = new TestPAP();
-        memoryPAP.executePML(new UserContext(id("u1")), pml);
+        memoryPAP.executePML(new UserIdContext(id("u1")), pml);
 
         PDP pdp = new PDP(memoryPAP);
         EPP epp = new EPP(pdp, memoryPAP);

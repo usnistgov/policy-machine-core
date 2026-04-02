@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +29,7 @@ class TargetEvaluatorTest {
             associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:graph:assignment:descendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new UserIdContext(-1), pml);
 
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(
@@ -56,7 +57,7 @@ class TargetEvaluatorTest {
             associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:assignment:descendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new UserIdContext(-1), pml);
 
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(
@@ -89,7 +90,7 @@ class TargetEvaluatorTest {
             associate "ua1" to "oa2" with ["admin:graph:assignment:ascendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new UserIdContext(-1), pml);
 
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(

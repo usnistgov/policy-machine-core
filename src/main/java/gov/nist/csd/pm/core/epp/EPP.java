@@ -27,6 +27,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.PDPTx;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -63,7 +64,7 @@ public class EPP implements EventSubscriber {
 
         for (Obligation obligation : obligations) {
             long author = obligation.getAuthorId();
-            UserContext authorCtx = new UserContext(author);
+            UserContext authorCtx = new UserIdContext(author);
 
             try {
                 pdp.runTx(authorCtx, pdpTx -> {

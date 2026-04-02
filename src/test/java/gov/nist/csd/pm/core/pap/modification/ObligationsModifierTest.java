@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -108,7 +109,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
         void testTx() throws PMException, IOException {
             loadSamplePolicyFromPML(pap);
 
-            pap.runTx(tx -> pap.executePML(new UserContext(id("u1")), """
+            pap.runTx(tx -> pap.executePML(new UserIdContext(id("u1")), """
                 create obligation "ob1"
                     when any user
                     performs any operation
@@ -120,7 +121,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
                     do(ctx) { }
                 """));
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                pap.executePML(new UserContext(id("u1")), """
+                pap.executePML(new UserIdContext(id("u1")), """
                     create obligation "ob3"
                         when any user
                         performs any operation
@@ -148,7 +149,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
         public void testSuccess() throws PMException, IOException {
             loadSamplePolicyFromPML(pap);
 
-            pap.executePML(new UserContext(id("u1")), """
+            pap.executePML(new UserIdContext(id("u1")), """
                     create obligation "ob1"
                         when any user
                         performs any operation
@@ -164,7 +165,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
         void testTx() throws PMException, IOException {
             loadSamplePolicyFromPML(pap);
 
-            pap.runTx(tx -> pap.executePML(new UserContext(id("u1")), """
+            pap.runTx(tx -> pap.executePML(new UserIdContext(id("u1")), """
                 create obligation "ob1"
                     when any user 
                     performs any operation

@@ -18,6 +18,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class CreateProhibitionStatementTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
 
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id("u1")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new UserIdContext(id("u1")), pap);
 
         stmt.execute(execCtx, pap);
 
@@ -81,7 +82,7 @@ class CreateProhibitionStatementTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
 
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id("u1")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new UserIdContext(id("u1")), pap);
 
         stmt.execute(execCtx, pap);
 

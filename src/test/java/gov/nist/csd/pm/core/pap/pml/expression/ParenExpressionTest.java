@@ -14,6 +14,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,7 @@ class ParenExpressionTest {
         VisitorContext visitorContext = new VisitorContext(compileScope);
         Expression e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        Object actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object actual = e.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 actual
@@ -49,7 +50,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileScope);
         e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 actual
@@ -62,7 +63,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileScope);
         e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 actual
@@ -75,7 +76,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileScope);
         e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 actual
@@ -88,7 +89,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileScope);
         e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 actual
@@ -101,7 +102,7 @@ class ParenExpressionTest {
         visitorContext = new VisitorContext(compileScope);
         e = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
-        actual = e.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        actual = e.execute(new ExecutionContext(new UserIdContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 actual
@@ -119,7 +120,7 @@ class ParenExpressionTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         PAP pap = new TestPAP();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), new MemoryPAP());
+        ExecutionContext executionContext = new ExecutionContext(new UserIdContext(0), new MemoryPAP());
         Object actual = expression.execute(executionContext, pap);
         assertEquals(
                 false,
