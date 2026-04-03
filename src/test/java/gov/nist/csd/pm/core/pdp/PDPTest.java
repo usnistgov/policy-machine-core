@@ -125,7 +125,7 @@ class PDPTest {
         });
 
         pap.modify().obligations().createObligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "obl1",
             new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
             new ObligationResponse("evt", List.of())

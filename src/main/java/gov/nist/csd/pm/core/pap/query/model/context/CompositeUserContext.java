@@ -1,31 +1,37 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.store.GraphStore;
 import java.util.List;
+import java.util.Objects;
 
 public final class CompositeUserContext implements UserContext {
 
-    private final List<SingleUserContext> contexts;
+    private final List<UserContext> contexts;
 
-    public CompositeUserContext(List<SingleUserContext> contexts) {
+    public CompositeUserContext(List<UserContext> contexts) {
         this.contexts = contexts;
     }
 
-    public List<SingleUserContext> contexts() {
+    public List<UserContext> contexts() {
         return contexts;
     }
 
     @Override
     public String getProcess() {
-        return "";
+        return contexts.getFirst().getProcess();
     }
 
     @Override
-    public void checkExists(GraphStore graphStore) throws PMException {
-        for (SingleUserContext ctx : contexts) {
-            ctx.checkExists(graphStore);
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
+        CompositeUserContext that = (CompositeUserContext) o;
+        return Objects.equals(contexts, that.contexts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(contexts);
     }
 
     @Override

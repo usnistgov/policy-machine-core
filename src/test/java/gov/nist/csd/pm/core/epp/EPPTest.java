@@ -292,7 +292,7 @@ class EPPTest {
         });
 
         pdp.runTx(new UserIdContext(id("u1")), (policy) -> {
-            policy.modify().obligations().createObligation(id("u1"), "test",
+            policy.modify().obligations().createObligation(new UserIdContext(id("u1")), "test",
                 new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString())),
                 new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(

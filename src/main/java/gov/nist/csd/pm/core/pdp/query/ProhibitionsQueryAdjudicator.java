@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
@@ -94,18 +95,18 @@ public class ProhibitionsQueryAdjudicator extends Adjudicator implements Prohibi
     private void checkCanQueryProhibition(Prohibition prohibition) throws PMException {
         switch (prohibition) {
             case NodeProhibition nodeProhibition ->
-                check(userCtx, new TargetContext(nodeProhibition.getNodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+                check(userCtx, new TargetIdContext(nodeProhibition.getNodeId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
             case ProcessProhibition processProhibition ->
-                check(userCtx, new TargetContext(processProhibition.getUserId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+                check(userCtx, new TargetIdContext(processProhibition.getUserId()), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
 
         // check user has access to each attribute
         for (long inc : prohibition.getInclusionSet()) {
-            check(userCtx, new TargetContext(inc), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+            check(userCtx, new TargetIdContext(inc), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
 
         for (long exc : prohibition.getExclusionSet()) {
-            check(userCtx, new TargetContext(exc), AdminAccessRight.ADMIN_PROHIBITION_LIST);
+            check(userCtx, new TargetIdContext(exc), AdminAccessRight.ADMIN_PROHIBITION_LIST);
         }
     }
 }

@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.util.List;
@@ -41,7 +42,7 @@ class DeleteStatementTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
         UserContext userContext = new UsernameContext("u1");
-        pap.modify().obligations().createObligation(id("u1"), "o1",
+        pap.modify().obligations().createObligation(new UserIdContext(id("u1")), "o1",
                 new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                 new ObligationResponse("e", List.of())
         );

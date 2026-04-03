@@ -15,6 +15,9 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
 public class ObligationsModificationAdjudicator extends Adjudicator implements ObligationsModification {
@@ -26,10 +29,14 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
     }
 
     @Override
-    public void createObligation(long authorId,
+    public void createObligation(UserNodeContext author,
                                  String name,
                                  EventPattern eventPattern,
                                  ObligationResponse response) throws PMException {
+        long authorId = switch (author) {
+            case UserIdContext c -> c.userId();
+            case UsernameContext c -> pap.query().graph().getNodeByName(c.username()).getId();
+        };
         CreateObligationOp op = new CreateObligationOp();
         Args args = new Args()
             .put(AUTHOR_PARAM, authorId)

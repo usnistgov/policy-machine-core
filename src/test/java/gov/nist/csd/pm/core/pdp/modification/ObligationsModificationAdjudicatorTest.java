@@ -66,7 +66,7 @@ class ObligationsModificationAdjudicatorTest {
 
     @Test
     void createObligation() {
-        assertDoesNotThrow(() -> ok.createObligation(id("u1"), "name",
+        assertDoesNotThrow(() -> ok.createObligation(new UserIdContext(id("u1")), "name",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
 
@@ -75,11 +75,11 @@ class ObligationsModificationAdjudicatorTest {
 
     @Test
     void deleteObligation() throws PMException {
-        ok.createObligation(id("u1"), "test",
+        ok.createObligation(new UserIdContext(id("u1")), "test",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
         );
-        ok.createObligation(id("u1"), "test2",
+        ok.createObligation(new UserIdContext(id("u1")), "test2",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
         );

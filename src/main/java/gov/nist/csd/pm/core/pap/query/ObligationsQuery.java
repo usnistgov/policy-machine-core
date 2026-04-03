@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
 import java.util.Collection;
 
 /**
@@ -38,10 +39,10 @@ public interface ObligationsQuery {
     /**
      * Get the obligations created by the given author.
      *
-     * @param userId The user representing the author to search for.
+     * @param authorCtx The user representing the author to search for.
      * @return A list of Obligation objects.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException;
+    Collection<Obligation> getObligationsWithAuthor(UserNodeContext authorCtx) throws PMException;
     
 }

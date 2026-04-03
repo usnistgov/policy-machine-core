@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -34,7 +35,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         }
 
         // check user has permissions on the node
-        check(userCtx, new TargetContext(id));
+        check(userCtx, new TargetIdContext(id));
 
         return true;
     }
@@ -45,7 +46,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
             Node node = pap.query().graph().getNodeByName(name);
 
             // check user has permissions on the node
-            check(userCtx, new TargetContext(node.getId()));
+            check(userCtx, new TargetIdContext(node.getId()));
         } catch (NodeDoesNotExistException e) {
             return false;
         }
@@ -59,7 +60,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         Node node = pap.query().graph().getNodeByName(name);
 
         // check user has permissions on the node
-        check(userCtx, new TargetContext(node.getId()));
+        check(userCtx, new TargetIdContext(node.getId()));
 
         return node;
     }
@@ -75,7 +76,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         Node node = pap.query().graph().getNodeById(id);
 
         // check user has permissions on the node
-        check(userCtx, new TargetContext(id));
+        check(userCtx, new TargetIdContext(id));
 
         return node;
     }
@@ -85,7 +86,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         Collection<Node> search = pap.query().graph().search(type, properties);
         search.removeIf(node -> {
             try {
-                check(userCtx, new TargetContext(node.getId()));
+                check(userCtx, new TargetIdContext(node.getId()));
                 return false;
             } catch (PMException e) {
                 return true;
@@ -97,7 +98,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Collection<Long> getPolicyClasses() throws PMException {
-        check(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId()),
+        check(userCtx, new TargetIdContext(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId()),
             AdminAccessRight.ADMIN_GRAPH_POLICY_CLASS_LIST);
 
         return pap.query().graph().getPolicyClasses();
@@ -105,14 +106,14 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Collection<Long> getAdjacentDescendants(long nodeId) throws PMException {
-        check(userCtx, new TargetContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
 
         return filterNodes(pap.query().graph().getAdjacentDescendants(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
     }
 
     @Override
     public Collection<Long> getAdjacentAscendants(long nodeId) throws PMException {
-        check(userCtx, new TargetContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
 
         return filterNodes(pap.query().graph().getAdjacentAscendants(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
     }
@@ -129,21 +130,21 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Subgraph getAscendantSubgraph(long nodeId) throws PMException {
-        check(userCtx, new TargetContext(nodeId), AdminAccessRight.ADMIN_GRAPH_SUBGRAPH_LIST);
+        check(userCtx, new TargetIdContext(nodeId), AdminAccessRight.ADMIN_GRAPH_SUBGRAPH_LIST);
 
         return pap.query().graph().getAscendantSubgraph(nodeId);
     }
 
     @Override
     public Subgraph getDescendantSubgraph(long nodeId) throws PMException {
-        check(userCtx, new TargetContext(nodeId), AdminAccessRight.ADMIN_GRAPH_SUBGRAPH_LIST);
+        check(userCtx, new TargetIdContext(nodeId), AdminAccessRight.ADMIN_GRAPH_SUBGRAPH_LIST);
 
         return pap.query().graph().getDescendantSubgraph(nodeId);
     }
 
     @Override
     public Collection<Long> getAttributeDescendants(long nodeId) throws PMException {
-        check(userCtx, new TargetContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
 
         Collection<Long> attributeDescendants = pap.query().graph().getAttributeDescendants(nodeId);
         return filterNodes(attributeDescendants, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
@@ -151,7 +152,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public Collection<Long> getPolicyClassDescendants(long nodeId) throws PMException {
-        check(userCtx, new TargetContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(nodeId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
 
         Collection<Long> policyClassDescendants = pap.query().graph().getPolicyClassDescendants(nodeId);
         return filterNodes(policyClassDescendants, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
@@ -159,16 +160,16 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     @Override
     public boolean isAscendant(long ascendantId, long descendantId) throws PMException {
-        check(userCtx, new TargetContext(ascendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
-        check(userCtx, new TargetContext(descendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(ascendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(descendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
 
         return pap.query().graph().isAscendant(ascendantId, descendantId);
     }
 
     @Override
     public boolean isDescendant(long ascendantId, long descendantId) throws PMException {
-        check(userCtx, new TargetContext(ascendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
-        check(userCtx, new TargetContext(descendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(ascendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
+        check(userCtx, new TargetIdContext(descendantId), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST);
 
         return pap.query().graph().isDescendant(ascendantId, descendantId);
     }
@@ -177,8 +178,8 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         List<Association> ret = new ArrayList<>();
         for (Association association : associations) {
             try {
-                check(userCtx, new TargetContext(association.source()), AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_LIST);
-                check(userCtx, new TargetContext(association.target()), AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_LIST);
+                check(userCtx, new TargetIdContext(association.source()), AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_LIST);
+                check(userCtx, new TargetIdContext(association.target()), AdminAccessRight.ADMIN_GRAPH_ASSOCIATION_LIST);
             } catch (UnauthorizedException e) {
                 continue;
             } catch (PMException e) {
@@ -195,7 +196,7 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         try {
             nodes.removeIf(id -> {
                 try {
-                    check(userCtx, new TargetContext(id), ar);
+                    check(userCtx, new TargetIdContext(id), ar);
                     return false;
                 } catch (UnauthorizedException e) {
                     return true;

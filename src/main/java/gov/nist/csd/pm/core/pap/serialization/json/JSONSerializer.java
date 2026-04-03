@@ -76,7 +76,7 @@ public class JSONSerializer implements PolicySerializer {
         List<JSONObligation> jsonObligations = new ArrayList<>();
         Collection<Obligation> all = policyQuery.obligations().getObligations();
         for (Obligation obligation : all) {
-            jsonObligations.add(JSONObligation.fromObligation(obligation));
+            jsonObligations.add(JSONObligation.fromObligation(obligation, policyQuery.graph()));
         }
 
         return jsonObligations.isEmpty() ? null : jsonObligations;

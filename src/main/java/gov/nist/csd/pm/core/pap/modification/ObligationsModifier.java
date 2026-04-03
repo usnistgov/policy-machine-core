@@ -1,10 +1,11 @@
 package gov.nist.csd.pm.core.pap.modification;
 
-import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
+import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class ObligationsModifier extends Modifier implements ObligationsModification {
@@ -14,13 +15,13 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     }
 
     @Override
-    public void createObligation(long authorId,
+    public void createObligation(UserNodeContext author,
                                  String name,
                                  EventPattern eventPattern,
                                  ObligationResponse response) throws PMException {
-        checkCreateInput(authorId, name);
+        checkCreateInput(author, name);
 
-        policyStore.obligations().createObligation(authorId, name, eventPattern, response);
+        policyStore.obligations().createObligation(author, name, eventPattern, response);
     }
 
     @Override
@@ -39,12 +40,12 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
      * @param name   The name of the obligation.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected void checkCreateInput(long author, String name) throws PMException {
+    protected void checkCreateInput(UserNodeContext author, String name) throws PMException {
         if (policyStore.obligations().obligationExists(name)) {
             throw new ObligationNameExistsException(name);
         }
 
-        checkAuthorExists(author);
+        ContextChecker.checkUserContextExists(author, policyStore.graph());
     }
 
     /**
@@ -57,11 +58,5 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
      */
     protected boolean checkDeleteInput(String name) throws PMException {
 	    return policyStore.obligations().obligationExists(name);
-    }
-
-    private void checkAuthorExists(long author) throws PMException {
-        if (!policyStore.graph().nodeExists(author)) {
-            throw new NodeDoesNotExistException(author);
-        }
     }
 }

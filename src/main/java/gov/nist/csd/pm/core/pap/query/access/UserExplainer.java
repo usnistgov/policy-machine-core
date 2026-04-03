@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
 import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
@@ -31,7 +32,7 @@ public class UserExplainer {
 	}
 
 	public Map<Node, Set<Path>> explainIntersectionOfTargetPaths(UserContext userCtx, Map<Node, Map<Path, List<Association>>> targetPaths) throws PMException {
-		userCtx.checkExists(policyStore.graph());
+		ContextChecker.checkUserContextExists(userCtx, policyStore.graph());
 
 		// initialize map with the UAs of the target path associations
 		Map<Node, Set<Path>> associationUAPaths = new HashMap<>();

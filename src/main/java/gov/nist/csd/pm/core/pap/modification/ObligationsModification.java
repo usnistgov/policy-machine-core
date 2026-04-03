@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pap.modification;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
 
 /**
  * NGAC obligation methods.
@@ -21,7 +22,7 @@ public interface ObligationsModification {
      * @param response      The obligation response.
      * @throws PMException  If any PM related exceptions occur in the implementing class.
      */
-    void createObligation(long authorId, String name, EventPattern eventPattern, ObligationResponse response) throws PMException;
+    void createObligation(UserNodeContext author, String name, EventPattern eventPattern, ObligationResponse response) throws PMException;
 
     /**
      * Delete the obligation with the given name. If the obligation does not exist, no exception is thrown as this is

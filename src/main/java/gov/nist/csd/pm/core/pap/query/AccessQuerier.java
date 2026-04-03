@@ -18,6 +18,7 @@ import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
 import gov.nist.csd.pm.core.pap.query.access.UserEvaluationResult;
 import gov.nist.csd.pm.core.pap.query.access.UserEvaluator;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
@@ -97,7 +98,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
         for (long borderTarget : borderTargets.keySet()) {
             // compute permissions on the border attr
-            AccessRightSet arset = computePrivileges(userDagResults, new TargetContext(borderTarget), cachedTargetEvaluator);
+            AccessRightSet arset = computePrivileges(userDagResults, new TargetIdContext(borderTarget), cachedTargetEvaluator);
             results.put(borderTarget, arset);
 
             // compute decisions for the subgraph of the border attr
@@ -107,7 +108,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
                     continue;
                 }
 
-                arset = computePrivileges(userDagResults, new TargetContext(ascendant), cachedTargetEvaluator);
+                arset = computePrivileges(userDagResults, new TargetIdContext(ascendant), cachedTargetEvaluator);
                 results.put(ascendant, arset);
             }
         }
@@ -158,7 +159,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
         return new SubgraphPrivileges(
             store.graph().getNodeById(root),
-            computePrivileges(userDagResults, new TargetContext(root), targetEvaluator),
+            computePrivileges(userDagResults, new TargetIdContext(root), targetEvaluator),
             subgraphs
         );
     }
@@ -173,7 +174,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
         Collection<Long> adjacentAscendants = store.graph().getAdjacentAscendants(root);
         for (long adjacentAscendant : adjacentAscendants) {
             Node node = store.graph().getNodeById(adjacentAscendant);
-            ascendantPrivs.put(node, computePrivileges(userDagResults, new TargetContext(adjacentAscendant), targetEvaluator));
+            ascendantPrivs.put(node, computePrivileges(userDagResults, new TargetIdContext(adjacentAscendant), targetEvaluator));
         }
 
         return ascendantPrivs;
@@ -189,7 +190,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
         Collection<Long> adjacentDescendants = store.graph().getAdjacentDescendants(root);
         for (long adjacentDescendant : adjacentDescendants) {
             Node node = store.graph().getNodeById(adjacentDescendant);
-            descendantPrivs.put(node, computePrivileges(userDagResults, new TargetContext(adjacentDescendant), targetEvaluator));
+            descendantPrivs.put(node, computePrivileges(userDagResults, new TargetIdContext(adjacentDescendant), targetEvaluator));
         }
 
         return descendantPrivs;
@@ -212,7 +213,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
             new GraphStoreBFS(store.graph())
                 .withDirection(Direction.ASCENDANTS)
                 .withVisitor(n -> {
-                    AccessRightSet privs = computePrivileges(userDagResults, new TargetContext(n), cachedTargetEvaluator);
+                    AccessRightSet privs = computePrivileges(userDagResults, new TargetIdContext(n), cachedTargetEvaluator);
                     if (privs.isEmpty()) {
                         return;
                     }

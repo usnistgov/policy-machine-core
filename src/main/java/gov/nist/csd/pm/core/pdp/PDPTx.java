@@ -30,6 +30,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
@@ -235,7 +236,7 @@ public class PDPTx implements OperationExecutor {
         public void reset() throws PMException {
             if(!pap.query()
                 .access()
-                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                .computePrivileges(userCtx, new TargetIdContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
                 .contains(AdminAccessRight.ADMIN_POLICY_RESET.toString())) {
                 throw UnauthorizedException.of(pap.query().graph(), userCtx, "reset");
             }
@@ -247,7 +248,7 @@ public class PDPTx implements OperationExecutor {
         public String serialize(PolicySerializer serializer) throws PMException {
             if(!pap.query()
                 .access()
-                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                .computePrivileges(userCtx, new TargetIdContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
                 .contains(AdminAccessRight.ADMIN_POLICY_SERIALIZE.toString())) {
                 throw UnauthorizedException.of(pap.query().graph(), userCtx, "serialize");
             }
@@ -259,7 +260,7 @@ public class PDPTx implements OperationExecutor {
         public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
             if(!pap.query()
                 .access()
-                .computePrivileges(userCtx, new TargetContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
+                .computePrivileges(userCtx, new TargetIdContext(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId()))
                 .contains(AdminAccessRight.ADMIN_POLICY_DESERIALIZE.toString())) {
                 throw UnauthorizedException.of(pap.query().graph(), userCtx, "deserialize");
             }

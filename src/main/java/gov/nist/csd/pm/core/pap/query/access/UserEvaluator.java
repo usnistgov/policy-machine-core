@@ -6,12 +6,14 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
 import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.SingleUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -47,20 +49,19 @@ public class UserEvaluator {
 		return switch (userContext) {
 			case CompositeUserContext c -> {
 				List<UserDagResult> results = new ArrayList<>();
-				for (SingleUserContext ctx : c.contexts()) {
-					ctx.checkExists(policyStore.graph());
-					results.add(evaluateSingle(ctx));
+				for (UserContext ctx : c.contexts()) {
+					results.addAll(evaluate(ctx).dagResults());
 				}
 				yield new UserEvaluationResult(results);
 			}
-			case SingleUserContext ctx -> {
-				ctx.checkExists(policyStore.graph());
-				yield new UserEvaluationResult(List.of(evaluateSingle(ctx)));
-			}
+			case UserNodeContext ctx -> new UserEvaluationResult(List.of(evaluate(ctx)));
+			case AnonymousUserContext ctx -> new UserEvaluationResult(List.of(evaluate(ctx)));
 		};
 	}
 
-	private UserDagResult evaluateSingle(SingleUserContext userContext) throws PMException {
+	private UserDagResult evaluate(UserNodeContext userContext) throws PMException {
+		ContextChecker.checkUserContextExists(userContext, policyStore.graph());
+
 		Map<Long, AccessRightSet> borderTargets = new HashMap<>();
 		Set<Prohibition> reachedProhibitions = new HashSet<>();
 
@@ -80,10 +81,45 @@ public class UserEvaluator {
 				});
 
 		Collection<Long> startNodes = switch (userContext) {
-			case AttributeIdsContext ctx -> ctx.getAdjacentDescendants(policyStore.graph());
-			case AttributeNamesContext ctx -> ctx.getAdjacentDescendants(policyStore.graph());
-			case UsernameContext ctx -> List.of(policyStore.graph().getNodeByName(ctx.username()).getId());
-			case UserIdContext ctx -> List.of(ctx.userId());
+			case UserIdContext c -> List.of(c.userId());
+			case UsernameContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
+		};
+
+		bfs.walk(startNodes);
+
+		return new UserDagResult(borderTargets, reachedProhibitions);
+	}
+
+	private UserDagResult evaluate(AnonymousUserContext userContext) throws PMException {
+		ContextChecker.checkUserContextExists(userContext, policyStore.graph());
+
+		Map<Long, AccessRightSet> borderTargets = new HashMap<>();
+		Set<Prohibition> reachedProhibitions = new HashSet<>();
+
+		String process = userContext.getProcess();
+		if (process != null && !process.isEmpty()) {
+			reachedProhibitions.addAll(policyStore.prohibitions().getProcessProhibitions(process));
+		}
+
+		BreadthFirstGraphWalker bfs = new GraphStoreBFS(policyStore.graph())
+				.withDirection(Direction.DESCENDANTS)
+				.withVisitor(nodeId -> {
+					reachedProhibitions.addAll(policyStore.prohibitions().getNodeProhibitions(nodeId));
+					for (Association association : policyStore.graph().getAssociationsWithSource(nodeId)) {
+						borderTargets.computeIfAbsent(association.target(), k -> new AccessRightSet())
+								.addAll(association.arset());
+					}
+				});
+
+		Collection<Long> startNodes = switch (userContext) {
+			case AttributeIdsContext c -> c.attributeIds();
+			case AttributeNamesContext c -> {
+				Collection<Long> ids = new ArrayList<>();
+				for (String name : c.attributeNames()) {
+					ids.add(policyStore.graph().getNodeByName(name).getId());
+				}
+				yield ids;
+			}
 		};
 		bfs.walk(startNodes);
 

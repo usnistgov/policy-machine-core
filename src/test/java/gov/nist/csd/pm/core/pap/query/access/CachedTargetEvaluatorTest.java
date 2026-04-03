@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -87,10 +88,10 @@ class CachedTargetEvaluatorTest {
 
         // Test multiple target contexts
         TargetContext[] contexts = {
-            new TargetContext(id("o1")),
-            new TargetContext(id("o2")),
-            new TargetContext(id("oa1")),
-            new TargetContext(id("oa2"))
+            new TargetIdContext(id("o1")),
+            new TargetIdContext(id("o2")),
+            new TargetIdContext(id("oa1")),
+            new TargetIdContext(id("oa2"))
         };
 
         for (TargetContext context : contexts) {
@@ -106,9 +107,9 @@ class CachedTargetEvaluatorTest {
     void testConsistentResults() throws PMException {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
-        TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
-        TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
-        TargetDagResult result3 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
+        TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
+        TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
+        TargetDagResult result3 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
 
         assertEquals(result1.pcMap(), result2.pcMap());
         assertEquals(result2.pcMap(), result3.pcMap());
@@ -119,21 +120,21 @@ class CachedTargetEvaluatorTest {
     @Test
     void testCacheInvalidatedOnUserDagResultChange() throws PMException {
         TargetEvaluator regularEvaluator = new TargetEvaluator(pap.policyStore());
-        TargetDagResult regularResult1 = regularEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
-        TargetDagResult regularResult2 = regularEvaluator.evaluate(alternateUserDagResult, new TargetContext(id("o1")));
+        TargetDagResult regularResult1 = regularEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
+        TargetDagResult regularResult2 = regularEvaluator.evaluate(alternateUserDagResult, new TargetIdContext(id("o1")));
 
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
-        TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
+        TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
 
-        TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
+        TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
         assertEquals(result1.pcMap(), result2.pcMap());
 
-        TargetDagResult result3 = cachedEvaluator.evaluate(alternateUserDagResult, new TargetContext(id("o1")));
+        TargetDagResult result3 = cachedEvaluator.evaluate(alternateUserDagResult, new TargetIdContext(id("o1")));
         assertEquals(regularResult1.pcMap(), result1.pcMap());
         assertEquals(regularResult2.pcMap(), result3.pcMap());
 
-        TargetDagResult result4 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
+        TargetDagResult result4 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
         assertEquals(result1.pcMap(), result4.pcMap());
     }
 
@@ -143,11 +144,11 @@ class CachedTargetEvaluatorTest {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
         TargetContext[] contexts = {
-            new TargetContext(id("o1")),
-            new TargetContext(id("o2")),
-            new TargetContext(id("oa1")),
-            new TargetContext(id("oa2")),
-            new TargetContext(id("o3"))
+            new TargetIdContext(id("o1")),
+            new TargetIdContext(id("o2")),
+            new TargetIdContext(id("oa1")),
+            new TargetIdContext(id("oa2")),
+            new TargetIdContext(id("o3"))
         };
 
         for (TargetContext context : contexts) {
@@ -163,10 +164,10 @@ class CachedTargetEvaluatorTest {
     void testCacheDoesNotAffectProhibitionResolution() throws PMException {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
-        TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o2")));
+        TargetDagResult result1 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o2")));
         // evaluating a new target should reset the prohibition evaluation state
-        TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o1")));
-        TargetDagResult result3 = cachedEvaluator.evaluate(userDagResult, new TargetContext(id("o2")));
+        TargetDagResult result2 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o1")));
+        TargetDagResult result3 = cachedEvaluator.evaluate(userDagResult, new TargetIdContext(id("o2")));
 
         assertEquals(result1, result3);
         assertNotEquals(result1, result2);
@@ -177,7 +178,7 @@ class CachedTargetEvaluatorTest {
         UserDagResult emptyUserDagResult = new UserDagResult(Map.of(), Set.of());
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
 
-        TargetDagResult result = cachedEvaluator.evaluate(emptyUserDagResult, new TargetContext(id("o1")));
+        TargetDagResult result = cachedEvaluator.evaluate(emptyUserDagResult, new TargetIdContext(id("o1")));
 
         assertNotNull(result);
         assertTrue(result.pcMap().isEmpty() || result.pcMap().values().stream().allMatch(AccessRightSet::isEmpty));
@@ -201,16 +202,16 @@ class CachedTargetEvaluatorTest {
         CachedTargetEvaluator cachedEvaluator = new CachedTargetEvaluator(pap.policyStore());
         TargetEvaluator regularEvaluator = new TargetEvaluator(pap.policyStore());
 
-        TargetDagResult cachedResultWithAccess = cachedEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
-        TargetDagResult regularResultWithAccess = regularEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
+        TargetDagResult cachedResultWithAccess = cachedEvaluator.evaluate(userWithWriteAccess, new TargetIdContext(id("o1")));
+        TargetDagResult regularResultWithAccess = regularEvaluator.evaluate(userWithWriteAccess, new TargetIdContext(id("o1")));
 
-        TargetDagResult cachedResultNoAccess = cachedEvaluator.evaluate(userWithNoAccess, new TargetContext(id("o1")));
-        TargetDagResult regularResultNoAccess = regularEvaluator.evaluate(userWithNoAccess, new TargetContext(id("o1")));
+        TargetDagResult cachedResultNoAccess = cachedEvaluator.evaluate(userWithNoAccess, new TargetIdContext(id("o1")));
+        TargetDagResult regularResultNoAccess = regularEvaluator.evaluate(userWithNoAccess, new TargetIdContext(id("o1")));
 
         assertEquals(regularResultWithAccess.pcMap(), cachedResultWithAccess.pcMap());
         assertEquals(regularResultNoAccess.pcMap(), cachedResultNoAccess.pcMap());
 
-        TargetDagResult cachedResultWithAccessAgain = cachedEvaluator.evaluate(userWithWriteAccess, new TargetContext(id("o1")));
+        TargetDagResult cachedResultWithAccessAgain = cachedEvaluator.evaluate(userWithWriteAccess, new TargetIdContext(id("o1")));
         assertEquals(cachedResultWithAccess.pcMap(), cachedResultWithAccessAgain.pcMap());
     }
 }

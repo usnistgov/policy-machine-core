@@ -25,7 +25,6 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -78,7 +77,7 @@ class CreateObligationStatementTest {
         assertTrue(pap.query().obligations().obligationExists("o1"));
 
         Obligation actual = pap.query().obligations().getObligation("o1");
-        assertEquals(id("u2"), actual.getAuthorId());
+        assertEquals(new UserIdContext(id("u2")), actual.getAuthor());
         assertEquals(eventPattern, actual.getEventPattern());
     }
 

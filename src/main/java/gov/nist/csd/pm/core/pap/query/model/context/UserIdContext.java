@@ -1,11 +1,8 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
-import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.store.GraphStore;
-import java.util.Collection;
+import java.util.Objects;
 
-public final class UserIdContext implements SingleUserContext {
+public final class UserIdContext implements UserNodeContext {
 
     private final long userId;
     private final String process;
@@ -29,15 +26,15 @@ public final class UserIdContext implements SingleUserContext {
     }
 
     @Override
-    public void checkExists(GraphStore graphStore) throws PMException {
-        if (!graphStore.nodeExists(userId)) {
-            throw new NodeDoesNotExistException(userId);
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserIdContext that)) return false;
+        return userId == that.userId && Objects.equals(process, that.process);
     }
 
     @Override
-    public Collection<Long> getAdjacentDescendants(GraphStore graphStore) throws PMException {
-        return graphStore.getAdjacentDescendants(userId);
+    public int hashCode() {
+        return Objects.hash(userId, process);
     }
 
     @Override

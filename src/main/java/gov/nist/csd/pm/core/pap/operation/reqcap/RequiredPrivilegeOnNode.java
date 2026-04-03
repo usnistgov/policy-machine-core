@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.Objects;
 
@@ -27,7 +28,7 @@ public final class RequiredPrivilegeOnNode extends RequiredPrivilege{
     public boolean isSatisfied(PAP pap, UserContext userCtx, Args args) throws PMException {
         AccessRightSet arset = pap.query()
             .access()
-            .computePrivileges(userCtx, new TargetContext(pap.query().graph().getNodeId(name)));
+            .computePrivileges(userCtx, new TargetIdContext(pap.query().graph().getNodeId(name)));
         return !arset.isEmpty() && arset.containsAll(getRequired());
     }
 

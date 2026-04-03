@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -37,7 +38,7 @@ class TargetEvaluatorTest {
                 Map.of(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("admin:graph:assignment:descendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa1"))
+            new TargetIdContext(id("oa1"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:descendant:create")),
@@ -65,7 +66,7 @@ class TargetEvaluatorTest {
                 Map.of(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("admin:graph:assignment:descendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa1"))
+            new TargetIdContext(id("oa1"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:descendant:create")),
@@ -100,7 +101,7 @@ class TargetEvaluatorTest {
                     id("oa2"), new AccessRightSet("admin:graph:assignment:ascendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa1"))
+            new TargetIdContext(id("oa1"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:descendant:create", "admin:graph:assignment:ascendant:create")),
@@ -114,7 +115,7 @@ class TargetEvaluatorTest {
                     id("oa2"), new AccessRightSet("admin:graph:assignment:ascendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa3"))
+            new TargetIdContext(id("oa3"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:ascendant:create")),

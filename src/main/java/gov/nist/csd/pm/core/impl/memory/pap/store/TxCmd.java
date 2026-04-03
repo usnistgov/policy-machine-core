@@ -214,7 +214,7 @@ public abstract class TxCmd implements TxRollbackSupport {
         @Override
         public void rollback(MemoryPolicyStore memoryPolicyStore) throws PMException {
             memoryPolicyStore.obligations().createObligation(
-                    obligationToDelete.getAuthorId(),
+                    obligationToDelete.getAuthor(),
                     obligationToDelete.getName(),
                     obligationToDelete.getEventPattern(),
                     obligationToDelete.getResponse()

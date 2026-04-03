@@ -12,7 +12,14 @@ import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeNamesContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetNameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetNodeContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -42,7 +49,7 @@ public class TargetEvaluator {
 	 * those PCs and add them to the entries of those PCs in the resulting TargetDagResult
 	 */
 	public TargetDagResult evaluate(UserDagResult userDagResult, TargetContext targetContext) throws PMException {
-		prepareTargetCtx(targetContext);
+		targetContext = prepareTargetCtx(targetContext);
 
 		// initialize objects for traversal
 		TraversalState state = initializeEvaluationState(userDagResult, targetContext);
@@ -50,14 +57,25 @@ public class TargetEvaluator {
 
 		// walk the target graph starting at the first level descs
 		List<Long> targetNodes = new ArrayList<>();
-		if (targetContext.isNode()) {
-			long targetId = targetContext.getTargetId();
-			targetNodes.add(targetId);
-			dfs.walk(targetId);
-		} else {
-			Collection<Long> attributeIds = targetContext.getAttributeIds();
-			targetNodes.addAll(attributeIds);
-			dfs.walk(attributeIds);
+		switch (targetContext) {
+			case TargetIdContext ctx -> {
+				targetNodes.add(ctx.targetId());
+				dfs.walk(ctx.targetId());
+			}
+			case TargetNameContext ctx -> {
+				long id = policyStore.graph().getNodeByName(ctx.targetName()).getId();
+				targetNodes.add(id);
+				dfs.walk(id);
+			}
+			case TargetAttributeIdsContext ctx -> {
+				targetNodes.addAll(ctx.attributeIds());
+				dfs.walk(ctx.attributeIds());
+			}
+			case TargetAttributeNamesContext ctx -> {
+				Collection<Long> ids = resolveAttributeNames(ctx.attributeNames());
+				targetNodes.addAll(ids);
+				dfs.walk(ids);
+			}
 		}
 
 		Map<Long, AccessRightSet> pcMap = computePcMap(targetNodes, state.visitedNodes);
@@ -90,10 +108,17 @@ public class TargetEvaluator {
 
 	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
 		Collection<Long> firstLevelDescs = new LongArrayList();
-		if (targetCtx.isNode()) {
-			firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(targetCtx.getTargetId()));
-		} else {
-			firstLevelDescs.addAll(targetCtx.getAttributeIds());
+		switch (targetCtx) {
+			case TargetIdContext ctx ->
+				firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(ctx.targetId()));
+			case TargetNameContext ctx -> {
+				long id = policyStore.graph().getNodeByName(ctx.targetName()).getId();
+				firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(id));
+			}
+			case TargetAttributeIdsContext ctx ->
+				firstLevelDescs.addAll(ctx.attributeIds());
+			case TargetAttributeNamesContext ctx ->
+				firstLevelDescs.addAll(resolveAttributeNames(ctx.attributeNames()));
 		}
 
 		Set<Long> userProhibitionTargets = collectUserProhibitionAttributes(userDagResult.prohibitions());
@@ -129,7 +154,7 @@ public class TargetEvaluator {
 
 		// evaluate the privileges this user has on the PM_ADMIN_POLICY_CLASSES node
 		// these privs represent the access rights the user has on policy classes
-		TargetDagResult adminTargetResult = evaluate(userDagResult, new TargetContext(PM_ADMIN_POLICY_CLASSES.nodeId()));
+		TargetDagResult adminTargetResult = evaluate(userDagResult, new TargetIdContext(PM_ADMIN_POLICY_CLASSES.nodeId()));
 		return AccessRightResolver.resolvePrivileges(
 			userDagResult,
 			adminTargetResult,
@@ -184,20 +209,25 @@ public class TargetEvaluator {
 		};
 	}
 
-	protected void prepareTargetCtx(TargetContext targetContext) throws PMException {
-		// ensure the target context node or attributes exist
-		targetContext.checkExists(policyStore.graph());
+	protected TargetContext prepareTargetCtx(TargetContext targetContext) throws PMException {
+		ContextChecker.checkTargetContextExists(targetContext, policyStore.graph());
 
-		// if already list of attributes than nothing to prepare
-		if (!targetContext.isNode()) {
-			return;
+		// if already a list of attributes, nothing to prepare
+		if (targetContext instanceof AnonymousTargetContext) {
+			return targetContext;
 		}
 
-		// if the node is a PC, make the target the PM_ADMIN_PCs node
-		long targetId = targetContext.getTargetId();
-		Node targetNode = policyStore.graph().getNodeById(targetId);
-		targetId = targetNode.getType().equals(PC) ? PM_ADMIN_POLICY_CLASSES.nodeId() : targetId;
-		targetContext.setTargetId(targetId);
+		// if the node is a PC, redirect to the PM_ADMIN_PCs node
+		Node targetNode = switch ((TargetNodeContext) targetContext) {
+			case TargetIdContext ctx -> policyStore.graph().getNodeById(ctx.targetId());
+			case TargetNameContext ctx -> policyStore.graph().getNodeByName(ctx.targetName());
+		};
+
+		if (targetNode.getType().equals(PC)) {
+			return new TargetIdContext(PM_ADMIN_POLICY_CLASSES.nodeId());
+		}
+
+		return targetContext;
 	}
 
 	protected Set<Long> collectUserProhibitionAttributes(Set<Prohibition> prohibitions) {
@@ -208,6 +238,14 @@ public class TargetEvaluator {
 		}
 
 		return userProhibitionAttrs;
+	}
+
+	private Collection<Long> resolveAttributeNames(Collection<String> names) throws PMException {
+		Collection<Long> ids = new ArrayList<>();
+		for (String name : names) {
+			ids.add(policyStore.graph().getNodeByName(name).getId());
+		}
+		return ids;
 	}
 
 	protected record TraversalState(Collection<Long> firstLevelDescs,

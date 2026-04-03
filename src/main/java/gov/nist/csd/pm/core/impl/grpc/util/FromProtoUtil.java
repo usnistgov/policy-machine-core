@@ -17,7 +17,9 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
@@ -64,9 +66,9 @@ public class FromProtoUtil {
                                                        gov.nist.csd.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
         return switch (targetCtxProto.getTargetCase()) {
             case TARGET_NODE ->
-                new TargetContext(resolveNodeRefId(pap, targetCtxProto.getTargetNode()));
+                new TargetIdContext(resolveNodeRefId(pap, targetCtxProto.getTargetNode()));
             case TARGET_ATTRIBUTES ->
-                new TargetContext(resolveNodeRefIdList(pap, targetCtxProto.getTargetAttributes().getNodesList()));
+                new TargetAttributeIdsContext(resolveNodeRefIdList(pap, targetCtxProto.getTargetAttributes().getNodesList()));
             case TARGET_NOT_SET ->
                 throw new IllegalArgumentException("target context not set");
         };
@@ -218,7 +220,7 @@ public class FromProtoUtil {
         Obligation obligation = new Obligation();
         obligation.setName(proto.getName());
         if (proto.hasAuthor()) {
-            obligation.setAuthorId(proto.getAuthor().getId());
+            obligation.setAuthor(new gov.nist.csd.pm.core.pap.query.model.context.UserIdContext(proto.getAuthor().getId()));
         }
         return obligation;
     }

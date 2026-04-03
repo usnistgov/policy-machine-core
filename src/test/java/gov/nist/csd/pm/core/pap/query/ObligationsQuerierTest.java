@@ -13,6 +13,7 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
+import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -22,7 +23,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 
     public Obligation obligation1() throws PMException {
         return new Obligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "obl1",
             new EventPattern(
                 new SubjectPattern(),
@@ -36,7 +37,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 
     public Obligation obligation2() throws PMException {
         return new Obligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "label2",
             new EventPattern(
                 new SubjectPattern(),
@@ -50,7 +51,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 
     public Obligation obligation3() throws PMException {
         return new Obligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "label3",
             new EventPattern(
                 new SubjectPattern(),
@@ -74,9 +75,9 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             Obligation obligation2 = obligation2();
             Obligation obligation3 = obligation3();
 
-            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
-            pap.modify().obligations().createObligation(obligation2.getAuthorId(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
-            pap.modify().obligations().createObligation(obligation3.getAuthorId(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
+            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
+            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
+            pap.modify().obligations().createObligation(obligation3.getAuthor(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
 
             Collection<Obligation> obligations = pap.query().obligations().getObligations();
             assertEquals(3, obligations.size());
@@ -112,9 +113,9 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             Obligation obligation2 = obligation2();
             Obligation obligation3 = obligation3();
 
-            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
-            pap.modify().obligations().createObligation(obligation2.getAuthorId(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
-            pap.modify().obligations().createObligation(obligation3.getAuthorId(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
+            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
+            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
+            pap.modify().obligations().createObligation(obligation3.getAuthor(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
 
 
             Obligation obligation = pap.query().obligations().getObligation(obligation1.getName());

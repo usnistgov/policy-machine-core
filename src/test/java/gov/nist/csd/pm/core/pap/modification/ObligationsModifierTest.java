@@ -18,7 +18,6 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +33,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
 
     public Obligation obligation1() throws PMException {
         return new Obligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "obl1",
             eventPattern,
             new ObligationResponse("evtCtx", List.of(
@@ -46,7 +45,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
 
     public Obligation obligation2() throws PMException {
         return new Obligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "label2",
             eventPattern,
             new ObligationResponse("evtCtx", List.of(
@@ -57,7 +56,7 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
 
     public Obligation obligation3() throws PMException {
         return new Obligation(
-            id("u1"),
+            new UserIdContext(id("u1")),
             "label2",
             eventPattern,
             new ObligationResponse("evtCtx", List.of(
@@ -76,15 +75,15 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUser("u1", ids("ua1"));
 
             Obligation obligation1 = obligation1();
-            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
+            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
 
-            assertThrows(ObligationNameExistsException.class, () -> pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse()));
+            assertThrows(ObligationNameExistsException.class, () -> pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse()));
         }
 
         @Test
         void testAuthorNodeDoestNotExistException() throws PMException {
             assertThrows(NodeDoesNotExistException.class,
-                () -> pap.modify().obligations().createObligation(id("u1"), "test", eventPattern, new ObligationResponse("", List.of())));
+                () -> pap.modify().obligations().createObligation(new UserIdContext(id("u1")), "test", eventPattern, new ObligationResponse("", List.of())));
         }
 
         @Test
@@ -94,10 +93,10 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             pap.modify().graph().createUser("u1", ids("ua1"));
 
             Obligation obligation1 = obligation1();
-            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
+            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
 
             assertThrows(ObligationNameExistsException.class,
-                () -> pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), new EventPattern(
+                () -> pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), new EventPattern(
                     new SubjectPattern(), new AnyOperationPattern()
                 ), new ObligationResponse("", List.of())));
 
@@ -211,8 +210,8 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             Obligation obligation1 = obligation1();
             Obligation obligation2 = obligation2();
 
-            pap.modify().obligations().createObligation(obligation1.getAuthorId(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
-            pap.modify().obligations().createObligation(obligation2.getAuthorId(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
+            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
+            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
 
             pap.modify().obligations().deleteObligation(obligation1.getName());
 
