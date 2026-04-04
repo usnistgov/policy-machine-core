@@ -12,8 +12,10 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeNamesContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetNameContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
@@ -1632,5 +1634,56 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         actual = pap.query().access().computePrivileges(new AttributeIdsContext(LongList.of(id("ua1"), id("ua2"))), new TargetAttributeIdsContext(LongList.of(id("oa1"), id("oa2"))));
         assertEquals(new AccessRightSet("read"), actual);
 
+    }
+
+    @Test
+    void testComputePrivilegesWithUsernameContext() throws PMException {
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                create u "u1" in ["ua1"]
+                create o "o1" in ["oa1"]
+                """;
+        pap.executePML(new UsernameContext("u1"), pml);
+
+        AccessRightSet actual = pap.query().access().computePrivileges(new UsernameContext("u1"), new TargetIdContext(id("o1")));
+        assertEquals(new AccessRightSet("read", "write"), actual);
+    }
+
+    @Test
+    void testComputePrivilegesWithTargetNameContext() throws PMException {
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                create u "u1" in ["ua1"]
+                create o "o1" in ["oa1"]
+                """;
+        pap.executePML(new UsernameContext("u1"), pml);
+
+        AccessRightSet actual = pap.query().access().computePrivileges(new UserIdContext(id("u1")), new TargetNameContext("o1"));
+        assertEquals(new AccessRightSet("read", "write"), actual);
+    }
+
+    @Test
+    void testComputePrivilegesWithTargetAttributeNamesContext() throws PMException {
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                create u "u1" in ["ua1"]
+                create o "o1" in ["oa1"]
+                """;
+        pap.executePML(new UsernameContext("u1"), pml);
+
+        AccessRightSet actual = pap.query().access().computePrivileges(new UserIdContext(id("u1")), new TargetAttributeNamesContext(List.of("oa1")));
+        assertEquals(new AccessRightSet("read", "write"), actual);
     }
 }

@@ -19,6 +19,7 @@ import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -139,6 +140,19 @@ public abstract class ObligationsModifierTest extends PAPTestInitializer {
             assertDoesNotThrow(() -> pap.query().obligations().getObligation("ob2"));
             assertThrows(ObligationDoesNotExistException.class, () -> pap.query().obligations().getObligation("ob3"));
             assertThrows(ObligationDoesNotExistException.class, () -> pap.query().obligations().getObligation("ob4"));
+        }
+
+        @Test
+        void testUsernameContextAsAuthor() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+            pap.modify().graph().createUser("u1", ids("ua1"));
+
+            UsernameContext authorCtx = new UsernameContext("u1");
+            pap.modify().obligations().createObligation(authorCtx, "obl", eventPattern, new ObligationResponse("evtCtx", List.of()));
+
+            Obligation stored = pap.query().obligations().getObligation("obl");
+            assertEquals(authorCtx, stored.getAuthor());
         }
     }
 
