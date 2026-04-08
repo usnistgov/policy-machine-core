@@ -11,8 +11,7 @@ import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.operation.builtin.GetAssociationsWithSource;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ class GetAssociationsWithSourceTest {
             """;
         MemoryPAP pap = new TestPAP();
 
-        pap.executePML(new UserIdContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertEquals(2, pap.query().graph().getAssociationsWithTarget(id("oa1")).size());
     }

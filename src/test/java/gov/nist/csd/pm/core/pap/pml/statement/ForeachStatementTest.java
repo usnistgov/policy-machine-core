@@ -17,9 +17,9 @@ import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class ForeachStatementTest {
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createUser("u1", ids("ua1"));
-        UserContext userContext = new UsernameContext("u1");
+        UserContext userContext = new NameUserContext("u1");
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 
@@ -85,7 +85,7 @@ class ForeachStatementTest {
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createUser("u1", ids("ua1"));
-        UserContext userContext = new UsernameContext("u1");
+        UserContext userContext = new NameUserContext("u1");
 
         ExecutionContext executionContext = new ExecutionContext(userContext, pap);
         executionContext.scope().addVariable("test", "test");
@@ -157,7 +157,7 @@ class ForeachStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserIdContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));
@@ -176,7 +176,7 @@ class ForeachStatementTest {
                 }
                 """;
         pap = new TestPAP();
-        pap.executePML(new UserIdContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("1"));
         assertFalse(pap.query().graph().nodeExists("2"));

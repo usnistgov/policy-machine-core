@@ -11,12 +11,11 @@ import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ class ObligationsModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new TestPAP();
 
-        pap.executePML(new UsernameContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -59,14 +58,14 @@ class ObligationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new ObligationsModificationAdjudicator(new UsernameContext("u1"), pap);
-        fail = new ObligationsModificationAdjudicator(new UserIdContext(id("u2")), pap);
+        ok = new ObligationsModificationAdjudicator(new NameUserContext("u1"), pap);
+        fail = new ObligationsModificationAdjudicator(new IdUserContext(id("u2")), pap);
     }
 
 
     @Test
     void createObligation() {
-        assertDoesNotThrow(() -> ok.createObligation(new UserIdContext(id("u1")), "name",
+        assertDoesNotThrow(() -> ok.createObligation(new IdUserContext(id("u1")), "name",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
 
@@ -75,11 +74,11 @@ class ObligationsModificationAdjudicatorTest {
 
     @Test
     void deleteObligation() throws PMException {
-        ok.createObligation(new UserIdContext(id("u1")), "test",
+        ok.createObligation(new IdUserContext(id("u1")), "test",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
         );
-        ok.createObligation(new UserIdContext(id("u1")), "test2",
+        ok.createObligation(new IdUserContext(id("u1")), "test2",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
         );

@@ -6,12 +6,12 @@ import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetNameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(UserNodeContext authorCtx) throws PMException {
+    public Collection<Obligation> getObligationsWithAuthor(NodeUserContext authorCtx) throws PMException {
         check(userCtx, toTargetCtx(authorCtx), AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
         Collection<Obligation> obligationsWithAuthor = new ArrayList<>(pap.query().obligations().getObligationsWithAuthor(
@@ -63,10 +63,10 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
         return filterObligations(obligationsWithAuthor);
     }
 
-    private TargetContext toTargetCtx(UserNodeContext author) {
+    private TargetContext toTargetCtx(NodeUserContext author) {
         return switch (author) {
-            case UserIdContext c -> new TargetIdContext(c.userId());
-            case UsernameContext c -> new TargetNameContext(c.username());
+            case IdUserContext c -> new IdTargetContext(c.userId());
+            case NameUserContext c -> new NameTargetContext(c.username());
         };
     }
 

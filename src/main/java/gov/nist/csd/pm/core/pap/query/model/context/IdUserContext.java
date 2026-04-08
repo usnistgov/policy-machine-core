@@ -2,17 +2,17 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import java.util.Objects;
 
-public final class UserIdContext implements UserNodeContext {
+public final class IdUserContext implements NodeUserContext {
 
     private final long userId;
     private final String process;
 
-    public UserIdContext(long userId, String process) {
+    public IdUserContext(long userId, String process) {
         this.userId = userId;
         this.process = process;
     }
 
-    public UserIdContext(long userId) {
+    public IdUserContext(long userId) {
         this(userId, "");
     }
 
@@ -28,7 +28,7 @@ public final class UserIdContext implements UserNodeContext {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserIdContext that)) return false;
+        if (!(o instanceof IdUserContext that)) return false;
         return userId == that.userId && Objects.equals(process, that.process);
     }
 

@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -31,10 +30,10 @@ class PrivilegeCheckerTest {
 				""";
 
 		TestPAP pap = new TestPAP();
-		pap.executePML(new UserIdContext(id("u1")), pml);
+		pap.executePML(new IdUserContext(id("u1")), pml);
 
-		assertDoesNotThrow(() -> pap.check(new UserIdContext(id("u1")), id("o1"), List.of()));
-		assertThrows(PMException.class, () -> pap.check(new UserIdContext(id("u2")), id("o1"), List.of()));
+		assertDoesNotThrow(() -> pap.check(new IdUserContext(id("u1")), id("o1"), List.of()));
+		assertThrows(PMException.class, () -> pap.check(new IdUserContext(id("u2")), id("o1"), List.of()));
 	}
 
 }

@@ -10,31 +10,31 @@ public class ContextChecker {
 
     public static void checkUserContextExists(UserContext ctx, GraphStore graphStore) throws PMException {
         switch (ctx) {
-            case UserIdContext c -> {
+            case IdUserContext c -> {
                 if (!graphStore.nodeExists(c.userId())) {
                     throw new NodeDoesNotExistException(c.userId());
                 }
             }
-            case UsernameContext c -> {
+            case NameUserContext c -> {
                 if (!graphStore.nodeExists(c.username())) {
                     throw new NodeDoesNotExistException(c.username());
                 }
             }
-            case AttributeIdsContext c -> {
+            case AttributeIdsUserContext c -> {
                 for (long id : c.attributeIds()) {
                     if (!graphStore.nodeExists(id)) {
                         throw new NodeDoesNotExistException(id);
                     }
                 }
             }
-            case AttributeNamesContext c -> {
+            case AttributeNamesUserContext c -> {
                 for (String name : c.attributeNames()) {
                     if (!graphStore.nodeExists(name)) {
                         throw new NodeDoesNotExistException(name);
                     }
                 }
             }
-            case CompositeUserContext c -> {
+            case ConjunctiveUserContext c -> {
                 for (UserContext sub : c.contexts()) {
                     checkUserContextExists(sub, graphStore);
                 }
@@ -44,24 +44,24 @@ public class ContextChecker {
 
     public static void checkTargetContextExists(TargetContext ctx, GraphStore graphStore) throws PMException {
         switch (ctx) {
-            case TargetIdContext c -> {
+            case IdTargetContext c -> {
                 if (!graphStore.nodeExists(c.targetId())) {
                     throw new NodeDoesNotExistException(c.targetId());
                 }
             }
-            case TargetNameContext c -> {
+            case NameTargetContext c -> {
                 if (!graphStore.nodeExists(c.targetName())) {
                     throw new NodeDoesNotExistException(c.targetName());
                 }
             }
-            case TargetAttributeIdsContext c -> {
+            case AttributeIdsTargetContext c -> {
                 for (long id : c.attributeIds()) {
                     if (!graphStore.nodeExists(id)) {
                         throw new NodeDoesNotExistException(id);
                     }
                 }
             }
-            case TargetAttributeNamesContext c -> {
+            case AttributeNamesTargetContext c -> {
                 for (String name : c.attributeNames()) {
                     if (!graphStore.nodeExists(name)) {
                         throw new NodeDoesNotExistException(name);

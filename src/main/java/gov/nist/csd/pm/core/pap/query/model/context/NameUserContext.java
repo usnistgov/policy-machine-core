@@ -2,17 +2,17 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import java.util.Objects;
 
-public final class UsernameContext implements UserNodeContext {
+public final class NameUserContext implements NodeUserContext {
 
     private final String username;
     private final String process;
 
-    public UsernameContext(String username, String process) {
+    public NameUserContext(String username, String process) {
         this.username = username;
         this.process = process;
     }
 
-    public UsernameContext(String username) {
+    public NameUserContext(String username) {
         this(username, "");
     }
 
@@ -28,7 +28,7 @@ public final class UsernameContext implements UserNodeContext {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UsernameContext that)) return false;
+        if (!(o instanceof NameUserContext that)) return false;
         return Objects.equals(username, that.username) && Objects.equals(process, that.process);
     }
 

@@ -14,7 +14,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.EventPatternType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ObligationResponseType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import java.util.List;
 
 public class CreateObligationOp extends AdminOperation<Void> {
@@ -39,7 +39,7 @@ public class CreateObligationOp extends AdminOperation<Void> {
     @Override
     public Void execute(PAP pap, Args args) throws PMException {
         pap.modify().obligations().createObligation(
-            new UserIdContext(args.get(AUTHOR_PARAM)),
+            new IdUserContext(args.get(AUTHOR_PARAM)),
             args.get(NAME_PARAM),
             args.get(EVENT_PATTERN_PARAM),
             args.get(OBLIGATION_RESPONSE_PARAM)

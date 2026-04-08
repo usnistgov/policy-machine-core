@@ -27,7 +27,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class AnyTypeErrorHandlingTest {
     @BeforeEach
     void setUp() throws PMException {
         pap = new MemoryPAP();
-        executionContext = new ExecutionContext(new UsernameContext("u1"), new MemoryPAP());
+        executionContext = new ExecutionContext(new NameUserContext("u1"), new MemoryPAP());
     }
 
     @Test

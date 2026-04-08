@@ -19,9 +19,9 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -41,8 +41,8 @@ class DeleteStatementTest {
         pap.modify().graph().createUser("u1", ids("ua1"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-        UserContext userContext = new UsernameContext("u1");
-        pap.modify().obligations().createObligation(new UserIdContext(id("u1")), "o1",
+        UserContext userContext = new NameUserContext("u1");
+        pap.modify().obligations().createObligation(new IdUserContext(id("u1")), "o1",
                 new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                 new ObligationResponse("e", List.of())
         );
@@ -67,7 +67,7 @@ class DeleteStatementTest {
         DeleteStatement stmt3 = new DeleteObligationStatement(new StringLiteralExpression("o1"), true);
 
         PAP pap = new TestPAP();
-        UserContext testUserContext = new UsernameContext("u1");
+        UserContext testUserContext = new NameUserContext("u1");
         assertDoesNotThrow(() -> stmt1.execute(new ExecutionContext(testUserContext, pap), pap));
         assertDoesNotThrow(() -> stmt2.execute(new ExecutionContext(testUserContext, pap), pap));
         assertDoesNotThrow(() -> stmt3.execute(new ExecutionContext(testUserContext, pap), pap));

@@ -8,6 +8,10 @@ import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainAssociation;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainNode;
@@ -23,10 +27,10 @@ import gov.nist.csd.pm.proto.v1.model.StringList;
 import gov.nist.csd.pm.proto.v1.model.Value;
 import gov.nist.csd.pm.proto.v1.model.ValueList;
 import gov.nist.csd.pm.proto.v1.model.ValueMap;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeNamesContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetNameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.proto.v1.pdp.query.TargetContext;
 import gov.nist.csd.pm.proto.v1.pdp.query.UserContext;
 import java.util.ArrayList;
@@ -44,11 +48,11 @@ public class ToProtoUtil {
         }
 
         switch (userCtx) {
-            case gov.nist.csd.pm.core.pap.query.model.context.UserIdContext c ->
+            case IdUserContext c ->
                 builder.setUserNode(NodeRef.newBuilder().setId(c.userId()).build());
-            case gov.nist.csd.pm.core.pap.query.model.context.UsernameContext c ->
+            case NameUserContext c ->
                 builder.setUserNode(NodeRef.newBuilder().setName(c.username()).build());
-            case gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext c ->
+            case AttributeIdsUserContext c ->
                 builder.setUserAttributes(
                     NodeRefList.newBuilder()
                         .addAllNodes(
@@ -56,7 +60,7 @@ public class ToProtoUtil {
                         )
                         .build()
                 );
-            case gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext c ->
+            case AttributeNamesUserContext c ->
                 builder.setUserAttributes(
                     NodeRefList.newBuilder()
                         .addAllNodes(
@@ -64,7 +68,7 @@ public class ToProtoUtil {
                         )
                         .build()
                 );
-            case gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext ignored ->
+            case gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext ignored ->
                 throw new IllegalArgumentException("CompositeUserContext cannot be serialized to a single proto UserContext");
         }
 
@@ -75,11 +79,11 @@ public class ToProtoUtil {
         TargetContext.Builder builder = TargetContext.newBuilder();
 
         switch (targetCtx) {
-            case TargetIdContext ctx ->
+            case IdTargetContext ctx ->
                 builder.setTargetNode(NodeRef.newBuilder().setId(ctx.targetId()).build());
-            case TargetNameContext ctx ->
+            case NameTargetContext ctx ->
                 builder.setTargetNode(NodeRef.newBuilder().setName(ctx.targetName()).build());
-            case TargetAttributeIdsContext ctx ->
+            case AttributeIdsTargetContext ctx ->
                 builder.setTargetAttributes(
                     NodeRefList.newBuilder()
                         .addAllNodes(
@@ -87,7 +91,7 @@ public class ToProtoUtil {
                         )
                         .build()
                 );
-            case TargetAttributeNamesContext ctx ->
+            case AttributeNamesTargetContext ctx ->
                 builder.setTargetAttributes(
                     NodeRefList.newBuilder()
                         .addAllNodes(
@@ -185,9 +189,9 @@ public class ToProtoUtil {
         gov.nist.csd.pm.proto.v1.model.Obligation.Builder builder = gov.nist.csd.pm.proto.v1.model.Obligation.newBuilder()
             .setName(obligation.getName())
             .setAuthor(toNodeProto(switch (obligation.getAuthor()) {
-            case gov.nist.csd.pm.core.pap.query.model.context.UserIdContext c ->
+            case IdUserContext c ->
                 pap.query().graph().getNodeById(c.userId());
-            case gov.nist.csd.pm.core.pap.query.model.context.UsernameContext c ->
+            case NameUserContext c ->
                 pap.query().graph().getNodeByName(c.username());
             default -> throw new IllegalStateException("unsupported author type: " + obligation.getAuthor());
         }))

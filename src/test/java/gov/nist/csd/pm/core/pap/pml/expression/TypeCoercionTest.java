@@ -19,7 +19,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +34,7 @@ public class TypeCoercionTest {
 
     @BeforeEach
     void setUp() throws PMException {
-        executionContext = new ExecutionContext(new UsernameContext("u1"), new MemoryPAP());
+        executionContext = new ExecutionContext(new NameUserContext("u1"), new MemoryPAP());
     }
 
     @Test

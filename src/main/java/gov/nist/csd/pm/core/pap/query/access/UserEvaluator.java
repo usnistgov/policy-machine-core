@@ -7,14 +7,14 @@ import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
-import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
@@ -47,19 +47,19 @@ public class UserEvaluator {
 	 */
 	public UserEvaluationResult evaluate(UserContext userContext) throws PMException {
 		return switch (userContext) {
-			case CompositeUserContext c -> {
+			case ConjunctiveUserContext c -> {
 				List<UserDagResult> results = new ArrayList<>();
 				for (UserContext ctx : c.contexts()) {
 					results.addAll(evaluate(ctx).dagResults());
 				}
 				yield new UserEvaluationResult(results);
 			}
-			case UserNodeContext ctx -> new UserEvaluationResult(List.of(evaluate(ctx)));
+			case NodeUserContext ctx -> new UserEvaluationResult(List.of(evaluate(ctx)));
 			case AnonymousUserContext ctx -> new UserEvaluationResult(List.of(evaluate(ctx)));
 		};
 	}
 
-	private UserDagResult evaluate(UserNodeContext userContext) throws PMException {
+	private UserDagResult evaluate(NodeUserContext userContext) throws PMException {
 		ContextChecker.checkUserContextExists(userContext, policyStore.graph());
 
 		Map<Long, AccessRightSet> borderTargets = new HashMap<>();
@@ -81,8 +81,8 @@ public class UserEvaluator {
 				});
 
 		Collection<Long> startNodes = switch (userContext) {
-			case UserIdContext c -> List.of(c.userId());
-			case UsernameContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
+			case IdUserContext c -> List.of(c.userId());
+			case NameUserContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
 		};
 
 		bfs.walk(startNodes);
@@ -112,8 +112,8 @@ public class UserEvaluator {
 				});
 
 		Collection<Long> startNodes = switch (userContext) {
-			case AttributeIdsContext c -> c.attributeIds();
-			case AttributeNamesContext c -> {
+			case AttributeIdsUserContext c -> c.attributeIds();
+			case AttributeNamesUserContext c -> {
 				Collection<Long> ids = new ArrayList<>();
 				for (String name : c.attributeNames()) {
 					ids.add(policyStore.graph().getNodeByName(name).getId());

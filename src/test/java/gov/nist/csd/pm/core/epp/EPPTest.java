@@ -44,12 +44,12 @@ import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import it.unimi.dsi.fastutil.longs.LongList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,7 @@ class EPPTest {
     @Test
     void testCustomOperationEvent() throws PMException {
         MemoryPAP pap = new TestPAP();
-        UserContext u1 = new UsernameContext("u1");
+        UserContext u1 = new NameUserContext("u1");
         pap.executePML(u1, """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -147,7 +147,7 @@ class EPPTest {
     @Test
     void testResourceOperationEvent() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UsernameContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create u "u1" in ["ua1"]
@@ -179,7 +179,7 @@ class EPPTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        assertDoesNotThrow(() -> pdp.adjudicateOperation(new UserIdContext(id("u1")), "read_file",
+        assertDoesNotThrow(() -> pdp.adjudicateOperation(new IdUserContext(id("u1")), "read_file",
             Map.of("name", "oa1")));
         // resource operation events sent via pep not pdp
         assertFalse(pap.query().graph().nodeExists("oa1pc1"));
@@ -211,12 +211,12 @@ class EPPTest {
                         create PC "pc2"
                     }
                 """;
-        pap.executePML(new UsernameContext("u1"), pml);
+        pap.executePML(new NameUserContext("u1"), pml);
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("oa1"));
 
-        pdp.runTx(new UserIdContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
+        pdp.runTx(new IdUserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
 
         assertTrue(pap.query().graph().nodeExists("pc2"));
 
@@ -259,9 +259,9 @@ class EPPTest {
                     }
                 
                 """;
-        pap.executePML(new UsernameContext("u1"), pml);
+        pap.executePML(new NameUserContext("u1"), pml);
 
-        pdp.runTx(new UserIdContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
+        pdp.runTx(new IdUserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2",
             ids("oa1")));
 
         assertTrue(pap.query().graph().getPolicyClasses().containsAll(ids(
@@ -291,8 +291,8 @@ class EPPTest {
             txPAP.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
         });
 
-        pdp.runTx(new UserIdContext(id("u1")), (policy) -> {
-            policy.modify().obligations().createObligation(new UserIdContext(id("u1")), "test",
+        pdp.runTx(new IdUserContext(id("u1")), (policy) -> {
+            policy.modify().obligations().createObligation(new IdUserContext(id("u1")), "test",
                 new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString())),
                 new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(
@@ -366,9 +366,9 @@ class EPPTest {
                         testFunc()
                     }
                 """;
-        pap.executePML(new UsernameContext("u1"), pml);
+        pap.executePML(new NameUserContext("u1"), pml);
 
-        pdp.runTx(new UserIdContext(id("u1")), (txPDP) -> {
+        pdp.runTx(new IdUserContext(id("u1")), (txPDP) -> {
             txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1"));
 
             return null;
@@ -410,9 +410,9 @@ class EPPTest {
                         create PC "test"
                     }
                 """;
-        pap.executePML(new UsernameContext("u1"), pml);
+        pap.executePML(new NameUserContext("u1"), pml);
 
-        pdp.runTx(new UserIdContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
+        pdp.runTx(new IdUserContext(id("u1")), (txPDP) -> txPDP.modify().graph().createObjectAttribute("oa2", ids("oa1")));
         assertFalse(pap.query().graph().nodeExists("test"));
     }
 
@@ -454,8 +454,8 @@ class EPPTest {
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
-        pap.executePML(new UsernameContext("u1"), pml);
-        pdp.runTx(new UsernameContext("u1"), (txPDP) -> txPDP.modify().graph().createPolicyClass("u1_pc"));
+        pap.executePML(new NameUserContext("u1"), pml);
+        pdp.runTx(new NameUserContext("u1"), (txPDP) -> txPDP.modify().graph().createPolicyClass("u1_pc"));
         assertTrue(pap.query().graph().nodeExists("test_pc"));
         assertTrue(pap.query().graph().nodeExists("o1"));
         assertTrue(pap.query().graph().nodeExists("u1_pc"));
@@ -466,8 +466,8 @@ class EPPTest {
         epp = new EPP(pdp2, pap);
         epp.subscribeTo(pdp2);
 
-        pap.executePML(new UsernameContext("u2"), pml);
-        assertThrows(UnauthorizedException.class, () -> pdp2.runTx(new UserIdContext(id("u2")), (txPDP) -> txPDP.modify().graph().createPolicyClass("u2_pc")));
+        pap.executePML(new NameUserContext("u2"), pml);
+        assertThrows(UnauthorizedException.class, () -> pdp2.runTx(new IdUserContext(id("u2")), (txPDP) -> txPDP.modify().graph().createPolicyClass("u2_pc")));
         assertFalse(pap.query().graph().nodeExists("test_pc"));
         assertFalse(pap.query().graph().nodeExists("o1"));
         assertFalse(pap.query().graph().nodeExists("u1_pc"));
@@ -497,7 +497,7 @@ class EPPTest {
         pap.modify().graph().createUserAttribute("ua2", List.of(id("ua1")));
         pap.modify().graph().associate(id("ua2"), id("ua1"), new AccessRightSet("*"));
 
-        UserContext userCtx = new AttributeIdsContext(List.of(id("ua2")));
+        UserContext userCtx = new AttributeIdsUserContext(List.of(id("ua2")));
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -524,7 +524,7 @@ class EPPTest {
         pap.modify().graph().createUserAttribute("ua2", List.of(id("ua1")));
         pap.modify().graph().associate(id("ua2"), id("ua1"), new AccessRightSet("*"));
 
-        UserContext userCtx = new AttributeIdsContext(List.of(id("ua2")));
+        UserContext userCtx = new AttributeIdsUserContext(List.of(id("ua2")));
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -548,7 +548,7 @@ class EPPTest {
 
         PAP pap = testPAP();
 
-        UserContext userCtx = new UserIdContext(id("u1"));
+        UserContext userCtx = new IdUserContext(id("u1"));
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -571,13 +571,13 @@ class EPPTest {
         );
 
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UsernameContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
             create pc "pc1"
             create ua "ua1" in ["pc1"]
             create u "u1" in ["ua1"]
             """);
 
-        UserContext userCtx = new UserIdContext(id("u1"));
+        UserContext userCtx = new IdUserContext(id("u1"));
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -600,13 +600,13 @@ class EPPTest {
         );
 
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UsernameContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
             create pc "pc1"
             create ua "ua1" in ["pc1"]
             create u "u1" in ["ua1"]
             """);
 
-        UserContext userCtx = new UserIdContext(id("u1"), "");
+        UserContext userCtx = new IdUserContext(id("u1"), "");
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -642,7 +642,7 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        UserContext userCtx = new UserIdContext(id("u1"), "");
+        UserContext userCtx = new IdUserContext(id("u1"), "");
         boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
             eventPattern));
         assertTrue(actual);
@@ -669,7 +669,7 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        UserContext userCtx = new UserIdContext(id("u1"), "p2");
+        UserContext userCtx = new IdUserContext(id("u1"), "p2");
         boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
             eventPattern));
         assertTrue(actual);
@@ -696,7 +696,7 @@ class EPPTest {
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
-        UserContext userCtx = new UserIdContext(id("u1"), "");
+        UserContext userCtx = new IdUserContext(id("u1"), "");
         boolean actual = pdp.runTx(userCtx, pdpTx -> epp.matches(userCtx, pdpTx, eventContext, pdpTx.buildExecutionContext(userCtx),
             eventPattern));
         assertFalse(actual);
@@ -728,7 +728,7 @@ class EPPTest {
         pap.modify().graph().createObjectAttribute("a", List.of(id("oa1")));
         pap.modify().graph().associate(id("ua1"), id("oa1"), new AccessRightSet("read"));
 
-        UserContext userCtx = new UserIdContext(id("u1"), "");
+        UserContext userCtx = new IdUserContext(id("u1"), "");
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -766,7 +766,7 @@ class EPPTest {
 
         MemoryPAP pap = testPAP();
 
-        UserContext userCtx = new UserIdContext(id("u1"), "");
+        UserContext userCtx = new IdUserContext(id("u1"), "");
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -803,19 +803,19 @@ class EPPTest {
             """;
 
         TestPAP pap = new TestPAP();
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);
         boolean actual = pdp.runTx(
-            new UserIdContext(id("u1")),
+            new IdUserContext(id("u1")),
             pdpTx -> epp.matches(
-                new UserIdContext(id("u1")),
+                new IdUserContext(id("u1")),
                 pdpTx,
                 new EventContext(new EventContextUser("u1"), "assign", Map.of(
                     "ascendant", id("test"),
                     "descendants", List.of(id("ua2"))
                 )),
-                pdpTx.buildExecutionContext(new UserIdContext(id("u1"))), pap.query().obligations().getObligation("1").getEventPattern()
+                pdpTx.buildExecutionContext(new IdUserContext(id("u1"))), pap.query().obligations().getObligation("1").getEventPattern()
             )
         );
         assertTrue(actual);

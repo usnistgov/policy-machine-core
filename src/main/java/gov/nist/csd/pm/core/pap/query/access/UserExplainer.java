@@ -5,13 +5,13 @@ import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
-import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -87,17 +87,17 @@ public class UserExplainer {
 
 	private Collection<Long> resolveStartNodes(UserContext userCtx) throws PMException {
 		return switch (userCtx) {
-			case UserIdContext c -> List.of(c.userId());
-			case UsernameContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
-			case AttributeIdsContext c -> c.attributeIds();
-			case AttributeNamesContext c -> {
+			case IdUserContext c -> List.of(c.userId());
+			case NameUserContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
+			case AttributeIdsUserContext c -> c.attributeIds();
+			case AttributeNamesUserContext c -> {
 				List<Long> ids = new ArrayList<>();
 				for (String name : c.attributeNames()) {
 					ids.add(policyStore.graph().getNodeByName(name).getId());
 				}
 				yield ids;
 			}
-			case CompositeUserContext c -> {
+			case ConjunctiveUserContext c -> {
 				List<Long> ids = new ArrayList<>();
 				for (UserContext sub : c.contexts()) {
 					ids.addAll(resolveStartNodes(sub));

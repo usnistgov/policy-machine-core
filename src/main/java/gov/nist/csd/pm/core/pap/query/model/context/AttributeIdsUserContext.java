@@ -3,17 +3,17 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 import java.util.Collection;
 import java.util.Objects;
 
-public final class AttributeIdsContext implements AnonymousUserContext {
+public final class AttributeIdsUserContext implements AnonymousUserContext {
 
     private final Collection<Long> attributeIds;
     private final String process;
 
-    public AttributeIdsContext(Collection<Long> attributeIds, String process) {
+    public AttributeIdsUserContext(Collection<Long> attributeIds, String process) {
         this.attributeIds = attributeIds;
         this.process = process;
     }
 
-    public AttributeIdsContext(Collection<Long> attributeIds) {
+    public AttributeIdsUserContext(Collection<Long> attributeIds) {
         this(attributeIds, "");
     }
 
@@ -31,7 +31,7 @@ public final class AttributeIdsContext implements AnonymousUserContext {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AttributeIdsContext that = (AttributeIdsContext) o;
+        AttributeIdsUserContext that = (AttributeIdsUserContext) o;
         return Objects.equals(attributeIds, that.attributeIds) && Objects.equals(process, that.process);
     }
 

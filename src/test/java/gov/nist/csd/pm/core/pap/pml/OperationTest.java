@@ -16,13 +16,12 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.operation.resource.PMLResourceOperation;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapperWithSuper;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +41,7 @@ public class OperationTest {
 
         PMLCompilationException e = assertThrows(PMLCompilationException.class, () -> {
             PAP pap = new TestPAP();
-            pap.executePML(new UsernameContext("u1"), pml);
+            pap.executePML(new NameUserContext("u1"), pml);
         });
         assertEquals("not all conditional paths return", e.getErrors().get(0).errorMessage());
     }
@@ -63,7 +62,7 @@ public class OperationTest {
 
         assertDoesNotThrow(() -> {
             PAP pap = new TestPAP();
-            pap.executePML(new UsernameContext("u1"), pml2);
+            pap.executePML(new NameUserContext("u1"), pml2);
         });
     }
 
@@ -81,7 +80,7 @@ public class OperationTest {
 
         assertDoesNotThrow(() -> {
             PAP pap = new TestPAP();
-            pap.executePML(new UsernameContext("u1"), pml2);
+            pap.executePML(new NameUserContext("u1"), pml2);
         });
     }
 
@@ -101,13 +100,13 @@ public class OperationTest {
             """;
 
         MemoryPAP memoryPAP = new TestPAP();
-        memoryPAP.executePML(new UserIdContext(-1), pml);
+        memoryPAP.executePML(new IdUserContext(-1), pml);
 
         PMLResourceOperation<?> res1 = (PMLResourceOperation<?>) memoryPAP.query().operations().getOperation("res1");
-        ExecutionContext u1 = memoryPAP.buildExecutionContext(new UserIdContext(id("u1")));
+        ExecutionContext u1 = memoryPAP.buildExecutionContext(new IdUserContext(id("u1")));
         res1.setCtx(u1);
         PDP pdp = new PDP(memoryPAP);
-        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserIdContext(id("u1")), pdpTx -> {
+        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new IdUserContext(id("u1")), pdpTx -> {
             pdpTx.executeOperation(res1, new Args());
             return null;
         }));
@@ -131,7 +130,7 @@ public class OperationTest {
         MemoryPAP pap = new TestPAP();
         pap.bootstrap(new PMLBootstrapperWithSuper(pml));
         PDP pdp = new PDP(pap);
-        pdp.adjudicateOperation(new UserIdContext(id("super")), "op1", Map.of("a", "a", "b", "b"));
+        pdp.adjudicateOperation(new IdUserContext(id("super")), "op1", Map.of("a", "a", "b", "b"));
         EPP epp = new EPP(pdp, pap);
         epp.processEvent(new EventContext(
             new EventContextUser("super"),

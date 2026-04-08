@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public final class TargetAttributeIdsContext implements AnonymousTargetContext {
+public final class AttributeIdsTargetContext implements AnonymousTargetContext {
 
     private final Collection<Long> attributeIds;
 
-    public TargetAttributeIdsContext(Collection<Long> attributeIds) {
+    public AttributeIdsTargetContext(Collection<Long> attributeIds) {
         this.attributeIds = attributeIds;
     }
 
@@ -21,7 +21,7 @@ public final class TargetAttributeIdsContext implements AnonymousTargetContext {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TargetAttributeIdsContext that = (TargetAttributeIdsContext) o;
+        AttributeIdsTargetContext that = (AttributeIdsTargetContext) o;
         return Objects.equals(attributeIds, that.attributeIds);
     }
 

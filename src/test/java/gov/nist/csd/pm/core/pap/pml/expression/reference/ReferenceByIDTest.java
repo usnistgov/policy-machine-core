@@ -10,8 +10,7 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import org.junit.jupiter.api.Test;
 
 class ReferenceByIDTest {
@@ -31,7 +30,7 @@ class ReferenceByIDTest {
     @Test
     void testExecute() throws PMException {
         VariableReferenceExpression<?> a = new VariableReferenceExpression<>("a", STRING_TYPE);
-        ExecutionContext executionContext = new ExecutionContext(new UserIdContext(0), new MemoryPAP());
+        ExecutionContext executionContext = new ExecutionContext(new IdUserContext(0), new MemoryPAP());
         Object expected = "test";
         executionContext.scope().addVariable("a", expected);
 

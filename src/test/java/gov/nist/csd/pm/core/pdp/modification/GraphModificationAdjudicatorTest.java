@@ -31,7 +31,7 @@ import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ class GraphModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new TestPAP();
 
-        UserContext u1 = new UsernameContext("u1");
+        UserContext u1 = new NameUserContext("u1");
 
         pap.executePML(u1, """
                 create pc "pc1"
@@ -85,7 +85,7 @@ class GraphModificationAdjudicatorTest {
         pdp.addEventSubscriber(testEventProcessor);
 
         ok = new GraphModificationAdjudicator(u1, pap, pdp);
-        fail = new GraphModificationAdjudicator(new UsernameContext("u2"), pap, pdp);
+        fail = new GraphModificationAdjudicator(new NameUserContext("u2"), pap, pdp);
     }
 
     @Test

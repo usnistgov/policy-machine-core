@@ -10,8 +10,7 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ class RequiredCapabilityTest {
         MemoryPAP pap = new TestPAP();
         RequiredCapability reqCap = new RequiredCapability(List.of());
 
-        assertTrue(reqCap.isSatisfied(pap, new UserIdContext(id("u1")), new Args()));
+        assertTrue(reqCap.isSatisfied(pap, new IdUserContext(id("u1")), new Args()));
     }
 
     @Test
@@ -37,7 +36,7 @@ class RequiredCapabilityTest {
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create", "admin:graph:node:delete"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         RequiredCapability reqCap = new RequiredCapability(
             new RequiredPrivilegeOnNode(
@@ -50,7 +49,7 @@ class RequiredCapabilityTest {
             )
         );
 
-        assertTrue(reqCap.isSatisfied(pap, new UserIdContext(id("u1")), new Args()));
+        assertTrue(reqCap.isSatisfied(pap, new IdUserContext(id("u1")), new Args()));
     }
 
     @Test
@@ -65,7 +64,7 @@ class RequiredCapabilityTest {
                 create u "u1" in ["ua1"]
                 """;
 
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         RequiredCapability reqCap = new RequiredCapability(
             new RequiredPrivilegeOnNode(
@@ -78,6 +77,6 @@ class RequiredCapabilityTest {
             )
         );
 
-        assertFalse(reqCap.isSatisfied(pap, new UserIdContext(id("u1")), new Args()));
+        assertFalse(reqCap.isSatisfied(pap, new IdUserContext(id("u1")), new Args()));
     }
 }

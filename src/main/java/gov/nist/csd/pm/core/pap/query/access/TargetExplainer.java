@@ -9,11 +9,11 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeNamesContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetNameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -72,7 +72,7 @@ public class TargetExplainer {
 
 		List<Node> nodes = new ArrayList<>();
 		switch (targetCtx) {
-			case TargetIdContext ctx -> {
+			case IdTargetContext ctx -> {
 				long target = ctx.targetId();
 				Node targetNode = policyStore.graph().getNodeById(target);
 				if (targetNode.getType().equals(PC)) {
@@ -81,19 +81,19 @@ public class TargetExplainer {
 				nodes.add(targetNode);
 				dfs.walk(target);
 			}
-			case TargetNameContext ctx -> {
+			case NameTargetContext ctx -> {
 				Node targetNode = policyStore.graph().getNodeByName(ctx.targetName());
 				long target = targetNode.getType().equals(PC) ? PM_ADMIN_POLICY_CLASSES.nodeId() : targetNode.getId();
 				nodes.add(targetNode);
 				dfs.walk(target);
 			}
-			case TargetAttributeIdsContext ctx -> {
+			case AttributeIdsTargetContext ctx -> {
 				for (long id : ctx.attributeIds()) {
 					nodes.add(policyStore.graph().getNodeById(id));
 				}
 				dfs.walk(ctx.attributeIds());
 			}
-			case TargetAttributeNamesContext ctx -> {
+			case AttributeNamesTargetContext ctx -> {
 				List<Long> ids = new ArrayList<>();
 				for (String name : ctx.attributeNames()) {
 					Node n = policyStore.graph().getNodeByName(name);

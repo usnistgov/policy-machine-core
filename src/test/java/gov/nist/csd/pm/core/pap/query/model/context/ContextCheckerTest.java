@@ -32,52 +32,52 @@ class ContextCheckerTest {
 
         @Test
         void userIdContext_existingNode_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new UserIdContext(1), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new IdUserContext(1), graphStore));
         }
 
         @Test
         void userIdContext_missingNode_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkUserContextExists(new UserIdContext(-1), graphStore));
+                () -> ContextChecker.checkUserContextExists(new IdUserContext(-1), graphStore));
         }
 
         @Test
         void usernameContext_existingNode_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new UsernameContext("u1"), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new NameUserContext("u1"), graphStore));
         }
 
         @Test
         void usernameContext_missingNode_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkUserContextExists(new UsernameContext("u2"), graphStore));
+                () -> ContextChecker.checkUserContextExists(new NameUserContext("u2"), graphStore));
         }
 
         @Test
         void attributeIdsContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeIdsContext(List.of(2L)), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeIdsUserContext(List.of(2L)), graphStore));
         }
 
         @Test
         void attributeIdsContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkUserContextExists(new AttributeIdsContext(List.of(2L, -1L)), graphStore));
+                () -> ContextChecker.checkUserContextExists(new AttributeIdsUserContext(List.of(2L, -1L)), graphStore));
         }
 
         @Test
         void attributeNamesContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeNamesContext(List.of("ua1")), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeNamesUserContext(List.of("ua1")), graphStore));
         }
 
         @Test
         void attributeNamesContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkUserContextExists(new AttributeNamesContext(List.of("ua1", "ua2")), graphStore));
+                () -> ContextChecker.checkUserContextExists(new AttributeNamesUserContext(List.of("ua1", "ua2")), graphStore));
         }
 
         @Test
         void compositeUserContext_allExist_noException() {
             assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(
-                new CompositeUserContext(List.of(new UserIdContext(1), new UsernameContext("ua1"))),
+                new ConjunctiveUserContext(List.of(new IdUserContext(1), new NameUserContext("ua1"))),
                 graphStore));
         }
 
@@ -85,7 +85,7 @@ class ContextCheckerTest {
         void compositeUserContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
                 () -> ContextChecker.checkUserContextExists(
-                    new CompositeUserContext(List.of(new UserIdContext(1), new UserIdContext(-1))),
+                    new ConjunctiveUserContext(List.of(new IdUserContext(1), new IdUserContext(-1))),
                     graphStore));
         }
     }
@@ -95,46 +95,46 @@ class ContextCheckerTest {
 
         @Test
         void targetIdContext_existingNode_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new TargetIdContext(3), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new IdTargetContext(3), graphStore));
         }
 
         @Test
         void targetIdContext_missingNode_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkTargetContextExists(new TargetIdContext(-1), graphStore));
+                () -> ContextChecker.checkTargetContextExists(new IdTargetContext(-1), graphStore));
         }
 
         @Test
         void targetNameContext_existingNode_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new TargetNameContext("o1"), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new NameTargetContext("o1"), graphStore));
         }
 
         @Test
         void targetNameContext_missingNode_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkTargetContextExists(new TargetNameContext("u2"), graphStore));
+                () -> ContextChecker.checkTargetContextExists(new NameTargetContext("u2"), graphStore));
         }
 
         @Test
         void targetAttributeIdsContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new TargetAttributeIdsContext(List.of(4L)), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new AttributeIdsTargetContext(List.of(4L)), graphStore));
         }
 
         @Test
         void targetAttributeIdsContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkTargetContextExists(new TargetAttributeIdsContext(List.of(4L, -1L)), graphStore));
+                () -> ContextChecker.checkTargetContextExists(new AttributeIdsTargetContext(List.of(4L, -1L)), graphStore));
         }
 
         @Test
         void targetAttributeNamesContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new TargetAttributeNamesContext(List.of("oa1")), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new AttributeNamesTargetContext(List.of("oa1")), graphStore));
         }
 
         @Test
         void targetAttributeNamesContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkTargetContextExists(new TargetAttributeNamesContext(List.of("oa1", "oa2")), graphStore));
+                () -> ContextChecker.checkTargetContextExists(new AttributeNamesTargetContext(List.of("oa1", "oa2")), graphStore));
         }
     }
 }

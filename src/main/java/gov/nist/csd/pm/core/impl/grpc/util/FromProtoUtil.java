@@ -17,12 +17,12 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainAssociation;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainNode;
@@ -54,9 +54,9 @@ public class FromProtoUtil {
 
         return switch (userCtxProto.getUserCase()) {
             case USER_NODE ->
-                new UserIdContext(resolveNodeRefId(pap, userCtxProto.getUserNode()), process);
+                new IdUserContext(resolveNodeRefId(pap, userCtxProto.getUserNode()), process);
             case USER_ATTRIBUTES ->
-                new AttributeIdsContext(resolveNodeRefIdList(pap, userCtxProto.getUserAttributes().getNodesList()), process);
+                new AttributeIdsUserContext(resolveNodeRefIdList(pap, userCtxProto.getUserAttributes().getNodesList()), process);
             case USER_NOT_SET ->
                 throw new IllegalArgumentException("user context not set");
         };
@@ -66,9 +66,9 @@ public class FromProtoUtil {
                                                        gov.nist.csd.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
         return switch (targetCtxProto.getTargetCase()) {
             case TARGET_NODE ->
-                new TargetIdContext(resolveNodeRefId(pap, targetCtxProto.getTargetNode()));
+                new IdTargetContext(resolveNodeRefId(pap, targetCtxProto.getTargetNode()));
             case TARGET_ATTRIBUTES ->
-                new TargetAttributeIdsContext(resolveNodeRefIdList(pap, targetCtxProto.getTargetAttributes().getNodesList()));
+                new AttributeIdsTargetContext(resolveNodeRefIdList(pap, targetCtxProto.getTargetAttributes().getNodesList()));
             case TARGET_NOT_SET ->
                 throw new IllegalArgumentException("target context not set");
         };
@@ -220,7 +220,7 @@ public class FromProtoUtil {
         Obligation obligation = new Obligation();
         obligation.setName(proto.getName());
         if (proto.hasAuthor()) {
-            obligation.setAuthor(new gov.nist.csd.pm.core.pap.query.model.context.UserIdContext(proto.getAuthor().getId()));
+            obligation.setAuthor(new IdUserContext(proto.getAuthor().getId()));
         }
         return obligation;
     }

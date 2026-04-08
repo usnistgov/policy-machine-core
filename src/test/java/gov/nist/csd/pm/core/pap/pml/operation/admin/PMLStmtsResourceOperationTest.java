@@ -10,7 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ class PMLStmtsResourceOperationTest {
             }
         });
 
-        memoryPAP.executePML(new UsernameContext("u1"), """
+        memoryPAP.executePML(new NameUserContext("u1"), """
             t := op1()
             create pc t
             """);
@@ -40,7 +40,7 @@ class PMLStmtsResourceOperationTest {
     @Test
     void testPMLResourceOpInvokedInPML() throws PMException {
         MemoryPAP memoryPAP = new MemoryPAP();
-        memoryPAP.executePML(new UsernameContext("u1"), """
+        memoryPAP.executePML(new NameUserContext("u1"), """
             set resource access rights ["read"]
             
             resourceop op1() string {
@@ -57,7 +57,7 @@ class PMLStmtsResourceOperationTest {
     @Test
     void testPMLResourceOpCanOnlyCallQueryOrFunctions() throws PMException {
         MemoryPAP memoryPAP = new MemoryPAP();
-        Object actual = memoryPAP.executePML(new UsernameContext("u1"), """
+        Object actual = memoryPAP.executePML(new NameUserContext("u1"), """
             set resource access rights ["read"]
             
             create pc "a"

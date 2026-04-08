@@ -13,8 +13,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,7 @@ class LogicalExpressionTest {
         Expression<Boolean> expression = ExpressionVisitor.compile(visitorContext, ctx, BOOLEAN_TYPE);
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
-        ExecutionContext executionContext = new ExecutionContext(new UserIdContext(0), pap);
+        ExecutionContext executionContext = new ExecutionContext(new IdUserContext(0), pap);
         Object actual = expression.execute(executionContext, pap);
         assertEquals(
                 false,
@@ -65,7 +64,7 @@ class LogicalExpressionTest {
         assertEquals(0, visitorContext.errorLog().getErrors().size());
 
         pap = new TestPAP();
-        executionContext = new ExecutionContext(new UserIdContext(0), pap);
+        executionContext = new ExecutionContext(new IdUserContext(0), pap);
         actual = expression.execute(executionContext, pap);
         assertEquals(
                 true,

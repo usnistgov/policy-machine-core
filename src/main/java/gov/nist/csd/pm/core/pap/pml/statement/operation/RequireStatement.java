@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class RequireStatement extends PMLStatement<VoidResult> {
 
         for (String target : targets) {
             long id = pap.query().graph().getNodeByName(target).getId();
-            TargetContext targetCtx = new TargetIdContext(id);
+            TargetContext targetCtx = new IdTargetContext(id);
             AccessRightSet privs = pap.query().access().computePrivileges(ctx.author(), targetCtx);
             if (!privs.containsAll(ars) || (privs.isEmpty() && ars.isEmpty())) {
                 throw UnauthorizedException.of(pap.query().graph(), ctx.author(), targetCtx, privs, ars);

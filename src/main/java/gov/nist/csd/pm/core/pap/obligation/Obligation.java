@@ -3,15 +3,13 @@ package gov.nist.csd.pm.core.pap.obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Obligation implements Serializable {
 
-    private UserNodeContext author;
+    private NodeUserContext author;
     private String name;
     private EventPattern eventPattern;
     private ObligationResponse response;
@@ -19,18 +17,18 @@ public class Obligation implements Serializable {
     public Obligation() {
     }
 
-    public Obligation(UserNodeContext author, String name, EventPattern eventPattern, ObligationResponse response) {
+    public Obligation(NodeUserContext author, String name, EventPattern eventPattern, ObligationResponse response) {
         this.author = author;
         this.name = name;
         this.eventPattern = eventPattern;
         this.response = response;
     }
 
-    public UserNodeContext getAuthor() {
+    public NodeUserContext getAuthor() {
         return author;
     }
 
-    public void setAuthor(UserNodeContext author) {
+    public void setAuthor(NodeUserContext author) {
         this.author = author;
     }
 

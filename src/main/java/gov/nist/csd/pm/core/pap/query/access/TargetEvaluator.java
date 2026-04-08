@@ -14,12 +14,12 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.AnonymousTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetAttributeNamesContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetNameContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetNodeContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -58,20 +58,20 @@ public class TargetEvaluator {
 		// walk the target graph starting at the first level descs
 		List<Long> targetNodes = new ArrayList<>();
 		switch (targetContext) {
-			case TargetIdContext ctx -> {
+			case IdTargetContext ctx -> {
 				targetNodes.add(ctx.targetId());
 				dfs.walk(ctx.targetId());
 			}
-			case TargetNameContext ctx -> {
+			case NameTargetContext ctx -> {
 				long id = policyStore.graph().getNodeByName(ctx.targetName()).getId();
 				targetNodes.add(id);
 				dfs.walk(id);
 			}
-			case TargetAttributeIdsContext ctx -> {
+			case AttributeIdsTargetContext ctx -> {
 				targetNodes.addAll(ctx.attributeIds());
 				dfs.walk(ctx.attributeIds());
 			}
-			case TargetAttributeNamesContext ctx -> {
+			case AttributeNamesTargetContext ctx -> {
 				Collection<Long> ids = resolveAttributeNames(ctx.attributeNames());
 				targetNodes.addAll(ids);
 				dfs.walk(ids);
@@ -109,15 +109,15 @@ public class TargetEvaluator {
 	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
 		Collection<Long> firstLevelDescs = new LongArrayList();
 		switch (targetCtx) {
-			case TargetIdContext ctx ->
+			case IdTargetContext ctx ->
 				firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(ctx.targetId()));
-			case TargetNameContext ctx -> {
+			case NameTargetContext ctx -> {
 				long id = policyStore.graph().getNodeByName(ctx.targetName()).getId();
 				firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(id));
 			}
-			case TargetAttributeIdsContext ctx ->
+			case AttributeIdsTargetContext ctx ->
 				firstLevelDescs.addAll(ctx.attributeIds());
-			case TargetAttributeNamesContext ctx ->
+			case AttributeNamesTargetContext ctx ->
 				firstLevelDescs.addAll(resolveAttributeNames(ctx.attributeNames()));
 		}
 
@@ -154,7 +154,7 @@ public class TargetEvaluator {
 
 		// evaluate the privileges this user has on the PM_ADMIN_POLICY_CLASSES node
 		// these privs represent the access rights the user has on policy classes
-		TargetDagResult adminTargetResult = evaluate(userDagResult, new TargetIdContext(PM_ADMIN_POLICY_CLASSES.nodeId()));
+		TargetDagResult adminTargetResult = evaluate(userDagResult, new IdTargetContext(PM_ADMIN_POLICY_CLASSES.nodeId()));
 		return AccessRightResolver.resolvePrivileges(
 			userDagResult,
 			adminTargetResult,
@@ -218,13 +218,13 @@ public class TargetEvaluator {
 		}
 
 		// if the node is a PC, redirect to the PM_ADMIN_PCs node
-		Node targetNode = switch ((TargetNodeContext) targetContext) {
-			case TargetIdContext ctx -> policyStore.graph().getNodeById(ctx.targetId());
-			case TargetNameContext ctx -> policyStore.graph().getNodeByName(ctx.targetName());
+		Node targetNode = switch ((NodeTargetContext) targetContext) {
+			case IdTargetContext ctx -> policyStore.graph().getNodeById(ctx.targetId());
+			case NameTargetContext ctx -> policyStore.graph().getNodeByName(ctx.targetName());
 		};
 
 		if (targetNode.getType().equals(PC)) {
-			return new TargetIdContext(PM_ADMIN_POLICY_CLASSES.nodeId());
+			return new IdTargetContext(PM_ADMIN_POLICY_CLASSES.nodeId());
 		}
 
 		return targetContext;

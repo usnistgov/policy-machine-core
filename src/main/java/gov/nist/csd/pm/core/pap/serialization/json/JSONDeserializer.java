@@ -15,7 +15,7 @@ import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,7 +91,7 @@ public class JSONDeserializer implements PolicyDeserializer {
 
     private void createObligations(PAP pap, List<JSONObligation> obligations) throws PMException {
         for (JSONObligation obligation : obligations) {
-            pap.executePML(new UserIdContext(obligation.getAuthor()), obligation.getPml());
+            pap.executePML(new IdUserContext(obligation.getAuthor()), obligation.getPml());
         }
     }
 
@@ -106,7 +106,7 @@ public class JSONDeserializer implements PolicyDeserializer {
         }
 
         // author doesnt matter when executing create operation statements, only obligations
-        pap.executePML(new UserIdContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
     }
 
     private void createGraph(PAP pap, JSONGraph graph)

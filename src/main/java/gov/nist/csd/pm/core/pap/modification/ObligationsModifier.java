@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
-import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class ObligationsModifier extends Modifier implements ObligationsModification {
@@ -15,7 +15,7 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     }
 
     @Override
-    public void createObligation(UserNodeContext author,
+    public void createObligation(NodeUserContext author,
                                  String name,
                                  EventPattern eventPattern,
                                  ObligationResponse response) throws PMException {
@@ -40,7 +40,7 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
      * @param name   The name of the obligation.
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
-    protected void checkCreateInput(UserNodeContext author, String name) throws PMException {
+    protected void checkCreateInput(NodeUserContext author, String name) throws PMException {
         if (policyStore.obligations().obligationExists(name)) {
             throw new ObligationNameExistsException(name);
         }

@@ -2,11 +2,11 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import java.util.Objects;
 
-public final class TargetNameContext implements TargetNodeContext {
+public final class NameTargetContext implements NodeTargetContext {
 
     private final String targetName;
 
-    public TargetNameContext(String targetName) {
+    public NameTargetContext(String targetName) {
         this.targetName = targetName;
     }
 
@@ -19,7 +19,7 @@ public final class TargetNameContext implements TargetNodeContext {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        TargetNameContext that = (TargetNameContext) o;
+        NameTargetContext that = (NameTargetContext) o;
         return Objects.equals(targetName, that.targetName);
     }
 

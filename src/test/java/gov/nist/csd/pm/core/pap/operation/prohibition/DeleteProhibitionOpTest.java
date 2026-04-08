@@ -11,8 +11,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
@@ -49,7 +48,7 @@ class DeleteProhibitionOpTest {
                 associate "ua1" to "oa1" with ["admin:prohibition:inclusion:delete"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         // Create a prohibition first so delete can look it up
         pap.modify().prohibitions().createNodeProhibition(
@@ -63,7 +62,7 @@ class DeleteProhibitionOpTest {
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
         Args args = op.validateArgs(Map.of("name", "pro1", "node_id", id("ua2"), "inclusion_set", List.of(id("oa1")), "exclusion_set", List.of()));
-        op.canExecute(pap, new UserIdContext(id("u1")), args);
+        op.canExecute(pap, new IdUserContext(id("u1")), args);
     }
 
     @Test
@@ -79,7 +78,7 @@ class DeleteProhibitionOpTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 """;
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         // Create a prohibition first so delete can look it up
         pap.modify().prohibitions().createNodeProhibition(
@@ -93,6 +92,6 @@ class DeleteProhibitionOpTest {
 
         DeleteProhibitionOp op = new DeleteProhibitionOp();
         Args args = op.validateArgs(Map.of("name", "pro1", "node_id", id("ua2"), "inclusion_set", Set.of(id("oa1")), "exclusion_set", Set.of()));
-        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserIdContext(id("u2")), args));
+        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new IdUserContext(id("u2")), args));
     }
 }

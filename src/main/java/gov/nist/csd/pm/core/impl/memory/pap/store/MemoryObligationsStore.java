@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
-import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +18,7 @@ public class MemoryObligationsStore extends MemoryStore implements ObligationsSt
     }
 
     @Override
-    public void createObligation(UserNodeContext author, String name, EventPattern eventPattern, ObligationResponse response) throws PMException {
+    public void createObligation(NodeUserContext author, String name, EventPattern eventPattern, ObligationResponse response) throws PMException {
         Obligation obligation = new Obligation(author, name, eventPattern, response);
 
         policy.obligations.add(obligation);
@@ -54,7 +54,7 @@ public class MemoryObligationsStore extends MemoryStore implements ObligationsSt
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(UserNodeContext authorCtx) throws PMException {
+    public Collection<Obligation> getObligationsWithAuthor(NodeUserContext authorCtx) throws PMException {
         List<Obligation> obls = new ArrayList<>();
         for (Obligation obligation : getObligations()) {
             if (authorCtx.equals(obligation.getAuthor())) {

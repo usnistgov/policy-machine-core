@@ -10,8 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Map;
@@ -41,13 +40,13 @@ class CreatePolicyClassOpTest {
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         CreatePolicyClassOp op = new CreatePolicyClassOp();
         Args args = op.validateArgs(Map.of(
                 "name", "pc2"
         ));
-        op.canExecute(pap, new UserIdContext(id("u1")), args);
+        op.canExecute(pap, new IdUserContext(id("u1")), args);
     }
 
     @Test
@@ -63,12 +62,12 @@ class CreatePolicyClassOpTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 """;
-        pap.executePML(new UserIdContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         CreatePolicyClassOp op = new CreatePolicyClassOp();
         Args args = op.validateArgs(Map.of(
                 "name", "pc2"
         ));
-        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new UserIdContext(id("u2")), args));
+        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new IdUserContext(id("u2")), args));
     }
 }

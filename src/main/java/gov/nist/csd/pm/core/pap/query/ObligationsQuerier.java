@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.query.model.context.UserNodeContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +35,7 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(UserNodeContext author) throws PMException {
+    public Collection<Obligation> getObligationsWithAuthor(NodeUserContext author) throws PMException {
         Collection<Obligation> obligations = store.obligations().getObligations();
         List<Obligation> withAuthor = new ArrayList<>();
         for (Obligation obligation : obligations) {

@@ -5,7 +5,7 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.Collection;
@@ -22,11 +22,11 @@ public class TestPAP extends MemoryPAP {
 	}
 
 	public void check(UserContext userCtx, long targetId, Collection<String> rightsToCheck) throws PMException {
-		check(userCtx, new TargetIdContext(targetId), rightsToCheck);
+		check(userCtx, new IdTargetContext(targetId), rightsToCheck);
 	}
 
 	public void check(UserContext userCtx, long target, AdminAccessRight accessRight) throws PMException {
-		check(userCtx, new TargetIdContext(target), List.of(accessRight.toString()));
+		check(userCtx, new IdTargetContext(target), List.of(accessRight.toString()));
 	}
 
 	private void checkOrThrow(UserContext userCtx, TargetContext targetCtx, AccessRightSet computed,

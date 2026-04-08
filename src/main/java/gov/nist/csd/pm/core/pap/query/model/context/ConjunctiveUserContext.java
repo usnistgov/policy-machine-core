@@ -3,11 +3,11 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 import java.util.List;
 import java.util.Objects;
 
-public final class CompositeUserContext implements UserContext {
+public final class ConjunctiveUserContext implements UserContext {
 
     private final List<UserContext> contexts;
 
-    public CompositeUserContext(List<UserContext> contexts) {
+    public ConjunctiveUserContext(List<UserContext> contexts) {
         this.contexts = contexts;
     }
 
@@ -25,7 +25,7 @@ public final class CompositeUserContext implements UserContext {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CompositeUserContext that = (CompositeUserContext) o;
+        ConjunctiveUserContext that = (ConjunctiveUserContext) o;
         return Objects.equals(contexts, that.contexts);
     }
 

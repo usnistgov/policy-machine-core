@@ -7,11 +7,11 @@ import static gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp.O
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesContext;
-import gov.nist.csd.pm.core.pap.query.model.context.CompositeUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UsernameContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
@@ -57,11 +57,11 @@ public class CreateObligationStatement extends OperationStatement {
         String nameStr = name.execute(ctx, pap);
 
         long authorId = switch (ctx.author()) {
-            case UserIdContext c -> c.userId();
-            case UsernameContext c -> pap.query().graph().getNodeByName(c.username()).getId();
-            case AttributeIdsContext c -> c.attributeIds().iterator().next();
-            case AttributeNamesContext c -> pap.query().graph().getNodeByName(c.attributeNames().iterator().next()).getId();
-            case CompositeUserContext c -> throw new PMException("CompositeUserContext cannot be used as an obligation author");
+            case IdUserContext c -> c.userId();
+            case NameUserContext c -> pap.query().graph().getNodeByName(c.username()).getId();
+            case AttributeIdsUserContext c -> c.attributeIds().iterator().next();
+            case AttributeNamesUserContext c -> pap.query().graph().getNodeByName(c.attributeNames().iterator().next()).getId();
+            case ConjunctiveUserContext c -> throw new PMException("ConjunctiveUserContext cannot be used as an obligation author");
         };
 
         return new Args()

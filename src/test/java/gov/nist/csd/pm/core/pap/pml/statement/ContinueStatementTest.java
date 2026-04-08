@@ -8,8 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ContinueStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserIdContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,7 @@ class ContinueStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserIdContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertFalse(pap.query().graph().nodeExists("b"));
@@ -48,7 +47,7 @@ class ContinueStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserIdContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertFalse(pap.query().graph().nodeExists("b"));
