@@ -1,6 +1,5 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;

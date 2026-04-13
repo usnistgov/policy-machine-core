@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * Represents the user in an access decision.
- *
  * Three types are supported:
  *   - NodeUserContext: identifies a specific user node by id (IdUserContext) or by name (NameUserContext).
  *   - AnonymousUserContext: identifies a subject by a set of user attribute IDs (AttributeIdsUserContext) or names
