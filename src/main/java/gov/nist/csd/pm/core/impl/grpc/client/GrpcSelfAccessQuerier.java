@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pap.query.SelfAccessQuery;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
@@ -50,9 +51,7 @@ public class GrpcSelfAccessQuerier implements SelfAccessQuery {
 
     public AccessRightSet computePrivileges(String name) {
         SelfComputePrivilegesRequest request = SelfComputePrivilegesRequest.newBuilder()
-            .setTargetCtx(gov.nist.csd.pm.proto.v1.pdp.query.TargetContext.newBuilder()
-                .setTargetNode(ToProtoUtil.toNodeRefProto(name))
-            )
+            .setTargetCtx(ToProtoUtil.toTargetContextProto(new NameTargetContext(name)))
             .build();
         SelfComputePrivilegesResponse response = blockingStub.selfComputePrivileges(request);
         return new AccessRightSet(response.getPrivilegesList());

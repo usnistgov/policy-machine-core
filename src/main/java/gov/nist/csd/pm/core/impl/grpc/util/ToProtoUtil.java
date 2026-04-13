@@ -19,7 +19,6 @@ import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.query.model.explain.PolicyClassExplain;
 import gov.nist.csd.pm.proto.v1.epp.EventContext;
 import gov.nist.csd.pm.proto.v1.model.NodeRef;
-import gov.nist.csd.pm.proto.v1.model.NodeRefList;
 import gov.nist.csd.pm.proto.v1.model.NodeType;
 import gov.nist.csd.pm.proto.v1.model.Obligation;
 import gov.nist.csd.pm.proto.v1.model.Prohibition;
@@ -43,33 +42,31 @@ public class ToProtoUtil {
 
     public static UserContext toUserContextProto(gov.nist.csd.pm.core.pap.query.model.context.UserContext userCtx) {
         UserContext.Builder builder = UserContext.newBuilder();
-        if (userCtx.getProcess() == null) {
+        if (userCtx.getProcess() != null) {
             builder.setProcess(userCtx.getProcess());
         }
 
         switch (userCtx) {
-            case IdUserContext c ->
-                builder.setUserNode(NodeRef.newBuilder().setId(c.userId()).build());
-            case NameUserContext c ->
-                builder.setUserNode(NodeRef.newBuilder().setName(c.username()).build());
+            case IdUserContext c -> builder.setId(c.userId());
+            case NameUserContext c -> builder.setName(c.username());
             case AttributeIdsUserContext c ->
-                builder.setUserAttributes(
-                    NodeRefList.newBuilder()
-                        .addAllNodes(
-                            c.attributeIds().stream().map(id -> NodeRef.newBuilder().setId(id).build()).toList()
-                        )
-                        .build()
+                builder.setAttributeIds(
+                    gov.nist.csd.pm.proto.v1.pdp.query.Int64List.newBuilder()
+                        .addAllValues(c.attributeIds()).build()
                 );
             case AttributeNamesUserContext c ->
-                builder.setUserAttributes(
-                    NodeRefList.newBuilder()
-                        .addAllNodes(
-                            c.attributeNames().stream().map(name -> NodeRef.newBuilder().setName(name).build()).toList()
-                        )
-                        .build()
+                builder.setAttributeNames(
+                    gov.nist.csd.pm.proto.v1.pdp.query.StringList.newBuilder()
+                        .addAllValues(c.attributeNames()).build()
                 );
-            case gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext ignored ->
-                throw new IllegalArgumentException("CompositeUserContext cannot be serialized to a single proto UserContext");
+            case gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext c -> {
+                gov.nist.csd.pm.proto.v1.pdp.query.ConjunctiveUserContext.Builder conjBuilder =
+                    gov.nist.csd.pm.proto.v1.pdp.query.ConjunctiveUserContext.newBuilder();
+                for (gov.nist.csd.pm.core.pap.query.model.context.UserContext ctx : c.contexts()) {
+                    conjBuilder.addContexts(toUserContextProto(ctx));
+                }
+                builder.setConjunctive(conjBuilder.build());
+            }
         }
 
         return builder.build();
@@ -79,25 +76,17 @@ public class ToProtoUtil {
         TargetContext.Builder builder = TargetContext.newBuilder();
 
         switch (targetCtx) {
-            case IdTargetContext ctx ->
-                builder.setTargetNode(NodeRef.newBuilder().setId(ctx.targetId()).build());
-            case NameTargetContext ctx ->
-                builder.setTargetNode(NodeRef.newBuilder().setName(ctx.targetName()).build());
+            case IdTargetContext ctx -> builder.setId(ctx.targetId());
+            case NameTargetContext ctx -> builder.setName(ctx.targetName());
             case AttributeIdsTargetContext ctx ->
-                builder.setTargetAttributes(
-                    NodeRefList.newBuilder()
-                        .addAllNodes(
-                            ctx.attributeIds().stream().map(id -> NodeRef.newBuilder().setId(id).build()).toList()
-                        )
-                        .build()
+                builder.setAttributeIds(
+                    gov.nist.csd.pm.proto.v1.pdp.query.Int64List.newBuilder()
+                        .addAllValues(ctx.attributeIds()).build()
                 );
             case AttributeNamesTargetContext ctx ->
-                builder.setTargetAttributes(
-                    NodeRefList.newBuilder()
-                        .addAllNodes(
-                            ctx.attributeNames().stream().map(name -> NodeRef.newBuilder().setName(name).build()).toList()
-                        )
-                        .build()
+                builder.setAttributeNames(
+                    gov.nist.csd.pm.proto.v1.pdp.query.StringList.newBuilder()
+                        .addAllValues(ctx.attributeNames()).build()
                 );
         }
 
