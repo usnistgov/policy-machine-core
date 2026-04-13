@@ -18,11 +18,11 @@ public class EventContextParamsTest {
     @Test
     void testOk() throws PMException {
         String pml = """
-            @eventctx(a, b, string c)
+            @EventCtx(a, b, string c)
             resourceop op1(string a, string b)
-            @eventctx(a, string c)
+            @EventCtx(a, string c)
             resourceop op2(string a, string b)
-            @eventctx(a)
+            @EventCtx(a)
             resourceop op3(string a, string b)
             """;
 
@@ -40,7 +40,7 @@ public class EventContextParamsTest {
     @Test
     void test_whenEventParamDoesNotHaveTypeAndIsNotFormalParam_throwsException() throws PMException {
         String pml = """
-            @eventctx(a, b, c)
+            @EventCtx(a, b, c)
             resourceop op1(string a, string b)
             """;
 
@@ -58,7 +58,7 @@ public class EventContextParamsTest {
     @Test
     void test_whenEventParamDoesClashesWithFormalParam_throwsException() throws PMException {
         String pml = """
-            @eventctx(a, string b)
+            @EventCtx(a, string b)
             resourceop op1(string a, string b)
             """;
 

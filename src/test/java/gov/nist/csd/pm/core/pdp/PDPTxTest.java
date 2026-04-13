@@ -97,7 +97,7 @@ class PDPTxTest {
     @Test
     void testObligationAuthorNoPrivilegesOnEventContextUser() throws PMException {
         String pml = """
-            resourceop read_file(@node string n) { }
+            resourceop read_file(@Node string n) { }
             
             create pc "pc1"
             create ua "ua1" in ["pc1"]
@@ -128,7 +128,7 @@ class PDPTxTest {
     @Test
     void testObligationAuthorNoPrivilegesOnEventContextArgs() throws PMException {
         String pml = """
-            resourceop read_file(@node string n) { }
+            resourceop read_file(@Node string n) { }
             
             create pc "pc1"
             create ua "ua1" in ["pc1"]

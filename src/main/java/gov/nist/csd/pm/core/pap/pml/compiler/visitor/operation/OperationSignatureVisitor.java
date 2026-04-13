@@ -177,7 +177,7 @@ public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignat
         for (AnnotationsContext annotationsContext : annotations) {
             if (annotationsContext instanceof EventCtxAnnotationContext eventCtxAnnotationCtx) {
                 if (eventParams != null) {
-                    throw new PMLCompilationRuntimeException("only one @eventctx annotation allowed");
+                    throw new PMLCompilationRuntimeException("only one @EventCtx annotation allowed");
                 }
 
                 eventParams = parseEventParameters(eventCtxAnnotationCtx, formalParams, visitorCtx);

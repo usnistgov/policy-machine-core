@@ -56,7 +56,7 @@ PC, OA, UA, U, O, user, node
 break, default, map, else, const, if, range, continue, foreach, return, var
 string, bool, void, array, int64
 true, false
-check, @node
+check, @Node
 ```
 
 ### Whitespace
@@ -531,25 +531,25 @@ Formal parameters with a `?` appended to the parameter name are denotes as optio
 ```
 
 
-### @node, @reqcap, and @eventctx Annotations
+### @Node, @ReqCap, and @EventCtx Annotations
 
-The `@node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
+The `@Node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
 
 **Note:** 
-- The `@node` annotation can only be used in `adminop`, `resourceop`, and `query` operations.
-- Only formal parameters of type `int64`, `int64[]`, `string`, `string[]` can use the `@node` annotation.
+- The `@Node` annotation can only be used in `adminop`, `resourceop`, and `query` operations.
+- Only formal parameters of type `int64`, `int64[]`, `string`, `string[]` can use the `@Node` annotation.
 
 ```pml
-resourceop delete_file(@node string filename) {
+resourceop delete_file(@Node string filename) {
     delete node filename
 }
 ```
 
-The `@reqcap` annotation precedes an operation definition, and defines a set of capabilities required to execute the operation.
-Multiple `@reqcap` annotations are supported with only one needing to be satisfied to execute the operation.
+The `@ReqCap` annotation precedes an operation definition, and defines a set of capabilities required to execute the operation.
+Multiple `@ReqCap` annotations are supported with only one needing to be satisfied to execute the operation.
 
 ```pml
-@reqcap({
+@ReqCap({
     require ["delete"] on [filename]
 })
 resourceop delete_file(string filename) { 
@@ -557,16 +557,16 @@ resourceop delete_file(string filename) {
 }
 ```
 
-The `@eventctx` annotation also precedes the operation definition and defines the parameters that will be available in an 
+The `@EventCtx` annotation also precedes the operation definition and defines the parameters that will be available in an 
 event context as a result of the operation being sent to the EPP. If this annotation is omitted, then the parameters in 
 the operation signature are used. You can add additional params as well as omit certain params found in the signature.
 
 
 ```pml
-@reqcap({
+@ReqCap({
     require ["create"] on ["files"]
 })
-@eventctx(string id, filename)
+@EventCtx(string id, filename)
 resourceop create_file(string filename) { 
     delete node filename
 }
@@ -632,15 +632,15 @@ adminop create_new_user(string username) {
 Resource operations denote an operation on a resource (object). Optionally, return data to the caller.
 
 ```pml
-@reqcap({
+@ReqCap({
     require ["read"] on [filename]
 })
-resourceop read_file(@node string filename) { }
+resourceop read_file(@Node string filename) { }
 
-@reqcap({
+@ReqCap({
     require ["read"] on [filename]
 })
-resourceop read_file(@node string filename) { 
+resourceop read_file(@Node string filename) { 
 	return getNode(filename)
 }
 ```
@@ -740,10 +740,10 @@ arset ["read"]
 include ["user inboxes"]
   
 // create resource operation to read a file  
-@reqcap({
+@ReqCap({
     require ["read"] on [filename]
 })
-resourceop read_file(@node string name) { }  
+resourceop read_file(@Node string name) { }  
   
 // create a custom administration operation  
 adminop create_new_user(string username) {  

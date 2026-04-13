@@ -58,7 +58,7 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
                     params.add(new NodeNameListFormalParameter(name));
                 } else {
                     errors.add(CompileError.fromParserRuleContext(operationFormalParamContext,
-                        "@node annotation cannot be applied to type " + TypeStringer.toPMLString(type)));
+                        "@Node annotation cannot be applied to type " + TypeStringer.toPMLString(type)));
                     continue;
                 }
             } else {

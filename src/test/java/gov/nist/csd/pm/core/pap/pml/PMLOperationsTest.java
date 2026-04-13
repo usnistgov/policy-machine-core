@@ -30,7 +30,7 @@ public class PMLOperationsTest {
                 associate "ua1" to "oa1" with ["*"]
                 associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["*"]
                 
-                @reqcap({
+                @ReqCap({
                     require ["admin:graph:assignment:ascendant:create"] on ["oa1"]
                 })
                 adminop op1(string name) {

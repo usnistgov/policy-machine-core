@@ -24,7 +24,7 @@ class FormalParameterListVisitorTest {
     @Test
     void testOperationFormalParameterList() throws PMException {
         String pml = """
-            @node string a, string b
+            @Node string a, string b
             """;
         OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
 
@@ -45,7 +45,7 @@ class FormalParameterListVisitorTest {
     @Test
     void testOperationFormalParameterListNoArs() throws PMException {
         String pml = """
-            @node string a, string b
+            @Node string a, string b
             """;
         OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
 
@@ -63,7 +63,7 @@ class FormalParameterListVisitorTest {
         );
 
         pml = """
-            @node string a, string b
+            @Node string a, string b
             """;
         ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
 
@@ -82,7 +82,7 @@ class FormalParameterListVisitorTest {
     @Test
     void testNodeParamType() throws PMException {
         String pml = """
-            @node int64 a, @node []int64 b, @node string c, @node []string d
+            @Node int64 a, @Node []int64 b, @Node string c, @Node []string d
             """;
         OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
 
@@ -101,13 +101,13 @@ class FormalParameterListVisitorTest {
         );
 
         pml = """
-            @node bool a
+            @Node bool a
             """;
         OperationFormalParamListContext ctx1 = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
         PMLCompilationRuntimeException ex = assertThrows(PMLCompilationRuntimeException.class,
             () -> visitor.visitOperationFormalParamList(ctx1));
         assertEquals(1, ex.getErrors().size());
-        assertEquals("@node annotation cannot be applied to type bool", ex.getErrors().get(0).errorMessage());
+        assertEquals("@Node annotation cannot be applied to type bool", ex.getErrors().get(0).errorMessage());
     }
 
     @Test
@@ -129,7 +129,7 @@ class FormalParameterListVisitorTest {
 
     @Test
     void testMultipleInvalidNodeAnnotationTypes() throws PMException {
-        String pml = "@node bool a, @node bool b";
+        String pml = "@Node bool a, @Node bool b";
         OperationFormalParamListContext ctx = TestPMLParser.parse(pml, OperationFormalParamListContext.class);
         VisitorContext visitorCtx = new VisitorContext(new CompileScope(new MemoryPAP()));
         FormalParameterListVisitor visitor = new FormalParameterListVisitor(visitorCtx);

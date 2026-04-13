@@ -92,7 +92,7 @@ public class OperationTest {
             create ua "ua1" in ["pc1"]
             create u "u1" in ["ua1"]
             
-            @reqcap({
+            @ReqCap({
                 require ["read"] on [PM_ADMIN_BASE_OA]
             })
             resourceop res1() {
@@ -115,7 +115,7 @@ public class OperationTest {
     @Test
     void test_whenArgAddedToEventCtx_argIsAvailableInObligationResponse() throws PMException {
         String pml = """
-            @eventctx(a, b, string c)
+            @EventCtx(a, b, string c)
             resourceop op1(string a, string b)
            
             create obligation "o1"

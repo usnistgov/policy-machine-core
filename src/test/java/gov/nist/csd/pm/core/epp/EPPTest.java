@@ -72,7 +72,7 @@ class EPPTest {
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
                 
-                adminop op1(@node string a, @node string b) {
+                adminop op1(@Node string a, @Node string b) {
                 
                 }
                 
@@ -154,10 +154,10 @@ class EPPTest {
                 
                 set resource access rights ["read"]
                 
-                @reqcap({
+                @ReqCap({
                     require ["read"] on [name]
                 })
-                resourceop read_file(@node string name)
+                resourceop read_file(@Node string name)
                 
                 create oa "oa1" in ["pc1"]
                 create oa "oa2" in ["pc1"]
@@ -430,7 +430,7 @@ class EPPTest {
                 associate "ua1" to "oa1" with ["admin:*"]
                 associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:*"]
                 
-                @reqcap({
+                @ReqCap({
                     require ["admin:graph:assignment:ascendant:create"] on ["oa1"]
                 })
                 adminop op1() {

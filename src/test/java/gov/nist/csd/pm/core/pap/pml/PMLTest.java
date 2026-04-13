@@ -146,7 +146,7 @@ public class PMLTest {
                 arset ["admin:graph:assignment:ascendant:create"]
                 include [PM_ADMIN_BASE_OA]
                 
-                @reqcap({
+                @ReqCap({
                     require ["admin:graph:assignment:ascendant:create"] on [PM_ADMIN_BASE_OA]
                 })
                 adminop op1(string a, []string b, map[string]string c) {
@@ -457,13 +457,13 @@ public class PMLTest {
             associate "ua1" to "oa1" with ["read"]
             associate "ua1" to "oa2" with ["read"]
             
-            @reqcap({
+            @ReqCap({
                 require ["read"] on [file]
             })
-            @reqcap({
+            @ReqCap({
                 require ["read"] on ["o2"]
             })
-            resourceop read_file(@node string file) { }
+            resourceop read_file(@Node string file) { }
             """;
         PAP pap = new TestPAP();
         pap.executePML(null, pml);

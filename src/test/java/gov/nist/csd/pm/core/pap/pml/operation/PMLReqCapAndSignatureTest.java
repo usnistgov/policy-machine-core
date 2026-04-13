@@ -48,10 +48,10 @@ class PMLReqCapAndSignatureTest {
         PMLRequiredCapabilityFunc func = new PMLRequiredCapabilityFunc(block);
 
         String actual0 = func.toFormattedString(0);
-        assertEquals("@reqcap({\n    require [\"read\"] on [\"oa1\"]\n})", actual0);
+        assertEquals("@ReqCap({\n    require [\"read\"] on [\"oa1\"]\n})", actual0);
 
         String actual1 = func.toFormattedString(1);
-        assertEquals("@reqcap({\n        require [\"read\"] on [\"oa1\"]\n    })", actual1);
+        assertEquals("@ReqCap({\n        require [\"read\"] on [\"oa1\"]\n    })", actual1);
     }
 
     @Test
@@ -95,11 +95,11 @@ class PMLReqCapAndSignatureTest {
         );
 
         String actual = sig.toFormattedString(0);
-        assertTrue(actual.startsWith("@reqcap("));
+        assertTrue(actual.startsWith("@ReqCap("));
         assertTrue(actual.contains("adminop op1()"));
 
         actual = sig.toFormattedString(1);
-        assertTrue(actual.startsWith("    @reqcap("));
+        assertTrue(actual.startsWith("    @ReqCap("));
         assertTrue(actual.contains("    adminop op1()"));
     }
 
@@ -114,7 +114,7 @@ class PMLReqCapAndSignatureTest {
         );
 
         String actual = sig.toFormattedString(0);
-        assertFalse(actual.contains("@reqcap"));
+        assertFalse(actual.contains("@ReqCap"));
         assertEquals("adminop op1() ", actual);
     }
 
@@ -131,7 +131,7 @@ class PMLReqCapAndSignatureTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
 
-                @reqcap({
+                @ReqCap({
                     require ["read"] on ["oa1"]
                 })
                 adminop test() {
@@ -161,7 +161,7 @@ class PMLReqCapAndSignatureTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
 
-                @reqcap({
+                @ReqCap({
                     require ["read"] on ["oa1"]
                     require ["write"] on ["oa2"]
                 })
@@ -196,7 +196,7 @@ class PMLReqCapAndSignatureTest {
         );
 
         String formatted = op.toFormattedString(0);
-        assertTrue(formatted.contains("@reqcap("));
+        assertTrue(formatted.contains("@ReqCap("));
         assertTrue(formatted.contains("adminop myOp()"));
         assertTrue(formatted.contains("require [\"read\"] on [\"oa1\"]"));
     }

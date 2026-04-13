@@ -54,7 +54,7 @@ class OperationDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             adminop op1(@node string a, string b) string {
+                             adminop op1(@Node string a, string b) string {
                                  require ["ar1"] on [a]
                                  require ["ar2"] on ["node"]
                                  return "test"
@@ -62,7 +62,7 @@ class OperationDefinitionStatementTest {
             stmt.toFormattedString(0));
 
         assertEquals("""
-                                 adminop op1(@node string a, string b) string {
+                                 adminop op1(@Node string a, string b) string {
                                      require ["ar1"] on [a]
                                      require ["ar2"] on ["node"]
                                      return "test"
@@ -85,13 +85,13 @@ class OperationDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             routine rou1(@node string a, string b) {
+                             routine rou1(@Node string a, string b) {
                                  create PC "test"
                              }""",
             stmt.toFormattedString(0));
 
         assertEquals("""
-                                 routine rou1(@node string a, string b) {
+                                 routine rou1(@Node string a, string b) {
                                      create PC "test"
                                  }
                              """,
@@ -120,7 +120,7 @@ class OperationDefinitionStatementTest {
         ));
 
         assertEquals("""
-                             adminop func1(@node string a, string b) {
+                             adminop func1(@Node string a, string b) {
                                  require ["ar1"] on [a]
                                  require ["ar2"] on ["node"]
                                  return

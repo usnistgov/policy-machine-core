@@ -14,7 +14,7 @@ class ReqCapVisitorTest {
     @Test
     void testCallFunctionInReqCap() throws PMException {
         String pml = """
-            @reqcap({
+            @ReqCap({
                 if true {
                     require ["admin:graph:assignment:ascendant:create"] on [PM_ADMIN_BASE_OA]
                 }
