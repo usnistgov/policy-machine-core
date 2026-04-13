@@ -21,7 +21,7 @@ public class PMLRequiredCapabilityFunc extends RequiredCapabilityFunc implements
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return String.format("@reqcap(%s)", statementBlock.toFormattedString(indentLevel));
+        return String.format("@ReqCap(%s)", statementBlock.toFormattedString(indentLevel));
     }
 
     static class PMLRequiredCapabilityFuncExecutor implements RequiredCapabilityFuncExecutor {

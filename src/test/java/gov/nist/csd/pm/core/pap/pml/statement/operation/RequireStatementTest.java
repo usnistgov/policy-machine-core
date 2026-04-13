@@ -98,7 +98,7 @@ class RequireStatementTest {
                     return PM_ADMIN_BASE_OA
                 }
 
-                @reqcap({
+                @ReqCap({
                     require ["admin:graph:assignment:ascendant:create"] on [testOp()]
                 })
                 adminop op1() {

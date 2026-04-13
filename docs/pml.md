@@ -531,7 +531,7 @@ Formal parameters with a `?` appended to the parameter name are denotes as optio
 ```
 
 
-### @node, @reqcap, and @eventctx Annotations
+### @node, @ReqCap, and @EventCtx Annotations
 
 The `@node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
 
@@ -545,11 +545,11 @@ resourceop delete_file(@node string filename) {
 }
 ```
 
-The `@reqcap` annotation precedes an operation definition, and defines a set of capabilities required to execute the operation.
-Multiple `@reqcap` annotations are supported with only one needing to be satisfied to execute the operation.
+The `@ReqCap` annotation precedes an operation definition, and defines a set of capabilities required to execute the operation.
+Multiple `@ReqCap` annotations are supported with only one needing to be satisfied to execute the operation.
 
 ```pml
-@reqcap({
+@ReqCap({
     require ["delete"] on [filename]
 })
 resourceop delete_file(string filename) { 
@@ -557,16 +557,16 @@ resourceop delete_file(string filename) {
 }
 ```
 
-The `@eventctx` annotation also precedes the operation definition and defines the parameters that will be available in an 
+The `@EventCtx` annotation also precedes the operation definition and defines the parameters that will be available in an 
 event context as a result of the operation being sent to the EPP. If this annotation is omitted, then the parameters in 
 the operation signature are used. You can add additional params as well as omit certain params found in the signature.
 
 
 ```pml
-@reqcap({
+@ReqCap({
     require ["create"] on ["files"]
 })
-@eventctx(string id, filename)
+@EventCtx(string id, filename)
 resourceop create_file(string filename) { 
     delete node filename
 }
@@ -632,12 +632,12 @@ adminop create_new_user(string username) {
 Resource operations denote an operation on a resource (object). Optionally, return data to the caller.
 
 ```pml
-@reqcap({
+@ReqCap({
     require ["read"] on [filename]
 })
 resourceop read_file(@node string filename) { }
 
-@reqcap({
+@ReqCap({
     require ["read"] on [filename]
 })
 resourceop read_file(@node string filename) { 
@@ -740,7 +740,7 @@ arset ["read"]
 include ["user inboxes"]
   
 // create resource operation to read a file  
-@reqcap({
+@ReqCap({
     require ["read"] on [filename]
 })
 resourceop read_file(@node string name) { }  

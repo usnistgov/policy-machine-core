@@ -84,7 +84,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
             .map(FormalParameter::getName)
             .collect(Collectors.toSet());
 
-        StringBuilder sb = new StringBuilder("@eventctx(");
+        StringBuilder sb = new StringBuilder("@EventCtx(");
         boolean first = true;
         for (FormalParameter<?> ep : eventParameters) {
             if (!first) {
@@ -153,7 +153,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
                 ));
             }
 
-            reqCapStrs.add(String.format("@reqcap({%s})", String.join(", ", entries)));
+            reqCapStrs.add(String.format("@ReqCap({%s})", String.join(", ", entries)));
         }
 
         if (reqCapStrs.isEmpty()) {
