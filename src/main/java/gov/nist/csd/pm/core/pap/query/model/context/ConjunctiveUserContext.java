@@ -3,6 +3,10 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A UserContext with a list of sub contexts. Using this in an access decision enforces the intersection of privileges
+ * for all sub contexts.
+ */
 public final class ConjunctiveUserContext implements UserContext {
 
     private final List<UserContext> contexts;

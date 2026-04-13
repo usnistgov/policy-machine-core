@@ -2,6 +2,9 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import java.util.Objects;
 
+/**
+ * A NodeTargetContext with a specific node name.
+ */
 public final class NameTargetContext implements NodeTargetContext {
 
     private final String targetName;

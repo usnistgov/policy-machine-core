@@ -2,6 +2,9 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import java.util.Objects;
 
+/**
+ * A NodeUserContext with a user node ID.
+ */
 public final class IdUserContext implements NodeUserContext {
 
     private final long userId;

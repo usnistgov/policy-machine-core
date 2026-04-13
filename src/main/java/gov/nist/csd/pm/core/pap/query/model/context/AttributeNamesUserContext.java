@@ -1,23 +1,26 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
-import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 
+/**
+ * An AnonymousUserContext with a set of attribute names.
+ */
 public final class AttributeNamesUserContext implements AnonymousUserContext {
 
-    private final Collection<String> attributeNames;
+    private final Set<String> attributeNames;
     private final String process;
 
-    public AttributeNamesUserContext(Collection<String> attributeNames, String process) {
+    public AttributeNamesUserContext(Set<String> attributeNames, String process) {
         this.attributeNames = attributeNames;
         this.process = process;
     }
 
-    public AttributeNamesUserContext(Collection<String> attributeNames) {
+    public AttributeNamesUserContext(Set<String> attributeNames) {
         this(attributeNames, "");
     }
 
-    public Collection<String> attributeNames() {
+    public Set<String> attributeNames() {
         return attributeNames;
     }
 

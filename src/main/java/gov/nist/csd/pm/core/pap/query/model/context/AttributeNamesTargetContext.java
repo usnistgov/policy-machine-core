@@ -3,6 +3,9 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * An AnonymousTargetContext with a set of attribute names.
+ */
 public final class AttributeNamesTargetContext implements AnonymousTargetContext {
 
     private final Collection<String> attributeNames;

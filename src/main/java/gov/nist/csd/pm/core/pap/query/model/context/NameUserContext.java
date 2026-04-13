@@ -2,6 +2,9 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import java.util.Objects;
 
+/**
+ * A NodeUserContext with a specific user node name.
+ */
 public final class NameUserContext implements NodeUserContext {
 
     private final String username;
