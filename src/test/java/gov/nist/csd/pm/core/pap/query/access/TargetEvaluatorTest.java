@@ -7,8 +7,8 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +28,7 @@ class TargetEvaluatorTest {
             associate "ua1" to PM_ADMIN_POLICY_CLASSES with ["admin:graph:assignment:descendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new IdUserContext(-1), pml);
 
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(
@@ -36,7 +36,7 @@ class TargetEvaluatorTest {
                 Map.of(AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet("admin:graph:assignment:descendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa1"))
+            new IdTargetContext(id("oa1"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:descendant:create")),
@@ -56,7 +56,7 @@ class TargetEvaluatorTest {
             associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:assignment:descendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new IdUserContext(-1), pml);
 
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(
@@ -64,7 +64,7 @@ class TargetEvaluatorTest {
                 Map.of(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("admin:graph:assignment:descendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa1"))
+            new IdTargetContext(id("oa1"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:descendant:create")),
@@ -89,7 +89,7 @@ class TargetEvaluatorTest {
             associate "ua1" to "oa2" with ["admin:graph:assignment:ascendant:create"]
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new UserContext(-1), pml);
+        pap.executePML(new IdUserContext(-1), pml);
 
         TargetEvaluator targetEvaluator = new TargetEvaluator(pap.policyStore());
         TargetDagResult result = targetEvaluator.evaluate(
@@ -99,7 +99,7 @@ class TargetEvaluatorTest {
                     id("oa2"), new AccessRightSet("admin:graph:assignment:ascendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa1"))
+            new IdTargetContext(id("oa1"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:descendant:create", "admin:graph:assignment:ascendant:create")),
@@ -113,7 +113,7 @@ class TargetEvaluatorTest {
                     id("oa2"), new AccessRightSet("admin:graph:assignment:ascendant:create")),
                 new HashSet<>()
             ),
-            new TargetContext(id("oa3"))
+            new IdTargetContext(id("oa3"))
         );
         assertEquals(
             Map.of(id("pc1"), new AccessRightSet("admin:graph:assignment:ascendant:create")),

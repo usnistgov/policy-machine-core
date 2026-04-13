@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.BreakStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class BreakStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));
@@ -47,7 +47,7 @@ class BreakStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("a"));
         assertTrue(pap.query().graph().nodeExists("b"));

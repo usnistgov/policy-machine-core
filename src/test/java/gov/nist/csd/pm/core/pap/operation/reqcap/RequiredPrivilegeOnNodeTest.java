@@ -12,7 +12,7 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -29,14 +29,14 @@ class RequiredPrivilegeOnNodeTest {
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(
             AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName(),
             new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)
         );
 
-        assertTrue(reqPriv.isSatisfied(pap, new UserContext(id("u1")), new Args()));
+        assertTrue(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), new Args()));
     }
 
     @Test
@@ -50,14 +50,14 @@ class RequiredPrivilegeOnNodeTest {
                 associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(
             AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName(),
             new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE)
         );
 
-        assertFalse(reqPriv.isSatisfied(pap, new UserContext(id("u1")), new Args()));
+        assertFalse(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), new Args()));
     }
 
     @Test
@@ -71,14 +71,14 @@ class RequiredPrivilegeOnNodeTest {
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:graph:node:create"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         RequiredPrivilegeOnNode reqPriv = new RequiredPrivilegeOnNode(
             AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName(),
             AdminAccessRight.ADMIN_GRAPH_NODE_CREATE
         );
 
-        assertTrue(reqPriv.isSatisfied(pap, new UserContext(id("u1")), new Args()));
+        assertTrue(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), new Args()));
         assertEquals(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName(), reqPriv.getName());
         assertTrue(reqPriv.getRequired().contains(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString()));
     }

@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONDeserializer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +24,7 @@ public class SamplePolicy {
         long u1 = pap.modify().graph().createUser("u1", Collections.singleton(ua1));
         pap.modify().graph().associate(id("ua1"), AdminPolicyNode.PM_ADMIN_BASE_OA.nodeId(), new AccessRightSet("*"));
 
-        pap.executePML(new TestUserContext("u1"), s);
+        pap.executePML(new NameUserContext("u1"), s);
     }
 
     public static void loadSamplePolicyFromJSON(PAP pap) throws IOException, PMException {

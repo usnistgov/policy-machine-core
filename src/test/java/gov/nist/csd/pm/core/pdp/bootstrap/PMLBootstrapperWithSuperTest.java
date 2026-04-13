@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestIdGenerator;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -49,7 +49,7 @@ class PMLBootstrapperWithSuperTest {
         EPP epp = new EPP(pdp, pap);
         epp.subscribeTo(pdp);
 
-        pdp.runTx(new UserContext(superId), pdpTx -> {
+        pdp.runTx(new IdUserContext(superId), pdpTx -> {
             long oa2 = pdpTx.modify().graph().createObjectAttribute("oa2", List.of(pcId));
             long ua2 = pdpTx.modify().graph().createUserAttribute("ua2", List.of(pcId));
             pdpTx.modify().graph().assign(oa3Id, List.of(oa1Id));

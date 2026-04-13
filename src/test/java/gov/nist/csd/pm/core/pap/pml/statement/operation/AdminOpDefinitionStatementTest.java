@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
 import org.junit.jupiter.api.Test;
 
 class AdminOpDefinitionStatementTest {
@@ -40,10 +40,10 @@ class AdminOpDefinitionStatementTest {
                 }
                 """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+        pap.executePML(new NameUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new TestUserContext("u1"), tx -> {
+        pdp.runTx(new NameUserContext("u1"), tx -> {
             tx.executePML("""
                 op1(a="o1", b=["o2", "o3"])
                 """);
@@ -51,7 +51,7 @@ class AdminOpDefinitionStatementTest {
         });
         assertTrue(pap.query().graph().nodeExists("test"));
 
-        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new UserContext(id("u2")), tx -> {
+        assertThrows(UnauthorizedException.class, () -> pdp.runTx(new IdUserContext(id("u2")), tx -> {
             tx.executePML("""
                 op1(a="o1", b=["o2", "o3"])
                 """);
@@ -79,10 +79,10 @@ class AdminOpDefinitionStatementTest {
                 }
                 """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), pml);
+        pap.executePML(new NameUserContext("u1"), pml);
 
         PDP pdp = new PDP(pap);
-        pdp.runTx(new TestUserContext("u1"), tx -> {
+        pdp.runTx(new NameUserContext("u1"), tx -> {
             tx.executePML("""
                 op1(a="test1", b=["o2", "o3"])
                 """);
@@ -90,7 +90,7 @@ class AdminOpDefinitionStatementTest {
         });
         assertTrue(pap.query().graph().nodeExists("test1"));
 
-        pdp.runTx(new UserContext(id("u2")), tx -> {
+        pdp.runTx(new IdUserContext(id("u2")), tx -> {
             tx.executePML("""
                 op1(a="test2", b=["o2", "o3"])
                 """);

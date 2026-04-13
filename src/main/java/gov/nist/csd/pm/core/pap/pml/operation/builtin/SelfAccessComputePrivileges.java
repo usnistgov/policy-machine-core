@@ -8,7 +8,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +25,6 @@ public class SelfAccessComputePrivileges extends QueryOperation<List<String>> {
     public List<String> execute(PolicyQuery query, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
         long nodeId = query.graph().getNodeId(nodeName);
-        return new ArrayList<>(query.selfAccess().computePrivileges(new TargetContext(nodeId)));
+        return new ArrayList<>(query.selfAccess().computePrivileges(new IdTargetContext(nodeId)));
     }
 }

@@ -14,7 +14,7 @@ import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ class ReferenceByDotIndexTest {
             ListType.of(STRING_TYPE)
         );
         PAP pap = new TestPAP();
-        ExecutionContext executionContext = new ExecutionContext(new UserContext(0), pap);
+        ExecutionContext executionContext = new ExecutionContext(new IdUserContext(0), pap);
         List<String> expected = List.of("1","2");
         Map<String, List<String>> mapValue = Map.of("b", expected);
 
@@ -74,7 +74,7 @@ class ReferenceByDotIndexTest {
         long pc1 = pap.modify().graph().createPolicyClass("pc1");
         long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
         long u1 = pap.modify().graph().createUserAttribute("u1", List.of(ua1));
-        pap.executePML(new UserContext(u1), pml);
+        pap.executePML(new IdUserContext(u1), pml);
 
         assertTrue(pap.query().graph().nodeExists("e"));
     }

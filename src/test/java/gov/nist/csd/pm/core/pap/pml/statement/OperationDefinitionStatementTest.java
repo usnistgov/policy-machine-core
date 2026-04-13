@@ -22,7 +22,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.operation.AdminOpDefinitionStateme
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RequireStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
@@ -142,7 +142,7 @@ class OperationDefinitionStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
         assertTrue(pap.query().graph().nodeExists("test2"));
@@ -163,7 +163,7 @@ class OperationDefinitionStatementTest {
                 f2()
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new UserContext(0), pml);
+        pap.executePML(new IdUserContext(0), pml);
 
         assertTrue(pap.query().graph().nodeExists("test"));
     }
@@ -178,7 +178,7 @@ class OperationDefinitionStatementTest {
                 }
                 """;
         PAP pap = new TestPAP();
-        assertThrows(PMLCompilationException.class, () -> pap.executePML(new UserContext(0), pml));
+        assertThrows(PMLCompilationException.class, () -> pap.executePML(new IdUserContext(0), pml));
     }
 
     @Test
@@ -199,6 +199,6 @@ class OperationDefinitionStatementTest {
         TestPAP pap = new TestPAP();
         pap.executePML(null, pml);
         PDP pdp = new PDP(pap);
-        pdp.runTx(new UserContext(id("u1")), pdpTx -> pdpTx.executePML("f()"));
+        pdp.runTx(new IdUserContext(id("u1")), pdpTx -> pdpTx.executePML("f()"));
     }
 }

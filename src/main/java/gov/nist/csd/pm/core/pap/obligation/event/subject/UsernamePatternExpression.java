@@ -5,7 +5,6 @@ import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
-import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import java.util.Objects;
 
 public class UsernamePatternExpression extends SubjectPatternExpression {

@@ -15,7 +15,7 @@ import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +39,7 @@ class EqualsExpressionTest {
 
         MemoryPAP pap = new TestPAP();
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), pap), pap);
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), pap), pap);
         assertEquals(
                 true,
                 value
@@ -62,7 +62,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -85,7 +85,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 value
@@ -105,7 +105,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -128,7 +128,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -151,7 +151,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 value
@@ -171,7 +171,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -194,7 +194,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -217,7 +217,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 value
@@ -237,7 +237,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -260,7 +260,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -291,7 +291,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 true,
                 value
@@ -319,7 +319,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value
@@ -350,7 +350,7 @@ class EqualsExpressionTest {
                 equalsExpression
         );
 
-        Object value = equalsExpression.execute(new ExecutionContext(new UserContext(0), new MemoryPAP()), new MemoryPAP());
+        Object value = equalsExpression.execute(new ExecutionContext(new IdUserContext(0), new MemoryPAP()), new MemoryPAP());
         assertEquals(
                 false,
                 value

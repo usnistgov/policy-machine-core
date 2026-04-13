@@ -5,6 +5,11 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
@@ -44,23 +49,31 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     public Obligation getObligation(String name) throws PMException {
         Obligation obligation = pap.query().obligations().getObligation(name);
 
-        check(userCtx, new TargetContext(obligation.getAuthorId()), AdminAccessRight.ADMIN_OBLIGATION_LIST);
+        check(userCtx, toTargetCtx(obligation.getAuthor()), AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
         return obligation;
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(long userId) throws PMException {
-        check(userCtx, new TargetContext(userId), AdminAccessRight.ADMIN_OBLIGATION_LIST);
+    public Collection<Obligation> getObligationsWithAuthor(NodeUserContext authorCtx) throws PMException {
+        check(userCtx, toTargetCtx(authorCtx), AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
-        Collection<Obligation> obligationsWithAuthor = new ArrayList<>(pap.query().obligations().getObligationsWithAuthor(userId));
+        Collection<Obligation> obligationsWithAuthor = new ArrayList<>(pap.query().obligations().getObligationsWithAuthor(
+            authorCtx));
         return filterObligations(obligationsWithAuthor);
+    }
+
+    private TargetContext toTargetCtx(NodeUserContext author) {
+        return switch (author) {
+            case IdUserContext c -> new IdTargetContext(c.userId());
+            case NameUserContext c -> new NameTargetContext(c.username());
+        };
     }
 
     private Collection<Obligation> filterObligations(Collection<Obligation> obligations) {
         obligations.removeIf(obligation -> {
             try {
-                check(userCtx, new TargetContext(obligation.getAuthorId()), AdminAccessRight.ADMIN_OBLIGATION_LIST);
+                check(userCtx, toTargetCtx(obligation.getAuthor()), AdminAccessRight.ADMIN_OBLIGATION_LIST);
 
                 return false;
             } catch (UnauthorizedException e) {

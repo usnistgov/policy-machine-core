@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +34,7 @@ class ReqCapVisitorTest {
         assertDoesNotThrow(() -> testPAP.query()
             .operations()
             .getOperation("op1")
-            .canExecute(testPAP, new UserContext(id("u1")), new Args()));
+            .canExecute(testPAP, new IdUserContext(id("u1")), new Args()));
     }
 
 }

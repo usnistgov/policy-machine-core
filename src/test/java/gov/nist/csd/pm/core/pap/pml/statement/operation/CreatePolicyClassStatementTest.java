@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ class CreatePolicyClassStatementTest {
         pap.modify().graph().createPolicyClass("pc2");
         pap.modify().graph().createUserAttribute("ua2", ids("pc2"));
         pap.modify().graph().createUser("u2", ids("ua2"));
-        ExecutionContext execCtx = new ExecutionContext(new UserContext(id("u2")), pap);
+        ExecutionContext execCtx = new ExecutionContext(new IdUserContext(id("u2")), pap);
 
         stmt.execute(execCtx, pap);
 

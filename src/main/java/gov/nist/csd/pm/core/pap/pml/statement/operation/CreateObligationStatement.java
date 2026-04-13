@@ -18,6 +18,11 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.Objects;
 
 public class CreateObligationStatement extends OperationStatement {
@@ -51,8 +56,16 @@ public class CreateObligationStatement extends OperationStatement {
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap);
 
+        long authorId = switch (ctx.author()) {
+            case IdUserContext c -> c.userId();
+            case NameUserContext c -> pap.query().graph().getNodeByName(c.username()).getId();
+            case AttributeIdsUserContext c -> c.attributeIds().iterator().next();
+            case AttributeNamesUserContext c -> pap.query().graph().getNodeByName(c.attributeNames().iterator().next()).getId();
+            case ConjunctiveUserContext c -> throw new PMException("ConjunctiveUserContext cannot be used as an obligation author");
+        };
+
         return new Args()
-            .put(AUTHOR_PARAM, ctx.author().getUser())
+            .put(AUTHOR_PARAM, authorId)
             .put(NAME_PARAM, nameStr)
             .put(EVENT_PATTERN_PARAM, eventPattern)
             .put(OBLIGATION_RESPONSE_PARAM, response);

@@ -1,13 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.epp.EventContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.scope.ExecuteScope;
 import gov.nist.csd.pm.core.pap.pml.scope.Scope;
-import gov.nist.csd.pm.core.pap.pml.scope.VariableAlreadyDefinedInScopeException;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.BreakResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.ContinueResult;
@@ -16,9 +14,7 @@ import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.VoidResult;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class ExecutionContext implements Serializable {

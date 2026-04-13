@@ -18,9 +18,9 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationTyp
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RequireStatement;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +57,7 @@ class PMLReqCapAndSignatureTest {
     @Test
     void testPMLRequiredCapabilityFuncIsSatisfied() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -74,8 +74,8 @@ class PMLReqCapAndSignatureTest {
         PMLStatementBlock block = new PMLStatementBlock(stmt);
         PMLRequiredCapabilityFunc func = new PMLRequiredCapabilityFunc(block);
 
-        assertTrue(func.isSatisfied(pap, new TestUserContext("u1"), new Args()));
-        assertFalse(func.isSatisfied(pap, new TestUserContext("u2"), new Args()));
+        assertTrue(func.isSatisfied(pap, new NameUserContext("u1"), new Args()));
+        assertFalse(func.isSatisfied(pap, new NameUserContext("u2"), new Args()));
     }
 
     @Test
@@ -121,7 +121,7 @@ class PMLReqCapAndSignatureTest {
     @Test
     void testReqCapListVisitorCompilesToPMLRequiredCapabilityFunc() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -141,15 +141,15 @@ class PMLReqCapAndSignatureTest {
 
         Operation<?> op = pap.query().operations().getOperation("test");
 
-        assertDoesNotThrow(() -> op.canExecute(pap, new TestUserContext("u1"), new Args()));
+        assertDoesNotThrow(() -> op.canExecute(pap, new NameUserContext("u1"), new Args()));
         assertThrows(UnauthorizedException.class,
-            () -> op.canExecute(pap, new TestUserContext("u2"), new Args()));
+            () -> op.canExecute(pap, new NameUserContext("u2"), new Args()));
     }
 
     @Test
     void testReqCapWithMultipleRequireStatements() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 set resource access rights ["read", "write"]
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -172,9 +172,9 @@ class PMLReqCapAndSignatureTest {
 
         Operation<?> op = pap.query().operations().getOperation("test");
 
-        assertDoesNotThrow(() -> op.canExecute(pap, new TestUserContext("u1"), new Args()));
+        assertDoesNotThrow(() -> op.canExecute(pap, new NameUserContext("u1"), new Args()));
         assertThrows(UnauthorizedException.class,
-            () -> op.canExecute(pap, new TestUserContext("u2"), new Args()));
+            () -> op.canExecute(pap, new NameUserContext("u2"), new Args()));
     }
 
     @Test

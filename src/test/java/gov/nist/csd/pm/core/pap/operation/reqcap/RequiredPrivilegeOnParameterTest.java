@@ -12,7 +12,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class RequiredPrivilegeOnParameterTest {
                 associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         NodeIdFormalParameter param = new NodeIdFormalParameter("target");
         RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(
@@ -40,7 +40,7 @@ class RequiredPrivilegeOnParameterTest {
         Args args = new Args();
         args.put(param, id("oa1"));
 
-        assertTrue(reqPriv.isSatisfied(pap, new UserContext(id("u1")), args));
+        assertTrue(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), args));
     }
 
     @Test
@@ -54,7 +54,7 @@ class RequiredPrivilegeOnParameterTest {
                 associate "ua1" to "oa1" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         NodeNameFormalParameter param = new NodeNameFormalParameter("target");
         RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(
@@ -64,7 +64,7 @@ class RequiredPrivilegeOnParameterTest {
         Args args = new Args();
         args.put(param, "oa1");
 
-        assertTrue(reqPriv.isSatisfied(pap, new UserContext(id("u1")), args));
+        assertTrue(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), args));
     }
 
     @Test
@@ -80,7 +80,7 @@ class RequiredPrivilegeOnParameterTest {
                 associate "ua1" to "oa2" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         NodeIdListFormalParameter param = new NodeIdListFormalParameter("targets");
         RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(
@@ -90,7 +90,7 @@ class RequiredPrivilegeOnParameterTest {
         Args args = new Args();
         args.put(param, List.of(id("oa1"), id("oa2")));
 
-        assertTrue(reqPriv.isSatisfied(pap, new UserContext(id("u1")), args));
+        assertTrue(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), args));
     }
 
     @Test
@@ -106,7 +106,7 @@ class RequiredPrivilegeOnParameterTest {
                 associate "ua1" to "oa2" with ["read"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         NodeNameListFormalParameter param = new NodeNameListFormalParameter("targets");
         RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(
@@ -116,7 +116,7 @@ class RequiredPrivilegeOnParameterTest {
         Args args = new Args();
         args.put(param, List.of("oa1", "oa2"));
 
-        assertTrue(reqPriv.isSatisfied(pap, new UserContext(id("u1")), args));
+        assertTrue(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), args));
     }
 
     @Test
@@ -132,7 +132,7 @@ class RequiredPrivilegeOnParameterTest {
                 create u "u1" in ["ua1"]
                 """;
 
-        pap.executePML(new UserContext(id("u1")), pml);
+        pap.executePML(new IdUserContext(id("u1")), pml);
 
         NodeNameListFormalParameter param = new NodeNameListFormalParameter("targets");
         RequiredPrivilegeOnParameter reqPriv = new RequiredPrivilegeOnParameter(
@@ -142,6 +142,6 @@ class RequiredPrivilegeOnParameterTest {
         Args args = new Args();
         args.put(param, List.of("oa1", "oa2"));
 
-        assertFalse(reqPriv.isSatisfied(pap, new UserContext(id("u1")), args));
+        assertFalse(reqPriv.isSatisfied(pap, new IdUserContext(id("u1")), args));
     }
 }

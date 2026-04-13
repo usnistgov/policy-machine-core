@@ -3,12 +3,13 @@ package gov.nist.csd.pm.core.pap.obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Obligation implements Serializable {
 
-    private long authorId;
+    private NodeUserContext author;
     private String name;
     private EventPattern eventPattern;
     private ObligationResponse response;
@@ -16,19 +17,19 @@ public class Obligation implements Serializable {
     public Obligation() {
     }
 
-    public Obligation(long authorId, String name, EventPattern eventPattern, ObligationResponse response) {
-        this.authorId = authorId;
+    public Obligation(NodeUserContext author, String name, EventPattern eventPattern, ObligationResponse response) {
+        this.author = author;
         this.name = name;
         this.eventPattern = eventPattern;
         this.response = response;
     }
 
-    public long getAuthorId() {
-        return authorId;
+    public NodeUserContext getAuthor() {
+        return author;
     }
 
-    public void setAuthorId(long authorId) {
-        this.authorId = authorId;
+    public void setAuthor(NodeUserContext author) {
+        this.author = author;
     }
 
     public String getName() {
@@ -68,12 +69,12 @@ public class Obligation implements Serializable {
         if (!(o instanceof Obligation that)) {
             return false;
         }
-        return authorId == that.authorId && Objects.equals(name, that.name) && Objects.equals(
+        return Objects.equals(author, that.author) && Objects.equals(name, that.name) && Objects.equals(
             eventPattern, that.eventPattern) && Objects.equals(response, that.response);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authorId, name, eventPattern, response);
+        return Objects.hash(author, name, eventPattern, response);
     }
 }

@@ -25,6 +25,8 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
@@ -62,8 +64,7 @@ public class EPP implements EventSubscriber {
         }
 
         for (Obligation obligation : obligations) {
-            long author = obligation.getAuthorId();
-            UserContext authorCtx = new UserContext(author);
+            NodeUserContext authorCtx = obligation.getAuthor();
 
             try {
                 pdp.runTx(authorCtx, pdpTx -> {
@@ -163,19 +164,19 @@ public class EPP implements EventSubscriber {
 
             switch (nodeFormalParameter) {
                 case NodeIdFormalParameter nodeId ->
-                    check(userCtx, new TargetContext((long) value));
+                    check(userCtx, new IdTargetContext((long) value));
                 case NodeIdListFormalParameter nodeIdList -> {
                     List<Long> idList = (List<Long>) value;
                     for (Long id : idList) {
-                        check(userCtx, new TargetContext(id));
+                        check(userCtx, new IdTargetContext(id));
                     }
                 }
                 case NodeNameFormalParameter nodeName ->
-                    check(userCtx, new TargetContext(pap.query().graph().getNodeId((String) value)));
+                    check(userCtx, new IdTargetContext(pap.query().graph().getNodeId((String) value)));
                 case NodeNameListFormalParameter nodeNameList -> {
                     List<String> nameList = (List<String>) value;
                     for (String name : nameList) {
-                        check(userCtx, new TargetContext(pap.query().graph().getNodeId(name)));
+                        check(userCtx, new IdTargetContext(pap.query().graph().getNodeId(name)));
                     }
                 }
             }

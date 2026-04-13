@@ -1,10 +1,17 @@
 package gov.nist.csd.pm.core.pap.serialization.json;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.google.gson.Gson;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
+import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.util.PolicyEquals;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
@@ -45,5 +52,28 @@ class JSONSerializerTest {
         assertNull(graph.get("users"));
         assertNull(graph.get("objects"));
         assertNull(((Map)((List) graph.get("oas")).getFirst()).get("associations"));
+    }
+
+    @Test
+    void testObligationAuthorAlwaysSerializesAsId() throws PMException {
+        MemoryPAP pap = new MemoryPAP();
+        long pc1 = pap.modify().graph().createPolicyClass("pc1");
+        long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+        long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+
+        EventPattern eventPattern = new EventPattern(new SubjectPattern(), new AnyOperationPattern());
+
+        // obligation authored with UserIdContext
+        pap.modify().obligations().createObligation(new IdUserContext(u1), "obl-by-id", eventPattern, new ObligationResponse("ctx", List.of()));
+        // obligation authored with UsernameContext
+        pap.modify().obligations().createObligation(new NameUserContext("u1"), "obl-by-name", eventPattern, new ObligationResponse("ctx", List.of()));
+
+        JSONSerializer serializer = new JSONSerializer();
+        JSONPolicy jsonPolicy = serializer.buildJSONPolicy(pap.query());
+
+        for (JSONObligation jsonObligation : jsonPolicy.getObligations()) {
+            assertEquals(u1, jsonObligation.getAuthor(),
+                "obligation '" + jsonObligation.getName() + "' should serialize author as id " + u1);
+        }
     }
 }

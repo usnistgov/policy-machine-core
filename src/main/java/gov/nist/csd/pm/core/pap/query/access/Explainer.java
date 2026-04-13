@@ -38,18 +38,28 @@ public class Explainer {
 
 		// evaluate user
 		UserEvaluator userEvaluator = new UserEvaluator(policyStore);
-		UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
+		UserEvaluationResult userEvaluationResult = userEvaluator.evaluate(userCtx);
 
-		// evaluate target
+		// evaluate target and resolve privs per UserDagResult, intersecting across composite sub-contexts
 		TargetEvaluator targetEvaluator = new TargetEvaluator(policyStore);
-		TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
+		AccessRightSet priv = null;
+		AccessRightSet deniedPriv = null;
+		List<Prohibition> prohibitions = new ArrayList<>();
+		for (UserDagResult userDagResult : userEvaluationResult.dagResults()) {
+			TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
+			AccessRightSet p = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
+			AccessRightSet d = resolveDeniedAccessRights(userDagResult, targetDagResult);
+			priv = (priv == null) ? p : intersect(priv, p);
+			deniedPriv = (deniedPriv == null) ? d : intersect(deniedPriv, d);
+			prohibitions.addAll(computeSatisfiedProhibitions(userDagResult, targetDagResult));
+		}
 
-		// resolve privs and prohibitions
-		AccessRightSet priv = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
-		AccessRightSet deniedPriv = resolveDeniedAccessRights(userDagResult, targetDagResult);
-		List<Prohibition> prohibitions = computeSatisfiedProhibitions(userDagResult, targetDagResult);
-
-		return new Explain(priv, resolvedPaths, deniedPriv, prohibitions);
+		return new Explain(
+				priv == null ? new AccessRightSet() : priv,
+				resolvedPaths,
+				deniedPriv == null ? new AccessRightSet() : deniedPriv,
+				prohibitions
+		);
 	}
 
 	private List<PolicyClassExplain> resolvePaths(UserContext userCtx, TargetContext targetCtx) throws PMException {
@@ -108,6 +118,13 @@ public class Explainer {
 		}
 
 		return paths;
+	}
+
+	private static AccessRightSet intersect(AccessRightSet a, AccessRightSet b) {
+		AccessRightSet result = new AccessRightSet();
+		result.addAll(a);
+		result.retainAll(b);
+		return result;
 	}
 
 	private AccessRightSet getArsetFromPaths(Collection<List<ExplainNode>> paths) {

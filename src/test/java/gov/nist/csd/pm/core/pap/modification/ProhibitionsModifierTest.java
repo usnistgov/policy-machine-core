@@ -14,7 +14,7 @@ import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.Set;
@@ -95,7 +95,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.executePML(new UserContext(id("u1")), """
+                tx.executePML(new IdUserContext(id("u1")), """
                     create conj node prohibition "p1"
                     deny "ua1"
                     arset ["read"]
@@ -109,7 +109,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.executePML(new UserContext(id("u1")), """
+                tx.executePML(new IdUserContext(id("u1")), """
                     create conj node prohibition "p3"
                     deny "ua1"
                     arset ["read"]
@@ -166,7 +166,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
             pap.runTx(tx -> {
-                tx.executePML(new UserContext(id("u1")), """
+                tx.executePML(new IdUserContext(id("u1")), """
                     create conj node prohibition "p1"
                     deny "ua1"
                     arset ["read"]
@@ -180,7 +180,7 @@ public abstract class ProhibitionsModifierTest extends PAPTestInitializer {
             });
 
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
-                tx.executePML(new UserContext(id("u1")), """
+                tx.executePML(new IdUserContext(id("u1")), """
                     delete prohibition "p1"
                     delete prohibition "p2"
                     """);

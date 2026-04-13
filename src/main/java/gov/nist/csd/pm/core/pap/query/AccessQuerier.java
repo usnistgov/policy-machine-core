@@ -15,7 +15,10 @@ import gov.nist.csd.pm.core.pap.query.access.Explainer;
 import gov.nist.csd.pm.core.pap.query.access.TargetDagResult;
 import gov.nist.csd.pm.core.pap.query.access.TargetEvaluator;
 import gov.nist.csd.pm.core.pap.query.access.UserDagResult;
+import gov.nist.csd.pm.core.pap.query.access.UserEvaluationResult;
 import gov.nist.csd.pm.core.pap.query.access.UserEvaluator;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
@@ -38,27 +41,26 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        UserDagResult userDagResult = evaluateUser(userCtx);
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
 
         // traverse the target side of the graph to get permissions per policy class
         TargetEvaluator targetEvaluator = new TargetEvaluator(store);
 
         // resolve the permissions
-        return computePrivileges(userDagResult, targetCtx, targetEvaluator);
+        return computePrivileges(userDagResults, targetCtx, targetEvaluator);
     }
 
     @Override
     public List<AccessRightSet> computePrivileges(UserContext userCtx, List<TargetContext> targetCtxs) throws PMException {
         // traverse the user side of the graph to get the associations
-        UserDagResult userDagResult = evaluateUser(userCtx);
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
 
         // traverse the target side of the graph to get permissions per policy class
         TargetEvaluator targetEvaluator = new CachedTargetEvaluator(store);
 
         List<AccessRightSet> accessRightSets = new ArrayList<>();
         for (TargetContext targetCtx : targetCtxs) {
-            AccessRightSet privs = computePrivileges(userDagResult, targetCtx, targetEvaluator);
-
+            AccessRightSet privs = computePrivileges(userDagResults, targetCtx, targetEvaluator);
             accessRightSets.add(privs);
         }
 
@@ -67,39 +69,36 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
     @Override
     public AccessRightSet computeDeniedPrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
-        AccessRightSet accessRights = new AccessRightSet();
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
 
-        // traverse the user side of the graph to get the associations
-        UserEvaluator userEvaluator = new UserEvaluator(store);
-        UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
-        if (userDagResult.borderTargets().isEmpty()) {
-            return accessRights;
-        }
-
-        // traverse the target side of the graph to get permissions per policy class
         TargetEvaluator targetEvaluator = new TargetEvaluator(store);
-        TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
-
-        // resolve the permissions
-        return resolveDeniedAccessRights(userDagResult, targetDagResult);
+        AccessRightSet denied = null;
+        for (UserDagResult userDagResult : userDagResults.dagResults()) {
+            if (userDagResult.borderTargets().isEmpty()) {
+                continue;
+            }
+            TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
+            AccessRightSet d = resolveDeniedAccessRights(userDagResult, targetDagResult);
+            denied = (denied == null) ? d : intersect(denied, d);
+        }
+        return denied == null ? new AccessRightSet() : denied;
     }
 
     @Override
     public Map<Long, AccessRightSet> computeCapabilityList(UserContext userCtx) throws PMException {
         Map<Long, AccessRightSet> results = new HashMap<>();
 
-        // get border nodes.  Can be OA or UA.  Return empty set if no attrs are reachable
-        UserEvaluator userEvaluator = new UserEvaluator(store);
-        UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
-        if (userDagResult.borderTargets().isEmpty()) {
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
+        Map<Long, AccessRightSet> borderTargets = unionBorderTargets(userDagResults);
+        if (borderTargets.isEmpty()) {
             return results;
         }
 
         CachedTargetEvaluator cachedTargetEvaluator = new CachedTargetEvaluator(store);
 
-        for(long borderTarget : userDagResult.borderTargets().keySet()) {
+        for (long borderTarget : borderTargets.keySet()) {
             // compute permissions on the border attr
-            AccessRightSet arset = computePrivileges(userDagResult, new TargetContext(borderTarget), cachedTargetEvaluator);
+            AccessRightSet arset = computePrivileges(userDagResults, new IdTargetContext(borderTarget), cachedTargetEvaluator);
             results.put(borderTarget, arset);
 
             // compute decisions for the subgraph of the border attr
@@ -109,7 +108,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
                     continue;
                 }
 
-                arset = computePrivileges(userDagResult, new TargetContext(ascendant), cachedTargetEvaluator);
+                arset = computePrivileges(userDagResults, new IdTargetContext(ascendant), cachedTargetEvaluator);
                 results.put(ascendant, arset);
             }
         }
@@ -132,9 +131,9 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
         TargetEvaluator targetEvaluator = new CachedTargetEvaluator(store);
         for (long user : search) {
-            UserDagResult userDagResult = evaluateUser(new UserContext(user));
+            UserEvaluationResult userDagResults = evaluateUser(new IdUserContext(user));
 
-            AccessRightSet list = this.computePrivileges(userDagResult, targetCtx, targetEvaluator);
+            AccessRightSet list = this.computePrivileges(userDagResults, targetCtx, targetEvaluator);
             acl.put(user, list);
         }
 
@@ -143,7 +142,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
     @Override
     public Map<Long, AccessRightSet> computeDestinationAttributes(UserContext userCtx) throws PMException {
-        return evaluateUser(userCtx).borderTargets();
+        return unionBorderTargets(evaluateUser(userCtx));
     }
 
     @Override
@@ -155,12 +154,12 @@ public class AccessQuerier extends Querier implements AccessQuery {
             subgraphs.add(computeSubgraphPrivileges(userCtx, adjacent));
         }
 
-        UserDagResult userDagResult = evaluateUser(userCtx);
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
         TargetEvaluator targetEvaluator = new TargetEvaluator(store);
 
         return new SubgraphPrivileges(
             store.graph().getNodeById(root),
-            computePrivileges(userDagResult, new TargetContext(root), targetEvaluator),
+            computePrivileges(userDagResults, new IdTargetContext(root), targetEvaluator),
             subgraphs
         );
     }
@@ -169,13 +168,13 @@ public class AccessQuerier extends Querier implements AccessQuery {
     public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
         Map<Node, AccessRightSet> ascendantPrivs = new HashMap<>();
 
-        UserDagResult userDagResult = evaluateUser(userCtx);
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
         TargetEvaluator targetEvaluator = new TargetEvaluator(store);
 
         Collection<Long> adjacentAscendants = store.graph().getAdjacentAscendants(root);
         for (long adjacentAscendant : adjacentAscendants) {
             Node node = store.graph().getNodeById(adjacentAscendant);
-            ascendantPrivs.put(node, computePrivileges(userDagResult, new TargetContext(adjacentAscendant), targetEvaluator));
+            ascendantPrivs.put(node, computePrivileges(userDagResults, new IdTargetContext(adjacentAscendant), targetEvaluator));
         }
 
         return ascendantPrivs;
@@ -185,13 +184,13 @@ public class AccessQuerier extends Querier implements AccessQuery {
     public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
         Map<Node, AccessRightSet> descendantPrivs = new HashMap<>();
 
-        UserDagResult userDagResult = evaluateUser(userCtx);
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
         TargetEvaluator targetEvaluator = new TargetEvaluator(store);
 
         Collection<Long> adjacentDescendants = store.graph().getAdjacentDescendants(root);
         for (long adjacentDescendant : adjacentDescendants) {
             Node node = store.graph().getNodeById(adjacentDescendant);
-            descendantPrivs.put(node, computePrivileges(userDagResult, new TargetContext(adjacentDescendant), targetEvaluator));
+            descendantPrivs.put(node, computePrivileges(userDagResults, new IdTargetContext(adjacentDescendant), targetEvaluator));
         }
 
         return descendantPrivs;
@@ -207,14 +206,14 @@ public class AccessQuerier extends Querier implements AccessQuery {
     public Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException {
         Map<Long, AccessRightSet> pos = new HashMap<>();
 
-        UserDagResult userDagResult = evaluateUser(userCtx);
+        UserEvaluationResult userDagResults = evaluateUser(userCtx);
         CachedTargetEvaluator cachedTargetEvaluator = new CachedTargetEvaluator(store);
 
         for (long pc : store.graph().getPolicyClasses()) {
             new GraphStoreBFS(store.graph())
                 .withDirection(Direction.ASCENDANTS)
                 .withVisitor(n -> {
-                    AccessRightSet privs = computePrivileges(userDagResult, new TargetContext(n), cachedTargetEvaluator);
+                    AccessRightSet privs = computePrivileges(userDagResults, new IdTargetContext(n), cachedTargetEvaluator);
                     if (privs.isEmpty()) {
                         return;
                     }
@@ -233,9 +232,17 @@ public class AccessQuerier extends Querier implements AccessQuery {
         return posWithNodes;
     }
 
-    private UserDagResult evaluateUser(UserContext userCtx) throws PMException {
+    private UserEvaluationResult evaluateUser(UserContext userCtx) throws PMException {
         UserEvaluator userEvaluator = new UserEvaluator(store);
         return userEvaluator.evaluate(userCtx);
+    }
+
+    private Map<Long, AccessRightSet> unionBorderTargets(UserEvaluationResult userDagResults) {
+        Map<Long, AccessRightSet> union = new HashMap<>();
+        for (UserDagResult result : userDagResults.dagResults()) {
+            union.putAll(result.borderTargets());
+        }
+        return union;
     }
 
     private Set<Long> getAscendants(long vNode) throws PMException {
@@ -255,10 +262,26 @@ public class AccessQuerier extends Querier implements AccessQuery {
         return ret;
     }
 
+    private AccessRightSet computePrivileges(UserEvaluationResult userDagResults, TargetContext targetCtx, TargetEvaluator targetEvaluator) throws PMException {
+        AccessRightSet result = null;
+        for (UserDagResult userDagResult : userDagResults.dagResults()) {
+            AccessRightSet privs = computePrivileges(userDagResult, targetCtx, targetEvaluator);
+            result = (result == null) ? privs : intersect(result, privs);
+        }
+        return result == null ? new AccessRightSet() : result;
+    }
+
     private AccessRightSet computePrivileges(UserDagResult userDagResult, TargetContext targetCtx, TargetEvaluator targetEvaluator) throws PMException {
         TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 
         // resolve the permissions
         return resolvePrivileges(userDagResult, targetDagResult, store.operations().getResourceAccessRights());
+    }
+
+    private static AccessRightSet intersect(AccessRightSet a, AccessRightSet b) {
+        AccessRightSet result = new AccessRightSet();
+        result.addAll(a);
+        result.retainAll(b);
+        return result;
     }
 }

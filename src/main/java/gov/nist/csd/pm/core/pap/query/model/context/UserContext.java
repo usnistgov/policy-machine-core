@@ -1,101 +1,22 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
-import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.store.GraphStore;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Objects;
 
-public class UserContext implements Serializable {
+/**
+ * Represents the user in an access decision.
+ * Three types are supported:
+ *   - NodeUserContext: identifies a specific user node by id (IdUserContext) or by name (NameUserContext).
+ *   - AnonymousUserContext: identifies a subject by a set of user attribute IDs (AttributeIdsUserContext) or names
+ *                           (AttributeNamesUserContext).
+ *   - ConjunctiveUserContext: combines multiple UserContext instances so that access is evaluated as the intersection
+ *                             of all contexts.
+ */
+public sealed interface UserContext extends Serializable
+        permits NodeUserContext, AnonymousUserContext, ConjunctiveUserContext {
 
-    private long userId;
-    private Collection<Long> attributeIds;
-    private String process;
-
-    public UserContext(long userId, String process) {
-        this.userId = userId;
-        this.process = process;
-    }
-
-    public UserContext(long userId) {
-        this.userId = userId;
-    }
-
-    public UserContext(Collection<Long> attributeIds, String process) {
-        this.attributeIds = attributeIds;
-        this.process = process;
-    }
-
-    public UserContext(Collection<Long> attributeIds) {
-        this.attributeIds = attributeIds;
-    }
-
-    public long getUser() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
-    public Collection<Long> getAttributeIds() {
-        return attributeIds;
-    }
-
-    public void setAttributeIds(Collection<Long> attributeIds) {
-        this.attributeIds = attributeIds;
-    }
-
-    public String getProcess() {
-        return process;
-    }
-
-    public void setProcess(String process) {
-        this.process = process;
-    }
-
-    public boolean isUserDefined() {
-        return userId != 0;
-    }
-
-    public void checkExists(GraphStore graphStore) throws PMException {
-        if (isUserDefined()) {
-            if (!graphStore.nodeExists(userId)) {
-                throw new NodeDoesNotExistException(userId);
-            }
-        } else {
-            for (long attribute : attributeIds) {
-                if (!graphStore.nodeExists(attribute)) {
-                    throw new NodeDoesNotExistException(attribute);
-                }
-            }
-        }
-    }
-
-    @Override
-    public String toString() {
-        String s = "%s";
-        if (process != null) {
-            s += ", process=" + process + "]";
-        }
-
-        if (isUserDefined()) {
-            return String.format(s, "user=" + userId);
-        } else {
-            return String.format(s, "attributes=" + attributeIds);
-        }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserContext that)) return false;
-        return Objects.equals(userId, that.userId) && Objects.equals(attributeIds, that.attributeIds) && Objects.equals(process, that.process);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, attributeIds, process);
-    }
+    /**
+     * Returns the process identifier associated with this user context.
+     * @return the process identifier, or an empty string if none is set
+     */
+    String getProcess();
 }

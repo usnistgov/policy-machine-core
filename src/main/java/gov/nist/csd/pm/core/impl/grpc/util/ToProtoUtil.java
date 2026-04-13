@@ -8,6 +8,14 @@ import gov.nist.csd.pm.core.epp.EventContextUser;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainAssociation;
 import gov.nist.csd.pm.core.pap.query.model.explain.ExplainNode;
@@ -15,7 +23,6 @@ import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.query.model.explain.PolicyClassExplain;
 import gov.nist.csd.pm.proto.v1.epp.EventContext;
 import gov.nist.csd.pm.proto.v1.model.NodeRef;
-import gov.nist.csd.pm.proto.v1.model.NodeRefList;
 import gov.nist.csd.pm.proto.v1.model.NodeType;
 import gov.nist.csd.pm.proto.v1.model.Obligation;
 import gov.nist.csd.pm.proto.v1.model.Prohibition;
@@ -35,24 +42,31 @@ public class ToProtoUtil {
 
     public static UserContext toUserContextProto(gov.nist.csd.pm.core.pap.query.model.context.UserContext userCtx) {
         UserContext.Builder builder = UserContext.newBuilder();
-        if (userCtx.getProcess() == null) {
+        if (userCtx.getProcess() != null) {
             builder.setProcess(userCtx.getProcess());
         }
 
-        if (userCtx.isUserDefined()) {
-            long userId = userCtx.getUser();
-
-            builder.setUserNode(NodeRef.newBuilder().setId(userId).build());
-        } else {
-            Collection<Long> attributeIds = userCtx.getAttributeIds();
-
-            builder.setUserAttributes(
-                NodeRefList.newBuilder()
-                    .addAllNodes(
-                        attributeIds.stream().map(id -> NodeRef.newBuilder().setId(id).build()).toList()
-                    )
-                    .build()
-            );
+        switch (userCtx) {
+            case IdUserContext c -> builder.setId(c.userId());
+            case NameUserContext c -> builder.setName(c.username());
+            case AttributeIdsUserContext c ->
+                builder.setAttributeIds(
+                    gov.nist.csd.pm.proto.v1.pdp.query.Int64List.newBuilder()
+                        .addAllValues(c.attributeIds()).build()
+                );
+            case AttributeNamesUserContext c ->
+                builder.setAttributeNames(
+                    gov.nist.csd.pm.proto.v1.pdp.query.StringList.newBuilder()
+                        .addAllValues(c.attributeNames()).build()
+                );
+            case gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext c -> {
+                gov.nist.csd.pm.proto.v1.pdp.query.ConjunctiveUserContext.Builder conjBuilder =
+                    gov.nist.csd.pm.proto.v1.pdp.query.ConjunctiveUserContext.newBuilder();
+                for (gov.nist.csd.pm.core.pap.query.model.context.UserContext ctx : c.contexts()) {
+                    conjBuilder.addContexts(toUserContextProto(ctx));
+                }
+                builder.setConjunctive(conjBuilder.build());
+            }
         }
 
         return builder.build();
@@ -61,20 +75,19 @@ public class ToProtoUtil {
     public static TargetContext toTargetContextProto(gov.nist.csd.pm.core.pap.query.model.context.TargetContext targetCtx) {
         TargetContext.Builder builder = TargetContext.newBuilder();
 
-        if (targetCtx.isNode()) {
-            long targetId = targetCtx.getTargetId();
-
-            builder.setTargetNode(NodeRef.newBuilder().setId(targetId).build());
-        } else {
-            Collection<Long> attributeIds = targetCtx.getAttributeIds();
-
-            builder.setTargetAttributes(
-                NodeRefList.newBuilder()
-                    .addAllNodes(
-                        attributeIds.stream().map(id -> NodeRef.newBuilder().setId(id).build()).toList()
-                    )
-                    .build()
-            );
+        switch (targetCtx) {
+            case IdTargetContext ctx -> builder.setId(ctx.targetId());
+            case NameTargetContext ctx -> builder.setName(ctx.targetName());
+            case AttributeIdsTargetContext ctx ->
+                builder.setAttributeIds(
+                    gov.nist.csd.pm.proto.v1.pdp.query.Int64List.newBuilder()
+                        .addAllValues(ctx.attributeIds()).build()
+                );
+            case AttributeNamesTargetContext ctx ->
+                builder.setAttributeNames(
+                    gov.nist.csd.pm.proto.v1.pdp.query.StringList.newBuilder()
+                        .addAllValues(ctx.attributeNames()).build()
+                );
         }
 
         return builder.build();
@@ -164,7 +177,13 @@ public class ToProtoUtil {
                                                                                                               PMException {
         gov.nist.csd.pm.proto.v1.model.Obligation.Builder builder = gov.nist.csd.pm.proto.v1.model.Obligation.newBuilder()
             .setName(obligation.getName())
-            .setAuthor(toNodeProto(pap.query().graph().getNodeById(obligation.getAuthorId())))
+            .setAuthor(toNodeProto(switch (obligation.getAuthor()) {
+            case IdUserContext c ->
+                pap.query().graph().getNodeById(c.userId());
+            case NameUserContext c ->
+                pap.query().graph().getNodeByName(c.username());
+            default -> throw new IllegalStateException("unsupported author type: " + obligation.getAuthor());
+        }))
             .setPml(obligation.toString());
         return builder.build();
     }

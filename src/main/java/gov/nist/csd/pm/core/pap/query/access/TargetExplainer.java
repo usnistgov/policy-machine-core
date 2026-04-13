@@ -8,6 +8,11 @@ import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
@@ -27,7 +32,7 @@ public class TargetExplainer {
 	}
 
 	public Map<Node, Map<Path, List<Association>>> explainTarget(TargetContext targetCtx) throws PMException {
-		targetCtx.checkExists(policyStore.graph());
+		ContextChecker.checkTargetContextExists(targetCtx, policyStore.graph());
 
 		Collection<Long> policyClasses = policyStore.graph().getPolicyClasses();
 
@@ -66,22 +71,37 @@ public class TargetExplainer {
 				.withPropagator(propagator);
 
 		List<Node> nodes = new ArrayList<>();
-		if (targetCtx.isNode()) {
-			long target = targetCtx.getTargetId();
-			Node targetNode = policyStore.graph().getNodeById(target);
-			if (targetNode.getType().equals(PC)) {
-				target = PM_ADMIN_POLICY_CLASSES.nodeId();
+		switch (targetCtx) {
+			case IdTargetContext ctx -> {
+				long target = ctx.targetId();
+				Node targetNode = policyStore.graph().getNodeById(target);
+				if (targetNode.getType().equals(PC)) {
+					target = PM_ADMIN_POLICY_CLASSES.nodeId();
+				}
+				nodes.add(targetNode);
+				dfs.walk(target);
 			}
-
-			nodes.add(targetNode);
-
-			dfs.walk(target);
-		} else {
-			for (long id : targetCtx.getAttributeIds()) {
-				nodes.add(policyStore.graph().getNodeById(id));
+			case NameTargetContext ctx -> {
+				Node targetNode = policyStore.graph().getNodeByName(ctx.targetName());
+				long target = targetNode.getType().equals(PC) ? PM_ADMIN_POLICY_CLASSES.nodeId() : targetNode.getId();
+				nodes.add(targetNode);
+				dfs.walk(target);
 			}
-
-			dfs.walk(targetCtx.getAttributeIds());
+			case AttributeIdsTargetContext ctx -> {
+				for (long id : ctx.attributeIds()) {
+					nodes.add(policyStore.graph().getNodeById(id));
+				}
+				dfs.walk(ctx.attributeIds());
+			}
+			case AttributeNamesTargetContext ctx -> {
+				List<Long> ids = new ArrayList<>();
+				for (String name : ctx.attributeNames()) {
+					Node n = policyStore.graph().getNodeByName(name);
+					nodes.add(n);
+					ids.add(n.getId());
+				}
+				dfs.walk(ids);
+			}
 		}
 
 		// convert the map created above into a map where the policy classes are the keys
@@ -103,4 +123,5 @@ public class TargetExplainer {
 
 		return pcMap;
 	}
+
 }

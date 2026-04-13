@@ -3,6 +3,9 @@ package gov.nist.csd.pm.core.impl.grpc.client;
 import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.proto.v1.model.NodeRef;
 import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationRequest;
 import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationResponse;
@@ -49,9 +52,13 @@ public class GrpcObligationsQuerier implements ObligationsQuery {
     }
 
     @Override
-    public Collection<Obligation> getObligationsWithAuthor(long author) {
+    public Collection<Obligation> getObligationsWithAuthor(NodeUserContext author) {
+        NodeRef authorRef = switch (author) {
+            case IdUserContext c -> NodeRef.newBuilder().setId(c.userId()).build();
+            case NameUserContext c -> NodeRef.newBuilder().setName(c.username()).build();
+        };
         GetObligationsByAuthorRequest request = GetObligationsByAuthorRequest.newBuilder()
-            .setAuthor(NodeRef.newBuilder().setId(author).build())
+            .setAuthor(authorRef)
             .build();
         GetObligationsByAuthorResponse response = blockingStub.getObligationsByAuthor(request);
         List<Obligation> obligations = new ArrayList<>();

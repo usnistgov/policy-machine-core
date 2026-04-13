@@ -17,6 +17,15 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
@@ -37,8 +46,10 @@ import gov.nist.csd.pm.proto.v1.pdp.query.ParamType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,24 +60,29 @@ public class FromProtoUtil {
         String process = userCtxProto.getProcess();
 
         return switch (userCtxProto.getUserCase()) {
-            case USER_NODE ->
-                new UserContext(resolveNodeRefId(pap, userCtxProto.getUserNode()), process);
-            case USER_ATTRIBUTES ->
-                new UserContext(resolveNodeRefIdList(pap, userCtxProto.getUserAttributes().getNodesList()), process);
-            case USER_NOT_SET ->
-                throw new IllegalArgumentException("user context not set");
+            case ID -> new IdUserContext(userCtxProto.getId(), process);
+            case NAME -> new NameUserContext(userCtxProto.getName(), process);
+            case ATTRIBUTE_IDS -> new AttributeIdsUserContext(new HashSet<>(userCtxProto.getAttributeIds().getValuesList()), process);
+            case ATTRIBUTE_NAMES -> new AttributeNamesUserContext(new HashSet<>(userCtxProto.getAttributeNames().getValuesList()), process);
+            case CONJUNCTIVE -> {
+                List<UserContext> contexts = new ArrayList<>();
+                for (gov.nist.csd.pm.proto.v1.pdp.query.UserContext ctx : userCtxProto.getConjunctive().getContextsList()) {
+                    contexts.add(fromUserContextProto(pap, ctx));
+                }
+                yield new ConjunctiveUserContext(contexts);
+            }
+            case USER_NOT_SET -> throw new IllegalArgumentException("user context not set");
         };
     }
 
     public static TargetContext fromTargetContextProto(PAP pap,
                                                        gov.nist.csd.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
         return switch (targetCtxProto.getTargetCase()) {
-            case TARGET_NODE ->
-                new TargetContext(resolveNodeRefId(pap, targetCtxProto.getTargetNode()));
-            case TARGET_ATTRIBUTES ->
-                new TargetContext(resolveNodeRefIdList(pap, targetCtxProto.getTargetAttributes().getNodesList()));
-            case TARGET_NOT_SET ->
-                throw new IllegalArgumentException("target context not set");
+            case ID -> new IdTargetContext(targetCtxProto.getId());
+            case NAME -> new NameTargetContext(targetCtxProto.getName());
+            case ATTRIBUTE_IDS -> new AttributeIdsTargetContext(new HashSet<>(targetCtxProto.getAttributeIds().getValuesList()));
+            case ATTRIBUTE_NAMES -> new AttributeNamesTargetContext(targetCtxProto.getAttributeNames().getValuesList());
+            case TARGET_NOT_SET -> throw new IllegalArgumentException("target context not set");
         };
     }
 
@@ -216,7 +232,7 @@ public class FromProtoUtil {
         Obligation obligation = new Obligation();
         obligation.setName(proto.getName());
         if (proto.hasAuthor()) {
-            obligation.setAuthorId(proto.getAuthor().getId());
+            obligation.setAuthor(new IdUserContext(proto.getAuthor().getId()));
         }
         return obligation;
     }
@@ -259,7 +275,7 @@ public class FromProtoUtil {
         Map<String, Object> converted = new HashMap<>();
 
         Map<String, Value> values = valueMap.getValuesMap();
-        for (Map.Entry<String, Value> entry : values.entrySet()) {
+        for (Entry<String, Value> entry : values.entrySet()) {
             converted.put(entry.getKey(), fromValue(entry.getValue()));
         }
 
@@ -288,12 +304,14 @@ public class FromProtoUtil {
 
     private static Map<Object, Object> fromMapValue(ValueMap valueMap) {
         Map<Object, Object> result = new HashMap<>();
-        for(Map.Entry<String, Value> e : valueMap.getValuesMap().entrySet()) {
+        for(Entry<String, Value> e : valueMap.getValuesMap().entrySet()) {
             result.put(e.getKey(), fromValue(e.getValue()));
         }
 
         return result;
     }
+
+
 
     public static EventContext fromEventContextProto(gov.nist.csd.pm.proto.v1.epp.EventContext proto) {
         String process = proto.getProcess();
@@ -307,7 +325,7 @@ public class FromProtoUtil {
         Map<String, Object> args = new HashMap<>();
         ValueMap protoArgs = proto.getArgs();
 
-        for (Map.Entry<String, Value> e : protoArgs.getValuesMap().entrySet()) {
+        for (Entry<String, Value> e : protoArgs.getValuesMap().entrySet()) {
             String name = e.getKey();
             Value value = e.getValue();
 

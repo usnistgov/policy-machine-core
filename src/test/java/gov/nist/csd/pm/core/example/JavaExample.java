@@ -20,7 +20,7 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
@@ -102,7 +102,7 @@ public class JavaExample {
                 create o objName in [inboxName]
             }
             """;
-        pap.executePML(new UserContext(adminUserId), pml);
+        pap.executePML(new IdUserContext(adminUserId), pml);
 
         // create a PDP to run transactions
         PDP pdp = new PDP(pap);
@@ -112,7 +112,7 @@ public class JavaExample {
         epp.subscribeTo(pdp);
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        pdp.adjudicateOperation(new UserContext(adminUserId), "create_new_user", Map.of("username", "testUser"));
+        pdp.adjudicateOperation(new IdUserContext(adminUserId), "create_new_user", Map.of("username", "testUser"));
 
         // check admin operation and obligation response was successful
         assertTrue(pap.query().graph().nodeExists("testUser home"));
@@ -123,7 +123,7 @@ public class JavaExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateOperation(new UserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+            () -> pdp.adjudicateOperation(new IdUserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
         );
     }
 }

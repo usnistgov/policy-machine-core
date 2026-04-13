@@ -6,7 +6,6 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.type.AnyType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
@@ -32,9 +31,9 @@ import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.PlusExpressionContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.StringLitContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.VariableReferenceContext;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
-import gov.nist.csd.pm.core.pap.pml.compiler.error.CompileError;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
 import gov.nist.csd.pm.core.pap.pml.expression.EqualsExpression;

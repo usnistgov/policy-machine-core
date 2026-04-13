@@ -13,10 +13,10 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.util.TestUserContext;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class PDPTxTest {
     @Test
     void testReset() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -34,17 +34,17 @@ class PDPTxTest {
                 create u "u2" in ["ua2"]
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
                 """);
-        PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
+        PDPTx u2 = new PDPTx(new IdUserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, u2::reset);
 
-        PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
+        PDPTx u1 = new PDPTx(new NameUserContext("u1"), pap, List.of());
         assertDoesNotThrow(u1::reset);
     }
 
     @Test
     void testSerialize() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -52,17 +52,17 @@ class PDPTxTest {
                 create u "u2" in ["ua2"]
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]
                 """);
-        PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
+        PDPTx u2 = new PDPTx(new IdUserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.serialize(new JSONSerializer()));
 
-        PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
+        PDPTx u1 = new PDPTx(new NameUserContext("u1"), pap, List.of());
         assertDoesNotThrow(() -> u1.serialize(new JSONSerializer()));
     }
 
     @Test
     void testDeserialize() throws PMException {
         PAP pap = new TestPAP();
-        pap.executePML(new TestUserContext("u1"), """
+        pap.executePML(new NameUserContext("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 create ua "ua2" in ["pc1"]
@@ -73,10 +73,10 @@ class PDPTxTest {
 
         String serialize = "create pc \"test\"";
 
-        PDPTx u2 = new PDPTx(new UserContext(id("u2")), pap, List.of());
+        PDPTx u2 = new PDPTx(new IdUserContext(id("u2")), pap, List.of());
         assertThrows(UnauthorizedException.class, () -> u2.executePML(serialize));
 
-        PDPTx u1 = new PDPTx(new TestUserContext("u1"), pap, List.of());
+        PDPTx u1 = new PDPTx(new NameUserContext("u1"), pap, List.of());
         assertDoesNotThrow(() -> u1.executePML(serialize));
     }
 
@@ -89,7 +89,7 @@ class PDPTxTest {
         long u1 = graph.createUser("u1", List.of(ua1));
         graph.associate(ua1, AdminPolicyNode.PM_ADMIN_POLICY_CLASSES.nodeId(), new AccessRightSet(WildcardAccessRight.ADMIN_GRAPH_WILDCARD.toString()));
 
-        PDPTx pdpTx = new PDPTx(new UserContext(u1), pap, List.of());
+        PDPTx pdpTx = new PDPTx(new IdUserContext(u1), pap, List.of());
         long oa1 = pdpTx.modify().graph().createObjectAttribute("oa1", List.of(pc1));
         assertDoesNotThrow(() -> pdpTx.modify().graph().createObjectAttribute("oa2", List.of(oa1)));
     }
@@ -109,7 +109,7 @@ class PDPTxTest {
         TestPAP testPAP = new TestPAP();
         testPAP.executePML(null, pml);
 
-        testPAP.executePML(new TestUserContext("u1"), """
+        testPAP.executePML(new NameUserContext("u1"), """
             create obligation "o1"
             when any user 
             performs any operation
@@ -142,7 +142,7 @@ class PDPTxTest {
         TestPAP testPAP = new TestPAP();
         testPAP.executePML(null, pml);
 
-        testPAP.executePML(new TestUserContext("u1"), """
+        testPAP.executePML(new NameUserContext("u1"), """
             create obligation "o1"
             when any user 
             performs any operation
