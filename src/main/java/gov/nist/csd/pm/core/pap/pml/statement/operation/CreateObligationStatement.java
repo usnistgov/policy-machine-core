@@ -7,11 +7,6 @@ import static gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp.O
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.OperationPattern;
@@ -23,6 +18,11 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.Objects;
 
 public class CreateObligationStatement extends OperationStatement {

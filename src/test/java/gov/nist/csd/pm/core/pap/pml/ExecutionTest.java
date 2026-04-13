@@ -13,8 +13,8 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
-import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
 

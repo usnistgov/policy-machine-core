@@ -18,9 +18,9 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationTyp
 import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.RequireStatement;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

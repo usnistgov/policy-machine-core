@@ -5,12 +5,12 @@ import static gov.nist.csd.pm.core.util.PolicyEquals.assertPolicyEquals;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import gov.nist.csd.pm.core.util.TestIdGenerator;
 import gov.nist.csd.pm.core.util.TestPAP;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
 

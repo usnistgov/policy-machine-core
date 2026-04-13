@@ -16,10 +16,10 @@ import gov.nist.csd.pm.core.pap.pml.expression.reference.VariableReferenceExpres
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ForeachStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.util.TestPAP;
 import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
