@@ -497,7 +497,7 @@ class EPPTest {
         pap.modify().graph().createUserAttribute("ua2", List.of(id("ua1")));
         pap.modify().graph().associate(id("ua2"), id("ua1"), new AccessRightSet("*"));
 
-        UserContext userCtx = new AttributeIdsUserContext(List.of(id("ua2")));
+        UserContext userCtx = new AttributeIdsUserContext(Set.of(id("ua2")));
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,
@@ -524,7 +524,7 @@ class EPPTest {
         pap.modify().graph().createUserAttribute("ua2", List.of(id("ua1")));
         pap.modify().graph().associate(id("ua2"), id("ua1"), new AccessRightSet("*"));
 
-        UserContext userCtx = new AttributeIdsUserContext(List.of(id("ua2")));
+        UserContext userCtx = new AttributeIdsUserContext(Set.of(id("ua2")));
 
         EventContext eventContext = EventContext.fromUserContext(
             pap, userCtx,

@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.impl.memory.pap.store.MemoryPolicyStore;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,24 +55,24 @@ class ContextCheckerTest {
 
         @Test
         void attributeIdsContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeIdsUserContext(List.of(2L)), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeIdsUserContext(Set.of(2L)), graphStore));
         }
 
         @Test
         void attributeIdsContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkUserContextExists(new AttributeIdsUserContext(List.of(2L, -1L)), graphStore));
+                () -> ContextChecker.checkUserContextExists(new AttributeIdsUserContext(Set.of(2L, -1L)), graphStore));
         }
 
         @Test
         void attributeNamesContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeNamesUserContext(List.of("ua1")), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkUserContextExists(new AttributeNamesUserContext(Set.of("ua1")), graphStore));
         }
 
         @Test
         void attributeNamesContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkUserContextExists(new AttributeNamesUserContext(List.of("ua1", "ua2")), graphStore));
+                () -> ContextChecker.checkUserContextExists(new AttributeNamesUserContext(Set.of("ua1", "ua2")), graphStore));
         }
 
         @Test
@@ -117,13 +118,13 @@ class ContextCheckerTest {
 
         @Test
         void targetAttributeIdsContext_allExist_noException() {
-            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new AttributeIdsTargetContext(List.of(4L)), graphStore));
+            assertDoesNotThrow(() -> ContextChecker.checkTargetContextExists(new AttributeIdsTargetContext(Set.of(4L)), graphStore));
         }
 
         @Test
         void targetAttributeIdsContext_oneMissing_throws() {
             assertThrows(NodeDoesNotExistException.class,
-                () -> ContextChecker.checkTargetContextExists(new AttributeIdsTargetContext(List.of(4L, -1L)), graphStore));
+                () -> ContextChecker.checkTargetContextExists(new AttributeIdsTargetContext(Set.of(4L, -1L)), graphStore));
         }
 
         @Test

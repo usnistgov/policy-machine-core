@@ -46,6 +46,7 @@ import gov.nist.csd.pm.proto.v1.pdp.query.ParamType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,8 +62,8 @@ public class FromProtoUtil {
         return switch (userCtxProto.getUserCase()) {
             case ID -> new IdUserContext(userCtxProto.getId(), process);
             case NAME -> new NameUserContext(userCtxProto.getName(), process);
-            case ATTRIBUTE_IDS -> new AttributeIdsUserContext(userCtxProto.getAttributeIds().getValuesList(), process);
-            case ATTRIBUTE_NAMES -> new AttributeNamesUserContext(userCtxProto.getAttributeNames().getValuesList(), process);
+            case ATTRIBUTE_IDS -> new AttributeIdsUserContext(new HashSet<>(userCtxProto.getAttributeIds().getValuesList()), process);
+            case ATTRIBUTE_NAMES -> new AttributeNamesUserContext(new HashSet<>(userCtxProto.getAttributeNames().getValuesList()), process);
             case CONJUNCTIVE -> {
                 List<UserContext> contexts = new ArrayList<>();
                 for (gov.nist.csd.pm.proto.v1.pdp.query.UserContext ctx : userCtxProto.getConjunctive().getContextsList()) {
@@ -79,7 +80,7 @@ public class FromProtoUtil {
         return switch (targetCtxProto.getTargetCase()) {
             case ID -> new IdTargetContext(targetCtxProto.getId());
             case NAME -> new NameTargetContext(targetCtxProto.getName());
-            case ATTRIBUTE_IDS -> new AttributeIdsTargetContext(targetCtxProto.getAttributeIds().getValuesList());
+            case ATTRIBUTE_IDS -> new AttributeIdsTargetContext(new HashSet<>(targetCtxProto.getAttributeIds().getValuesList()));
             case ATTRIBUTE_NAMES -> new AttributeNamesTargetContext(targetCtxProto.getAttributeNames().getValuesList());
             case TARGET_NOT_SET -> throw new IllegalArgumentException("target context not set");
         };

@@ -19,8 +19,10 @@ import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
@@ -124,7 +126,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
                 check(this.userCtx, new IdTargetContext(id), AdminAccessRight.ADMIN_ACCESS_QUERY);
             }
             case AttributeNamesUserContext ctx -> {
-                List<Long> ids = new ArrayList<>();
+                Set<Long> ids = new HashSet<>();
                 for (String name : ctx.attributeNames()) {
                     ids.add(pap.query().graph().getNodeByName(name).getId());
                 }
