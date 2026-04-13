@@ -56,7 +56,7 @@ PC, OA, UA, U, O, user, node
 break, default, map, else, const, if, range, continue, foreach, return, var
 string, bool, void, array, int64
 true, false
-check, @node
+check, @Node
 ```
 
 ### Whitespace
@@ -531,16 +531,16 @@ Formal parameters with a `?` appended to the parameter name are denotes as optio
 ```
 
 
-### @node, @ReqCap, and @EventCtx Annotations
+### @Node, @ReqCap, and @EventCtx Annotations
 
-The `@node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
+The `@Node` annotation indicates a parameter represents a node or list of nodes. You can specify the required capabilities on the node by passing a comma separated list of known access rights as an argument to the annotation. An annotation with no args indicates that no capabilities are required. 
 
 **Note:** 
-- The `@node` annotation can only be used in `adminop`, `resourceop`, and `query` operations.
-- Only formal parameters of type `int64`, `int64[]`, `string`, `string[]` can use the `@node` annotation.
+- The `@Node` annotation can only be used in `adminop`, `resourceop`, and `query` operations.
+- Only formal parameters of type `int64`, `int64[]`, `string`, `string[]` can use the `@Node` annotation.
 
 ```pml
-resourceop delete_file(@node string filename) {
+resourceop delete_file(@Node string filename) {
     delete node filename
 }
 ```
@@ -635,12 +635,12 @@ Resource operations denote an operation on a resource (object). Optionally, retu
 @ReqCap({
     require ["read"] on [filename]
 })
-resourceop read_file(@node string filename) { }
+resourceop read_file(@Node string filename) { }
 
 @ReqCap({
     require ["read"] on [filename]
 })
-resourceop read_file(@node string filename) { 
+resourceop read_file(@Node string filename) { 
 	return getNode(filename)
 }
 ```
@@ -743,7 +743,7 @@ include ["user inboxes"]
 @ReqCap({
     require ["read"] on [filename]
 })
-resourceop read_file(@node string name) { }  
+resourceop read_file(@Node string name) { }  
   
 // create a custom administration operation  
 adminop create_new_user(string username) {  

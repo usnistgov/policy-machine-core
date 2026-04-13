@@ -463,7 +463,7 @@ public class PMLTest {
             @ReqCap({
                 require ["read"] on ["o2"]
             })
-            resourceop read_file(@node string file) { }
+            resourceop read_file(@Node string file) { }
             """;
         PAP pap = new TestPAP();
         pap.executePML(null, pml);

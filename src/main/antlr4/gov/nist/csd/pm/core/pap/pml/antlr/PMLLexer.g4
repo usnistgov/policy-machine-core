@@ -6,7 +6,7 @@ INCLUDE: ('inclusion' | 'include');
 EXCLUDE: ('exclusion' | 'exclude');
 ADMIN_OP: 'adminop';
 RESOURCE_OP: 'resourceop';
-NODE_ARG: '@node';
+NODE_ARG: '@Node';
 REQ_CAP: '@ReqCap';
 EVENT_CTX: '@EventCtx';
 NODE: 'node';

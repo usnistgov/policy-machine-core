@@ -29,7 +29,7 @@ class PMLAdminOperationSignatureTest {
 
         String actual = signature.toFormattedString(0);
         assertEquals(
-            "adminop op1(@node string a, string b, string c) []string ",
+            "adminop op1(@Node string a, string b, string c) []string ",
             actual
         );
     }

@@ -174,12 +174,12 @@ class PDPTest {
                 @ReqCap({
                     require ["read"] on [name]
                 })
-                resourceop read_file(@node string name) {}
+                resourceop read_file(@Node string name) {}
 
                 @ReqCap({
                     require ["write"] on [name]
                 })
-                resourceop write_file(@node string name) {}
+                resourceop write_file(@Node string name) {}
                 
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
@@ -255,7 +255,7 @@ class PDPTest {
                 @ReqCap({
                     require ["read"] on [name(id=id)]
                 })
-                resourceop read_file(@node int64 id) {}
+                resourceop read_file(@Node int64 id) {}
 
                 """);
         PDP pdp = new PDP(pap);

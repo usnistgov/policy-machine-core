@@ -41,7 +41,7 @@ public class PMLExample {
         @ReqCap({
             require ["read"] on [name]
         })
-        resourceop read_file(@node string name) { }
+        resourceop read_file(@Node string name) { }
         
         // create a custom administration operation
         @ReqCap({

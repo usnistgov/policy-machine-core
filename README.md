@@ -260,7 +260,7 @@ public class PMLExample {
         @ReqCap({
             require ["read"] on [name]
         })
-        resourceop read_file(@node string name) { }
+        resourceop read_file(@Node string name) { }
         
         // create a custom administration operation
         @ReqCap({
@@ -353,7 +353,7 @@ set resource access rights ["read"]
 
 // check for the read access right on the node passed to the filename param
 // return a map representing the node name, type, and properties
-resourceop read_file(@node("read") string filename) map[string]any {
+resourceop read_file(@Node("read") string filename) map[string]any {
     return getNode(filename)
 }
 

@@ -108,7 +108,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
                 pml += ", ";
             }
 
-            String annotationStr = formalParameter instanceof NodeFormalParameter<?> ? "@node ": "";
+            String annotationStr = formalParameter instanceof NodeFormalParameter<?> ? "@Node ": "";
             pml += String.format("%s%s %s%s",
                 annotationStr,
                 TypeStringer.toPMLString(formalParameter.getType()),
