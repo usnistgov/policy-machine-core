@@ -5,14 +5,13 @@ import java.util.Objects;
 /**
  * A NodeUserContext with a user node ID.
  */
-public final class IdUserContext implements NodeUserContext {
+public final class IdUserContext extends NodeUserContext {
 
     private final long userId;
-    private final String process;
 
     public IdUserContext(long userId, String process) {
+        super(process);
         this.userId = userId;
-        this.process = process;
     }
 
     public IdUserContext(long userId) {
@@ -24,24 +23,20 @@ public final class IdUserContext implements NodeUserContext {
     }
 
     @Override
-    public String getProcess() {
-        return process;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof IdUserContext that)) return false;
-        return userId == that.userId && Objects.equals(process, that.process);
+        return userId == that.userId && Objects.equals(getProcess(), that.getProcess());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, process);
+        return Objects.hash(userId, getProcess());
     }
 
     @Override
     public String toString() {
+        String process = getProcess();
         String processStr = process != null && !process.isEmpty() ? ", process: " + process : "";
         return String.format("{user: %d%s}", userId, processStr);
     }

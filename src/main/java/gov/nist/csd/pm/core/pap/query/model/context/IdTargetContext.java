@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * A NodeTargetContext with a target node ID.
  */
-public final class IdTargetContext implements NodeTargetContext {
+public final class IdTargetContext extends NodeTargetContext {
 
     private final long targetId;
 

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 /**
  * An AnonymousTargetContext with a set of attribute IDs.
  */
-public final class AttributeIdsTargetContext implements AnonymousTargetContext {
+public final class AttributeIdsTargetContext extends AnonymousTargetContext {
 
     private final Set<Long> attributeIds;
 
