@@ -7,21 +7,17 @@ import java.util.Objects;
  * A UserContext with a list of sub contexts. Using this in an access decision enforces the intersection of privileges
  * for all sub contexts.
  */
-public final class ConjunctiveUserContext implements UserContext {
+public final class ConjunctiveUserContext extends UserContext {
 
     private final List<UserContext> contexts;
 
     public ConjunctiveUserContext(List<UserContext> contexts) {
+        super(contexts.isEmpty() ? "" : contexts.getFirst().getProcess());
         this.contexts = contexts;
     }
 
     public List<UserContext> contexts() {
         return contexts;
-    }
-
-    @Override
-    public String getProcess() {
-        return contexts.getFirst().getProcess();
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * An AnonymousTargetContext with a set of attribute names.
  */
-public final class AttributeNamesTargetContext implements AnonymousTargetContext {
+public final class AttributeNamesTargetContext extends AnonymousTargetContext {
 
     private final Collection<String> attributeNames;
 
