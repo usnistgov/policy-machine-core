@@ -138,6 +138,16 @@ public class ToProtoUtil {
         return ValueMap.newBuilder().putAllValues(converted).build();
     }
 
+    public static Map<String, Value> toStringValueMapProto(Map<String, Object> objectMap) {
+        Map<String, Value> converted = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : objectMap.entrySet()) {
+            converted.put(entry.getKey(), toValueProto(entry.getValue()));
+        }
+
+        return converted;
+    }
+
     public static Value toValueProto(Object o) {
         Value.Builder builder = Value.newBuilder();
         if (o instanceof Long l) {

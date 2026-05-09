@@ -23,7 +23,7 @@ public class GrpcOperationsModifier implements OperationsModification {
     public void setResourceAccessRights(AccessRightSet resourceAccessRights) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("set_resource_access_rights")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "arset", new ArrayList<>(resourceAccessRights)
             )))
             .build();
@@ -44,7 +44,7 @@ public class GrpcOperationsModifier implements OperationsModification {
     public void deleteOperation(String name) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("delete_operation")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name
             )))
             .build();

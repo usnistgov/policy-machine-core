@@ -69,9 +69,9 @@ public class SelfAccessQuerier extends Querier implements SelfAccessQuery{
     public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(long root) throws PMException {
         Map<Node, AccessRightSet> map = new HashMap<>();
 
-        Collection<Long> adjacentAscendants = store.graph().getAdjacentDescendants(root);
-        for (Long adjAsc : adjacentAscendants) {
-            Node node = store.graph().getNodeById(adjAsc);
+        Collection<Long> adjacentDescendants = store.graph().getAdjacentDescendants(root);
+        for (Long adjDesc : adjacentDescendants) {
+            Node node = store.graph().getNodeById(adjDesc);
             map.put(node, new AccessRightSet());
         }
 

@@ -23,7 +23,7 @@ public class GrpcGraphModifier implements GraphModification {
     public long createPolicyClass(String name) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_policy_class")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of("name", name)))
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of("name", name)))
             .build();
 
         AdjudicateOperationResponse response = blockingStub.adjudicateOperation(request);
@@ -34,7 +34,7 @@ public class GrpcGraphModifier implements GraphModification {
     public long createUserAttribute(String name, Collection<Long> assignments) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_user_attribute")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name,
                 "descendants", new ArrayList<>(assignments)
             )))
@@ -48,7 +48,7 @@ public class GrpcGraphModifier implements GraphModification {
     public long createObjectAttribute(String name, Collection<Long> assignments) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_object_attribute")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name,
                 "descendants", new ArrayList<>(assignments)
             )))
@@ -62,7 +62,7 @@ public class GrpcGraphModifier implements GraphModification {
     public long createObject(String name, Collection<Long> assignments) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_object")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name,
                 "descendants", new ArrayList<>(assignments)
             )))
@@ -76,7 +76,7 @@ public class GrpcGraphModifier implements GraphModification {
     public long createUser(String name, Collection<Long> assignments) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_user")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name,
                 "descendants", new ArrayList<>(assignments)
             )))
@@ -90,7 +90,7 @@ public class GrpcGraphModifier implements GraphModification {
     public void setNodeProperties(long id, Map<String, String> properties) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("set_node_properties")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "id", id,
                 "properties", properties
             )))
@@ -103,7 +103,7 @@ public class GrpcGraphModifier implements GraphModification {
     public void deleteNode(long id) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("delete_node")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "id", id
             )))
             .build();
@@ -115,7 +115,7 @@ public class GrpcGraphModifier implements GraphModification {
     public void assign(long ascId, Collection<Long> descendants) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("assign")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "ascendant", ascId,
                 "descendants", new ArrayList<>(descendants)
             )))
@@ -128,7 +128,7 @@ public class GrpcGraphModifier implements GraphModification {
     public void deassign(long ascendant, Collection<Long> descendants) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("deassign")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "ascendant", ascendant,
                 "descendants", new ArrayList<>(descendants)
             )))
@@ -141,7 +141,7 @@ public class GrpcGraphModifier implements GraphModification {
     public void associate(long ua, long target, AccessRightSet accessRights) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("associate")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "ua", ua,
                 "target", target,
                 "arset", new ArrayList<>(accessRights)
@@ -155,7 +155,7 @@ public class GrpcGraphModifier implements GraphModification {
     public void dissociate(long ua, long target) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("dissociate")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "ua", ua,
                 "target", target
             )))

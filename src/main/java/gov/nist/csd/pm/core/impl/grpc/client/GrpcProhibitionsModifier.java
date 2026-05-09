@@ -24,7 +24,7 @@ public class GrpcProhibitionsModifier implements ProhibitionsModification {
                                       boolean isConjunctive) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_node_prohibition")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name,
                 "node_id", nodeId,
                 "arset", new ArrayList<>(accessRightSet),
@@ -43,7 +43,7 @@ public class GrpcProhibitionsModifier implements ProhibitionsModification {
                                          Set<Long> exclusionSet, boolean isConjunctive) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("create_process_prohibition")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name,
                 "user_id", userId,
                 "process", process,
@@ -61,7 +61,7 @@ public class GrpcProhibitionsModifier implements ProhibitionsModification {
     public void deleteProhibition(String name) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("delete_prohibition")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name
             )))
             .build();
