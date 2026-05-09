@@ -19,12 +19,12 @@ public class GrpcResourcePDP {
         this.process = process;
     }
 
-    public void adjudicateOperation(String name, Map<String, Object> args) {
+    public Object adjudicateOperation(String name, Map<String, Object> args) {
         ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub stub =
             ResourceAdjudicationServiceGrpc.newBlockingStub(managedChannel)
                 .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
         GrpcResourceAdjudicationService service = new GrpcResourceAdjudicationService(stub);
 
-        service.adjudicateResourceOperation(name, args);
+        return service.adjudicateResourceOperation(name, args);
     }
 }
