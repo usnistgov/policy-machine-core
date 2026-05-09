@@ -34,7 +34,7 @@ public class GrpcObligationsModifier implements ObligationsModification {
     public void deleteObligation(String name) throws PMException {
         OperationRequest request = OperationRequest.newBuilder()
             .setName("delete_obligation")
-            .setArgs(ToProtoUtil.toValueMapProto(Map.of(
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(Map.of(
                 "name", name
             )))
             .build();

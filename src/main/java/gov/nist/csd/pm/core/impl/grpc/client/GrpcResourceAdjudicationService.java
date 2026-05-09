@@ -18,7 +18,7 @@ public class GrpcResourceAdjudicationService {
     public Object adjudicateResourceOperation(String name, Map<String, Object> args) {
         OperationRequest request = OperationRequest.newBuilder()
             .setName(name)
-            .setArgs(ToProtoUtil.toValueMapProto(args))
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(args))
             .build();
 
         AdjudicateOperationResponse response = blockingStub.adjudicateResourceOperation(request);

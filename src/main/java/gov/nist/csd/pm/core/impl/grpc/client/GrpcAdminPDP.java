@@ -35,7 +35,7 @@ public class GrpcAdminPDP {
 
         OperationRequest request = OperationRequest.newBuilder()
             .setName(name)
-            .setArgs(ToProtoUtil.toValueMapProto(args))
+            .putAllArgs(ToProtoUtil.toStringValueMapProto(args))
             .build();
 
         AdjudicateOperationResponse response = stub.adjudicateOperation(request);
@@ -55,7 +55,7 @@ public class GrpcAdminPDP {
         for (gov.nist.csd.pm.core.pdp.adjudication.OperationRequest req : operations) {
             requestProtos.add(OperationRequest.newBuilder()
                 .setName(req.op())
-                .setArgs(ToProtoUtil.toValueMapProto(req.args()))
+                .putAllArgs(ToProtoUtil.toStringValueMapProto(req.args()))
                 .build());
         }
 
