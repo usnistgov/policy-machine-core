@@ -1684,4 +1684,62 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
         AccessRightSet actual = pap.query().access().computePrivileges(new IdUserContext(id("u1")), new AttributeNamesTargetContext(List.of("oa1")));
         assertEquals(new AccessRightSet("read", "write"), actual);
     }
+
+    @Test
+    void testComputeRequiredAttributeSets() throws PMException {
+        // pc1: ua1 → oa1 → o1; pc2: ua2 → oa2 → o1
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+
+                create pc "pc2"
+                create ua "ua2" in ["pc2"]
+                create oa "oa2" in ["pc2"]
+                associate "ua2" to "oa2" with ["read"]
+
+                create u "u1" in ["ua1", "ua2"]
+                create o "o1" in ["oa1", "oa2"]
+                """;
+        pap.executePML(new NameUserContext("u1"), pml);
+
+        Map<Long, Set<Long>> result = pap.query().access()
+            .computeRequiredAttributeSets(new IdTargetContext(id("o1")), new AccessRightSet("read"));
+
+        // both PCs must be present; each PC maps to the UA whose association covers read
+        assertEquals(Set.of(id("ua1")), result.get(id("pc1")));
+        assertEquals(Set.of(id("ua2")), result.get(id("pc2")));
+    }
+
+    @Test
+    void testComputeRequiredAttributeSets_prohibitionFiltersUA() throws PMException {
+        // ua1 and ua2 both associate to oa1 with read; a prohibition on ua1 denies read → only ua2 survives
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create ua "ua2" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                associate "ua2" to "oa1" with ["read", "write"]
+
+                create u "u1" in ["ua1"]
+                create u "u2" in ["ua2"]
+                create o "o1" in ["oa1"]
+                """;
+        pap.executePML(new NameUserContext("u1"), pml);
+
+        // prohibition on ua1: deny read when o1 is under oa1
+        pap.modify().prohibitions().createNodeProhibition(
+            "p1", id("ua1"), new AccessRightSet("read"), Set.of(id("oa1")), Set.of(), false);
+
+        Map<Long, Set<Long>> result = pap.query().access()
+            .computeRequiredAttributeSets(new IdTargetContext(id("o1")), new AccessRightSet("read"));
+
+        Set<Long> pc1Uas = result.get(id("pc1"));
+        assertFalse(pc1Uas.contains(id("ua1")), "ua1 should be filtered out by prohibition");
+        assertTrue(pc1Uas.contains(id("ua2")), "ua2 should remain");
+    }
 }
