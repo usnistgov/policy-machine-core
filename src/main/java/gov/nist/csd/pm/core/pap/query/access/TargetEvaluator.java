@@ -4,9 +4,9 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
-import gov.nist.csd.pm.core.common.graph.dag.Propagator;
-import gov.nist.csd.pm.core.common.graph.dag.Visitor;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
+import gov.nist.csd.pm.core.pap.graph.dag.Propagator;
+import gov.nist.csd.pm.core.pap.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;

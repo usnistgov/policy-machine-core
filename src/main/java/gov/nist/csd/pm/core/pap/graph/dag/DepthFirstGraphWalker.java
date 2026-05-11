@@ -1,14 +1,14 @@
 package gov.nist.csd.pm.core.pap.graph.dag;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.AdjacencyRetriever;
-import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
-import gov.nist.csd.pm.core.common.graph.dag.NoopPropagator;
-import gov.nist.csd.pm.core.common.graph.dag.NoopShortCircuit;
-import gov.nist.csd.pm.core.common.graph.dag.NoopVisitor;
-import gov.nist.csd.pm.core.common.graph.dag.Propagator;
-import gov.nist.csd.pm.core.common.graph.dag.ShortCircuit;
-import gov.nist.csd.pm.core.common.graph.dag.Visitor;
+import gov.nist.csd.pm.core.pap.graph.dag.AdjacencyRetriever;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
+import gov.nist.csd.pm.core.pap.graph.dag.NoopPropagator;
+import gov.nist.csd.pm.core.pap.graph.dag.NoopShortCircuit;
+import gov.nist.csd.pm.core.pap.graph.dag.NoopVisitor;
+import gov.nist.csd.pm.core.pap.graph.dag.Propagator;
+import gov.nist.csd.pm.core.pap.graph.dag.ShortCircuit;
+import gov.nist.csd.pm.core.pap.graph.dag.Visitor;
 import java.util.Collection;
 
 public class DepthFirstGraphWalker extends GraphWalker {

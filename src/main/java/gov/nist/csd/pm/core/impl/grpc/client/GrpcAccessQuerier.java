@@ -162,6 +162,6 @@ public class GrpcAccessQuerier implements AccessQuery {
 
     @Override
     public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) {
-        return null;//TODO
+
     }
 }

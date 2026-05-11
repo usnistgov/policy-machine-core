@@ -1,6 +1,9 @@
-package gov.nist.csd.pm.core.common.graph.dag;
+package gov.nist.csd.pm.core.pap.graph.dag;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 
 public abstract class GraphWalker {
 
@@ -69,5 +72,13 @@ public abstract class GraphWalker {
      * @throws PMException If there is an exception in the PM.
      */
     public abstract void walk(long start) throws PMException;
+
+    public void walk(UserContext userContext, NodeLookup nodeLookup) throws PMException {
+        userContext.walk(this, nodeLookup);
+    }
+
+    public void walk(TargetContext targetContext, NodeLookup nodeLookup) throws PMException {
+        targetContext.walk(this, nodeLookup);
+    }
 
 }
