@@ -1,24 +1,18 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,8 +64,7 @@ public class UserEvaluator {
 			reachedProhibitions.addAll(policyStore.prohibitions().getProcessProhibitions(process));
 		}
 
-		BreadthFirstGraphWalker bfs = new GraphStoreBFS(policyStore.graph())
-				.withDirection(Direction.DESCENDANTS)
+		GraphWalker bfs = new BreadthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 				.withVisitor(nodeId -> {
 					reachedProhibitions.addAll(policyStore.prohibitions().getNodeProhibitions(nodeId));
 					for (Association association : policyStore.graph().getAssociationsWithSource(nodeId)) {
@@ -80,12 +73,7 @@ public class UserEvaluator {
 					}
 				});
 
-		Collection<Long> startNodes = switch (userContext) {
-			case IdUserContext c -> List.of(c.userId());
-			case NameUserContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
-		};
-
-		bfs.walk(startNodes);
+		userContext.walk(bfs, policyStore.graph()::getNodeByName);
 
 		return new UserDagResult(borderTargets, reachedProhibitions);
 	}
@@ -101,8 +89,7 @@ public class UserEvaluator {
 			reachedProhibitions.addAll(policyStore.prohibitions().getProcessProhibitions(process));
 		}
 
-		BreadthFirstGraphWalker bfs = new GraphStoreBFS(policyStore.graph())
-				.withDirection(Direction.DESCENDANTS)
+		GraphWalker bfs = new BreadthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 				.withVisitor(nodeId -> {
 					reachedProhibitions.addAll(policyStore.prohibitions().getNodeProhibitions(nodeId));
 					for (Association association : policyStore.graph().getAssociationsWithSource(nodeId)) {
@@ -111,17 +98,7 @@ public class UserEvaluator {
 					}
 				});
 
-		Collection<Long> startNodes = switch (userContext) {
-			case AttributeIdsUserContext c -> c.attributeIds();
-			case AttributeNamesUserContext c -> {
-				Collection<Long> ids = new ArrayList<>();
-				for (String name : c.attributeNames()) {
-					ids.add(policyStore.graph().getNodeByName(name).getId());
-				}
-				yield ids;
-			}
-		};
-		bfs.walk(startNodes);
+		userContext.walk(bfs, policyStore.graph()::getNodeByName);
 
 		return new UserDagResult(borderTargets, reachedProhibitions);
 	}

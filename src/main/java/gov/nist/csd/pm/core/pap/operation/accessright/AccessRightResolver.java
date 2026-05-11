@@ -21,7 +21,7 @@ public class AccessRightResolver {
         AccessRightSet result = resolvePolicyClassAccessRightSets(resolvedPcMap);
 
         // remove any prohibited access rights
-        AccessRightSet denied = resolveDeniedAccessRights(userCtx, targetCtx);
+        AccessRightSet denied = resolveDeniedAccessRights(userCtx.prohibitions(), targetCtx);
         result.removeAll(denied);
 
         return result;
@@ -41,9 +41,8 @@ public class AccessRightResolver {
         return resolvedPcMap;
     }
 
-    public static AccessRightSet resolveDeniedAccessRights(UserDagResult userCtx, TargetDagResult targetCtx) {
+    public static AccessRightSet resolveDeniedAccessRights(Set<Prohibition> prohibitions, TargetDagResult targetCtx) {
         AccessRightSet denied = new AccessRightSet();
-        Set<Prohibition> prohibitions = userCtx.prohibitions();
         Set<Long> reachedTargets = targetCtx.reachedTargets();
 
         for(Prohibition p : prohibitions) {

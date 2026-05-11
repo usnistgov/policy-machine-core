@@ -48,7 +48,7 @@ public class Explainer {
 		for (UserDagResult userDagResult : userEvaluationResult.dagResults()) {
 			TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
 			AccessRightSet p = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
-			AccessRightSet d = resolveDeniedAccessRights(userDagResult, targetDagResult);
+			AccessRightSet d = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
 			priv = (priv == null) ? p : intersect(priv, p);
 			deniedPriv = (deniedPriv == null) ? d : intersect(deniedPriv, d);
 			prohibitions.addAll(computeSatisfiedProhibitions(userDagResult, targetDagResult));

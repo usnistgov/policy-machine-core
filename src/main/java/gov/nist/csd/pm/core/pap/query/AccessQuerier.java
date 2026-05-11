@@ -7,8 +7,11 @@ import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver
 import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.resolvePrivileges;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.common.graph.node.Node;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.access.CachedTargetEvaluator;
 import gov.nist.csd.pm.core.pap.query.access.Explainer;
@@ -23,7 +26,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
-import gov.nist.csd.pm.core.pap.store.GraphStoreBFS;
+import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,7 +81,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
                 continue;
             }
             TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
-            AccessRightSet d = resolveDeniedAccessRights(userDagResult, targetDagResult);
+            AccessRightSet d = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
             denied = (denied == null) ? d : intersect(denied, d);
         }
         return denied == null ? new AccessRightSet() : denied;
@@ -210,8 +213,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
         CachedTargetEvaluator cachedTargetEvaluator = new CachedTargetEvaluator(store);
 
         for (long pc : store.graph().getPolicyClasses()) {
-            new GraphStoreBFS(store.graph())
-                .withDirection(Direction.ASCENDANTS)
+            new BreadthFirstGraphWalker(store.graph()::getAdjacentAscendants)
                 .withVisitor(n -> {
                     AccessRightSet privs = computePrivileges(userDagResults, new IdTargetContext(n), cachedTargetEvaluator);
                     if (privs.isEmpty()) {
@@ -230,6 +232,80 @@ public class AccessQuerier extends Querier implements AccessQuery {
         }
 
         return posWithNodes;
+    }
+
+    @Override
+    public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws
+                                                                                                                 PMException {
+        Map<Long, Set<Long>> result = new HashMap<>();
+        Map<Long, Set<Long>> nodeToPcs = new HashMap<>();
+        Set<Long> visitedNodes = new HashSet<>();
+
+        Collection<Long> policyClasses = store.graph().getPolicyClasses();
+
+        // DFS from the target to find attributes
+        GraphWalker dfs = new DepthFirstGraphWalker(store.graph()::getAdjacentDescendants)
+            .withVisitor(nodeId -> {
+                visitedNodes.add(nodeId);
+                if (policyClasses.contains(nodeId)) {
+                    nodeToPcs.computeIfAbsent(nodeId, k -> new HashSet<>()).add(nodeId);
+                }
+            })
+            .withPropagator((parent, child) -> {
+                Set<Long> parentPcs = nodeToPcs.get(parent);
+                if (parentPcs != null && !parentPcs.isEmpty()) {
+                    nodeToPcs.computeIfAbsent(child, k -> new HashSet<>()).addAll(parentPcs);
+                }
+            });
+
+        targetCtx.walk(dfs, store.graph()::getNodeByName);
+
+        // For each visited node, collect association source UAs
+        for (long nodeId : visitedNodes) {
+            Set<Long> pcs = nodeToPcs.get(nodeId);
+            if (pcs == null || pcs.isEmpty()) {
+                continue;
+            }
+            for (Association assoc : store.graph().getAssociationsWithTarget(nodeId)) {
+                AccessRightSet overlap = new AccessRightSet(assoc.arset());
+
+                // retain only the privileges being searched for
+                overlap.retainAll(privileges);
+                if (overlap.isEmpty()) {
+                    continue;
+                }
+
+                // add the ua to source
+                long ua = assoc.source();
+                for (long pc : pcs) {
+                    result.computeIfAbsent(pc, k -> new HashSet<>()).add(ua);
+                }
+            }
+        }
+
+        // Remove UAs whose prohibitions are satisfied by the target path and denied any of the required privileges
+        Set<Long> allUas = new HashSet<>();
+        result.values().forEach(allUas::addAll);
+
+        Set<Long> prohibitedUas = new HashSet<>();
+        TargetDagResult targetDagResult = new TargetDagResult(Map.of(), visitedNodes);
+        for (long ua : allUas) {
+            Collection<Prohibition> prohibitions = store.prohibitions().getNodeProhibitions(ua);
+            if (prohibitions.isEmpty()) {
+                continue;
+            }
+            AccessRightSet denied = resolveDeniedAccessRights(new HashSet<>(prohibitions), targetDagResult);
+            denied.retainAll(privileges);
+            if (!denied.isEmpty()) {
+                prohibitedUas.add(ua);
+            }
+        }
+
+        if (!prohibitedUas.isEmpty()) {
+            result.values().forEach(uas -> uas.removeAll(prohibitedUas));
+        }
+
+        return result;
     }
 
     private UserEvaluationResult evaluateUser(UserContext userCtx) throws PMException {

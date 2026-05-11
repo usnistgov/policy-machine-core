@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.common.graph.dag;
+package gov.nist.csd.pm.core.pap.graph.dag;
 
 public class NoopPropagator implements Propagator {
 

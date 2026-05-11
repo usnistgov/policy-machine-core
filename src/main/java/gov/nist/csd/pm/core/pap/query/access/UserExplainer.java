@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.core.pap.query.access;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Propagator;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
+import gov.nist.csd.pm.core.pap.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
@@ -13,7 +14,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
-import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,11 +64,13 @@ public class UserExplainer {
 			pathsToUAs.put(dstNode, dstPaths);
 		};
 
-		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
+		GraphWalker dfs = new DepthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 				.withPropagator(propagator);
 
 		List<Long> nodes = new ArrayList<>(resolveStartNodes(userCtx));
-		dfs.walk(nodes);
+		for (long node : nodes) {
+			dfs.walk(node);
+		}
 
 		// transform the map so that the key is the last ua in the path pointing to it's paths
 		for (long node : nodes) {

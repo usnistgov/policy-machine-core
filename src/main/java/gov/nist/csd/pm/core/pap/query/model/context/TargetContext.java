@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
@@ -13,6 +15,14 @@ import java.util.Set;
  */
 public abstract sealed class TargetContext implements Serializable
         permits NodeTargetContext, AnonymousTargetContext {
+
+    /**
+     * Walk the graph using the given walker, starting from the node(s) identified by this context.
+     * @param walker the configured walker to use for traversal
+     * @param nodeLookup used to resolve node names to IDs where necessary
+     * @throws PMException if an error occurs during traversal or node lookup
+     */
+    public abstract void walk(GraphWalker walker, NodeLookup nodeLookup) throws PMException;
 
     /**
      * Creates a context identifying the target by name.

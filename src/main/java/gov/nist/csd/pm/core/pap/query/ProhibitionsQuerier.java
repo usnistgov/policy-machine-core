@@ -2,9 +2,8 @@ package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
-import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,11 +48,10 @@ public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
     public Collection<Prohibition> getInheritedProhibitionsFor(long subjectId) throws PMException {
         List<Prohibition> pros = new ArrayList<>();
 
-        new GraphStoreDFS(store.graph())
+        new DepthFirstGraphWalker(store.graph()::getAdjacentDescendants)
             .withVisitor((n) -> {
                 pros.addAll(getNodeProhibitions(n));
             })
-            .withDirection(Direction.DESCENDANTS)
             .walk(subjectId);
 
         return pros;

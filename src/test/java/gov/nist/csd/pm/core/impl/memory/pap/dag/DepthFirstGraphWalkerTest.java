@@ -3,7 +3,7 @@ package gov.nist.csd.pm.core.impl.memory.pap.dag;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -46,8 +46,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testWalk() throws PMException {
         List<Long> visited = new ArrayList<>();
-        DepthFirstGraphWalker bfs = new DepthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        GraphWalker bfs = new DepthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(visited::add);
         bfs.walk(pc1);
         List<Long> expected = List.of(
@@ -61,8 +60,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testAllPathsShortCircuit() throws PMException {
         List<Long> visited = new ArrayList<>();
-        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        GraphWalker dfs = new DepthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(node -> {
                     visited.add(node);
                 })
@@ -78,8 +76,7 @@ class DepthFirstGraphWalkerTest {
     @Test
     void testSinglePathShortCircuit() throws PMException {
         List<Long> visited = new ArrayList<>();
-        DepthFirstGraphWalker dfs = new DepthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        GraphWalker dfs = new DepthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(visited::add)
                 .withSinglePathShortCircuit(nodeId -> nodeId == oa11);
 

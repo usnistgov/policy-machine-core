@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import java.util.Objects;
 
 /**
@@ -15,6 +17,11 @@ public final class NameTargetContext extends NodeTargetContext {
 
     public String targetName() {
         return targetName;
+    }
+
+    @Override
+    public void walk(GraphWalker walker, NodeLookup nodeLookup) throws PMException {
+        walker.walk(nodeLookup.getNodeByName(targetName).getId());
     }
 
     @Override

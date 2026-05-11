@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.graph.dag.BreadthFirstGraphWalker;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -47,8 +47,7 @@ class BreadthFirstGraphWalkerTest {
     @Test
     void testWalk() throws PMException {
         List<Long> visited = new ArrayList<>();
-        BreadthFirstGraphWalker bfs = new BreadthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        GraphWalker bfs = new BreadthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(visited::add);
         bfs.walk(pc1);
         List<Long> expected = List.of(
@@ -71,8 +70,7 @@ class BreadthFirstGraphWalkerTest {
     @Test
     void testAllPathsShortCircuit() throws PMException {
         List<Long> visited = new ArrayList<>();
-        BreadthFirstGraphWalker bfs = new BreadthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        GraphWalker bfs = new BreadthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(node -> {
                     visited.add(node);
                 })
@@ -83,8 +81,7 @@ class BreadthFirstGraphWalkerTest {
         assertTrue(visited.containsAll(List.of(pc1, oa1, oa12)));
 
         visited.clear();
-        bfs = new BreadthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        bfs = new BreadthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(visited::add)
                 .withAllPathShortCircuit(node -> node == oa11);
 
@@ -97,8 +94,7 @@ class BreadthFirstGraphWalkerTest {
     @Test
     void testSinglePathShortCircuit() throws PMException {
         List<Long> visited = new ArrayList<>();
-        BreadthFirstGraphWalker bfs = new BreadthFirstGraphWalker(pap.query().graph())
-                .withDirection(Direction.ASCENDANTS)
+        GraphWalker bfs = new BreadthFirstGraphWalker(pap.query().graph()::getAdjacentAscendants)
                 .withVisitor(visited::add)
                 .withSinglePathShortCircuit(node -> node == oa11);
 

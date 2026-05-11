@@ -1,5 +1,7 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -16,6 +18,13 @@ public final class AttributeNamesTargetContext extends AnonymousTargetContext {
 
     public Collection<String> attributeNames() {
         return attributeNames;
+    }
+
+    @Override
+    public void walk(GraphWalker walker, NodeLookup nodeLookup) throws PMException {
+        for (String name : attributeNames) {
+            walker.walk(nodeLookup.getNodeByName(name).getId());
+        }
     }
 
     @Override

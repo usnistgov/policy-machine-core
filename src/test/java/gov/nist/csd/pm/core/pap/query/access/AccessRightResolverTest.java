@@ -220,7 +220,7 @@ class AccessRightResolverTest {
             Set.of(100L)
         );
 
-        AccessRightSet denied = AccessRightResolver.resolveDeniedAccessRights(userCtx, targetCtx);
+        AccessRightSet denied = AccessRightResolver.resolveDeniedAccessRights(userCtx.prohibitions(), targetCtx);
 
         AccessRightSet expected = new AccessRightSet(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE, AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_ASCENDANT_CREATE);
         assertEquals(expected, denied);
