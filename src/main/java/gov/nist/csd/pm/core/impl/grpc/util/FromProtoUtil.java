@@ -272,13 +272,14 @@ public class FromProtoUtil {
     }
 
     public static Map<String, Object> fromValueMap(ValueMap valueMap) {
-        Map<String, Object> converted = new HashMap<>();
+        return fromValueMap(valueMap.getValuesMap());
+    }
 
-        Map<String, Value> values = valueMap.getValuesMap();
-        for (Entry<String, Value> entry : values.entrySet()) {
+    public static Map<String, Object> fromValueMap(Map<String, Value> map) {
+        Map<String, Object> converted = new HashMap<>();
+        for (Entry<String, Value> entry : map.entrySet()) {
             converted.put(entry.getKey(), fromValue(entry.getValue()));
         }
-
         return converted;
     }
 
@@ -313,6 +314,8 @@ public class FromProtoUtil {
 
 
 
+
+
     public static EventContext fromEventContextProto(gov.nist.csd.pm.proto.v1.epp.EventContext proto) {
         String process = proto.getProcess();
 
@@ -322,15 +325,7 @@ public class FromProtoUtil {
             case USER_NOT_SET -> throw new IllegalStateException("User not set");
         };
 
-        Map<String, Object> args = new HashMap<>();
-        ValueMap protoArgs = proto.getArgs();
-
-        for (Entry<String, Value> e : protoArgs.getValuesMap().entrySet()) {
-            String name = e.getKey();
-            Value value = e.getValue();
-
-            args.put(name, fromValue(value));
-        }
+        Map<String, Object> args = fromValueMap(proto.getArgs());
 
         return new EventContext(user, proto.getOpName(), args);
     }
