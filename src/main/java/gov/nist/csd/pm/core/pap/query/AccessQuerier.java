@@ -263,9 +263,11 @@ public class AccessQuerier extends Querier implements AccessQuery {
         // For each visited node, collect association source UAs
         for (long nodeId : visitedNodes) {
             Set<Long> pcs = nodeToPcs.get(nodeId);
+            if (pcs == null || pcs.isEmpty()) {
+                continue;
+            }
             for (Association assoc : store.graph().getAssociationsWithTarget(nodeId)) {
-                AccessRightSet overlap = new AccessRightSet();
-                overlap.addAll(assoc.arset());
+                AccessRightSet overlap = new AccessRightSet(assoc.arset());
 
                 // retain only the privileges being searched for
                 overlap.retainAll(privileges);
@@ -282,22 +284,25 @@ public class AccessQuerier extends Querier implements AccessQuery {
         }
 
         // Remove UAs whose prohibitions are satisfied by the target path and denied any of the required privileges
+        Set<Long> allUas = new HashSet<>();
+        result.values().forEach(allUas::addAll);
+
+        Set<Long> prohibitedUas = new HashSet<>();
         TargetDagResult targetDagResult = new TargetDagResult(Map.of(), visitedNodes);
-        for (Map.Entry<Long, Set<Long>> entry : result.entrySet()) {
-            Set<Long> toRemove = new HashSet<>();
-            for (long ua : entry.getValue()) {
-                Collection<Prohibition> prohibitions = store.prohibitions().getNodeProhibitions(ua);
-                if (prohibitions.isEmpty()) {
-                    continue;
-                }
-                UserDagResult userDagResult = new UserDagResult(Map.of(), new HashSet<>(prohibitions));
-                AccessRightSet denied = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
-                denied.retainAll(privileges);
-                if (!denied.isEmpty()) {
-                    toRemove.add(ua);
-                }
+        for (long ua : allUas) {
+            Collection<Prohibition> prohibitions = store.prohibitions().getNodeProhibitions(ua);
+            if (prohibitions.isEmpty()) {
+                continue;
             }
-            entry.getValue().removeAll(toRemove);
+            AccessRightSet denied = resolveDeniedAccessRights(new HashSet<>(prohibitions), targetDagResult);
+            denied.retainAll(privileges);
+            if (!denied.isEmpty()) {
+                prohibitedUas.add(ua);
+            }
+        }
+
+        if (!prohibitedUas.isEmpty()) {
+            result.values().forEach(uas -> uas.removeAll(prohibitedUas));
         }
 
         return result;
