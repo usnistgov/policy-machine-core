@@ -19,7 +19,6 @@ import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInObligationException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
@@ -32,7 +31,7 @@ import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.Collection;
 import java.util.HashSet;
@@ -160,7 +159,7 @@ public class GraphModifier extends Modifier implements GraphModification {
     protected void checkAssignmentDoesNotCreateLoop(long ascendant, long descendant) throws PMException {
         AtomicBoolean loop = new AtomicBoolean(false);
 
-        new GraphStoreDFS(policyStore.graph())
+        new DepthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
             .withVisitor((node -> {
                 if (node != ascendant) {
                     return;
@@ -168,7 +167,6 @@ public class GraphModifier extends Modifier implements GraphModification {
 
                 loop.set(true);
             }))
-            .withDirection(Direction.DESCENDANTS)
             .withAllPathShortCircuit(node -> node == ascendant)
             .walk(descendant);
 

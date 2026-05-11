@@ -120,7 +120,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     @Override
     public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws
                                                                                                                  PMException {
-
+        return null;
     }
 
     private void checkOnUserCtx(UserContext userCtx) throws PMException {

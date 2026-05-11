@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
@@ -15,7 +16,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
-import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +67,7 @@ public class TargetExplainer {
 		};
 
 		// DFS from target node
-		DepthFirstGraphWalker dfs = new GraphStoreDFS(policyStore.graph())
+		GraphWalker dfs = new DepthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 				.withPropagator(propagator);
 
 		List<Node> nodes = new ArrayList<>();
@@ -91,16 +91,16 @@ public class TargetExplainer {
 				for (long id : ctx.attributeIds()) {
 					nodes.add(policyStore.graph().getNodeById(id));
 				}
-				dfs.walk(ctx.attributeIds());
+				for (long id : ctx.attributeIds()) {
+					dfs.walk(id);
+				}
 			}
 			case AttributeNamesTargetContext ctx -> {
-				List<Long> ids = new ArrayList<>();
 				for (String name : ctx.attributeNames()) {
 					Node n = policyStore.graph().getNodeByName(name);
 					nodes.add(n);
-					ids.add(n.getId());
+					dfs.walk(n.getId());
 				}
-				dfs.walk(ids);
 			}
 		}
 

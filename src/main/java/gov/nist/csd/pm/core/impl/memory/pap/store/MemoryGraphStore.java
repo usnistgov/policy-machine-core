@@ -9,14 +9,13 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.WILDCARD;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
-import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -216,8 +215,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     public Collection<Long> getPolicyClassDescendants(long id) throws PMException {
         LongOpenHashSet pcs = new LongOpenHashSet();
 
-        new GraphStoreDFS(this)
-                .withDirection(Direction.DESCENDANTS)
+        new DepthFirstGraphWalker(this::getAdjacentDescendants)
                 .withVisitor((n) -> {
                     Node visitedNode;
                     visitedNode = getNodeById(n);
@@ -236,8 +234,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     public Collection<Long> getAttributeDescendants(long id) throws PMException {
         LongOpenHashSet attrs = new LongOpenHashSet();
 
-        new GraphStoreDFS(this)
-                .withDirection(Direction.DESCENDANTS)
+        new DepthFirstGraphWalker(this::getAdjacentDescendants)
                 .withVisitor((n) -> {
                     Node visitedNode;
                     visitedNode = getNodeById(n);
@@ -281,8 +278,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     public boolean isAscendant(long asc, long dsc) throws PMException {
         AtomicBoolean found = new AtomicBoolean(false);
 
-        new GraphStoreDFS(this)
-                .withDirection(Direction.ASCENDANTS)
+        new DepthFirstGraphWalker(this::getAdjacentAscendants)
                 .withVisitor((n) -> {
                     if (n == asc) {
                         found.set(true);
@@ -298,8 +294,7 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     public boolean isDescendant(long asc, long dsc) throws PMException {
         AtomicBoolean found = new AtomicBoolean(false);
 
-        new GraphStoreDFS(this)
-                .withDirection(Direction.DESCENDANTS)
+        new DepthFirstGraphWalker(this::getAdjacentDescendants)
                 .withVisitor((n) -> {
                     if (n == dsc) {
                         found.set(true);

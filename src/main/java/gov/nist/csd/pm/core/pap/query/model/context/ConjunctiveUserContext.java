@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
-import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,9 +23,9 @@ public final class ConjunctiveUserContext extends UserContext {
     }
 
     @Override
-    public void walk(GraphWalker walker, GraphQuery graphQuery) throws PMException {
+    public void walk(GraphWalker walker, NodeLookup nodeLookup) throws PMException {
         for (UserContext ctx : contexts) {
-            ctx.walk(walker, graphQuery);
+            ctx.walk(walker, nodeLookup);
         }
     }
 

@@ -32,8 +32,10 @@ import gov.nist.csd.pm.proto.v1.pdp.query.ExplainRequest;
 import gov.nist.csd.pm.proto.v1.pdp.query.ExplainResponse;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GrpcAccessQuerier implements AccessQuery {
 
@@ -156,5 +158,10 @@ public class GrpcAccessQuerier implements AccessQuery {
             .build();
         ComputePersonalObjectSystemResponse response = blockingStub.computePersonalObjectSystem(request);
         return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
+    }
+
+    @Override
+    public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) {
+        return null;//TODO
     }
 }

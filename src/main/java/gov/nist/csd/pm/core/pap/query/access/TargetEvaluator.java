@@ -4,7 +4,7 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.PC;
 import static gov.nist.csd.pm.core.pap.admin.AdminPolicyNode.PM_ADMIN_POLICY_CLASSES;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.dag.Direction;
+import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.common.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.dag.Visitor;
 import gov.nist.csd.pm.core.common.graph.node.Node;
@@ -20,7 +20,6 @@ import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
-import gov.nist.csd.pm.core.pap.store.GraphStoreDFS;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -53,30 +52,16 @@ public class TargetEvaluator {
 
 		// initialize objects for traversal
 		TraversalState state = initializeEvaluationState(userDagResult, targetContext);
-		DepthFirstGraphWalker dfs = createDepthFirstWalker(userDagResult, state);
+		GraphWalker dfs = createDepthFirstWalker(userDagResult, state);
 
 		// walk the target graph starting at the first level descs
-		List<Long> targetNodes = new ArrayList<>();
-		switch (targetContext) {
-			case IdTargetContext ctx -> {
-				targetNodes.add(ctx.targetId());
-				dfs.walk(ctx.targetId());
-			}
-			case NameTargetContext ctx -> {
-				long id = policyStore.graph().getNodeByName(ctx.targetName()).getId();
-				targetNodes.add(id);
-				dfs.walk(id);
-			}
-			case AttributeIdsTargetContext ctx -> {
-				targetNodes.addAll(ctx.attributeIds());
-				dfs.walk(ctx.attributeIds());
-			}
-			case AttributeNamesTargetContext ctx -> {
-				Collection<Long> ids = resolveAttributeNames(ctx.attributeNames());
-				targetNodes.addAll(ids);
-				dfs.walk(ids);
-			}
-		}
+		List<Long> targetNodes = switch (targetContext) {
+			case IdTargetContext ctx -> List.of(ctx.targetId());
+			case NameTargetContext ctx -> List.of(policyStore.graph().getNodeByName(ctx.targetName()).getId());
+			case AttributeIdsTargetContext ctx -> new ArrayList<>(ctx.attributeIds());
+			case AttributeNamesTargetContext ctx -> new ArrayList<>(resolveAttributeNames(ctx.attributeNames()));
+		};
+		targetContext.walk(dfs, policyStore.graph()::getNodeByName);
 
 		Map<Long, AccessRightSet> pcMap = computePcMap(targetNodes, state.visitedNodes);
 
@@ -162,12 +147,11 @@ public class TargetEvaluator {
 		);
 	}
 
-	protected DepthFirstGraphWalker createDepthFirstWalker(UserDagResult userDagResult, TraversalState state) throws PMException {
+	protected GraphWalker createDepthFirstWalker(UserDagResult userDagResult, TraversalState state) throws PMException {
 		Visitor nodeVisitor = createVisitor(userDagResult, state);
 		Propagator privilegePropagator = createPropagator(state);
 
-		return new GraphStoreDFS(policyStore.graph())
-			.withDirection(Direction.DESCENDANTS)
+		return new DepthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 			.withVisitor(nodeVisitor)
 			.withPropagator(privilegePropagator);
 	}
