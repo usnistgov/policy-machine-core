@@ -7,7 +7,11 @@ import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver
 import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver.resolvePrivileges;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.prohibition.Prohibition;
+import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
 import gov.nist.csd.pm.core.common.graph.node.Node;
+import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.access.CachedTargetEvaluator;
 import gov.nist.csd.pm.core.pap.query.access.Explainer;
@@ -233,14 +237,71 @@ public class AccessQuerier extends Querier implements AccessQuery {
     @Override
     public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws
                                                                                                                  PMException {
-        /*
-        dfs from obejct to get OAs and group them by PC
-        for each OA, get the associations its a target of then get the UAs
-        collect those UAs and any asc UAs
+        Map<Long, Set<Long>> result = new HashMap<>();
+        Map<Long, Set<Long>> nodeToPcs = new HashMap<>();
+        Set<Long> visitedNodes = new HashSet<>();
 
-        need to also get prohibitions, if a UA leads to a prohibition then remove it before returning
-         */
-        return null;
+        Collection<Long> policyClasses = store.graph().getPolicyClasses();
+
+        // DFS from the target upward (getAdjacentDescendants walks toward PC in this graph model)
+        GraphWalker dfs = new DepthFirstGraphWalker(store.graph()::getAdjacentDescendants)
+            .withVisitor(nodeId -> {
+                visitedNodes.add(nodeId);
+                if (policyClasses.contains(nodeId)) {
+                    nodeToPcs.computeIfAbsent(nodeId, k -> new HashSet<>()).add(nodeId);
+                }
+            })
+            .withPropagator((parent, child) -> {
+                Set<Long> parentPcs = nodeToPcs.get(parent);
+                if (parentPcs != null && !parentPcs.isEmpty()) {
+                    nodeToPcs.computeIfAbsent(child, k -> new HashSet<>()).addAll(parentPcs);
+                }
+            });
+
+        targetCtx.walk(dfs, store.graph()::getNodeByName);
+
+        // For each visited node that belongs to at least one PC, collect qualifying source UAs
+        for (long nodeId : visitedNodes) {
+            Set<Long> pcs = nodeToPcs.get(nodeId);
+            if (pcs == null || pcs.isEmpty()) {
+                continue;
+            }
+
+            for (Association assoc : store.graph().getAssociationsWithTarget(nodeId)) {
+                AccessRightSet overlap = new AccessRightSet();
+                overlap.addAll(assoc.arset());
+                overlap.retainAll(privileges);
+                if (overlap.isEmpty()) {
+                    continue;
+                }
+
+                long ua = assoc.source();
+                for (long pc : pcs) {
+                    result.computeIfAbsent(pc, k -> new HashSet<>()).add(ua);
+                }
+            }
+        }
+
+        // Remove UAs whose prohibitions are satisfied by the target path and deny required privileges
+        TargetDagResult targetDagResult = new TargetDagResult(Map.of(), visitedNodes);
+        for (Map.Entry<Long, Set<Long>> entry : result.entrySet()) {
+            Set<Long> toRemove = new HashSet<>();
+            for (long ua : entry.getValue()) {
+                Collection<Prohibition> prohibitions = store.prohibitions().getNodeProhibitions(ua);
+                if (prohibitions.isEmpty()) {
+                    continue;
+                }
+                UserDagResult userDagResult = new UserDagResult(Map.of(), new HashSet<>(prohibitions));
+                AccessRightSet denied = resolveDeniedAccessRights(userDagResult, targetDagResult);
+                denied.retainAll(privileges);
+                if (!denied.isEmpty()) {
+                    toRemove.add(ua);
+                }
+            }
+            entry.getValue().removeAll(toRemove);
+        }
+
+        return result;
     }
 
     private UserEvaluationResult evaluateUser(UserContext userCtx) throws PMException {

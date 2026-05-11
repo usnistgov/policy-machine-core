@@ -120,7 +120,8 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     @Override
     public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws
                                                                                                                  PMException {
-        return null;
+        check(this.userCtx, targetCtx, AdminAccessRight.ADMIN_ACCESS_QUERY);
+        return pap.query().access().computeRequiredAttributeSets(targetCtx, privileges);
     }
 
     private void checkOnUserCtx(UserContext userCtx) throws PMException {
