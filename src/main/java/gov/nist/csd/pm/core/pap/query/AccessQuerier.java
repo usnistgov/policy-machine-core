@@ -81,7 +81,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
                 continue;
             }
             TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
-            AccessRightSet d = resolveDeniedAccessRights(userDagResult, targetDagResult);
+            AccessRightSet d = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
             denied = (denied == null) ? d : intersect(denied, d);
         }
         return denied == null ? new AccessRightSet() : denied;
@@ -243,7 +243,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
         Collection<Long> policyClasses = store.graph().getPolicyClasses();
 
-        // DFS from the target upward (getAdjacentDescendants walks toward PC in this graph model)
+        // DFS from the target to find attributes
         GraphWalker dfs = new DepthFirstGraphWalker(store.graph()::getAdjacentDescendants)
             .withVisitor(nodeId -> {
                 visitedNodes.add(nodeId);
@@ -260,21 +260,20 @@ public class AccessQuerier extends Querier implements AccessQuery {
 
         targetCtx.walk(dfs, store.graph()::getNodeByName);
 
-        // For each visited node that belongs to at least one PC, collect qualifying source UAs
+        // For each visited node, collect association source UAs
         for (long nodeId : visitedNodes) {
             Set<Long> pcs = nodeToPcs.get(nodeId);
-            if (pcs == null || pcs.isEmpty()) {
-                continue;
-            }
-
             for (Association assoc : store.graph().getAssociationsWithTarget(nodeId)) {
                 AccessRightSet overlap = new AccessRightSet();
                 overlap.addAll(assoc.arset());
+
+                // retain only the privileges being searched for
                 overlap.retainAll(privileges);
                 if (overlap.isEmpty()) {
                     continue;
                 }
 
+                // add the ua to source
                 long ua = assoc.source();
                 for (long pc : pcs) {
                     result.computeIfAbsent(pc, k -> new HashSet<>()).add(ua);
@@ -282,7 +281,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
             }
         }
 
-        // Remove UAs whose prohibitions are satisfied by the target path and deny required privileges
+        // Remove UAs whose prohibitions are satisfied by the target path and denied any of the required privileges
         TargetDagResult targetDagResult = new TargetDagResult(Map.of(), visitedNodes);
         for (Map.Entry<Long, Set<Long>> entry : result.entrySet()) {
             Set<Long> toRemove = new HashSet<>();
@@ -292,7 +291,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
                     continue;
                 }
                 UserDagResult userDagResult = new UserDagResult(Map.of(), new HashSet<>(prohibitions));
-                AccessRightSet denied = resolveDeniedAccessRights(userDagResult, targetDagResult);
+                AccessRightSet denied = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
                 denied.retainAll(privileges);
                 if (!denied.isEmpty()) {
                     toRemove.add(ua);
