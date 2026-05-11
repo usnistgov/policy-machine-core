@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
+import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +33,14 @@ public abstract sealed class UserContext implements Serializable
     public String getProcess() {
         return process;
     }
+
+    /**
+     * Walk the graph using the given walker, starting from the node(s) identified by this context.
+     * @param walker the configured walker to use for traversal
+     * @param graphQuery used to resolve node names to IDs where necessary
+     * @throws PMException if an error occurs during traversal or node lookup
+     */
+    public abstract void walk(GraphWalker walker, GraphQuery graphQuery) throws PMException;
 
     /**
      * Creates a context identifying the user by name.

@@ -232,6 +232,18 @@ public class AccessQuerier extends Querier implements AccessQuery {
         return posWithNodes;
     }
 
+    @Override
+    public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws
+                                                                                                                 PMException {
+        /*
+        dfs from obejct to get OAs and group them by PC
+        for each OA, get the associations its a target of then get the UAs
+        collect those UAs and any asc UAs
+
+        need to also get prohibitions, if a UA leads to a prohibition then remove it before returning
+         */
+    }
+
     private UserEvaluationResult evaluateUser(UserContext userCtx) throws PMException {
         UserEvaluator userEvaluator = new UserEvaluator(store);
         return userEvaluator.evaluate(userCtx);

@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface to query the access state of the policy.
@@ -137,5 +138,17 @@ public interface AccessQuery {
      * @throws PMException If there is an error in the PM.
      */
     Map<Node, AccessRightSet> computePersonalObjectSystem(UserContext userCtx) throws PMException;
+
+    /**
+     * Compute the set of attributes a user must be assigned to for each policy class the given target node is contained
+     * in.
+     *
+     * @param targetCtx  The target node context.
+     * @param privileges The privileges to check for.
+     * @return A mapping of the policy classes the given target node is contained in to the set of user attributes in
+     * each that a user must be assigned to in order to have the provided privileges on the target node.
+     * @throws PMException If there is an error in the PM.
+     */
+    Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws PMException;
 
 }

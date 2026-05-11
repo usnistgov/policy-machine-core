@@ -1,5 +1,8 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.common.graph.dag.GraphWalker;
+import gov.nist.csd.pm.core.pap.query.GraphQuery;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,6 +24,11 @@ public final class AttributeIdsUserContext extends AnonymousUserContext {
 
     public Set<Long> attributeIds() {
         return attributeIds;
+    }
+
+    @Override
+    public void walk(GraphWalker walker, GraphQuery graphQuery) throws PMException {
+        walker.walk(attributeIds);
     }
 
     @Override

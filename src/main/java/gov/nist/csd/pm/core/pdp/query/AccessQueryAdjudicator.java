@@ -117,6 +117,12 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
         return pap.query().access().computePersonalObjectSystem(userCtx);
     }
 
+    @Override
+    public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws
+                                                                                                                 PMException {
+
+    }
+
     private void checkOnUserCtx(UserContext userCtx) throws PMException {
         switch (userCtx) {
             case IdUserContext ctx -> check(this.userCtx, new IdTargetContext(ctx.userId()), AdminAccessRight.ADMIN_ACCESS_QUERY);
