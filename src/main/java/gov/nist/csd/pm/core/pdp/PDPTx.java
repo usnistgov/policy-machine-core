@@ -56,8 +56,9 @@ public class PDPTx implements OperationExecutor {
 
     @Override
     public Object executeOperation(Operation<?> operation,
+                                   UserContext userCtx,
                                    Args args) throws PMException {
-        return this.txExecutor.executeOperation(operation, args);
+        return this.txExecutor.executeOperation(operation, userCtx, args);
     }
 
     /**
@@ -206,16 +207,16 @@ public class PDPTx implements OperationExecutor {
         }
 
         @Override
-        public Object executeOperation(Operation<?> operation, Args args) throws PMException {
+        public Object executeOperation(Operation<?> operation, UserContext userCtx, Args args) throws PMException {
             if (operation instanceof Routine<?> routine) {
-                return routine.execute(this, args);
+                return routine.execute(this, userCtx, args);
             }
 
             // check if user can execute the operation
             operation.canExecute(pap, userCtx, args);
 
             // execute the operation
-            Object result = operation.execute(pap, args);
+            Object result = operation.execute(pap, userCtx, args);
 
             // if the operation is an Admin publish the event for EPPs
             // resource operation events are published by the PEP after the RAP succeeds

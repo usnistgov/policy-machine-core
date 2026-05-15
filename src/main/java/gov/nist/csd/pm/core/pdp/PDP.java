@@ -102,7 +102,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
         }
 
         // execute operation
-        return pdpTx.executeOperation(operation, args);
+        return pdpTx.executeOperation(operation, user, args);
     }
 
 }

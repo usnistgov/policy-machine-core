@@ -14,6 +14,7 @@ import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -281,7 +282,7 @@ class PDPTest {
 
         pap.modify().operations().createOperation(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));
                 return "test1";
             }

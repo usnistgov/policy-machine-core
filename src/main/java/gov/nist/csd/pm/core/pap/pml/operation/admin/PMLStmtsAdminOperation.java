@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class PMLStmtsAdminOperation<T> extends PMLAdminOperation<T> implements P
     }
 
     @Override
-    public T execute(PAP pap, Args args) throws PMException {
+    public T execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         Object result = ctx.executeOperationStatements(this.body.getStmts(), args);

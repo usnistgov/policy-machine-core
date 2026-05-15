@@ -92,7 +92,7 @@ public abstract sealed class Operation<R> implements Serializable permits AdminO
      * @param args The arguments passed to the function execution.
      * @return The function return value.
      */
-    public abstract R execute(PAP pap, Args args) throws PMException;
+    public abstract R execute(PAP pap, UserContext userCtx, Args args) throws PMException;
 
     public String getName() {
         return name;

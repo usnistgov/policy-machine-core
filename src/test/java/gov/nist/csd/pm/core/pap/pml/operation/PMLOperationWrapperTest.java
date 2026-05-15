@@ -4,6 +4,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
@@ -34,7 +35,7 @@ class PMLOperationWrapperTest {
         operations.createOperation(new AdminOperation<>("op1", STRING_TYPE, List.of(a), List.of()) {
             
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return args.get(a);
             }
 
@@ -43,7 +44,7 @@ class PMLOperationWrapperTest {
         operations.createOperation(new AdminOperation<>("op2", STRING_TYPE, List.of(a), List.of()) {
             
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return args.get(a);
             }
 
@@ -52,7 +53,7 @@ class PMLOperationWrapperTest {
         operations.createOperation(new AdminOperation<>("op3", STRING_TYPE, List.of(a), List.of()) {
             
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return args.get(a);
             }
 

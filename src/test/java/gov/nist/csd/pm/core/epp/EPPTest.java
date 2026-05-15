@@ -89,7 +89,7 @@ class EPPTest {
 
         AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(ARG_A, ARG_B), List.of()) {
             @Override
-            public String execute(PAP pap, Args args) throws PMException {
+            public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return "";
             }
         };
@@ -331,7 +331,7 @@ class EPPTest {
         PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType(), List.of()) {
 
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
                 return null;

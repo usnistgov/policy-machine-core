@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class AssociateOp extends AdminOperation<Void> {
@@ -31,7 +32,7 @@ public class AssociateOp extends AdminOperation<Void> {
     }
 
     @Override
-    public Void execute(PAP pap, Args args) throws PMException {
+    public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         long ua = args.get(ASSOCIATE_UA_PARAM);
         long target = args.get(ASSOCIATE_TARGET_PARAM);
         List<String> arset = args.get(ARSET_PARAM);

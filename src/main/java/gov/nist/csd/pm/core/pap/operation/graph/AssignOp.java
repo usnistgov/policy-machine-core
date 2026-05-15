@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class AssignOp extends AdminOperation<Void> {
@@ -35,7 +36,7 @@ public class AssignOp extends AdminOperation<Void> {
     }
 
     @Override
-    public Void execute(PAP pap, Args args) throws PMException {
+    public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         Long ascId = args.get(ASSIGN_ASCENDANT_PARAM);
         List<Long> descIds = args.get(ASSIGN_DESCENDANTS_PARAM);
 

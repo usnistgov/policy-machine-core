@@ -50,7 +50,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
             .put(IS_CONJUNCTIVE_PARAM, isConjunctive);
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
             .put(IS_CONJUNCTIVE_PARAM, isConjunctive);
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 
     @Override
@@ -93,6 +93,6 @@ public class ProhibitionsModificationAdjudicator extends Adjudicator implements 
             .put(EXCLUSION_SET_PARAM, new ArrayList<>(prohibition.getExclusionSet()));
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 }

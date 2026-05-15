@@ -150,8 +150,8 @@ public class PAP implements OperationExecutor, Transactional {
     }
 
     @Override
-    public Object executeOperation(Operation<?> operation, Args args) throws PMException {
-        return operation.execute(this, args);
+    public Object executeOperation(Operation<?> operation, UserContext userCtx, Args args) throws PMException {
+        return operation.execute(this, userCtx, args);
     }
 
     /**

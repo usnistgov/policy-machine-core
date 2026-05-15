@@ -45,7 +45,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
             .put(OBLIGATION_RESPONSE_PARAM, response);
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 
     @Override
@@ -58,6 +58,6 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
             .put(EVENT_PATTERN_PARAM, obligation.getEventPattern());
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 }

@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
@@ -37,7 +38,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     static AdminOperation<Void> op = new AdminOperation<>("testFunc", VOID_TYPE, List.of(), List.of()) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             pap.modify().graph().createPolicyClass("pc3");
             return null;
         }
@@ -174,7 +175,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
 
@@ -183,7 +184,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
         Routine<Void> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
 
@@ -217,7 +218,7 @@ public abstract class PAPTest extends PAPTestInitializer {
     void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
         pap.plugins().addOperation(new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
         });

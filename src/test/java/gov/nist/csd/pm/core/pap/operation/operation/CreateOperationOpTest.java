@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -32,7 +33,7 @@ class CreateOperationOpTest {
             new RequiredCapability(new RequiredPrivilegeOnNode(nodeName, AdminAccessRight.ADMIN_GRAPH_NODE_CREATE))
         ) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
         };
@@ -46,7 +47,7 @@ class CreateOperationOpTest {
             List.of()
         ) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
         };

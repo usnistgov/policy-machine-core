@@ -7,6 +7,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public abstract non-sealed class QueryOperation<R> extends Operation<R> {
@@ -46,7 +47,7 @@ public abstract non-sealed class QueryOperation<R> extends Operation<R> {
     public abstract R execute(PolicyQuery query, Args args) throws PMException;
 
     @Override
-    public final R execute(PAP pap, Args args) throws PMException {
+    public final R execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         return execute(pap.query(), args);
     }
 }

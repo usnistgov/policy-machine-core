@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class SetResourceAccessRights extends AdminOperation<Void> {
@@ -23,7 +24,7 @@ public class SetResourceAccessRights extends AdminOperation<Void> {
     }
 
     @Override
-    public Void execute(PAP pap, Args args) throws PMException {
+    public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         pap.modify().operations().setResourceAccessRights(new AccessRightSet(args.get(ARSET_PARAM)));
         return null;
     }

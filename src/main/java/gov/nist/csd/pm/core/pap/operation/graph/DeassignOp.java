@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class DeassignOp extends AdminOperation<Void> {
@@ -33,7 +34,7 @@ public class DeassignOp extends AdminOperation<Void> {
     }
 
     @Override
-    public Void execute(PAP pap, Args args) throws PMException {
+    public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         long ascId = args.get(DEASSIGN_ASCENDANT_PARAM);
         List<Long> descIds = args.get(DEASSIGN_DESCENDANTS_PARAM);
 
