@@ -20,36 +20,36 @@ public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAcces
 
 	@Override
 	public AccessRightSet computePrivileges(TargetContext targetCtx) throws PMException {
-		return pap.query().access().computePrivileges(userCtx, targetCtx);
+		return pap.query().access().self(userCtx).computePrivileges(targetCtx);
 	}
 
 	@Override
 	public List<AccessRightSet> computePrivileges(List<TargetContext> targetCtxs) throws PMException {
-		return pap.query().access().computePrivileges(userCtx, targetCtxs);
+		return pap.query().access().self(userCtx).computePrivileges(targetCtxs);
 	}
 
 	@Override
 	public AccessRightSet computeDeniedPrivileges(TargetContext targetCtx) throws PMException {
-		return pap.query().access().computeDeniedPrivileges(userCtx, targetCtx);
+		return pap.query().access().self(userCtx).computeDeniedPrivileges(targetCtx);
 	}
 
 	@Override
 	public SubgraphPrivileges computeSubgraphPrivileges(long root) throws PMException {
-		return pap.query().access().computeSubgraphPrivileges(userCtx, root);
+		return pap.query().access().self(userCtx).computeSubgraphPrivileges(root);
 	}
 
 	@Override
 	public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(long root) throws PMException {
-		return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
+		return pap.query().access().self(userCtx).computeAdjacentAscendantPrivileges(root);
 	}
 
 	@Override
 	public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(long root) throws PMException {
-		return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
+		return pap.query().access().self(userCtx).computeAdjacentDescendantPrivileges(root);
 	}
 
 	@Override
 	public Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException {
-		return pap.query().access().computePersonalObjectSystem(userCtx);
+		return pap.query().access().self(userCtx).computePersonalObjectSystem();
 	}
 }

@@ -6,10 +6,12 @@ import gov.nist.csd.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.csd.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.AccessQuery;
+import gov.nist.csd.pm.core.pap.query.SelfAccessQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
+import gov.nist.csd.pm.core.pdp.query.SelfAccessQueryAdjudicator;
 import gov.nist.csd.pm.proto.v1.pdp.query.ComputeACLRequest;
 import gov.nist.csd.pm.proto.v1.pdp.query.ComputeACLResponse;
 import gov.nist.csd.pm.proto.v1.pdp.query.ComputeAdjacentAscendantPrivilegesRequest;
@@ -43,6 +45,11 @@ public class GrpcAccessQuerier implements AccessQuery {
 
     public GrpcAccessQuerier(PolicyQueryServiceBlockingStub blockingStub) {
         this.blockingStub = blockingStub;
+    }
+
+    @Override
+    public SelfAccessQuery self(UserContext userCtx) throws PMException {
+        return new GrpcSelfAccessQuerier(blockingStub);
     }
 
     @Override

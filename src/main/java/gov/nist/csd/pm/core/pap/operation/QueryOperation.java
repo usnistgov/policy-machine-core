@@ -44,10 +44,10 @@ public abstract non-sealed class QueryOperation<R> extends Operation<R> {
         super(name, returnType, parameters, eventParameters, req, rest);
     }
 
-    public abstract R execute(PolicyQuery query, Args args) throws PMException;
+    public abstract R execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException;
 
     @Override
     public final R execute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        return execute(pap.query(), args);
+        return execute(pap.query(), userCtx, args);
     }
 }

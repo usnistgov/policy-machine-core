@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +29,7 @@ public class GetAdjacentAscendants extends PMLQueryOperation<List<String>> {
     }
 
     @Override
-    public List<String> execute(PolicyQuery query, Args args) throws PMException {
+    public List<String> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
 
         long id = query.graph().getNodeId(nodeName);

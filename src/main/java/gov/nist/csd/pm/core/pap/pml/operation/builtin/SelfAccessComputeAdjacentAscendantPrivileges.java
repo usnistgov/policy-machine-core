@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +28,10 @@ public class SelfAccessComputeAdjacentAscendantPrivileges extends QueryOperation
     }
 
     @Override
-    public Map<String, List<String>> execute(PolicyQuery query, Args args) throws PMException {
+    public Map<String, List<String>> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
         long nodeId = query.graph().getNodeId(nodeName);
-        Map<Node, AccessRightSet> arsetMap = query.selfAccess().computeAdjacentAscendantPrivileges(nodeId);
+        Map<Node, AccessRightSet> arsetMap = query.access().self(userCtx).computeAdjacentAscendantPrivileges(nodeId);
         Map<String, List<String>> ret = new HashMap<>();
         for (Map.Entry<Node, AccessRightSet> e : arsetMap.entrySet()) {
             ret.put(e.getKey().getName(), new ArrayList<>(e.getValue()));

@@ -58,8 +58,7 @@ public class PAP implements OperationExecutor, Transactional {
             new ProhibitionsQuerier(policyStore),
             new ObligationsQuerier(policyStore),
             new OperationsQuerier(policyStore, pluginRegistry),
-            new AccessQuerier(policyStore),
-            new SelfAccessQuerier(policyStore)
+            new AccessQuerier(policyStore)
         );
         this.modifier = new PolicyModifier(
             new GraphModifier(policyStore, new RandomIdGenerator()),

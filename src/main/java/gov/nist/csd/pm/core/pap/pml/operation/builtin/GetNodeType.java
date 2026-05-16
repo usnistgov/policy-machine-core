@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class GetNodeType extends PMLQueryOperation<String> {
@@ -23,7 +24,7 @@ public class GetNodeType extends PMLQueryOperation<String> {
     }
 
     @Override
-    public String execute(PolicyQuery query, Args args) throws PMException {
+    public String execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         Node node = query.graph().getNodeByName(args.get(NODE_NAME_PARAM));
         return node.getType().toString();
     }

@@ -16,7 +16,6 @@ import java.util.Set;
  */
 public interface SelfAccessQuery {
 
-
     /**
      * Compute the privileges the user has on the target node.
      *

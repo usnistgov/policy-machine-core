@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 
@@ -28,7 +29,7 @@ public class HasPropertyValue extends PMLQueryOperation<Boolean> {
     }
 
     @Override
-    public Boolean execute(PolicyQuery query, Args args) throws PMException {
+    public Boolean execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
         String key = args.get(Env.KEY_PARAM);
         String value = args.get(VALUE_PARAM);

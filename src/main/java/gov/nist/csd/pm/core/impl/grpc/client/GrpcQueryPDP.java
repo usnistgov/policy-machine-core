@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.impl.grpc.client;
 import static gov.nist.csd.pm.core.impl.grpc.client.GrpcHeaders.buildHeaders;
 
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
@@ -20,10 +21,6 @@ public class GrpcQueryPDP implements PolicyQuery {
     @Override
     public GrpcAccessQuerier access() {
         return grpcPolicyQuerier.access();
-    }
-
-    public GrpcSelfAccessQuerier selfAccess() {
-        return grpcPolicyQuerier.selfAccess();
     }
 
     @Override

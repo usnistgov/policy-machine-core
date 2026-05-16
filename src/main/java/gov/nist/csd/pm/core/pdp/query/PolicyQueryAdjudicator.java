@@ -42,11 +42,6 @@ public class PolicyQueryAdjudicator implements PolicyQuery {
     }
 
     @Override
-    public SelfAccessQueryAdjudicator selfAccess() {
-        return selfAccess;
-    }
-
-    @Override
     public GraphQueryAdjudicator graph() {
         return graph;
     }
