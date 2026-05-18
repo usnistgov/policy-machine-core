@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SelfAccessQuerier implements SelfAccessQuery{
 
@@ -52,5 +53,15 @@ public class SelfAccessQuerier implements SelfAccessQuery{
     @Override
     public Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException {
         return accessQuerier.computePersonalObjectSystem(userCtx);
+    }
+
+    @Override
+    public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws PMException {
+        return accessQuerier.computeRequiredAttributeSets(targetCtx, privileges);
+    }
+
+    @Override
+    public Map<Long, AccessRightSet> computeCapabilityList() throws PMException {
+        return accessQuerier.computeCapabilityList(userCtx);
     }
 }

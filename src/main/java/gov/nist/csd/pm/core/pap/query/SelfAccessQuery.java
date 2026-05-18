@@ -78,4 +78,8 @@ public interface SelfAccessQuery {
      */
     Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException;
 
+    Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws PMException;
+
+    Map<Long, AccessRightSet> computeCapabilityList() throws PMException;
+
 }

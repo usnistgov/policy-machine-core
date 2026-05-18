@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAccessQuery {
 
@@ -51,5 +52,15 @@ public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAcces
 	@Override
 	public Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException {
 		return pap.query().access().self(userCtx).computePersonalObjectSystem();
+	}
+
+	@Override
+	public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws PMException {
+		return pap.query().access().self(userCtx).computeRequiredAttributeSets(targetCtx, privileges);
+	}
+
+	@Override
+	public Map<Long, AccessRightSet> computeCapabilityList() throws PMException {
+		return pap.query().access().self(userCtx).computeCapabilityList();
 	}
 }
