@@ -105,7 +105,7 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
         return new ResourceOperation(name, returnType, params, List.of()) {
             @Override
-            public Object execute(PolicyQuery query, Args args) {
+            public Object execute(PolicyQuery query, UserContext userCtx, Args args) {
                 throw new UnsupportedOperationException(
                     "operation '" + name + "' cannot be executed via gRPC stub proxy");
             }

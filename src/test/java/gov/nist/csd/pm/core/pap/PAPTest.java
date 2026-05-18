@@ -197,7 +197,7 @@ public abstract class PAPTest extends PAPTestInitializer {
 
     static ResourceOperation<Void> a = new ResourceOperation<>("a", VOID_TYPE, List.of(), List.of()) {
         @Override
-        public Void execute(PolicyQuery query, Args args) throws PMException {
+        public Void execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
             return null;
         }
     };

@@ -65,7 +65,7 @@ public class JavaExample {
         ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter),
             List.of(new RequiredCapability(new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
             @Override
-            public Void execute(PolicyQuery query, Args args) throws PMException {
+            public Void execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
         };
