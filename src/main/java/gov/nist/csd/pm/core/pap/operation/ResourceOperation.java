@@ -44,10 +44,10 @@ public abstract non-sealed class ResourceOperation<T> extends Operation<T> {
         super(name, returnType, parameters, eventParameters, req, rest);
     }
 
-    public abstract T execute(PolicyQuery query, Args args) throws PMException;
+    public abstract T execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException;
 
     @Override
     public final T execute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        return execute(pap.query(), args);
+        return execute(pap.query(), userCtx, args);
     }
 }
