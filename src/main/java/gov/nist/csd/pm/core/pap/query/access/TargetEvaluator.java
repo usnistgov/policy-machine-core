@@ -82,7 +82,7 @@ public class TargetEvaluator {
 					merged.put(pc, pcArset);
 				} else {
 					AccessRightSet mergedArset = merged.get(pc);
-					mergedArset.retainAll(pcArset);
+					mergedArset.addAll(pcArset);
 					merged.put(pc, mergedArset);
 				}
 			}
@@ -121,19 +121,10 @@ public class TargetEvaluator {
 	protected AccessRightSet computePrivilegesOnPCs(UserDagResult userDagResult,
 													Collection<Long> firstLevelDescs,
 													Collection<Long> policyClasses) throws PMException {
-		Collection<Long> firstLevelDescendantPCs = new ArrayList<>(firstLevelDescs);
+		List<Long> firstLevelDescendantPCs = new ArrayList<>(firstLevelDescs);
 		firstLevelDescendantPCs.retainAll(policyClasses);
 
 		if (firstLevelDescendantPCs.isEmpty()) {
-			return new AccessRightSet();
-		}
-
-		// retain all policy class first level descs
-		List<Long> policyClassDescendants = new ArrayList<>(firstLevelDescs);
-		policyClassDescendants.retainAll(policyClasses);
-
-		// there are no policy class adjacent descendants, so no privs to evaluate for
-		if (policyClassDescendants.isEmpty()) {
 			return new AccessRightSet();
 		}
 
@@ -169,10 +160,9 @@ public class TargetEvaluator {
 			Map<Long, AccessRightSet> nodePrivileges = state.visitedNodes.computeIfAbsent(nodeId, __ -> new Long2ObjectOpenHashMap<>());
 
 			if (policyClasses.contains(nodeId)) {
-				nodePrivileges.put(nodeId, adminPrivilegesOnPCs);
+				nodePrivileges.put(nodeId, new AccessRightSet(adminPrivilegesOnPCs));
 			} else if (userDagResult.borderTargets().containsKey(nodeId)) {
 				AccessRightSet borderArset = userDagResult.borderTargets().get(nodeId);
-
 				nodePrivileges.forEach((policyClassId, privileges) -> privileges.addAll(borderArset));
 			}
 		};
