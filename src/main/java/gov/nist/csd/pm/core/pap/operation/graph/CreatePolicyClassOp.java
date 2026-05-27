@@ -7,6 +7,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public class CreatePolicyClassOp extends CreateNodeOp {
@@ -29,7 +30,7 @@ public class CreatePolicyClassOp extends CreateNodeOp {
     }
 
     @Override
-    public Long execute(PAP pap, Args args) throws PMException {
+    public Long execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         String name = args.get(NAME_PARAM);
         return createNode(pap, name, List.of());
     }

@@ -23,6 +23,7 @@ import gov.nist.csd.pm.proto.v1.pdp.query.SelfComputeSubgraphPrivilegesResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GrpcSelfAccessQuerier implements SelfAccessQuery {
 
@@ -120,5 +121,15 @@ public class GrpcSelfAccessQuerier implements SelfAccessQuery {
             .build();
         SelfComputePersonalObjectSystemResponse response = blockingStub.selfComputePersonalObjectSystem(request);
         return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
+    }
+
+    @Override
+    public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) {
+        throw new UnsupportedOperationException("selfComputeRequiredAttributeSets not supported");
+    }
+
+    @Override
+    public Map<Long, AccessRightSet> computeCapabilityList() {
+        throw new UnsupportedOperationException("selfComputeCapabilityList not supported");
     }
 }

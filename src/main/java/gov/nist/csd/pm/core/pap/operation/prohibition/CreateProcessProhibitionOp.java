@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.HashSet;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class CreateProcessProhibitionOp extends ProhibitionOp {
     }
 
     @Override
-    public Void execute(PAP pap, Args args) throws PMException {
+    public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         pap.modify().prohibitions().createProcessProhibition(
             args.get(NAME_PARAM),
             args.get(USER_ID_PARAM),

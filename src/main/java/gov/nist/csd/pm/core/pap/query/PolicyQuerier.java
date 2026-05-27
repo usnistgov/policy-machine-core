@@ -7,30 +7,22 @@ public class PolicyQuerier implements PolicyQuery {
     private final ObligationsQuerier obligationsQuerier;
     private final OperationsQuerier operationsQuerier;
     private final AccessQuerier accessQuerier;
-    private final SelfAccessQuerier selfAccessQuerier;
 
     public PolicyQuerier(GraphQuerier graphQuerier,
                          ProhibitionsQuerier prohibitionsQuerier,
                          ObligationsQuerier obligationsQuerier,
                          OperationsQuerier operationsQuerier,
-                         AccessQuerier accessQuerier,
-                         SelfAccessQuerier selfAccessQuerier) {
+                         AccessQuerier accessQuerier) {
         this.graphQuerier = graphQuerier;
         this.prohibitionsQuerier = prohibitionsQuerier;
         this.obligationsQuerier = obligationsQuerier;
         this.operationsQuerier = operationsQuerier;
         this.accessQuerier = accessQuerier;
-        this.selfAccessQuerier = selfAccessQuerier;
     }
 
     @Override
     public AccessQuerier access() {
         return accessQuerier;
-    }
-
-    @Override
-    public SelfAccessQuery selfAccess() {
-        return selfAccessQuerier;
     }
 
     @Override

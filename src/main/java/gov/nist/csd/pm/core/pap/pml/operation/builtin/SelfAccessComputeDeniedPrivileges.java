@@ -13,19 +13,19 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelfAccessComputePrivileges extends QueryOperation<List<String>> {
+public class SelfAccessComputeDeniedPrivileges extends QueryOperation<List<String>> {
 
     private static final NodeNameFormalParameter NODE_NAME_PARAM =
         new NodeNameFormalParameter("node_name");
 
-    public SelfAccessComputePrivileges() {
-        super("self_compute_privileges", ListType.of(STRING_TYPE), List.of(NODE_NAME_PARAM), List.of());
+    public SelfAccessComputeDeniedPrivileges() {
+        super("self_compute_denied_privileges", ListType.of(STRING_TYPE), List.of(NODE_NAME_PARAM), List.of());
     }
 
     @Override
     public List<String> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
         long nodeId = query.graph().getNodeId(nodeName);
-        return new ArrayList<>(query.access().self(userCtx).computePrivileges(new IdTargetContext(nodeId)));
+        return new ArrayList<>(query.access().self(userCtx).computeDeniedPrivileges(new IdTargetContext(nodeId)));
     }
 }

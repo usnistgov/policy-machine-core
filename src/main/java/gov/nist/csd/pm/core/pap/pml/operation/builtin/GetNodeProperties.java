@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class GetNodeProperties extends QueryOperation<Map<String, String>> {
     }
 
     @Override
-    public Map<String, String> execute(PolicyQuery query, Args args) throws PMException {
+    public Map<String, String> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         Node node = query.graph().getNodeByName(args.get(NODE_NAME_PARAM));
         return node.getProperties();
     }

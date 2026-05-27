@@ -42,6 +42,10 @@ public class AccessQuerier extends Querier implements AccessQuery {
         super(store);
     }
 
+    public SelfAccessQuery self(UserContext userCtx) {
+        return new SelfAccessQuerier(this, userCtx);
+    }
+
     @Override
     public AccessRightSet computePrivileges(UserContext userCtx, TargetContext targetCtx) throws PMException {
         UserEvaluationResult userDagResults = evaluateUser(userCtx);

@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +34,7 @@ public class Search extends PMLQueryOperation<List<Map<String, Object>>> {
     }
 
     @Override
-    public List<Map<String, Object>> execute(PolicyQuery query, Args args) throws PMException {
+    public List<Map<String, Object>> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         NodeType nodeType = NodeType.toNodeType(args.get(TYPE_PARAM));
 
         Map<String, String> properties = args.get(PROPERTIES_PARAM);

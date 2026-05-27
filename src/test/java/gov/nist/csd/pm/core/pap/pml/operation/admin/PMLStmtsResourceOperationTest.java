@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ class PMLStmtsResourceOperationTest {
         memoryPAP.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
         memoryPAP.modify().operations().createOperation(new ResourceOperation<>("op1", STRING_TYPE, List.of(), List.of()) {
             @Override
-            public String execute(PolicyQuery query, Args args) throws PMException {
+            public String execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
                 return "test";
             }
         });

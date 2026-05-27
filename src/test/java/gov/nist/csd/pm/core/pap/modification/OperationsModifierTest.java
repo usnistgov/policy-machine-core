@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.modification.OperationsModifier.CannotDeletePluginOperationException;
@@ -32,7 +33,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
     static AdminOperation<?> testOp = new AdminOperation<>("test", ANY_TYPE, List.of(), List.of()) {
         @Override
-        public Object execute(PAP pap, Args args) throws PMException {
+        public Object execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
 
@@ -86,7 +87,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
     };
@@ -97,7 +98,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
     };
@@ -108,7 +109,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
     };
@@ -119,7 +120,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         List.of(ARG_A, ARG_B)
     ) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
     };

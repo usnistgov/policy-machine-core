@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.DisconnectedNodeException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
@@ -41,7 +42,7 @@ class PMLBootstrapperTest {
         AdminOperation<?> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("op1");
 
                 return null;
@@ -51,7 +52,7 @@ class PMLBootstrapperTest {
 
         Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
-            public Void execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args actualArgs) throws PMException {
                 pap.modify().graph().createPolicyClass("routine1");
                 return null;
             }

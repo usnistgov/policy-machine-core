@@ -22,6 +22,7 @@ import gov.nist.csd.pm.proto.v1.pdp.query.GetOperationSignatureResponse;
 import gov.nist.csd.pm.proto.v1.pdp.query.GetResourceAccessRightsRequest;
 import gov.nist.csd.pm.proto.v1.pdp.query.GetResourceAccessRightsResponse;
 import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.proto.v1.pdp.query.Signature;
 import io.grpc.StatusRuntimeException;
 import java.util.ArrayList;
@@ -104,7 +105,7 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
         return new ResourceOperation(name, returnType, params, List.of()) {
             @Override
-            public Object execute(PolicyQuery query, Args args) {
+            public Object execute(PolicyQuery query, UserContext userCtx, Args args) {
                 throw new UnsupportedOperationException(
                     "operation '" + name + "' cannot be executed via gRPC stub proxy");
             }
@@ -119,7 +120,7 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
         return new AdminOperation(name, returnType, params, List.of()) {
             @Override
-            public Object execute(PAP pap, Args args) {
+            public Object execute(PAP pap, UserContext userCtx, Args args) {
                 throw new UnsupportedOperationException(
                     "operation '" + name + "' cannot be executed via gRPC stub proxy");
             }
@@ -134,7 +135,7 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
         return new Routine(name, returnType, params) {
             @Override
-            public Object execute(PAP pap, Args args) {
+            public Object execute(PAP pap, UserContext userCtx, Args args) {
                 throw new UnsupportedOperationException(
                     "operation '" + name + "' cannot be executed via gRPC stub proxy");
             }
@@ -149,7 +150,7 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
         return new QueryOperation(name, returnType, params, List.of()) {
             @Override
-            public Object execute(PolicyQuery query, Args args) {
+            public Object execute(PolicyQuery query, UserContext userCtx, Args args) {
                 throw new UnsupportedOperationException(
                     "operation '" + name + "' cannot be executed via gRPC stub proxy");
             }

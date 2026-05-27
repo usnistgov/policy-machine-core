@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.operation.Operation;
@@ -24,7 +25,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
     static Routine<Void> r1 = new Routine<>("r1", VOID_TYPE, List.of()) {
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
 
@@ -32,7 +33,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
     static Routine<Void> r2 = new Routine<>("r2", VOID_TYPE, List.of()) {
 
         @Override
-        public Void execute(PAP pap, Args args) throws PMException {
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
             return null;
         }
 
@@ -50,7 +51,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
         pap.plugins().addOperation(new Routine<>("r3", VOID_TYPE, List.of()) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
 

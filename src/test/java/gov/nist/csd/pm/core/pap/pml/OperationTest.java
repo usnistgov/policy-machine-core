@@ -107,7 +107,7 @@ public class OperationTest {
         res1.setCtx(u1);
         PDP pdp = new PDP(memoryPAP);
         assertThrows(UnauthorizedException.class, () -> pdp.runTx(new IdUserContext(id("u1")), pdpTx -> {
-            pdpTx.executeOperation(res1, new Args());
+            pdpTx.executeOperation(res1, new IdUserContext(id("u1")), new Args());
             return null;
         }));
     }

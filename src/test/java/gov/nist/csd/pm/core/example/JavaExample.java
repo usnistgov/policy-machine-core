@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -64,7 +65,7 @@ public class JavaExample {
         ResourceOperation<Void> resourceOp = new ResourceOperation<>("read_file", VOID_TYPE, List.of(nameFormalParameter),
             List.of(new RequiredCapability(new RequiredPrivilegeOnParameter(nameFormalParameter, new AccessRightSet("read"))))) {
             @Override
-            public Void execute(PolicyQuery query, Args args) throws PMException {
+            public Void execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
                 return null;
             }
         };
@@ -76,7 +77,7 @@ public class JavaExample {
             List.of(new RequiredCapability(new RequiredPrivilegeOnNode("users", AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE)))) {
 
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 String username = args.get(usernameParam);
 
                 pap.modify().graph().createUser(username, List.of(usersId));

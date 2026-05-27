@@ -30,7 +30,7 @@ public abstract class OperationStatement extends PMLStatement<VoidResult> {
 
     @Override
     public VoidResult execute(ExecutionContext ctx, PAP pap) throws PMException {
-        op.execute(pap, prepareArgs(ctx, pap));
+        op.execute(pap, ctx.author(), prepareArgs(ctx, pap));
 
         return new VoidResult();
     }

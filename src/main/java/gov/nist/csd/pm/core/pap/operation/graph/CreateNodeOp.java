@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 public abstract class CreateNodeOp extends AdminOperation<Long> {
@@ -39,7 +40,7 @@ public abstract class CreateNodeOp extends AdminOperation<Long> {
     protected abstract long createNode(PAP pap, String name, List<Long> descs) throws PMException;
 
     @Override
-    public Long execute(PAP pap, Args args) throws PMException {
+    public Long execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         String name = args.get(NAME_PARAM);
         List<Long> descIds = args.get(CREATE_NODE_DESCENDANTS_PARAM);
 

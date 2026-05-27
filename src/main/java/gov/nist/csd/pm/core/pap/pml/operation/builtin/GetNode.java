@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.pml.operation.query.PMLQueryOperation;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class GetNode extends PMLQueryOperation<Map<String, Object>> {
     }
 
     @Override
-    public Map<String, Object> execute(PolicyQuery query, Args args) throws PMException {
+    public Map<String, Object> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         Node node = query.graph().getNodeByName(args.get(NODE_NAME_PARAM));
         return Map.of(
             "name", node.getName(),

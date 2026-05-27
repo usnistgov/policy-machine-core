@@ -16,7 +16,6 @@ import java.util.Set;
  */
 public interface SelfAccessQuery {
 
-
     /**
      * Compute the privileges the user has on the target node.
      *
@@ -78,5 +77,9 @@ public interface SelfAccessQuery {
      * @throws PMException If there is an error in the PM.
      */
     Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException;
+
+    Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws PMException;
+
+    Map<Long, AccessRightSet> computeCapabilityList() throws PMException;
 
 }

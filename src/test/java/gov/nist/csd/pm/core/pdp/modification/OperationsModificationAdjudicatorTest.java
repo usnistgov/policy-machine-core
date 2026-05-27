@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
@@ -77,7 +78,7 @@ class OperationsModificationAdjudicatorTest {
     void createAdminOperation() throws PMException {
         AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
             @Override
-            public Void execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args actualArgs) throws PMException {
                 return null;
             }
 
@@ -93,7 +94,7 @@ class OperationsModificationAdjudicatorTest {
         AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
 
             @Override
-            public Void execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args actualArgs) throws PMException {
                 return null;
             }
 
@@ -108,7 +109,7 @@ class OperationsModificationAdjudicatorTest {
     void createAdminRoutine() throws PMException {
         Routine<?> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
             @Override
-            public Void execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args actualArgs) throws PMException {
                 return null;
             }
 

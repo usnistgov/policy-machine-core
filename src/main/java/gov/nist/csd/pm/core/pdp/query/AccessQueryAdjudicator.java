@@ -6,6 +6,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.AccessQuery;
+import gov.nist.csd.pm.core.pap.query.SelfAccessQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
@@ -28,6 +29,11 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     public AccessQueryAdjudicator(PAP pap, UserContext userCtx) {
         super(pap, userCtx);
+    }
+
+    @Override
+    public SelfAccessQuery self(UserContext userCtx) throws PMException {
+        return new SelfAccessQueryAdjudicator(pap, userCtx);
     }
 
     @Override

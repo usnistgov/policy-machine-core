@@ -1686,6 +1686,70 @@ public abstract class AccessQuerierTest extends PAPTestInitializer {
     }
 
     @Test
+    void testComputePrivilegesMultipleOAsInSamePC() throws PMException {
+        String pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc1"]
+                create oa "oa3" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                create u "u1" in ["ua1"]
+                """;
+        pap.executePML(new NameUserContext("u1"), pml);
+
+        AccessRightSet actual = pap.query().access().computePrivileges(
+            new IdUserContext(id("u1")),
+            new AttributeNamesTargetContext(List.of("oa1", "oa2", "oa3"))
+        );
+        assertEquals(new AccessRightSet("read", "write"), actual);
+
+        pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                create pc "pc2"
+                create ua "ua2" in ["pc2"]
+                create oa "oa3" in ["pc2"]
+                create oa "oa4" in ["pc2"]
+                associate "ua2" to "oa3" with ["read"]
+                create u "u1" in ["ua1", "ua2"]
+                """;
+        pap.reset();
+        pap.executePML(new NameUserContext("u1"), pml);
+
+        actual = pap.query().access().computePrivileges(
+            new IdUserContext(id("u1")),
+            new AttributeNamesTargetContext(List.of("oa1", "oa2", "oa3", "oa4"))
+        );
+        assertEquals(new AccessRightSet("read"), actual);
+
+        pml = """
+                set resource access rights ["read", "write"]
+                create pc "pc1"
+                create ua "ua1" in ["pc1"]
+                create oa "oa1" in ["pc1"]
+                create oa "oa2" in ["pc1"]
+                associate "ua1" to "oa1" with ["read", "write"]
+                create pc "pc2"
+                create oa "oa3" in ["pc2"]
+                create u "u1" in ["ua1"]
+                """;
+        pap.reset();
+        pap.executePML(new NameUserContext("u1"), pml);
+
+        actual = pap.query().access().computePrivileges(
+            new IdUserContext(id("u1")),
+            new AttributeNamesTargetContext(List.of("oa1", "oa2", "oa3"))
+        );
+        assertEquals(new AccessRightSet(), actual);
+    }
+
+    @Test
     void testComputeRequiredAttributeSets() throws PMException {
         // pc1: ua1 → oa1 → o1; pc2: ua2 → oa2 → o1
         String pml = """

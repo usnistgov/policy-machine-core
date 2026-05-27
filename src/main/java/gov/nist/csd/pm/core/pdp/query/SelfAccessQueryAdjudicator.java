@@ -11,6 +11,7 @@ import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAccessQuery {
 
@@ -20,36 +21,46 @@ public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAcces
 
 	@Override
 	public AccessRightSet computePrivileges(TargetContext targetCtx) throws PMException {
-		return pap.query().access().computePrivileges(userCtx, targetCtx);
+		return pap.query().access().self(userCtx).computePrivileges(targetCtx);
 	}
 
 	@Override
 	public List<AccessRightSet> computePrivileges(List<TargetContext> targetCtxs) throws PMException {
-		return pap.query().access().computePrivileges(userCtx, targetCtxs);
+		return pap.query().access().self(userCtx).computePrivileges(targetCtxs);
 	}
 
 	@Override
 	public AccessRightSet computeDeniedPrivileges(TargetContext targetCtx) throws PMException {
-		return pap.query().access().computeDeniedPrivileges(userCtx, targetCtx);
+		return pap.query().access().self(userCtx).computeDeniedPrivileges(targetCtx);
 	}
 
 	@Override
 	public SubgraphPrivileges computeSubgraphPrivileges(long root) throws PMException {
-		return pap.query().access().computeSubgraphPrivileges(userCtx, root);
+		return pap.query().access().self(userCtx).computeSubgraphPrivileges(root);
 	}
 
 	@Override
 	public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(long root) throws PMException {
-		return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
+		return pap.query().access().self(userCtx).computeAdjacentAscendantPrivileges(root);
 	}
 
 	@Override
 	public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(long root) throws PMException {
-		return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
+		return pap.query().access().self(userCtx).computeAdjacentDescendantPrivileges(root);
 	}
 
 	@Override
 	public Map<Node, AccessRightSet> computePersonalObjectSystem() throws PMException {
-		return pap.query().access().computePersonalObjectSystem(userCtx);
+		return pap.query().access().self(userCtx).computePersonalObjectSystem();
+	}
+
+	@Override
+	public Map<Long, Set<Long>> computeRequiredAttributeSets(TargetContext targetCtx, AccessRightSet privileges) throws PMException {
+		return pap.query().access().self(userCtx).computeRequiredAttributeSets(targetCtx, privileges);
+	}
+
+	@Override
+	public Map<Long, AccessRightSet> computeCapabilityList() throws PMException {
+		return pap.query().access().self(userCtx).computeCapabilityList();
 	}
 }

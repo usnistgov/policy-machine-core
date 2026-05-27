@@ -8,6 +8,7 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +30,7 @@ public class PMLStmtsRoutine<T> extends PMLRoutine<T> implements PMLStatementSer
     }
 
     @Override
-    public T execute(PAP pap, Args args) throws PMException {
+    public T execute(PAP pap, UserContext userCtx, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         Object result = ctx.executeRoutineStatements(statements.getStmts(), args);

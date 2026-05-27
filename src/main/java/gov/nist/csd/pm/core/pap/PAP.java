@@ -58,8 +58,7 @@ public class PAP implements OperationExecutor, Transactional {
             new ProhibitionsQuerier(policyStore),
             new ObligationsQuerier(policyStore),
             new OperationsQuerier(policyStore, pluginRegistry),
-            new AccessQuerier(policyStore),
-            new SelfAccessQuerier(policyStore)
+            new AccessQuerier(policyStore)
         );
         this.modifier = new PolicyModifier(
             new GraphModifier(policyStore, new RandomIdGenerator()),
@@ -150,8 +149,8 @@ public class PAP implements OperationExecutor, Transactional {
     }
 
     @Override
-    public Object executeOperation(Operation<?> operation, Args args) throws PMException {
-        return operation.execute(this, args);
+    public Object executeOperation(Operation<?> operation, UserContext userCtx, Args args) throws PMException {
+        return operation.execute(this, userCtx, args);
     }
 
     /**

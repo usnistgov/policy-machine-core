@@ -65,7 +65,7 @@ public class OperationInvokeExpression<T> extends Expression<T> {
             pmlOperation.setCtx(funcInvokeCtx.copyWithParentScope());
         }
 
-        Object result = pap.executeOperation(operation, actualArgValues);
+        Object result = pap.executeOperation(operation, ctx.author(), actualArgValues);
         Type<?> actualType = Type.resolveTypeOfObject(result);
 
         if (!actualType.isCastableTo(expectedReturnType)) {

@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SelfAccessComputeAdjacentAscendantPrivileges extends QueryOperation<Map<String, List<String>>> {
+public class SelfAccessComputeAdjacentDescendantPrivileges extends QueryOperation<Map<String, List<String>>> {
 
     private static final NodeNameFormalParameter NODE_NAME_PARAM =
         new NodeNameFormalParameter("node_name");
 
-    public SelfAccessComputeAdjacentAscendantPrivileges() {
-        super("self_compute_adjacent_ascendant_privileges", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE)),
+    public SelfAccessComputeAdjacentDescendantPrivileges() {
+        super("self_compute_adjacent_descendant_privileges", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE)),
             List.of(NODE_NAME_PARAM), List.of());
     }
 
@@ -31,7 +31,7 @@ public class SelfAccessComputeAdjacentAscendantPrivileges extends QueryOperation
     public Map<String, List<String>> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
         String nodeName = args.get(NODE_NAME_PARAM);
         long nodeId = query.graph().getNodeId(nodeName);
-        Map<Node, AccessRightSet> arsetMap = query.access().self(userCtx).computeAdjacentAscendantPrivileges(nodeId);
+        Map<Node, AccessRightSet> arsetMap = query.access().self(userCtx).computeAdjacentDescendantPrivileges(nodeId);
         Map<String, List<String>> ret = new HashMap<>();
         for (Map.Entry<Node, AccessRightSet> e : arsetMap.entrySet()) {
             ret.put(e.getKey().getName(), new ArrayList<>(e.getValue()));

@@ -32,6 +32,12 @@ public class PMLBuiltinOperations {
     private static final SelfAccessComputePrivileges selfAccessComputePrivileges = new SelfAccessComputePrivileges();
     private static final SelfAccessComputeAdjacentAscendantPrivileges selfAccessComputeAdjacentAscendantPrivileges =
         new SelfAccessComputeAdjacentAscendantPrivileges();
+    private static final SelfAccessComputePrivilegesBatch selfAccessComputePrivilegesBatch = new SelfAccessComputePrivilegesBatch();
+    private static final SelfAccessComputeDeniedPrivileges selfAccessComputeDeniedPrivileges = new SelfAccessComputeDeniedPrivileges();
+    private static final SelfAccessComputeSubgraphPrivileges selfAccessComputeSubgraphPrivileges = new SelfAccessComputeSubgraphPrivileges();
+    private static final SelfAccessComputeAdjacentDescendantPrivileges selfAccessComputeAdjacentDescendantPrivileges =
+        new SelfAccessComputeAdjacentDescendantPrivileges();
+    private static final SelfAccessComputePersonalObjectSystem selfAccessComputePersonalObjectSystem = new SelfAccessComputePersonalObjectSystem();
 
 
     private static final Map<String, Operation<?>> BUILTIN_OPERATIONS = new HashMap<>();
@@ -60,6 +66,12 @@ public class PMLBuiltinOperations {
         BUILTIN_OPERATIONS.put(selfAccessComputePrivileges.getName(), selfAccessComputePrivileges);
         BUILTIN_OPERATIONS.put(selfAccessComputeAdjacentAscendantPrivileges.getName(),
             selfAccessComputeAdjacentAscendantPrivileges);
+        BUILTIN_OPERATIONS.put(selfAccessComputePrivilegesBatch.getName(), selfAccessComputePrivilegesBatch);
+        BUILTIN_OPERATIONS.put(selfAccessComputeDeniedPrivileges.getName(), selfAccessComputeDeniedPrivileges);
+        BUILTIN_OPERATIONS.put(selfAccessComputeSubgraphPrivileges.getName(), selfAccessComputeSubgraphPrivileges);
+        BUILTIN_OPERATIONS.put(selfAccessComputeAdjacentDescendantPrivileges.getName(),
+            selfAccessComputeAdjacentDescendantPrivileges);
+        BUILTIN_OPERATIONS.put(selfAccessComputePersonalObjectSystem.getName(), selfAccessComputePersonalObjectSystem);
         BUILTIN_OPERATIONS.put(isNull.getName(), isNull);
     }
 

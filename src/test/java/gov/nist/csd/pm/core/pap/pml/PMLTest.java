@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -67,7 +68,7 @@ public class PMLTest {
             )
         ) {
             @Override
-            public Void execute(PAP pap, Args actualArgs) throws PMException {
+            public Void execute(PAP pap, UserContext userCtx, Args actualArgs) throws PMException {
                 String a = actualArgs.get(ARGA);
                 List<String> b = actualArgs.get(ARGB);
                 Map<String, String> c = actualArgs.get(ARGC);
@@ -91,8 +92,8 @@ public class PMLTest {
 
         pap.modify().operations().createOperation(new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException {
-                pap.executeOperation(op1, args);
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
+                pap.executeOperation(op1, userCtx, args);
 
                 return null;
             }

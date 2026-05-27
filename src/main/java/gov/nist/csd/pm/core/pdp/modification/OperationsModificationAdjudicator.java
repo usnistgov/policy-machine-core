@@ -31,7 +31,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
             .put(ARSET_PARAM, new ArrayList<>(resourceAccessRights));
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
             .put(CreateOperationOp.OPERATION_PARAM, operation);
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class OperationsModificationAdjudicator extends Adjudicator implements Op
             .put(NAME_PARAM, name);
 
         op.canExecute(pap, userCtx, args);
-        op.execute(pap, args);
+        op.execute(pap, userCtx, args);
     }
 }

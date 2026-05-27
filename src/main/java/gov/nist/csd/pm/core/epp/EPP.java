@@ -103,13 +103,13 @@ public class EPP implements EventSubscriber {
                                    SubjectPattern subjectPattern) throws PMException {
         PMLRoutine<?> routine = new PMLRoutine<>("subject_matches", BOOLEAN_TYPE, List.of()) {
             @Override
-            public Boolean execute(PAP pap, Args args) throws PMException {
+            public Boolean execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return subjectPattern.matches(eventContextUser, executionContext, pap);
             }
         };
 
         routine.setCtx(executionContext);
-        return (boolean) pdpTx.executeOperation(routine, new Args());
+        return (boolean) pdpTx.executeOperation(routine, executionContext.author(), new Args());
     }
 
     private boolean operationMatches(UserContext userCtx,
@@ -149,7 +149,7 @@ public class EPP implements EventSubscriber {
         // execute the matching operation to determine if event context args match the pattern
         // use the pdptx so that any calls to the querier have privilege checks
         matchFunc.setCtx(executionContext);
-        return (boolean) pdpTx.executeOperation(matchFunc, args);
+        return (boolean) pdpTx.executeOperation(matchFunc, executionContext.author(), args);
     }
 
     private void checkAccessOnEventContextArgs(UserContext userCtx,

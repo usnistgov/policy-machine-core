@@ -16,6 +16,8 @@ import java.util.Set;
  */
 public interface AccessQuery {
 
+    SelfAccessQuery self(UserContext userCtx) throws PMException;
+
     /**
      * Compute the privileges the user has on the target node. The provided User and Target contexts, allow for the
      * specification of a single node or a list of attributes.

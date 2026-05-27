@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementSerializable;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class PMLStmtsQueryOperation<T> extends PMLQueryOperation<T> implements P
     }
 
     @Override
-    public T execute(PolicyQuery policyQuery, Args args) throws PMException {
+    public T execute(PolicyQuery policyQuery, UserContext userCtx, Args args) throws PMException {
         ExecutionContext ctx = getCtx();
 
         Object result = ctx.executeOperationStatements(stmts.getStmts(), args);

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
@@ -27,7 +28,7 @@ class OperationArgValidationTest {
     private static Operation<Void> opNoEventParams(List<FormalParameter<?>> params) {
         return new AdminOperation<>(null, null, params, List.of()) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException { return null; }
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException { return null; }
         };
     }
 
@@ -35,7 +36,7 @@ class OperationArgValidationTest {
                                                      List<FormalParameter<?>> eventParams) {
         return new AdminOperation<>(null, null, params, eventParams, List.of()) {
             @Override
-            public Void execute(PAP pap, Args args) throws PMException { return null; }
+            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException { return null; }
         };
     }
 
