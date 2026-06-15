@@ -25,13 +25,13 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class CreateObligationStatementTest {
 
@@ -70,14 +70,14 @@ class CreateObligationStatementTest {
         pap.modify().graph().createUser("u2", ids("ua2"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
-        ExecutionContext execCtx = new ExecutionContext(new IdUserContext(id("u2")), pap);
+        ExecutionContext execCtx = new ExecutionContext(NodeUserContext.of(id("u2")), pap);
 
         stmt.execute(execCtx, pap);
 
         assertTrue(pap.query().obligations().obligationExists("o1"));
 
         Obligation actual = pap.query().obligations().getObligation("o1");
-        assertEquals(new IdUserContext(id("u2")), actual.getAuthor());
+        assertEquals(NodeUserContext.of(id("u2")), actual.getAuthor());
         assertEquals(eventPattern, actual.getEventPattern());
     }
 
@@ -174,7 +174,7 @@ class CreateObligationStatementTest {
                 }
             """;
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new IdUserContext(id("u1")), pml);
+        pap.executePML(NodeUserContext.of(id("u1")), pml);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);

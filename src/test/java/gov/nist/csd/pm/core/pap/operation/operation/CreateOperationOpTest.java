@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
@@ -17,7 +18,6 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
@@ -75,14 +75,14 @@ class CreateOperationOpTest {
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:operation:create", "admin:access:query"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new IdUserContext(id("u1")), pml);
+        pap.executePML(NodeUserContext.of(id("u1")), pml);
 
         AdminOperation<Void> testOp = testOpWithReqCapOnNode(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName());
 
         CreateOperationOp op = new CreateOperationOp();
         Args args = new Args();
         args.put(CreateOperationOp.OPERATION_PARAM, testOp);
-        op.canExecute(pap, new IdUserContext(id("u1")), args);
+        op.canExecute(pap, NodeUserContext.of(id("u1")), args);
     }
 
     @Test
@@ -98,14 +98,14 @@ class CreateOperationOpTest {
                 create u "u1" in ["ua1"]
                 create u "u2" in ["ua2"]
                 """;
-        pap.executePML(new IdUserContext(id("u1")), pml);
+        pap.executePML(NodeUserContext.of(id("u1")), pml);
 
         AdminOperation<Void> testOp = testOpWithReqCapOnNode(AdminPolicyNode.PM_ADMIN_BASE_OA.nodeName());
 
         CreateOperationOp op = new CreateOperationOp();
         Args args = new Args();
         args.put(CreateOperationOp.OPERATION_PARAM, testOp);
-        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, new IdUserContext(id("u2")), args));
+        assertThrows(UnauthorizedException.class, () -> op.canExecute(pap, NodeUserContext.of(id("u2")), args));
     }
 
     @Test
@@ -119,7 +119,7 @@ class CreateOperationOpTest {
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:operation:create"]
                 create u "u1" in ["ua1"]
                 """;
-        pap.executePML(new IdUserContext(id("u1")), pml);
+        pap.executePML(NodeUserContext.of(id("u1")), pml);
 
         AdminOperation<Void> testOp = testOpWithNoReqCaps();
 
@@ -127,6 +127,6 @@ class CreateOperationOpTest {
         Args args = new Args();
         args.put(CreateOperationOp.OPERATION_PARAM, testOp);
         // No RequiredPrivilegeOnNode entries, so the loop is skipped; only super.canExecute is checked
-        op.canExecute(pap, new IdUserContext(id("u1")), args);
+        op.canExecute(pap, NodeUserContext.of(id("u1")), args);
     }
 }

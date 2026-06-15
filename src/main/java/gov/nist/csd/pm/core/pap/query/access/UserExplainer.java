@@ -6,17 +6,10 @@ import gov.nist.csd.pm.core.pap.graph.dag.Propagator;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Path;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,8 +25,6 @@ public class UserExplainer {
 	}
 
 	public Map<Node, Set<Path>> explainIntersectionOfTargetPaths(UserContext userCtx, Map<Node, Map<Path, List<Association>>> targetPaths) throws PMException {
-		ContextChecker.checkUserContextExists(userCtx, policyStore.graph());
-
 		// initialize map with the UAs of the target path associations
 		Map<Node, Set<Path>> associationUAPaths = new HashMap<>();
 		Set<Long> uasFromTargetPathAssociations = new HashSet<>(getUAsFromTargetPathAssociations(targetPaths));
@@ -46,7 +37,7 @@ public class UserExplainer {
 		Propagator propagator = (src, dst) -> {
 			Node dstNode = policyStore.graph().getNodeById(dst);
 			Node srcNode = policyStore.graph().getNodeById(src);
-			
+
 			// don't propagate unless the src is a ua in a target path association or an already propagated to dst node
 			if (!uasFromTargetPathAssociations.contains(src) && !pathsToUAs.containsKey(srcNode)) {
 				return;
@@ -67,7 +58,7 @@ public class UserExplainer {
 		GraphWalker dfs = new DepthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 				.withPropagator(propagator);
 
-		List<Long> nodes = new ArrayList<>(resolveStartNodes(userCtx));
+		List<Long> nodes = new ArrayList<>(userCtx.resolveNodeIds(policyStore.graph()::getNodeByName));
 		for (long node : nodes) {
 			dfs.walk(node);
 		}
@@ -85,28 +76,6 @@ public class UserExplainer {
 		}
 
 		return associationUAPaths;
-	}
-
-	private Collection<Long> resolveStartNodes(UserContext userCtx) throws PMException {
-		return switch (userCtx) {
-			case IdUserContext c -> List.of(c.userId());
-			case NameUserContext c -> List.of(policyStore.graph().getNodeByName(c.username()).getId());
-			case AttributeIdsUserContext c -> c.attributeIds();
-			case AttributeNamesUserContext c -> {
-				List<Long> ids = new ArrayList<>();
-				for (String name : c.attributeNames()) {
-					ids.add(policyStore.graph().getNodeByName(name).getId());
-				}
-				yield ids;
-			}
-			case ConjunctiveUserContext c -> {
-				List<Long> ids = new ArrayList<>();
-				for (UserContext sub : c.contexts()) {
-					ids.addAll(resolveStartNodes(sub));
-				}
-				yield ids;
-			}
-		};
 	}
 
 	private List<Long> getUAsFromTargetPathAssociations(Map<Node, Map<Path, List<Association>>> targetPaths) {

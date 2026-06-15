@@ -25,7 +25,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLRoutine;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -164,19 +164,19 @@ public class EPP implements EventSubscriber {
 
             switch (nodeFormalParameter) {
                 case NodeIdFormalParameter nodeId ->
-                    check(userCtx, new IdTargetContext((long) value));
+                    check(userCtx, NodeTargetContext.of((long) value));
                 case NodeIdListFormalParameter nodeIdList -> {
                     List<Long> idList = (List<Long>) value;
                     for (Long id : idList) {
-                        check(userCtx, new IdTargetContext(id));
+                        check(userCtx, NodeTargetContext.of(id));
                     }
                 }
                 case NodeNameFormalParameter nodeName ->
-                    check(userCtx, new IdTargetContext(pap.query().graph().getNodeId((String) value)));
+                    check(userCtx, NodeTargetContext.of(pap.query().graph().getNodeId((String) value)));
                 case NodeNameListFormalParameter nodeNameList -> {
                     List<String> nameList = (List<String>) value;
                     for (String name : nameList) {
-                        check(userCtx, new IdTargetContext(pap.query().graph().getNodeId(name)));
+                        check(userCtx, NodeTargetContext.of(pap.query().graph().getNodeId(name)));
                     }
                 }
             }

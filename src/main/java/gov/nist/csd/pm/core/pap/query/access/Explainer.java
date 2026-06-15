@@ -38,27 +38,22 @@ public class Explainer {
 
 		// evaluate user
 		UserEvaluator userEvaluator = new UserEvaluator(policyStore);
-		UserEvaluationResult userEvaluationResult = userEvaluator.evaluate(userCtx);
+		UserDagResult userDagResult = userEvaluator.evaluate(userCtx);
 
 		// evaluate target and resolve privs per UserDagResult, intersecting across composite sub-contexts
 		TargetEvaluator targetEvaluator = new TargetEvaluator(policyStore);
-		AccessRightSet priv = null;
-		AccessRightSet deniedPriv = null;
 		List<Prohibition> prohibitions = new ArrayList<>();
-		for (UserDagResult userDagResult : userEvaluationResult.dagResults()) {
-			TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
-			AccessRightSet p = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
-			AccessRightSet d = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
-			priv = (priv == null) ? p : intersect(priv, p);
-			deniedPriv = (deniedPriv == null) ? d : intersect(deniedPriv, d);
-			prohibitions.addAll(computeSatisfiedProhibitions(userDagResult, targetDagResult));
-		}
+
+		TargetDagResult targetDagResult = targetEvaluator.evaluate(userDagResult, targetCtx);
+		AccessRightSet priv = resolvePrivileges(userDagResult, targetDagResult, policyStore.operations().getResourceAccessRights());
+		AccessRightSet deniedPriv = resolveDeniedAccessRights(userDagResult.prohibitions(), targetDagResult);
+		prohibitions.addAll(computeSatisfiedProhibitions(userDagResult, targetDagResult));
 
 		return new Explain(
-				priv == null ? new AccessRightSet() : priv,
-				resolvedPaths,
-				deniedPriv == null ? new AccessRightSet() : deniedPriv,
-				prohibitions
+			priv,
+			resolvedPaths,
+			deniedPriv,
+			prohibitions
 		);
 	}
 
@@ -84,7 +79,7 @@ public class Explainer {
 	}
 
 	private Collection<List<ExplainNode>> getExplainNodePaths(Map<Path, List<Association>> targetPathAssociations,
-	                                                    Map<Node, Set<Path>> userPaths) throws PMException {
+	                                                          Map<Node, Set<Path>> userPaths) throws PMException {
 		Collection<List<ExplainNode>> paths = new ArrayList<>();
 
 		for (Map.Entry<Path, List<Association>> targetPathEntry : targetPathAssociations.entrySet()) {
@@ -105,9 +100,9 @@ public class Explainer {
 					Set<Path> userPathsToAssoc = userPaths.getOrDefault(uaNode, new HashSet<>());
 
 					explainAssocs.add(new ExplainAssociation(
-							uaNode,
-							pathAssoc.arset(),
-							new ArrayList<>(userPathsToAssoc)
+						uaNode,
+						pathAssoc.arset(),
+						new ArrayList<>(userPathsToAssoc)
 					));
 				}
 

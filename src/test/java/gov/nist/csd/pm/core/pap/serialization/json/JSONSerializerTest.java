@@ -10,14 +10,13 @@ import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.util.PolicyEquals;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class JSONSerializerTest {
 
@@ -64,9 +63,9 @@ class JSONSerializerTest {
         EventPattern eventPattern = new EventPattern(new SubjectPattern(), new AnyOperationPattern());
 
         // obligation authored with UserIdContext
-        pap.modify().obligations().createObligation(new IdUserContext(u1), "obl-by-id", eventPattern, new ObligationResponse("ctx", List.of()));
+        pap.modify().obligations().createObligation(NodeUserContext.of(u1), "obl-by-id", eventPattern, new ObligationResponse("ctx", List.of()));
         // obligation authored with UsernameContext
-        pap.modify().obligations().createObligation(new NameUserContext("u1"), "obl-by-name", eventPattern, new ObligationResponse("ctx", List.of()));
+        pap.modify().obligations().createObligation(NodeUserContext.of("u1"), "obl-by-name", eventPattern, new ObligationResponse("ctx", List.of()));
 
         JSONSerializer serializer = new JSONSerializer();
         JSONPolicy jsonPolicy = serializer.buildJSONPolicy(pap.query());

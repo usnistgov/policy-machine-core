@@ -5,7 +5,6 @@ import static gov.nist.csd.pm.core.util.PolicyEquals.assertPolicyEquals;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.json.JSONSerializer;
 import gov.nist.csd.pm.core.util.SamplePolicy;
@@ -13,6 +12,7 @@ import gov.nist.csd.pm.core.util.TestIdGenerator;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 
 public class SerializationTest {
@@ -35,7 +35,7 @@ public class SerializationTest {
         PAP pap = new TestPAP()
                 .withIdGenerator(new TestIdGenerator());
 
-        pap.executePML(new NameUserContext("u1"), """
+        pap.executePML(NodeUserContext.of("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 associate "ua1" to PM_ADMIN_BASE_OA with ["admin:*"]                
@@ -51,7 +51,7 @@ public class SerializationTest {
     @Test
     void testSerializationNodeProperties() throws PMException {
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new NameUserContext("u1"), """
+        pap.executePML(NodeUserContext.of("u1"), """
                 create pc "pc1"
                 create ua "ua1" in ["pc1"]
                 set properties of "ua1" to {"a": "b"}

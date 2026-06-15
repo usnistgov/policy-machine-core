@@ -8,6 +8,7 @@ import static gov.nist.csd.pm.core.common.graph.node.NodeType.U;
 import static gov.nist.csd.pm.core.common.graph.node.NodeType.UA;
 import static gov.nist.csd.pm.core.common.graph.node.Properties.WILDCARD;
 
+import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
@@ -161,12 +162,19 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
     @Override
     public Node getNodeById(long id) throws PMException {
         Vertex vertex = policy.graph.get(id);
+        if (vertex == null) {
+            throw new NodeDoesNotExistException(id);
+        }
         return new Node(vertex.getId(), vertex.getName(), vertex.getType(), vertex.getProperties());
     }
 
     @Override
     public Node getNodeByName(String name) throws PMException {
-        Vertex vertex = policy.graph.get(policy.nameToIds.get(name));
+        Long id = policy.nameToIds.get(name);
+        if (id == null) {
+            throw new NodeDoesNotExistException(name);
+        }
+        Vertex vertex = policy.graph.get(id);
         return new Node(vertex.getId(), vertex.getName(), vertex.getType(), vertex.getProperties());
     }
 
@@ -193,23 +201,42 @@ public class MemoryGraphStore extends MemoryStore implements GraphStore {
 
     @Override
     public Collection<Long> getAdjacentDescendants(long id) throws PMException {
-        return policy.graph.get(id).getAdjacentDescendants();
+        Vertex vertex = policy.graph.get(id);
+        if (vertex == null) {
+            throw new NodeDoesNotExistException(id);
+        }
+        return vertex.getAdjacentDescendants();
     }
 
     @Override
     public Collection<Long> getAdjacentAscendants(long id) throws PMException {
-        return policy.graph.get(id).getAdjacentAscendants();
+        Vertex vertex = policy.graph.get(id);
+        if (vertex == null) {
+            throw new NodeDoesNotExistException(id);
+        }
+        return vertex.getAdjacentAscendants();
     }
 
     @Override
     public Collection<Association> getAssociationsWithSource(long uaId) throws PMException {
-        return policy.graph.get(uaId).getOutgoingAssociations();
+        Vertex vertex = policy.graph.get(uaId);
+        if (vertex == null) {
+            throw new NodeDoesNotExistException(uaId);
+        }
+
+        return vertex.getOutgoingAssociations();
     }
 
     @Override
     public Collection<Association> getAssociationsWithTarget(long targetId) throws PMException {
-        return policy.graph.get(targetId).getIncomingAssociations();
+        Vertex vertex = policy.graph.get(targetId);
+        if (vertex == null) {
+            throw new NodeDoesNotExistException(targetId);
+        }
+
+        return vertex.getIncomingAssociations();
     }
+
 
     @Override
     public Collection<Long> getPolicyClassDescendants(long id) throws PMException {

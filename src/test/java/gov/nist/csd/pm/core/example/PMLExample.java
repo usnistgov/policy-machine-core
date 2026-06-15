@@ -7,11 +7,11 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 public class PMLExample {
     String pml = """
@@ -86,7 +86,7 @@ public class PMLExample {
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
         long adminUserId = pap.query().graph().getNodeId("admin_user");
-        pdp.executePML(new IdUserContext(adminUserId), """
+        pdp.executePML(NodeUserContext.of(adminUserId), """
             create_new_user(username="testUser")
             """);
 
@@ -99,7 +99,7 @@ public class PMLExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.executePML(new IdUserContext(testUserId), """
+            () -> pdp.executePML(NodeUserContext.of(testUserId), """
             create_new_user(username="testUser2")
             """)
         );

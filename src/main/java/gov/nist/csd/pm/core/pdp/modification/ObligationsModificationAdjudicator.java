@@ -14,8 +14,6 @@ import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
@@ -33,10 +31,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
                                  String name,
                                  EventPattern eventPattern,
                                  ObligationResponse response) throws PMException {
-        long authorId = switch (author) {
-            case IdUserContext c -> c.userId();
-            case NameUserContext c -> pap.query().graph().getNodeByName(c.username()).getId();
-        };
+        long authorId = author.resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
         CreateObligationOp op = new CreateObligationOp();
         Args args = new Args()
             .put(AUTHOR_PARAM, authorId)

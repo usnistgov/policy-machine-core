@@ -9,7 +9,7 @@ import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class SelfAccessComputePrivilegesBatch extends QueryOperation<List<List<S
         List<String> nodeNames = args.get(NODE_NAMES_PARAM);
         List<TargetContext> targets = new ArrayList<>(nodeNames.size());
         for (String name : nodeNames) {
-            targets.add(new IdTargetContext(query.graph().getNodeId(name)));
+            targets.add(NodeTargetContext.of(query.graph().getNodeId(name)));
         }
         List<AccessRightSet> results = query.access().self(userCtx).computePrivileges(targets);
         List<List<String>> ret = new ArrayList<>(results.size());

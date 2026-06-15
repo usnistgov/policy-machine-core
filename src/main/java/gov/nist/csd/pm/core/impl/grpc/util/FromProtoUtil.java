@@ -17,15 +17,10 @@ import gov.nist.csd.pm.core.pap.operation.arg.type.ListType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.MapType;
 import gov.nist.csd.pm.core.pap.operation.arg.type.Type;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
@@ -60,17 +55,11 @@ public class FromProtoUtil {
         String process = userCtxProto.getProcess();
 
         return switch (userCtxProto.getUserCase()) {
-            case ID -> new IdUserContext(userCtxProto.getId(), process);
-            case NAME -> new NameUserContext(userCtxProto.getName(), process);
-            case ATTRIBUTE_IDS -> new AttributeIdsUserContext(new HashSet<>(userCtxProto.getAttributeIds().getValuesList()), process);
-            case ATTRIBUTE_NAMES -> new AttributeNamesUserContext(new HashSet<>(userCtxProto.getAttributeNames().getValuesList()), process);
-            case CONJUNCTIVE -> {
-                List<UserContext> contexts = new ArrayList<>();
-                for (gov.nist.csd.pm.proto.v1.pdp.query.UserContext ctx : userCtxProto.getConjunctive().getContextsList()) {
-                    contexts.add(fromUserContextProto(pap, ctx));
-                }
-                yield new ConjunctiveUserContext(contexts);
-            }
+            case ID -> NodeUserContext.of(userCtxProto.getId(), process);
+            case NAME -> NodeUserContext.of(userCtxProto.getName(), process);
+            case ATTRIBUTE_IDS -> AnonymousUserContext.ofIds(new HashSet<>(userCtxProto.getAttributeIds().getValuesList()), process);
+            case ATTRIBUTE_NAMES -> AnonymousUserContext.ofNames(new HashSet<>(userCtxProto.getAttributeNames().getValuesList()), process);
+            case CONJUNCTIVE -> throw new IllegalArgumentException("conjunctive user context is no longer supported");
             case USER_NOT_SET -> throw new IllegalArgumentException("user context not set");
         };
     }
@@ -78,10 +67,10 @@ public class FromProtoUtil {
     public static TargetContext fromTargetContextProto(PAP pap,
                                                        gov.nist.csd.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
         return switch (targetCtxProto.getTargetCase()) {
-            case ID -> new IdTargetContext(targetCtxProto.getId());
-            case NAME -> new NameTargetContext(targetCtxProto.getName());
-            case ATTRIBUTE_IDS -> new AttributeIdsTargetContext(new HashSet<>(targetCtxProto.getAttributeIds().getValuesList()));
-            case ATTRIBUTE_NAMES -> new AttributeNamesTargetContext(targetCtxProto.getAttributeNames().getValuesList());
+            case ID -> NodeTargetContext.of(targetCtxProto.getId());
+            case NAME -> NodeTargetContext.of(targetCtxProto.getName());
+            case ATTRIBUTE_IDS -> AnonymousTargetContext.ofIds(new HashSet<>(targetCtxProto.getAttributeIds().getValuesList()));
+            case ATTRIBUTE_NAMES -> AnonymousTargetContext.ofNames(new HashSet<>(targetCtxProto.getAttributeNames().getValuesList()));
             case TARGET_NOT_SET -> throw new IllegalArgumentException("target context not set");
         };
     }
@@ -232,7 +221,7 @@ public class FromProtoUtil {
         Obligation obligation = new Obligation();
         obligation.setName(proto.getName());
         if (proto.hasAuthor()) {
-            obligation.setAuthor(new IdUserContext(proto.getAuthor().getId()));
+            obligation.setAuthor(NodeUserContext.of(proto.getAuthor().getId()));
         }
         return obligation;
     }

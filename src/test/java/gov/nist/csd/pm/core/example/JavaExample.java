@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -21,7 +22,6 @@ import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import java.util.List;
@@ -103,7 +103,7 @@ public class JavaExample {
                 create o objName in [inboxName]
             }
             """;
-        pap.executePML(new IdUserContext(adminUserId), pml);
+        pap.executePML(NodeUserContext.of(adminUserId), pml);
 
         // create a PDP to run transactions
         PDP pdp = new PDP(pap);
@@ -113,7 +113,7 @@ public class JavaExample {
         epp.subscribeTo(pdp);
 
         // adjudicate the admin operation which will cause the EPP to execute the above obligation response
-        pdp.adjudicateOperation(new IdUserContext(adminUserId), "create_new_user", Map.of("username", "testUser"));
+        pdp.adjudicateOperation(NodeUserContext.of(adminUserId), "create_new_user", Map.of("username", "testUser"));
 
         // check admin operation and obligation response was successful
         assertTrue(pap.query().graph().nodeExists("testUser home"));
@@ -124,7 +124,7 @@ public class JavaExample {
         long testUserId = pap.query().graph().getNodeId("testUser");
         assertThrows(
             UnauthorizedException.class,
-            () -> pdp.adjudicateOperation(new IdUserContext(testUserId), "create_new_user", Map.of("username", "testUser2"))
+            () -> pdp.adjudicateOperation(NodeUserContext.of(testUserId), "create_new_user", Map.of("username", "testUser2"))
         );
     }
 }

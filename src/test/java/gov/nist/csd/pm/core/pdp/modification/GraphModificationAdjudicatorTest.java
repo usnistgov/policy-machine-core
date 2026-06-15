@@ -27,8 +27,8 @@ import gov.nist.csd.pm.core.pap.operation.graph.DeassignOp;
 import gov.nist.csd.pm.core.pap.operation.graph.DeleteNodeOp;
 import gov.nist.csd.pm.core.pap.operation.graph.DissociateOp;
 import gov.nist.csd.pm.core.pap.operation.graph.SetNodePropertiesOp;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -53,7 +53,7 @@ class GraphModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new TestPAP();
 
-        UserContext u1 = new NameUserContext("u1");
+        UserContext u1 = NodeUserContext.of("u1");
 
         pap.executePML(u1, """
                 create pc "pc1"
@@ -85,7 +85,7 @@ class GraphModificationAdjudicatorTest {
         pdp.addEventSubscriber(testEventProcessor);
 
         ok = new GraphModificationAdjudicator(u1, pap, pdp);
-        fail = new GraphModificationAdjudicator(new NameUserContext("u2"), pap, pdp);
+        fail = new GraphModificationAdjudicator(NodeUserContext.of("u2"), pap, pdp);
     }
 
     @Test

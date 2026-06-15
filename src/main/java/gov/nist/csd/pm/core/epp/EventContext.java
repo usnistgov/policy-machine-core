@@ -1,13 +1,9 @@
 package gov.nist.csd.pm.core.epp;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,30 +43,23 @@ public record EventContext(EventContextUser user, String opName, Map<String, Obj
                                                UserContext userCtx,
                                                String opName,
                                                Map<String, Object> args) throws PMException {
-        EventContextUser user = switch (userCtx) {
-            case IdUserContext c -> {
-                Node node = pap.query().graph().getNodeById(c.userId());
-                yield new EventContextUser(node.getName(), userCtx.getProcess());
-            }
-            case NameUserContext c ->
-                new EventContextUser(c.username(), userCtx.getProcess());
-            case AttributeIdsUserContext c -> {
-                List<String> names = new ArrayList<>();
-                for (long id : c.attributeIds()) {
+        EventContextUser user;
+        if (userCtx instanceof NodeUserContext c) {
+            long id = c.resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
+            user = new EventContextUser(pap.query().graph().getNodeById(id).getName(), userCtx.getProcess());
+        } else if (userCtx instanceof AnonymousUserContext c) {
+            List<String> names = new ArrayList<>();
+            if (c.getAttributeNames() != null) {
+                names.addAll(c.getAttributeNames());
+            } else {
+                for (long id : c.getAttributeIds()) {
                     names.add(pap.query().graph().getNodeById(id).getName());
                 }
-                yield new EventContextUser(names, userCtx.getProcess());
             }
-            case AttributeNamesUserContext c ->
-                new EventContextUser(new ArrayList<>(c.attributeNames()), userCtx.getProcess());
-            case ConjunctiveUserContext c -> {
-                List<String> names = new ArrayList<>();
-                for (UserContext sub : c.contexts()) {
-                    names.add(sub.toString());
-                }
-                yield new EventContextUser(names, userCtx.getProcess());
-            }
-        };
+            user = new EventContextUser(names, userCtx.getProcess());
+        } else {
+            throw new IllegalArgumentException("unsupported user context type: " + userCtx.getClass());
+        }
 
         return new EventContext(
             user,

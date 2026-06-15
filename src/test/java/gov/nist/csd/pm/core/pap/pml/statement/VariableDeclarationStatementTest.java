@@ -8,9 +8,9 @@ import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableDeclarationStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class VariableDeclarationStatementTest {
 
@@ -30,7 +30,7 @@ class VariableDeclarationStatementTest {
                 )
         );
 
-        ExecutionContext ctx = new ExecutionContext(new IdUserContext(0), new MemoryPAP());
+        ExecutionContext ctx = new ExecutionContext(NodeUserContext.of(0), new MemoryPAP());
         ctx.scope().addVariable("c", "123");
         stmt1.execute(ctx, new MemoryPAP());
         stmt2.execute(ctx, new MemoryPAP());

@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.operation.Routine;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class RoutineDefinitionStatementTest {
 
@@ -19,7 +19,7 @@ class RoutineDefinitionStatementTest {
                     create OA "oa1" in [a]
                 }""";
         MemoryPAP pap = new TestPAP();
-        pap.executePML(new NameUserContext("u1"), pml);
+        pap.executePML(NodeUserContext.of("u1"), pml);
         Routine<?> routine1 = (Routine<?>) pap.query().operations().getOperation("routine1");
         assertEquals(pml, routine1.toString());
     }
