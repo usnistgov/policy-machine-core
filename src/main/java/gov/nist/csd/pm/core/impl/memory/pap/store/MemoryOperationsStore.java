@@ -1,5 +1,6 @@
 package gov.nist.csd.pm.core.impl.memory.pap.store;
 
+import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.DeleteOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
@@ -46,7 +47,11 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
 
     @Override
     public Operation<?> getOperation(String name) throws PMException {
-        return policy.operations.get(name);
+        Operation<?> operation = policy.operations.get(name);
+        if (operation == null) {
+            throw new OperationDoesNotExistException(name);
+        }
+        return operation;
     }
 
     @Override

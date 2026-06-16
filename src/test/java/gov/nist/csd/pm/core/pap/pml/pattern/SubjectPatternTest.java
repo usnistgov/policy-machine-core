@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.epp.EventContext;
-import gov.nist.csd.pm.core.epp.EventContextUser;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.InSubjectPatternExpression;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.LogicalSubjectPatternExpression;
@@ -20,12 +20,12 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.UsernamePatternExpressi
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class SubjectPatternTest {
 
@@ -168,7 +168,7 @@ class SubjectPatternTest {
                     }
                 """;
         MemoryPAP memoryPAP = new TestPAP();
-        memoryPAP.executePML(new IdUserContext(id("u1")), pml);
+        memoryPAP.executePML(NodeUserContext.of(id("u1")), pml);
 
         PDP pdp = new PDP(memoryPAP);
         EPP epp = new EPP(pdp, memoryPAP);

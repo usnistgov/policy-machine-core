@@ -5,10 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.ObligationsQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -63,11 +60,9 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
         return filterObligations(obligationsWithAuthor);
     }
 
-    private TargetContext toTargetCtx(NodeUserContext author) {
-        return switch (author) {
-            case IdUserContext c -> new IdTargetContext(c.userId());
-            case NameUserContext c -> new NameTargetContext(c.username());
-        };
+    private TargetContext toTargetCtx(NodeUserContext author) throws PMException {
+        long id = author.resolveNodeIds(pap.query().graph()).iterator().next();
+        return NodeTargetContext.of(id);
     }
 
     private Collection<Obligation> filterObligations(Collection<Obligation> obligations) {

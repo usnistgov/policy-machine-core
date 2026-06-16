@@ -2,18 +2,14 @@ package gov.nist.csd.pm.core.pap.serialization.json;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Objects;
 
 public class JSONObligation {
 
-    public static JSONObligation fromObligation(Obligation o, GraphQuery graphQuery) throws PMException {
-        long authorId = switch (o.getAuthor()) {
-            case IdUserContext c -> c.userId();
-            case NameUserContext c -> graphQuery.getNodeByName(c.username()).getId();
-        };
+    public static JSONObligation fromObligation(Obligation o, NodeLookup graphQuery) throws PMException {
+        long authorId = ((NodeUserContext) o.getAuthor()).resolveNodeIds(graphQuery).iterator().next();
         return new JSONObligation(o.getName(), authorId, o.toString());
     }
 

@@ -1,4 +1,4 @@
-package gov.nist.csd.pm.core.epp;
+package gov.nist.csd.pm.core.pap.obligation.event;
 
 import java.util.List;
 import java.util.Objects;

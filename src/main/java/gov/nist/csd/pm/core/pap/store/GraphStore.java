@@ -6,11 +6,12 @@ import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.tx.Transactional;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.Subgraph;
 import java.util.Collection;
 import java.util.Map;
 
-public interface GraphStore extends Transactional {
+public interface GraphStore extends Transactional, NodeLookup {
 
     void createNode(long id, String name, NodeType type) throws PMException;
     void deleteNode(long id) throws PMException;

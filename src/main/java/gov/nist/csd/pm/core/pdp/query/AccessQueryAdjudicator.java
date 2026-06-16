@@ -7,19 +7,15 @@ import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
 import gov.nist.csd.pm.core.pap.query.AccessQuery;
 import gov.nist.csd.pm.core.pap.query.SelfAccessQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ConjunctiveUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.explain.Explain;
 import gov.nist.csd.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +83,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     @Override
     public SubgraphPrivileges computeSubgraphPrivileges(UserContext userCtx, long root) throws PMException {
         checkOnUserCtx(userCtx);
-        check(this.userCtx, new IdTargetContext(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        check(this.userCtx, NodeTargetContext.of(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeSubgraphPrivileges(userCtx, root);
     }
@@ -95,7 +91,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     @Override
     public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(UserContext userCtx, long root) throws PMException {
         checkOnUserCtx(userCtx);
-        check(this.userCtx, new IdTargetContext(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        check(this.userCtx, NodeTargetContext.of(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeAdjacentAscendantPrivileges(userCtx, root);
     }
@@ -103,7 +99,7 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     @Override
     public Map<Node, AccessRightSet> computeAdjacentDescendantPrivileges(UserContext userCtx, long root) throws PMException {
         checkOnUserCtx(userCtx);
-        check(this.userCtx, new IdTargetContext(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
+        check(this.userCtx, NodeTargetContext.of(root), AdminAccessRight.ADMIN_ACCESS_QUERY);
 
         return pap.query().access().computeAdjacentDescendantPrivileges(userCtx, root);
     }
@@ -132,24 +128,15 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 
     private void checkOnUserCtx(UserContext userCtx) throws PMException {
         switch (userCtx) {
-            case IdUserContext ctx -> check(this.userCtx, new IdTargetContext(ctx.userId()), AdminAccessRight.ADMIN_ACCESS_QUERY);
-            case AttributeIdsUserContext ctx -> check(this.userCtx, new AttributeIdsTargetContext(ctx.attributeIds()), AdminAccessRight.ADMIN_ACCESS_QUERY);
-            case NameUserContext ctx -> {
-                long id = pap.query().graph().getNodeByName(ctx.username()).getId();
-                check(this.userCtx, new IdTargetContext(id), AdminAccessRight.ADMIN_ACCESS_QUERY);
+            case NodeUserContext ctx -> {
+                long id = ctx.resolveNodeIds(pap.query().graph()).iterator().next();
+                check(this.userCtx, NodeTargetContext.of(id), AdminAccessRight.ADMIN_ACCESS_QUERY);
             }
-            case AttributeNamesUserContext ctx -> {
-                Set<Long> ids = new HashSet<>();
-                for (String name : ctx.attributeNames()) {
-                    ids.add(pap.query().graph().getNodeByName(name).getId());
-                }
-                check(this.userCtx, new AttributeIdsTargetContext(ids), AdminAccessRight.ADMIN_ACCESS_QUERY);
+            case AnonymousUserContext ctx -> {
+                Set<Long> ids = new HashSet<>(ctx.resolveNodeIds(pap.query().graph()));
+                check(this.userCtx, AnonymousTargetContext.ofIds(ids), AdminAccessRight.ADMIN_ACCESS_QUERY);
             }
-            case ConjunctiveUserContext ctx -> {
-                for (UserContext sub : ctx.contexts()) {
-                    checkOnUserCtx(sub);
-                }
-            }
+            default -> throw new IllegalArgumentException("unsupported user context type: " + userCtx.getClass());
         }
     }
 }

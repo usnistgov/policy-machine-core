@@ -9,14 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pdp.PDP;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
 import gov.nist.csd.pm.core.util.TestPAP;
@@ -39,7 +38,7 @@ class OperationsModificationAdjudicatorTest {
     void setup() throws PMException {
         pap = new TestPAP();
 
-        pap.executePML(new NameUserContext("u1"), """
+        pap.executePML(NodeUserContext.of("u1"), """
                 create pc "pc1"
 
                 create ua "ua1" in ["pc1"]
@@ -62,8 +61,8 @@ class OperationsModificationAdjudicatorTest {
         testEventProcessor = new TestEventSubscriber();
         pdp.addEventSubscriber(testEventProcessor);
 
-        ok = new OperationsModificationAdjudicator(new NameUserContext("u1"), pap);
-        fail = new OperationsModificationAdjudicator(new IdUserContext(id("u2")), pap);
+        ok = new OperationsModificationAdjudicator(NodeUserContext.of("u1"), pap);
+        fail = new OperationsModificationAdjudicator(NodeUserContext.of(id("u2")), pap);
     }
 
 

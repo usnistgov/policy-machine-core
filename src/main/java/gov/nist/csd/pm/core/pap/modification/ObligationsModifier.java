@@ -4,7 +4,6 @@ import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
-import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
@@ -45,7 +44,6 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
             throw new ObligationNameExistsException(name);
         }
 
-        ContextChecker.checkUserContextExists(author, policyStore.graph());
     }
 
     /**

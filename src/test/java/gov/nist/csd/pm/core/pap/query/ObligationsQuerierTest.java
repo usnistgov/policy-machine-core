@@ -13,17 +13,17 @@ import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 
     public Obligation obligation1() throws PMException {
         return new Obligation(
-            new IdUserContext(id("u1")),
+            NodeUserContext.of(id("u1")),
             "obl1",
             new EventPattern(
                 new SubjectPattern(),
@@ -37,7 +37,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 
     public Obligation obligation2() throws PMException {
         return new Obligation(
-            new IdUserContext(id("u1")),
+            NodeUserContext.of(id("u1")),
             "label2",
             new EventPattern(
                 new SubjectPattern(),
@@ -51,7 +51,7 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
 
     public Obligation obligation3() throws PMException {
         return new Obligation(
-            new IdUserContext(id("u1")),
+            NodeUserContext.of(id("u1")),
             "label3",
             new EventPattern(
                 new SubjectPattern(),

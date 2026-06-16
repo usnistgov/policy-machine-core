@@ -3,9 +3,9 @@ package gov.nist.csd.pm.core.pap.pml.statement;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class ReturnStatementTest {
 
@@ -23,7 +23,7 @@ class ReturnStatementTest {
                 create PC f1()
                 """;
         PAP pap = new TestPAP();
-        pap.executePML(new IdUserContext(0), pml);
+        pap.executePML(NodeUserContext.of(0), pml);
     }
 
 }

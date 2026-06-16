@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.OperationsModification;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -59,7 +59,7 @@ class PMLOperationWrapperTest {
 
         });
 
-        pap.executePML(new IdUserContext(1), pml);
+        pap.executePML(NodeUserContext.of(1), pml);
 
         assertTrue(pap.query().graph().nodeExists("op4"));
     }

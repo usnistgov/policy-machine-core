@@ -32,7 +32,6 @@ import gov.nist.csd.pm.core.pap.query.OperationsQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuerier;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pap.query.ProhibitionsQuerier;
-import gov.nist.csd.pm.core.pap.query.SelfAccessQuerier;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;

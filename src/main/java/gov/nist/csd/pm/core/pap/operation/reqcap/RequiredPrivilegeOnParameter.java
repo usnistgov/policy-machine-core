@@ -11,7 +11,7 @@ import gov.nist.csd.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
 import gov.nist.csd.pm.core.pap.operation.param.NodeNameListFormalParameter;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
     }
 
     private boolean hasRequiredPrivileges(PAP pap, UserContext userCtx, long id, AccessRightSet required) throws PMException {
-        TargetContext targetCtx = new IdTargetContext(id);
+        TargetContext targetCtx = NodeTargetContext.of(id);
         AccessRightSet privs = pap.query().access().computePrivileges(userCtx, targetCtx);
         return !privs.isEmpty() && privs.containsAll(required);
     }

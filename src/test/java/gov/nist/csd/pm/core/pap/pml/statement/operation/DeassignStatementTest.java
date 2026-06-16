@@ -11,9 +11,9 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class DeassignStatementTest {
 
@@ -31,7 +31,7 @@ class DeassignStatementTest {
         pap.modify().graph().createUserAttribute("ua3", ids("ua1", "ua2", "pc1"));
         pap.modify().graph().createUser("u1", ids("ua1"));
 
-        ExecutionContext execCtx = new ExecutionContext(new NameUserContext("u1"), pap);
+        ExecutionContext execCtx = new ExecutionContext(NodeUserContext.of("u1"), pap);
         stmt.execute(execCtx, pap);
 
         assertTrue(pap.query().graph().getAdjacentDescendants(id("ua3")).contains(id("pc1")));

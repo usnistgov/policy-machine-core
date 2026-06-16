@@ -7,10 +7,10 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 class PrivilegeCheckerTest {
 
@@ -31,9 +31,9 @@ class PrivilegeCheckerTest {
         long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
         long o1 = pap.modify().graph().createObject("o1", List.of(oa1));
 
-        pap.check(new IdUserContext(u1), id("o1"), List.of("read"));
-        pap.check(new IdUserContext(u1), id("pc1"), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE);
-        assertThrows(UnauthorizedException.class, () -> pap.check(new IdUserContext(u1), id("pc1"),
+        pap.check(NodeUserContext.of(u1), id("o1"), List.of("read"));
+        pap.check(NodeUserContext.of(u1), id("pc1"), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_DESCENDANT_CREATE);
+        assertThrows(UnauthorizedException.class, () -> pap.check(NodeUserContext.of(u1), id("pc1"),
             AdminAccessRight.ADMIN_GRAPH_NODE_CREATE));
     }
 

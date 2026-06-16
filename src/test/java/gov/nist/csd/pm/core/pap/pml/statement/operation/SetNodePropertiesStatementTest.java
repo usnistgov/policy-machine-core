@@ -9,8 +9,8 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class SetNodePropertiesStatementTest {
         pap.modify().graph().createPolicyClass("pc1");
         pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
         pap.modify().graph().createUser("u1", ids("ua1"));
-        UserContext userContext = new NameUserContext("u1");
+        UserContext userContext = NodeUserContext.of("u1");
 
         stmt.execute(new ExecutionContext(userContext, pap), pap);
 

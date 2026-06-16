@@ -3,10 +3,8 @@ package gov.nist.csd.pm.core.pdp;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.GraphQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.AnonymousTargetContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
@@ -42,19 +40,23 @@ public class UnauthorizedException extends PMException {
     }
 
     private static String targetString(GraphQuery graphQuery, TargetContext targetContext) throws PMException {
-        return switch (targetContext) {
-            case IdTargetContext ctx -> "{target: " + graphQuery.getNodeById(ctx.targetId()).getName() + "}";
-            case NameTargetContext ctx -> "{target: " + ctx.targetName() + "}";
-            case AttributeIdsTargetContext ctx -> {
-                List<String> names = new ArrayList<>();
-                for (long id : ctx.attributeIds()) {
+        if (targetContext instanceof NodeTargetContext ctx) {
+            String name = ctx.getName() != null
+                ? ctx.getName()
+                : graphQuery.getNodeById(ctx.getId()).getName();
+            return "{target: " + name + "}";
+        } else {
+            AnonymousTargetContext ctx = (AnonymousTargetContext) targetContext;
+            List<String> names = new ArrayList<>();
+            if (ctx.getAttributeNames() != null) {
+                names.addAll(ctx.getAttributeNames());
+            } else {
+                for (long id : ctx.getAttributeIds()) {
                     names.add(graphQuery.getNodeById(id).getName());
                 }
-                yield String.format("{target: [%s]}", String.join(", ", names));
             }
-            case AttributeNamesTargetContext ctx ->
-                String.format("{target: [%s]}", String.join(", ", ctx.attributeNames()));
-        };
+            return String.format("{target: [%s]}", String.join(", ", names));
+        }
     }
 
     private UnauthorizedException(String msg) {

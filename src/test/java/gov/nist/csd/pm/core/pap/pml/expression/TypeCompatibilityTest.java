@@ -24,7 +24,6 @@ import gov.nist.csd.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.MapLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
-import gov.nist.csd.pm.core.pap.query.model.context.NameUserContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 public class TypeCompatibilityTest {
 
@@ -42,7 +42,7 @@ public class TypeCompatibilityTest {
     @BeforeEach
     void setUp() throws PMException {
         pap = new MemoryPAP();
-        executionContext = new ExecutionContext(new NameUserContext("u1"), pap);
+        executionContext = new ExecutionContext(NodeUserContext.of("u1"), pap);
     }
 
     @Test

@@ -13,11 +13,6 @@ import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightResolver;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.AnonymousTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeIdsTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.AttributeNamesTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.ContextChecker;
-import gov.nist.csd.pm.core.pap.query.model.context.IdTargetContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NameTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
@@ -54,14 +49,10 @@ public class TargetEvaluator {
 		TraversalState state = initializeEvaluationState(userDagResult, targetContext);
 		GraphWalker dfs = createDepthFirstWalker(userDagResult, state);
 
-		// walk the target graph starting at the first level descs
-		List<Long> targetNodes = switch (targetContext) {
-			case IdTargetContext ctx -> List.of(ctx.targetId());
-			case NameTargetContext ctx -> List.of(policyStore.graph().getNodeByName(ctx.targetName()).getId());
-			case AttributeIdsTargetContext ctx -> new ArrayList<>(ctx.attributeIds());
-			case AttributeNamesTargetContext ctx -> new ArrayList<>(resolveAttributeNames(ctx.attributeNames()));
-		};
-		targetContext.walk(dfs, policyStore.graph()::getNodeByName);
+		List<Long> targetNodes = new ArrayList<>(targetContext.resolveNodeIds(policyStore.graph()));
+		for (long id : targetNodes) {
+			dfs.walk(id);
+		}
 
 		Map<Long, AccessRightSet> pcMap = computePcMap(targetNodes, state.visitedNodes);
 
@@ -93,17 +84,14 @@ public class TargetEvaluator {
 
 	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
 		Collection<Long> firstLevelDescs = new LongArrayList();
-		switch (targetCtx) {
-			case IdTargetContext ctx ->
-				firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(ctx.targetId()));
-			case NameTargetContext ctx -> {
-				long id = policyStore.graph().getNodeByName(ctx.targetName()).getId();
-				firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(id));
-			}
-			case AttributeIdsTargetContext ctx ->
-				firstLevelDescs.addAll(ctx.attributeIds());
-			case AttributeNamesTargetContext ctx ->
-				firstLevelDescs.addAll(resolveAttributeNames(ctx.attributeNames()));
+		Collection<Long> resolvedIds = targetCtx.resolveNodeIds(policyStore.graph());
+
+		if (targetCtx instanceof NodeTargetContext) {
+			long id = resolvedIds.iterator().next();
+			firstLevelDescs.addAll(policyStore.graph().getAdjacentDescendants(id));
+		} else {
+			// AnonymousTargetContext: attribute ids are themselves the starting points
+			firstLevelDescs.addAll(resolvedIds);
 		}
 
 		Set<Long> userProhibitionTargets = collectUserProhibitionAttributes(userDagResult.prohibitions());
@@ -130,7 +118,7 @@ public class TargetEvaluator {
 
 		// evaluate the privileges this user has on the PM_ADMIN_POLICY_CLASSES node
 		// these privs represent the access rights the user has on policy classes
-		TargetDagResult adminTargetResult = evaluate(userDagResult, new IdTargetContext(PM_ADMIN_POLICY_CLASSES.nodeId()));
+		TargetDagResult adminTargetResult = evaluate(userDagResult, NodeTargetContext.of(PM_ADMIN_POLICY_CLASSES.nodeId()));
 		return AccessRightResolver.resolvePrivileges(
 			userDagResult,
 			adminTargetResult,
@@ -184,21 +172,17 @@ public class TargetEvaluator {
 	}
 
 	protected TargetContext prepareTargetCtx(TargetContext targetContext) throws PMException {
-		ContextChecker.checkTargetContextExists(targetContext, policyStore.graph());
-
 		// if already a list of attributes, nothing to prepare
 		if (targetContext instanceof AnonymousTargetContext) {
 			return targetContext;
 		}
 
 		// if the node is a PC, redirect to the PM_ADMIN_PCs node
-		Node targetNode = switch ((NodeTargetContext) targetContext) {
-			case IdTargetContext ctx -> policyStore.graph().getNodeById(ctx.targetId());
-			case NameTargetContext ctx -> policyStore.graph().getNodeByName(ctx.targetName());
-		};
+		long nodeId = targetContext.resolveNodeIds(policyStore.graph()).iterator().next();
+		Node targetNode = policyStore.graph().getNodeById(nodeId);
 
 		if (targetNode.getType().equals(PC)) {
-			return new IdTargetContext(PM_ADMIN_POLICY_CLASSES.nodeId());
+			return NodeTargetContext.of(PM_ADMIN_POLICY_CLASSES.nodeId());
 		}
 
 		return targetContext;
@@ -212,14 +196,6 @@ public class TargetEvaluator {
 		}
 
 		return userProhibitionAttrs;
-	}
-
-	private Collection<Long> resolveAttributeNames(Collection<String> names) throws PMException {
-		Collection<Long> ids = new ArrayList<>();
-		for (String name : names) {
-			ids.add(policyStore.graph().getNodeByName(name).getId());
-		}
-		return ids;
 	}
 
 	protected record TraversalState(Collection<Long> firstLevelDescs,

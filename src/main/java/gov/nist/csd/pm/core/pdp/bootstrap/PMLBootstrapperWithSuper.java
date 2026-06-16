@@ -6,7 +6,7 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.modification.GraphModification;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.accessright.WildcardAccessRight;
-import gov.nist.csd.pm.core.pap.query.model.context.IdUserContext;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.List;
 
 public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
@@ -100,10 +100,10 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
                     }                    
                     """;
             // execute the obligation pml
-            tx.executePML(new IdUserContext(superUserId), obligationPml);
+            tx.executePML(NodeUserContext.of(superUserId), obligationPml);
 
             // execute the provided pml directly with the PAP with no access checks
-            tx.executePML(new IdUserContext(superUserId), pml);
+            tx.executePML(NodeUserContext.of(superUserId), pml);
         });
     }
 }

@@ -1,23 +1,15 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.graph.dag.GraphWalker;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
 /**
- * Represents the user in an access decision.
- * Three types are supported:
- *   - NodeUserContext: identifies a specific user node by id (IdUserContext) or by name (NameUserContext).
- *   - AnonymousUserContext: identifies a subject by a set of user attribute IDs (AttributeIdsUserContext) or names
- *                           (AttributeNamesUserContext).
- *   - ConjunctiveUserContext: combines multiple UserContext instances so that access is evaluated as the intersection
- *                             of all contexts.
+ * Represents the user in access decisions.
  */
-public abstract sealed class UserContext implements Serializable
-        permits NodeUserContext, AnonymousUserContext, ConjunctiveUserContext {
+public abstract class UserContext implements Serializable {
 
     private final String process;
 
@@ -27,63 +19,27 @@ public abstract sealed class UserContext implements Serializable
 
     /**
      * Returns the process identifier associated with this user context.
-     * @return the process identifier, or an empty string if none is set
+     * @return the process identifier, or an empty string if none is set.
      */
     public String getProcess() {
         return process;
     }
 
     /**
-     * Walk the graph using the given walker, starting from the node(s) identified by this context.
-     * @param walker the configured walker to use for traversal
-     * @param nodeLookup used to resolve node names to IDs where necessary
-     * @throws PMException if an error occurs during traversal or node lookup
+     * Resolve the IDs of any nodes referenced in this user context. The NodeLookup provides a look-up to get node IDs.
+     * @param nodeLookup A NodeLookup implementation used to lookup nodes in the policy store.
+     * @return A list of the IDs.
+     * @throws PMException if there is an exception resolving a node id.
      */
-    public abstract void walk(GraphWalker walker, NodeLookup nodeLookup) throws PMException;
+    public abstract Collection<Long> resolveNodeIds(NodeLookup nodeLookup) throws PMException;
 
     /**
-     * Creates a context identifying the user by name.
-     * @param username the name of the user node
-     * @return a NameUserContext for the given username
+     * Convert this user context to an EventContextUser for use in obligation event processing.
+     *
+     * @param lookup A NodeLookup to get the node names.
+     * @return the EventContextUser representation of this context.
+     * @throws PMException if a node lookup fails.
      */
-    public static UserContext of(String username) {
-        return new NameUserContext(username);
-    }
+    public abstract EventContextUser toEventContextUser(NodeLookup lookup) throws PMException;
 
-    /**
-     * Creates a context identifying the user by node ID.
-     * @param userId the ID of the user node
-     * @return an IdUserContext for the given ID
-     */
-    public static UserContext of(long userId) {
-        return new IdUserContext(userId);
-    }
-
-    /**
-     * Creates an anonymous context identifying the subject by a set of user attribute names.
-     * @param attributeNames the names of the user attributes
-     * @return an AttributeNamesUserContext for the given attribute names
-     */
-    public static UserContext of(List<String> attributeNames) {
-        return new AttributeNamesUserContext(new HashSet<>(attributeNames));
-    }
-
-    /**
-     * Creates an anonymous context identifying the subject by a set of user attribute IDs.
-     * @param attributeIds the IDs of the user attributes
-     * @return an AttributeIdsUserContext for the given attribute IDs
-     */
-    public static UserContext of(Set<Long> attributeIds) {
-        return new AttributeIdsUserContext(attributeIds);
-    }
-
-    /**
-     * Creates a conjunctive context that combines multiple UserContext instances.
-     * Access is evaluated as the intersection of privileges across all sub-contexts.
-     * @param contexts the list of contexts to combine
-     * @return a ConjunctiveUserContext wrapping the given contexts
-     */
-    public static UserContext conjunctive(List<UserContext> contexts) {
-        return new ConjunctiveUserContext(contexts);
-    }
 }
