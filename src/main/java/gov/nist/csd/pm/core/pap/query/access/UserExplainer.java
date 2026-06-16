@@ -58,7 +58,7 @@ public class UserExplainer {
 		GraphWalker dfs = new DepthFirstGraphWalker(policyStore.graph()::getAdjacentDescendants)
 				.withPropagator(propagator);
 
-		List<Long> nodes = new ArrayList<>(userCtx.resolveNodeIds(policyStore.graph()::getNodeByName));
+		List<Long> nodes = new ArrayList<>(userCtx.resolveNodeIds(policyStore.graph()));
 		for (long node : nodes) {
 			dfs.walk(node);
 		}

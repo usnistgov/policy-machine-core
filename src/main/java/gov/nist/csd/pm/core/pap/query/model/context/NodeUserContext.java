@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +52,12 @@ public class NodeUserContext extends UserContext {
         }
 
         return List.of(nodeLookup.getNodeByName(name).getId());
+    }
+
+    @Override
+    public EventContextUser toEventContextUser(NodeLookup lookup) throws PMException {
+        String resolvedName = name != null ? name : lookup.getNodeById(id).getName();
+        return new EventContextUser(resolvedName, getProcess());
     }
 
     @Override

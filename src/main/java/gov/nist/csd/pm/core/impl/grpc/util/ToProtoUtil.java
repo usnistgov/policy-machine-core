@@ -4,7 +4,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
-import gov.nist.csd.pm.core.epp.EventContextUser;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.PolicyQuery;
@@ -184,7 +184,7 @@ public class ToProtoUtil {
         gov.nist.csd.pm.proto.v1.model.Obligation.Builder builder = gov.nist.csd.pm.proto.v1.model.Obligation.newBuilder()
             .setName(obligation.getName())
             .setAuthor(toNodeProto(pap.query().graph().getNodeById(
-                obligation.getAuthor().resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next()
+                obligation.getAuthor().resolveNodeIds(pap.query().graph()).iterator().next()
             )))
             .setPml(obligation.toString());
         return builder.build();

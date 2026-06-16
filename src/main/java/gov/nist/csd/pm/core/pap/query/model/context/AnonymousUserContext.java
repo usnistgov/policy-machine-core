@@ -2,7 +2,8 @@ package gov.nist.csd.pm.core.pap.query.model.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
-import gov.nist.csd.pm.core.common.graph.node.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,5 +62,17 @@ public class AnonymousUserContext extends UserContext{
         }
 
         return ids;
+    }
+
+    @Override
+    public EventContextUser toEventContextUser(NodeLookup lookup) throws PMException {
+        if (attributeNames != null) {
+            return new EventContextUser(new ArrayList<>(attributeNames), getProcess());
+        }
+        List<String> names = new ArrayList<>();
+        for (long attrId : attributeIds) {
+            names.add(lookup.getNodeById(attrId).getName());
+        }
+        return new EventContextUser(names, getProcess());
     }
 }

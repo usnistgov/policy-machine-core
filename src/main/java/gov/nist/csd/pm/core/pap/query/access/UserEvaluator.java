@@ -48,7 +48,7 @@ public class UserEvaluator {
 				}
 			});
 
-		for (long id : ctx.resolveNodeIds(policyStore.graph()::getNodeByName)) {
+		for (long id : ctx.resolveNodeIds(policyStore.graph())) {
 			bfs.walk(id);
 		}
 

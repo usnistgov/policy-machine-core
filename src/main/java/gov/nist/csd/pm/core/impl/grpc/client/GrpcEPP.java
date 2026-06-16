@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.impl.grpc.client;
 
 import gov.nist.csd.pm.core.epp.EventContext;
-import gov.nist.csd.pm.core.epp.EventContextUser;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import gov.nist.csd.pm.proto.v1.epp.EPPServiceGrpc;
 import io.grpc.ManagedChannel;
 import java.util.Map;

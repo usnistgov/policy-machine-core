@@ -129,11 +129,11 @@ public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
     private void checkOnUserCtx(UserContext userCtx) throws PMException {
         switch (userCtx) {
             case NodeUserContext ctx -> {
-                long id = ctx.resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
+                long id = ctx.resolveNodeIds(pap.query().graph()).iterator().next();
                 check(this.userCtx, NodeTargetContext.of(id), AdminAccessRight.ADMIN_ACCESS_QUERY);
             }
             case AnonymousUserContext ctx -> {
-                Set<Long> ids = new HashSet<>(ctx.resolveNodeIds(pap.query().graph()::getNodeByName));
+                Set<Long> ids = new HashSet<>(ctx.resolveNodeIds(pap.query().graph()));
                 check(this.userCtx, AnonymousTargetContext.ofIds(ids), AdminAccessRight.ADMIN_ACCESS_QUERY);
             }
             default -> throw new IllegalArgumentException("unsupported user context type: " + userCtx.getClass());

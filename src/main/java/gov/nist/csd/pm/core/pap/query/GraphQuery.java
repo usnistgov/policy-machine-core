@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Interface to query the graph.
  */
-public interface GraphQuery {
+public interface GraphQuery extends NodeLookup {
 
     /**
      * Check if a node exists in the graph with the given ID.
@@ -32,15 +32,6 @@ public interface GraphQuery {
     boolean nodeExists(String name) throws PMException;
 
     /**
-     * Get the Node object associated with the given name.
-     *
-     * @param name The name of the node to get.
-     * @return The Node with the given name.
-     * @throws PMException If any PM related exceptions occur in the implementing class.
-     */
-    Node getNodeByName(String name) throws PMException;
-
-    /**
      * Get the ID of the node with the given name.
      *
      * @param name The name of the node to get the ID for.
@@ -48,15 +39,6 @@ public interface GraphQuery {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     long getNodeId(String name) throws PMException;
-
-    /**
-     * Get the Node object with the given id.
-     *
-     * @param id The ID of the node to get.
-     * @return The Node with the given ID.
-     * @throws PMException If any PM related exceptions occur in the implementing class.
-     */
-    Node getNodeById(long id) throws PMException;
 
     /**
      * Search for nodes with the given type and/or properties. To return all nodes, use type=NodeType.ANY and properties=new HashMap<>().

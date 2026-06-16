@@ -67,14 +67,14 @@ public class TargetExplainer {
 
 		List<Node> nodes = new ArrayList<>();
 		if (targetCtx instanceof NodeTargetContext) {
-			long nodeId = targetCtx.resolveNodeIds(policyStore.graph()::getNodeByName).iterator().next();
+			long nodeId = targetCtx.resolveNodeIds(policyStore.graph()).iterator().next();
 			Node targetNode = policyStore.graph().getNodeById(nodeId);
 			long walkId = targetNode.getType().equals(PC) ? PM_ADMIN_POLICY_CLASSES.nodeId() : nodeId;
 			nodes.add(targetNode);
 			dfs.walk(walkId);
 		} else {
 			// AnonymousTargetContext
-			for (long id : targetCtx.resolveNodeIds(policyStore.graph()::getNodeByName)) {
+			for (long id : targetCtx.resolveNodeIds(policyStore.graph())) {
 				nodes.add(policyStore.graph().getNodeById(id));
 				dfs.walk(id);
 			}

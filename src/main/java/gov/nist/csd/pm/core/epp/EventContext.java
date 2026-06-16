@@ -2,12 +2,9 @@ package gov.nist.csd.pm.core.epp;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.AnonymousUserContext;
-import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,28 +40,7 @@ public record EventContext(EventContextUser user, String opName, Map<String, Obj
                                                UserContext userCtx,
                                                String opName,
                                                Map<String, Object> args) throws PMException {
-        EventContextUser user;
-        if (userCtx instanceof NodeUserContext c) {
-            long id = c.resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
-            user = new EventContextUser(pap.query().graph().getNodeById(id).getName(), userCtx.getProcess());
-        } else if (userCtx instanceof AnonymousUserContext c) {
-            List<String> names = new ArrayList<>();
-            if (c.getAttributeNames() != null) {
-                names.addAll(c.getAttributeNames());
-            } else {
-                for (long id : c.getAttributeIds()) {
-                    names.add(pap.query().graph().getNodeById(id).getName());
-                }
-            }
-            user = new EventContextUser(names, userCtx.getProcess());
-        } else {
-            throw new IllegalArgumentException("unsupported user context type: " + userCtx.getClass());
-        }
-
-        return new EventContext(
-            user,
-            opName,
-            args
-        );
+        EventContextUser user = userCtx.toEventContextUser(pap.query().graph());
+        return new EventContext(user, opName, args);
     }
 }

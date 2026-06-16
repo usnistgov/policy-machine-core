@@ -37,7 +37,7 @@ public class CachedTargetEvaluator extends TargetEvaluator {
     @Override
     protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
         Collection<Long> firstLevelDescs = new LongArrayList();
-        Collection<Long> resolvedIds = targetCtx.resolveNodeIds(policyStore.graph()::getNodeByName);
+        Collection<Long> resolvedIds = targetCtx.resolveNodeIds(policyStore.graph());
 
         if (targetCtx instanceof NodeTargetContext) {
             long id = resolvedIds.iterator().next();

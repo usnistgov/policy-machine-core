@@ -49,7 +49,7 @@ public class TargetEvaluator {
 		TraversalState state = initializeEvaluationState(userDagResult, targetContext);
 		GraphWalker dfs = createDepthFirstWalker(userDagResult, state);
 
-		List<Long> targetNodes = new ArrayList<>(targetContext.resolveNodeIds(policyStore.graph()::getNodeByName));
+		List<Long> targetNodes = new ArrayList<>(targetContext.resolveNodeIds(policyStore.graph()));
 		for (long id : targetNodes) {
 			dfs.walk(id);
 		}
@@ -84,7 +84,7 @@ public class TargetEvaluator {
 
 	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
 		Collection<Long> firstLevelDescs = new LongArrayList();
-		Collection<Long> resolvedIds = targetCtx.resolveNodeIds(policyStore.graph()::getNodeByName);
+		Collection<Long> resolvedIds = targetCtx.resolveNodeIds(policyStore.graph());
 
 		if (targetCtx instanceof NodeTargetContext) {
 			long id = resolvedIds.iterator().next();
@@ -178,7 +178,7 @@ public class TargetEvaluator {
 		}
 
 		// if the node is a PC, redirect to the PM_ADMIN_PCs node
-		long nodeId = targetContext.resolveNodeIds(policyStore.graph()::getNodeByName).iterator().next();
+		long nodeId = targetContext.resolveNodeIds(policyStore.graph()).iterator().next();
 		Node targetNode = policyStore.graph().getNodeById(nodeId);
 
 		if (targetNode.getType().equals(PC)) {

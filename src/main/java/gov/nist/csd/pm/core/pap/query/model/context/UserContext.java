@@ -1,7 +1,8 @@
 package gov.nist.csd.pm.core.pap.query.model.context;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
+import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -18,7 +19,7 @@ public abstract class UserContext implements Serializable {
 
     /**
      * Returns the process identifier associated with this user context.
-     * @return the process identifier, or an empty string if none is set
+     * @return the process identifier, or an empty string if none is set.
      */
     public String getProcess() {
         return process;
@@ -31,5 +32,14 @@ public abstract class UserContext implements Serializable {
      * @throws PMException if there is an exception resolving a node id.
      */
     public abstract Collection<Long> resolveNodeIds(NodeLookup nodeLookup) throws PMException;
+
+    /**
+     * Convert this user context to an EventContextUser for use in obligation event processing.
+     *
+     * @param lookup A NodeLookup to get the node names.
+     * @return the EventContextUser representation of this context.
+     * @throws PMException if a node lookup fails.
+     */
+    public abstract EventContextUser toEventContextUser(NodeLookup lookup) throws PMException;
 
 }

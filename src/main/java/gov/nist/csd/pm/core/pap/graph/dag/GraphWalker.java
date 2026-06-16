@@ -1,7 +1,7 @@
 package gov.nist.csd.pm.core.pap.graph.dag;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.graph.node.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
 import gov.nist.csd.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 

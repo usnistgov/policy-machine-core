@@ -2,7 +2,7 @@ package gov.nist.csd.pm.core.pap.serialization.json;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.common.graph.node.NodeLookup;
+import gov.nist.csd.pm.core.pap.query.NodeLookup;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Objects;
 

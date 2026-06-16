@@ -52,7 +52,7 @@ public class CreateObligationStatement extends OperationStatement {
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         String nameStr = name.execute(ctx, pap);
 
-        long authorId = ctx.author().resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
+        long authorId = ctx.author().resolveNodeIds(pap.query().graph()).iterator().next();
 
         return new Args()
             .put(AUTHOR_PARAM, authorId)

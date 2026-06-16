@@ -31,7 +31,7 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
                                  String name,
                                  EventPattern eventPattern,
                                  ObligationResponse response) throws PMException {
-        long authorId = author.resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
+        long authorId = author.resolveNodeIds(pap.query().graph()).iterator().next();
         CreateObligationOp op = new CreateObligationOp();
         Args args = new Args()
             .put(AUTHOR_PARAM, authorId)

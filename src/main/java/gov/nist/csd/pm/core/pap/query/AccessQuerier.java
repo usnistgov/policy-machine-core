@@ -253,7 +253,7 @@ public class AccessQuerier extends Querier implements AccessQuery {
                 }
             });
 
-        dfs.walk(targetCtx, store.graph()::getNodeByName);
+        dfs.walk(targetCtx, store.graph());
 
         // For each visited node, collect association source UAs
         for (long nodeId : visitedNodes) {

@@ -61,7 +61,7 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
     }
 
     private TargetContext toTargetCtx(NodeUserContext author) throws PMException {
-        long id = author.resolveNodeIds(pap.query().graph()::getNodeByName).iterator().next();
+        long id = author.resolveNodeIds(pap.query().graph()).iterator().next();
         return NodeTargetContext.of(id);
     }
 
