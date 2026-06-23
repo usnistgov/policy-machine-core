@@ -45,13 +45,11 @@ public class PDP implements EventPublisher, AccessAdjudication {
      * Execute PML on behalf of the user. The entire PML string will be executed in a transaction.
      * @param userCtx the user.
      * @param pml the PML.
+     * @return an Object containing the result of executing the PML.
      * @throws PMException tf there is an error executing the PML.
      */
-    public void executePML(UserContext userCtx, String pml) throws PMException {
-        runTx(userCtx, tx -> {
-            tx.executePML(pml);
-            return null;
-        });
+    public Object executePML(UserContext userCtx, String pml) throws PMException {
+        return runTx(userCtx, tx -> tx.executePML(pml));
     }
 
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
