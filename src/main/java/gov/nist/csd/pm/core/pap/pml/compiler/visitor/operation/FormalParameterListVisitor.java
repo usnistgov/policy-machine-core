@@ -47,6 +47,12 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
 
             boolean isNodeArg = operationFormalParamContext.NODE_ARG() != null;
             if (isNodeArg) {
+                if (operationFormalParamContext.OPTIONAL_PARAM() != null) {
+                    errors.add(CompileError.fromParserRuleContext(operationFormalParamContext,
+                        "@Node parameter '" + name + "' cannot be optional"));
+                    continue;
+                }
+
                 // node params can be one of 4 types: int64, int64[], string, string[]
                 if (type.equals(LONG_TYPE)) {
                     params.add(new NodeIdFormalParameter(name));
@@ -62,7 +68,8 @@ public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParame
                     continue;
                 }
             } else {
-                params.add(new FormalParameter<>(name, type));
+                boolean required = operationFormalParamContext.OPTIONAL_PARAM() == null;
+                params.add(new FormalParameter<>(name, type, required));
             }
 
             paramNames.add(name);
