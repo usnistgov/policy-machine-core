@@ -13,10 +13,22 @@ import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.AccessAdjudication;
 import gov.nist.csd.pm.core.pdp.adjudication.OperationRequest;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * An administrative PDP that wraps a {@link PAP} with privilege checks on administrative
+ * operations.
+ * <p>
+ * {@code PDP} itself is backend-agnostic: {@link #eventSubscribers} uses a
+ * {@link CopyOnWriteArrayList} so subscribing/unsubscribing concurrently with event publishing
+ * is safe. Overall thread safety of a {@code PDP} instance is otherwise determined by the
+ * {@link PAP}/{@link gov.nist.csd.pm.core.pap.store.PolicyStore} it wraps — the in-memory store
+ * ({@link gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP}) supports only a single thread per
+ * transaction and fails fast on concurrent misuse; a durable or remote backend's concurrency
+ * contract is defined by that backend.
+ */
 public class PDP implements EventPublisher, AccessAdjudication {
 
     protected final PAP pap;
@@ -24,7 +36,7 @@ public class PDP implements EventPublisher, AccessAdjudication {
 
     public PDP(PAP pap) {
         this.pap = pap;
-        this.eventSubscribers = new ArrayList<>();
+        this.eventSubscribers = new CopyOnWriteArrayList<>();
     }
 
     /**
