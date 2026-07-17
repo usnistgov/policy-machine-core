@@ -2,7 +2,6 @@ package gov.nist.csd.pm.core.pdp.query;
 
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.common.exception.PMRuntimeException;
 import gov.nist.csd.pm.core.common.graph.node.Node;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAP;
@@ -191,26 +190,8 @@ public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
         return ret;
     }
 
-    private Collection<Long> filterNodes(Collection<Long> nodes, AdminAccessRight ar) throws PMException {
-        try {
-            nodes.removeIf(id -> {
-                try {
-                    check(userCtx, NodeTargetContext.of(id), ar);
-                    return false;
-                } catch (UnauthorizedException e) {
-                    return true;
-                } catch (PMException e) {
-                    throw new PMRuntimeException(e);
-                }
-            });
-        } catch (PMRuntimeException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof PMException pmException) {
-                throw pmException;
-            } else {
-                throw new RuntimeException(e);
-            }
-        }
+    Collection<Long> filterNodes(Collection<Long> nodes, AdminAccessRight ar) throws PMException {
+        filterUnauthorized(nodes, id -> check(userCtx, NodeTargetContext.of(id), ar));
 
         return nodes;
     }

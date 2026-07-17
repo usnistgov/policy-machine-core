@@ -309,9 +309,30 @@ TCK to validate it" may be the right answer — but it must be an *explicit, sup
 3. **Remove or harden Java native deserialization in `Neo4jUtil`.** Replace with the existing
    JSON/protobuf representations, or at minimum install a strict `ObjectInputFilter` allow-list.
    Remove `e.printStackTrace()`.
-4. **Eliminate `RuntimeException` wrapping of `PMException`** in
-   `ObligationsQueryAdjudicator`/`GraphQueryAdjudicator` (restructure the lambdas); audit the
-   other 57 unchecked-throw sites for ones reachable mid-transaction.
+4. ✅ **DONE — Eliminate `RuntimeException` wrapping of `PMException`.** Both wrap sites
+   (`ObligationsQueryAdjudicator.filterObligations` and `GraphQueryAdjudicator.filterNodes`, the
+   latter's dead `else { throw new RuntimeException(e); }` fallback) reimplemented the same
+   "smuggle a checked exception out of a `removeIf` lambda" idiom by hand. Extracted it once into
+   `Adjudicator.filterUnauthorized`, a shared, type-safe helper on the common adjudicator base
+   class: it wraps a caught `PMException` in the existing unchecked carrier `PMRuntimeException`
+   inside the lambda, catches it immediately outside `removeIf`, and unconditionally unwraps and
+   rethrows the real `PMException` — no `instanceof`/fallback branch needed, since the helper is
+   the only place that constructs `PMRuntimeException`. Both adjudicators now declare
+   `throws PMException` on the filtering method instead of leaking an undeclared
+   `RuntimeException`. Added regression tests (`ObligationsQueryAdjudicatorTest`,
+   `GraphQueryAdjudicatorTest`) asserting a non-`UnauthorizedException` `PMException`
+   (`NodeDoesNotExistException`, triggered by a stale/non-existent node reference) propagates as
+   a checked `PMException`, not `RuntimeException`.
+   **Audit of the other 57 unchecked-throw sites:** of 59 `throw new
+   RuntimeException/IllegalArgumentException/IllegalStateException/UnsupportedOperationException`
+   sites in `src/main`, ~40 are reachable mid-transaction (operation-arg validation/casting in
+   `pap/operation`, PML execution, and query-adjudicator calls made through
+   `PDP.runTx`/`PDPTx.TxExecutor`); the remainder are gRPC client stub/marshalling code and one
+   PML pretty-printer used only for gRPC wire serialization, none of which run inside a local
+   transaction boundary in this codebase. Since P0.1's `catch (Exception e)` sits at the
+   outermost boundary of every transaction (`TxRunner.runTx`, `PAP.runTx`, `PAP.deserialize`),
+   every mid-tx-reachable site is already covered by rollback + `PMException`-wrapping
+   regardless of origin — no further code change was needed for the audit portion.
 5. **Fix `RandomIdGenerator`**: guard `Long.MIN_VALUE`, and either retry on collision at the
    `GraphModifier` layer or switch the default to a monotonic/sequence-based generator.
 

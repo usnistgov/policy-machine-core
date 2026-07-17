@@ -65,18 +65,9 @@ public class ObligationsQueryAdjudicator extends Adjudicator implements Obligati
         return NodeTargetContext.of(id);
     }
 
-    private Collection<Obligation> filterObligations(Collection<Obligation> obligations) {
-        obligations.removeIf(obligation -> {
-            try {
-                check(userCtx, toTargetCtx(obligation.getAuthor()), AdminAccessRight.ADMIN_OBLIGATION_LIST);
-
-                return false;
-            } catch (UnauthorizedException e) {
-                return true;
-            } catch (PMException e) {
-                throw new RuntimeException(e);
-            }
-        });
+    Collection<Obligation> filterObligations(Collection<Obligation> obligations) throws PMException {
+        filterUnauthorized(obligations, obligation ->
+            check(userCtx, toTargetCtx(obligation.getAuthor()), AdminAccessRight.ADMIN_OBLIGATION_LIST));
 
         return obligations;
     }
