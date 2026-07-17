@@ -2,17 +2,26 @@ package gov.nist.csd.pm.core.pap.id;
 
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import java.security.SecureRandom;
+import java.util.Random;
 
 public class RandomIdGenerator implements IdGenerator {
 
-	private final SecureRandom secureRandom;
+	private final Random random;
 
 	public RandomIdGenerator() {
-		this.secureRandom = new SecureRandom();
+		this(new SecureRandom());
+	}
+
+	RandomIdGenerator(Random random) {
+		this.random = random;
 	}
 
 	@Override
 	public long generateId(String name, NodeType type) {
-		return Math.abs(this.secureRandom.nextLong());
+		long value;
+		do {
+			value = random.nextLong();
+		} while (value == Long.MIN_VALUE);
+		return Math.abs(value);
 	}
 }

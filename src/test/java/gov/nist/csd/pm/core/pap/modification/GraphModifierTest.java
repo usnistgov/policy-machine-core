@@ -15,12 +15,15 @@ import gov.nist.csd.pm.core.common.exception.InvalidAssignmentException;
 import gov.nist.csd.pm.core.common.exception.InvalidAssociationException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.NodeHasAscendantsException;
+import gov.nist.csd.pm.core.common.exception.NodeIdExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeNameExistsException;
 import gov.nist.csd.pm.core.common.exception.NodeReferencedInProhibitionException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownAccessRightException;
+import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
 import gov.nist.csd.pm.core.pap.graph.Association;
+import gov.nist.csd.pm.core.pap.id.IdGenerator;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.HashSet;
@@ -860,6 +863,74 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
             assertTrue(pap.query().graph().getAssociationsWithSource(id("ua4")).contains(
                     new Association(id("ua4"), id("ua3"), new AccessRightSet("*"))
             ));
+        }
+    }
+
+    @Nested
+    class IdCollisionRetryTest {
+
+        @Test
+        void testCreatePolicyClassRetriesOnIdCollision() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            long existingId = id("pc1");
+
+            pap.withIdGenerator(new QueuedIdGenerator(existingId, existingId + 1));
+
+            pap.modify().graph().createPolicyClass("pc2");
+
+            assertEquals(existingId + 1, id("pc2"));
+        }
+
+        @Test
+        void testCreatePolicyClassThrowsAfterExhaustingRetries() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            long existingId = id("pc1");
+
+            pap.withIdGenerator(new QueuedIdGenerator(existingId));
+
+            assertThrows(NodeIdExistsException.class,
+                    () -> pap.modify().graph().createPolicyClass("pc2"));
+        }
+
+        @Test
+        void testCreateUserAttributeRetriesOnIdCollision() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+            long existingId = id("ua1");
+
+            pap.withIdGenerator(new QueuedIdGenerator(existingId, existingId + 1));
+
+            pap.modify().graph().createUserAttribute("ua2", ids("pc1"));
+
+            assertEquals(existingId + 1, id("ua2"));
+        }
+
+        @Test
+        void testCreateUserAttributeThrowsAfterExhaustingRetries() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createUserAttribute("ua1", ids("pc1"));
+            long existingId = id("ua1");
+
+            pap.withIdGenerator(new QueuedIdGenerator(existingId));
+
+            assertThrows(NodeIdExistsException.class,
+                    () -> pap.modify().graph().createUserAttribute("ua2", ids("pc1")));
+        }
+
+        private static class QueuedIdGenerator implements IdGenerator {
+            private final long[] ids;
+            private int index = 0;
+
+            QueuedIdGenerator(long... ids) {
+                this.ids = ids;
+            }
+
+            @Override
+            public long generateId(String name, NodeType type) {
+                long id = ids[Math.min(index, ids.length - 1)];
+                index++;
+                return id;
+            }
         }
     }
 }

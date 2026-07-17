@@ -333,8 +333,30 @@ TCK to validate it" may be the right answer — but it must be an *explicit, sup
    outermost boundary of every transaction (`TxRunner.runTx`, `PAP.runTx`, `PAP.deserialize`),
    every mid-tx-reachable site is already covered by rollback + `PMException`-wrapping
    regardless of origin — no further code change was needed for the audit portion.
-5. **Fix `RandomIdGenerator`**: guard `Long.MIN_VALUE`, and either retry on collision at the
-   `GraphModifier` layer or switch the default to a monotonic/sequence-based generator.
+5. ✅ **DONE — Fix `RandomIdGenerator`.** `generateId` now loops on `SecureRandom.nextLong()`
+   until it draws a value other than `Long.MIN_VALUE` before taking `Math.abs`, closing the
+   overflow case where `Math.abs(Long.MIN_VALUE)` returns `Long.MIN_VALUE` itself (two's-complement
+   negation of `MIN_VALUE` overflows back to `MIN_VALUE`), which previously let a negative id
+   through. A package-private `RandomIdGenerator(Random)` constructor was added so the branch is
+   directly testable with a stubbed `Random` instead of relying on chance with a real
+   `SecureRandom`.
+   **Collision retry added at the `GraphModifier` layer** (the interface `IdGenerator.generateId`
+   has no store access, so it cannot self-check uniqueness): a new `generateUniqueId` helper
+   retries `idGenerator.generateId(...)` while the id collides with an existing node, bounded at
+   `MAX_ID_GENERATION_ATTEMPTS = 5` attempts before throwing `NodeIdExistsException` — turning an
+   astronomically rare 63-bit collision into a transparent retry instead of a hard failure, while
+   still failing fast against a degenerate custom `IdGenerator`. `createNonPolicyClassNode`
+   (backing `createUserAttribute`/`createObjectAttribute`/`createObject`/`createUser`) already had
+   an id-existence check but threw immediately on the first collision with no retry; it now routes
+   through the shared helper. `createPolicyClass` had **no id-collision check at all** — a
+   colliding id there previously flowed straight into `MemoryPolicy.addNode`'s
+   `graph.put(vertex.getId(), vertex)`, silently overwriting/corrupting an existing node with no
+   exception raised — it now goes through the same `generateUniqueId` guard. Added
+   `RandomIdGeneratorTest` (non-negative ids across many draws; a stubbed-`Random` test proving the
+   `Long.MIN_VALUE` retry branch executes) and an `IdCollisionRetryTest` nested class in
+   `GraphModifierTest` (shared by both the memory and Neo4j backends) covering retry-then-succeed
+   and retry-exhaustion-throws for both `createPolicyClass` and `createUserAttribute` via a queued
+   test `IdGenerator` double.
 
 ### P1 — Required for a supportable production release
 
