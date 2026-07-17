@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.common.graph.node.Properties.toProperties;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -268,6 +269,25 @@ public abstract class GraphModifierTest extends PAPTestInitializer {
                 throw new PMException("test");
             }));
             assertEquals("test", e.getMessage());
+            assertTrue(pap.query().graph().nodeExists("o1"));
+            assertFalse(pap.query().graph().nodeExists("o2"));
+            assertFalse(pap.query().graph().nodeExists("o3"));
+        }
+
+        @Test
+        void testTxRollsBackOnRuntimeException() throws PMException {
+            pap.modify().graph().createPolicyClass("pc1");
+            pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
+            pap.runTx(tx -> {
+                pap.modify().graph().createObject("o1", ids("oa1"));
+            });
+
+            PMException e = assertThrows(PMException.class, () -> pap.runTx(tx -> {
+                pap.modify().graph().createObject("o2", ids("oa1"));
+                pap.modify().graph().createObject("o3", ids("oa1"));
+                throw new IllegalStateException("test");
+            }));
+            assertInstanceOf(IllegalStateException.class, e.getCause());
             assertTrue(pap.query().graph().nodeExists("o1"));
             assertFalse(pap.query().graph().nodeExists("o2"));
             assertFalse(pap.query().graph().nodeExists("o3"));

@@ -180,9 +180,9 @@ public class PAP implements OperationExecutor, Transactional {
 
         try {
             policyDeserializer.deserialize(this, input);
-        } catch (PMException e) {
+        } catch (Exception e) {
             rollback();
-            throw e;
+            throw toPMException(e);
         }
 
         commit();
@@ -214,9 +214,9 @@ public class PAP implements OperationExecutor, Transactional {
             tx.runTx(this);
 
             commit();
-        } catch (PMException e) {
+        } catch (Exception e) {
             rollback();
-            throw e;
+            throw toPMException(e);
         }
     }
 
@@ -237,6 +237,13 @@ public class PAP implements OperationExecutor, Transactional {
 
     public interface TxRunner {
         void runTx(PAP pap) throws PMException;
+    }
+
+    private static PMException toPMException(Exception e) {
+        if (e instanceof PMException pmException) {
+            return pmException;
+        }
+        return new PMException(e);
     }
 
     private boolean isPolicyEmpty() throws PMException {

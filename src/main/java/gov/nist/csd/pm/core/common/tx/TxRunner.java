@@ -10,9 +10,12 @@ public class TxRunner {
             V result = runner.run();
             transactor.commit();
             return result;
-        } catch (PMException e) {
+        } catch (Exception e) {
             transactor.rollback();
-            throw e;
+            if (e instanceof PMException pmException) {
+                throw pmException;
+            }
+            throw new PMException(e);
         }
     }
 

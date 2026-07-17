@@ -2,6 +2,7 @@ package gov.nist.csd.pm.core.common.tx;
 
 import static gov.nist.csd.pm.core.common.tx.TxRunner.runTx;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,6 +35,33 @@ class TxHandlerRunnerTest {
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertFalse(pap.query().graph().nodeExists("pc2"));
+    }
+
+    @Test
+    void testRunTxRollsBackOnRuntimeException() throws PMException {
+        PAP pap = new TestPAP();
+
+        runTx(pap, () -> {
+            pap.modify().graph().createPolicyClass("pc1");
+            return null;
+        });
+        assertTrue(pap.query().graph().nodeExists("pc1"));
+
+        PMException e = assertThrows(PMException.class, () -> runTx(pap, () -> {
+            pap.modify().graph().createPolicyClass("pc2");
+            throw new IllegalStateException("test");
+        }));
+        assertInstanceOf(IllegalStateException.class, e.getCause());
+        assertTrue(pap.query().graph().nodeExists("pc1"));
+        assertFalse(pap.query().graph().nodeExists("pc2"));
+
+        // Proves MemoryTx counter/active were reset by rollback: pre-fix, the stale
+        // active flag / nonzero counter would corrupt this subsequent transaction.
+        runTx(pap, () -> {
+            pap.modify().graph().createPolicyClass("pc3");
+            return null;
+        });
+        assertTrue(pap.query().graph().nodeExists("pc3"));
     }
 
 }

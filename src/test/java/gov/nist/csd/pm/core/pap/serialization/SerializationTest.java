@@ -1,6 +1,9 @@
 package gov.nist.csd.pm.core.pap.serialization;
 
 import static gov.nist.csd.pm.core.util.PolicyEquals.assertPolicyEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -62,5 +65,23 @@ public class SerializationTest {
         jsonPAP.deserialize(json, new JSONDeserializer());
 
         assertPolicyEquals(pap.query(), jsonPAP.query());
+    }
+
+    @Test
+    void testDeserializeRollsBackOnRuntimeException() throws PMException, IOException {
+        MemoryPAP pap = new TestPAP();
+        SamplePolicy.loadSamplePolicyFromPML(pap);
+
+        MemoryPAP expected = new TestPAP();
+        SamplePolicy.loadSamplePolicyFromPML(expected);
+
+        PMException e = assertThrows(PMException.class, () -> pap.deserialize("test", (target, input) -> {
+            target.modify().graph().createPolicyClass("pc2");
+            throw new IllegalStateException("test");
+        }));
+
+        assertInstanceOf(IllegalStateException.class, e.getCause());
+        assertFalse(pap.query().graph().nodeExists("pc2"));
+        assertPolicyEquals(pap.query(), expected.query());
     }
 }
