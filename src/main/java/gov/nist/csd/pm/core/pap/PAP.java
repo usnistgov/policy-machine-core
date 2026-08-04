@@ -66,6 +66,10 @@ public class PAP implements OperationExecutor, Transactional {
     public PAP(PolicyStore policyStore, NativeOperationRegistry nativeOperationRegistry) throws PMException {
         this.nativeOperationRegistry = nativeOperationRegistry;
 
+        // give the store a handle back to this PAP before it's used for anything, so a store that needs to
+        // recompile persisted PML text on read (e.g. Neo4j) can resolve lazy cross-references through it
+        policyStore.setPap(this);
+
         this.querier = new PolicyQuerier(
             new GraphQuerier(policyStore),
             new ProhibitionsQuerier(policyStore),
@@ -97,6 +101,7 @@ public class PAP implements OperationExecutor, Transactional {
     }
 
     public PAP withPolicyStore(PolicyStore policyStore) {
+        policyStore.setPap(this);
         this.policyStore = policyStore;
         return this;
     }
@@ -273,7 +278,9 @@ public class PAP implements OperationExecutor, Transactional {
         // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
 
-        boolean opsEmpty = query().operations().getOperations().isEmpty();
+        // ignore the always-present protected built-ins that query().operations().getOperations() now
+        // includes; only persisted rows count towards emptiness
+        boolean opsEmpty = policyStore().operations().getOperationNames().isEmpty();
 
         return nodes.isEmpty()
             && prohibitionsEmpty

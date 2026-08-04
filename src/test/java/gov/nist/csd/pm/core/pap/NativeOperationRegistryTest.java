@@ -15,7 +15,10 @@ import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class NativeOperationRegistryTest {
@@ -91,6 +94,33 @@ class NativeOperationRegistryTest {
         registry.register(testOp("op1"));
 
         assertFalse(registry.isProtected("op1"));
+    }
+
+    @Test
+    void testGetProtectedNamesReturnsEveryAdminOperationName() {
+        NativeOperationRegistry registry = new NativeOperationRegistry();
+
+        Set<String> expected = AdminOperations.ADMIN_OPERATIONS.stream().map(Operation::getName).collect(Collectors.toSet());
+
+        assertEquals(expected, registry.getProtectedNames());
+    }
+
+    @Test
+    void testGetProtectedNamesExcludesFreshlyRegisteredOperation() throws PMException {
+        NativeOperationRegistry registry = new NativeOperationRegistry();
+        registry.register(testOp("op1"));
+
+        assertFalse(registry.getProtectedNames().contains("op1"));
+    }
+
+    @Test
+    void testGetProtectedOperationsReturnsEveryAdminOperation() {
+        NativeOperationRegistry registry = new NativeOperationRegistry();
+
+        Collection<Operation<?>> protectedOperations = registry.getProtectedOperations();
+
+        assertEquals(AdminOperations.ADMIN_OPERATIONS.size(), protectedOperations.size());
+        assertTrue(protectedOperations.containsAll(AdminOperations.ADMIN_OPERATIONS));
     }
 
     @Test

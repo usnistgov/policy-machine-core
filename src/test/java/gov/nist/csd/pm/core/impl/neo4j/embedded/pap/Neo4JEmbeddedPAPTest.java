@@ -47,7 +47,7 @@ class Neo4jTestInitializer {
 
 	public static PAP init(Path tempDir) throws PMException {
 		return new Neo4jEmbeddedPAP(
-			new Neo4jEmbeddedPolicyStore(Neo4jTestInitializer.getTx(tempDir), Neo4jTestInitializer.class.getClassLoader())
+			new Neo4jEmbeddedPolicyStore(Neo4jTestInitializer.getTx(tempDir))
 		).withIdGenerator(new TestIdGenerator());
 	}
 }

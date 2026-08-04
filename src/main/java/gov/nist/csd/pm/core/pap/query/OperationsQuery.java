@@ -1,7 +1,9 @@
 package gov.nist.csd.pm.core.pap.query;
 
+import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 
@@ -38,6 +40,15 @@ public interface OperationsQuery {
      * @throws PMException If there is an error in the PM.
      */
     Operation<?> getOperation(String name) throws PMException;
+
+    /**
+     * Get the kind (native vs. PML-backed) of a persisted operation row, without materializing it.
+     * @param name The name of the operation.
+     * @return The row's {@link OperationKind}.
+     * @throws OperationDoesNotExistException If no operation with this name is persisted.
+     * @throws PMException If there is an error in the PM.
+     */
+    OperationKind getOperationKind(String name) throws PMException;
 
     /**
      * Returns true if the given name matches any resource operation, admin operation, or routine.

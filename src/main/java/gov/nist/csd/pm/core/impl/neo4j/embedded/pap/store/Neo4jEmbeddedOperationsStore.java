@@ -2,18 +2,28 @@ package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_KIND_PROPERTY;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_LABEL;
+import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PML_TEXT_PROPERTY;
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_ARS_LABEL;
-import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.deserialize;
 
+import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementVisitor;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
+import gov.nist.csd.pm.core.pap.pml.statement.OperationDefinitionStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
@@ -22,11 +32,11 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	private static final String RESOURCE_ACCESS_RIGHTS_NODE_NAME = "resource_access_rights";
 	private final TxHandler txHandler;
-	private ClassLoader classLoader;
+	private final PAP pap;
 
-	public Neo4jEmbeddedOperationsStore(TxHandler txHandler, ClassLoader classLoader) {
+	public Neo4jEmbeddedOperationsStore(TxHandler txHandler, PAP pap) {
 		this.txHandler = txHandler;
-		this.classLoader = classLoader;
+		this.pap = pap;
 	}
 
 	@Override
@@ -46,12 +56,17 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	@Override
 	public void createOperation(Operation<?> operation) throws PMException {
-		String hex = Neo4jUtil.serialize(operation);
+		boolean isPml = operation instanceof PMLOperation;
+		OperationKind kind = isPml ? OperationKind.PML : OperationKind.NATIVE;
+		String pmlText = isPml ? operation.toString() : null;
 
 		txHandler.runTx(tx -> {
 			Node node = tx.createNode(OPERATION_LABEL);
 			node.setProperty(NAME_PROPERTY, operation.getName());
-			node.setProperty(DATA_PROPERTY, hex);
+			node.setProperty(OPERATION_KIND_PROPERTY, kind.name());
+			if (pmlText != null) {
+				node.setProperty(PML_TEXT_PROPERTY, pmlText);
+			}
 		});
 	}
 
@@ -84,9 +99,15 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 		return resourceOperations;
 	}
 
+	/**
+	 * Only PML-kind rows can be materialized here (a NATIVE row has no body, only the
+	 * {@code NativeOperationRegistry} it was registered with can produce a live instance). Callers must
+	 * branch on {@link #getOperationKind(String)} before calling {@link #getOperation(String)} for a
+	 * possibly-native name.
+	 */
 	@Override
 	public Collection<Operation<?>> getOperations() throws PMException {
-		List<Operation<?>> operations = new ArrayList<>();
+		Map<String, String> pmlTextByName = new LinkedHashMap<>();
 
 		txHandler.runTx(tx -> {
 			ResourceIterator<Node> nodes = tx.findNodes(OPERATION_LABEL);
@@ -96,21 +117,70 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 			while (nodes.hasNext()) {
 				Node next = nodes.next();
-				operations.add((Operation<?>) deserialize(next.getProperty(DATA_PROPERTY).toString(), classLoader));
+				if (kindOf(next) == OperationKind.PML) {
+					pmlTextByName.put((String) next.getProperty(NAME_PROPERTY), (String) next.getProperty(PML_TEXT_PROPERTY));
+				}
 			}
 		});
+
+		List<Operation<?>> operations = new ArrayList<>();
+		for (String pmlText : pmlTextByName.values()) {
+			operations.add(toOperation(pmlText));
+		}
 
 		return operations;
 	}
 
 	@Override
 	public Collection<String> getOperationNames() throws PMException {
-		return getOperations().stream().map(Operation::getName).toList();
+		List<String> names = new ArrayList<>();
+
+		txHandler.runTx(tx -> {
+			ResourceIterator<Node> nodes = tx.findNodes(OPERATION_LABEL);
+			if (nodes == null) {
+				return;
+			}
+
+			while (nodes.hasNext()) {
+				names.add((String) nodes.next().getProperty(NAME_PROPERTY));
+			}
+		});
+
+		return names;
 	}
 
 	@Override
 	public Operation<?> getOperation(String name) throws PMException {
-		AtomicReference<Operation<?>> operation = new AtomicReference<>();
+		OperationRow row = readRow(name);
+		if (row == null) {
+			return null;
+		}
+
+		if (row.kind() == OperationKind.NATIVE) {
+			throw new IllegalStateException(
+				"cannot reconstruct native operation '" + name + "' from the store; resolve it through the NativeOperationRegistry instead");
+		}
+
+		return toOperation(row.pmlText());
+	}
+
+	@Override
+	public OperationKind getOperationKind(String name) throws PMException {
+		OperationRow row = readRow(name);
+		if (row == null) {
+			throw new OperationDoesNotExistException(name);
+		}
+
+		return row.kind();
+	}
+
+	/**
+	 * Reads a row's kind and PML text (if any) while the underlying Neo4j transaction is still open — a
+	 * {@link Node} becomes unusable once {@code txHandler.runTx} returns, so every property read must happen
+	 * inside the lambda, never on the {@code Node} reference afterward.
+	 */
+	private OperationRow readRow(String name) throws PMException {
+		AtomicReference<OperationRow> rowRef = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
 			Node node = tx.findNode(OPERATION_LABEL, NAME_PROPERTY, name);
@@ -118,10 +188,12 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 				return;
 			}
 
-			operation.set((Operation<?>) deserialize(node.getProperty(DATA_PROPERTY).toString(), classLoader));
+			OperationKind kind = kindOf(node);
+			String pmlText = kind == OperationKind.PML ? (String) node.getProperty(PML_TEXT_PROPERTY) : null;
+			rowRef.set(new OperationRow(kind, pmlText));
 		});
 
-		return operation.get();
+		return rowRef.get();
 	}
 
 	@Override
@@ -150,5 +222,17 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	@Override
 	public void rollback() throws PMException {
 
+	}
+
+	private static OperationKind kindOf(Node node) {
+		return OperationKind.valueOf((String) node.getProperty(OPERATION_KIND_PROPERTY));
+	}
+
+	private Operation<?> toOperation(String pmlText) throws PMException {
+		PMLStatement<?> statement = StatementVisitor.fromString(pap, pmlText);
+		return ((OperationDefinitionStatement) statement).getOperation();
+	}
+
+	private record OperationRow(OperationKind kind, String pmlText) {
 	}
 }

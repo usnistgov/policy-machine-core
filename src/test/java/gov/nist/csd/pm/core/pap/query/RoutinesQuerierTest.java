@@ -9,6 +9,7 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
+import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -58,13 +60,21 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         pap.modify().operations().createOperation(r1);
         pap.modify().operations().createOperation(r2);
 
+        // getOperationNames() always includes the protected built-ins too, alongside whatever is persisted
+        Set<String> adminOpNames = AdminOperations.ADMIN_OPERATIONS.stream()
+            .map(Operation::getName)
+            .collect(Collectors.toSet());
+
         Collection<String> names = pap.query().operations().getOperationNames();
-        assertEquals(Set.of("r1", "r2", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"), new HashSet<>(names));
+        Set<String> expected = new HashSet<>(adminOpNames);
+        expected.addAll(Set.of("r1", "r2", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"));
+        assertEquals(expected, new HashSet<>(names));
 
         pap.nativeOperations().register(r3);
         pap.modify().operations().createOperation(r3);
         names = pap.query().operations().getOperationNames();
-        assertEquals(Set.of("r1", "r2", "r3", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"), new HashSet<>(names));
+        expected.add("r3");
+        assertEquals(expected, new HashSet<>(names));
     }
 
     @Nested

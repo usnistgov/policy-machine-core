@@ -1,23 +1,14 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.UnknownTypeException;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.common.prohibition.NodeProhibition;
 import gov.nist.csd.pm.core.common.prohibition.ProcessProhibition;
 import gov.nist.csd.pm.core.common.prohibition.Prohibition;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
@@ -32,7 +23,7 @@ public class Neo4jUtil {
 	public static final Label U_LABEL = Label.label("U");
 	public static final Label OBLIGATION_LABEL = Label.label("Obligation");
 	public static final Label RESOURCE_ARS_LABEL = Label.label("ResourceAccessRights");
-	public static final Label OPERATION_LABEL = Label.label("AdminOp");
+	public static final Label OPERATION_LABEL = Label.label("Operation");
 	public static final Label PROHIBITION_LABEL = Label.label("Prohibition");
 	public static final Label PROCESS_LABEL = Label.label("Process");
 
@@ -45,6 +36,11 @@ public class Neo4jUtil {
 	public static final String ID_PROPERTY = "id";
 	public static final String DATA_PROPERTY = "data";
 	public static final String IS_CONJUNCTIVE_PROPERTY = "is_conjunctive";
+	public static final String OPERATION_KIND_PROPERTY = "operation_kind";
+	public static final String PML_TEXT_PROPERTY = "pml_text";
+	public static final String AUTHOR_ID_PROPERTY = "author_id";
+	public static final String AUTHOR_NAME_PROPERTY = "author_name";
+	public static final String AUTHOR_PROCESS_PROPERTY = "author_process";
 
 	public static final RelationshipType ASSIGNMENT_RELATIONSHIP_TYPE = RelationshipType.withName("ASSIGNED_TO");
 	public static final RelationshipType ASSOCIATION_RELATIONSHIP_TYPE = RelationshipType.withName("ASSOCIATED_WITH");
@@ -87,39 +83,6 @@ public class Neo4jUtil {
 			case PC -> PC_LABEL;
 			default -> Label.label("");
 		};
-	}
-
-	public static String serialize(Object obj) throws PMException {
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		try (ObjectOutputStream objectStream = new ObjectOutputStream(byteStream)) {
-			objectStream.writeObject(obj);
-		} catch (IOException e) {
-			throw new PMException(e);
-		}
-
-		byte[] bytes = byteStream.toByteArray();
-
-		return Hex.encodeHexString(bytes);
-	}
-
-	public static Object deserialize(String hex, ClassLoader classLoader) throws PMException {
-		try {
-			byte[] bytes = Hex.decodeHex(hex);
-
-			ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-			try (ObjectInputStream objectStream = new ObjectInputStream(byteStream) {
-				@Override
-				protected Class<?> resolveClass(ObjectStreamClass desc)
-				throws IOException, ClassNotFoundException {
-					return Class.forName(desc.getName(), false, classLoader);
-				}
-			}) {
-				return objectStream.readObject();
-			}
-		} catch (DecoderException | ClassNotFoundException | IOException e) {
-			e.printStackTrace();
-			throw new PMException(e);
-		}
 	}
 
 	private static Set<Long> toLongSet(long[] arr) {

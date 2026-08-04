@@ -1,9 +1,9 @@
 package gov.nist.csd.pm.core.pap.query;
 
-import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.NativeOperationRegistry;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
@@ -23,29 +23,61 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
         return store.operations().getResourceAccessRights();
     }
 
+    /**
+     * Resolves every persisted row plus the always-present protected built-ins. NATIVE-kind rows are resolved
+     * through the {@code NativeOperationRegistry} uniformly on both backends — never via a store shortcut, even
+     * though {@code MemoryOperationsStore} could technically return its own held object directly.
+     */
     @Override
     public Collection<Operation<?>> getOperations() throws PMException {
-        return new ArrayList<>(store.operations().getOperations());
+        Collection<Operation<?>> operations = new ArrayList<>(nativeOperationRegistry.getProtectedOperations());
+
+        for (String name : store.operations().getOperationNames()) {
+            operations.add(resolveStoreOperation(name));
+        }
+
+        return operations;
     }
 
     @Override
     public Collection<String> getOperationNames() throws PMException {
-        return new ArrayList<>(store.operations().getOperationNames());
+        Collection<String> names = new ArrayList<>(nativeOperationRegistry.getProtectedNames());
+        names.addAll(store.operations().getOperationNames());
+        return names;
     }
 
     @Override
     public Operation<?> getOperation(String name) throws PMException {
         if (nativeOperationRegistry.isProtected(name)) {
             return nativeOperationRegistry.get(name);
-        } else if (!store.operations().operationExists(name)) {
-            throw new OperationDoesNotExistException(name);
         }
 
-        return store.operations().getOperation(name);
+        return resolveStoreOperation(name);
+    }
+
+    @Override
+    public OperationKind getOperationKind(String name) throws PMException {
+        if (nativeOperationRegistry.isProtected(name)) {
+            return OperationKind.NATIVE;
+        }
+
+        return store.operations().getOperationKind(name);
     }
 
     @Override
     public boolean operationExists(String operationName) throws PMException {
         return nativeOperationRegistry.isProtected(operationName) || store.operations().operationExists(operationName);
+    }
+
+    /**
+     * Resolve a persisted (non-protected) row by name: NATIVE-kind through the registry, PML-kind by asking
+     * the store to recompile it.
+     */
+    private Operation<?> resolveStoreOperation(String name) throws PMException {
+        if (store.operations().getOperationKind(name) == OperationKind.NATIVE) {
+            return nativeOperationRegistry.get(name);
+        }
+
+        return store.operations().getOperation(name);
     }
 }

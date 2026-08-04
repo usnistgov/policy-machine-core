@@ -4,10 +4,9 @@ import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
-import java.io.Serializable;
 import java.util.Objects;
 
-public class Obligation implements Serializable {
+public class Obligation {
 
     private NodeUserContext author;
     private String name;

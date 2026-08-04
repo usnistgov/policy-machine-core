@@ -3,6 +3,7 @@ package gov.nist.csd.pm.core.pdp.query;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
@@ -39,6 +40,11 @@ public class OperationsQueryAdjudicator extends Adjudicator implements Operation
     @Override
     public Operation<?> getOperation(String name) throws PMException {
         return pap.query().operations().getOperation(name);
+    }
+
+    @Override
+    public OperationKind getOperationKind(String name) throws PMException {
+        return pap.query().operations().getOperationKind(name);
     }
 
     @Override

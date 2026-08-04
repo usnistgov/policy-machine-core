@@ -12,7 +12,6 @@ import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,10 +22,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract sealed class Operation<R> implements Serializable permits AdminOperation, ResourceOperation,
+public abstract sealed class Operation<R> permits AdminOperation, ResourceOperation,
     QueryOperation, Routine, Function {
 
-    private static final long serialVersionUID = 1L;
     public static final FormalParameter<String> NAME_PARAM = new FormalParameter<>("name", STRING_TYPE);
     public static final FormalParameter<List<String>> ARSET_PARAM = new FormalParameter<>("arset", ListType.of(STRING_TYPE));
     public static final FormalParameter<String> TYPE_PARAM = new FormalParameter<>("type", STRING_TYPE);

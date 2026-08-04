@@ -5,6 +5,7 @@ import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.QueryOperation;
 import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
@@ -73,6 +74,13 @@ public class GrpcOperationsQuerier implements OperationsQuery {
         GetOperationSignatureResponse response = blockingStub.getOperationSignature(
             GetOperationSignatureRequest.newBuilder().setName(name).build());
         return toOperation(response.getSignature());
+    }
+
+    @Override
+    public OperationKind getOperationKind(String name) {
+        // the Signature proto carries no native-vs-PML discriminator; the embedded backends' NATIVE/PML
+        // split is out of scope for the gRPC wire protocol (see ADR 0001's out-of-scope section)
+        throw new UnsupportedOperationException("operation kind is not exposed over the gRPC query API");
     }
 
     @Override

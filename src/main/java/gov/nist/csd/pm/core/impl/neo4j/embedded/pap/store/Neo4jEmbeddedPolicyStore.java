@@ -1,6 +1,7 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
@@ -25,16 +26,15 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 	}
 
 	private TxHandler txHandler;
-	private ClassLoader classLoader;
+	private PAP pap;
 
 	/**
 	 * Constructor starts a new transaction
 	 * @param graphDb The graph database service
 	 * @throws PMException If an error occurs initializing the policy store
 	 */
-	public Neo4jEmbeddedPolicyStore(GraphDatabaseService graphDb, ClassLoader classLoader) throws PMException {
+	public Neo4jEmbeddedPolicyStore(GraphDatabaseService graphDb) throws PMException {
 		this.txHandler = new TxHandler(graphDb);
-		this.classLoader = classLoader;
 	}
 
 	public TxHandler getTxHandler() {
@@ -43,6 +43,11 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
 	public void setTxHandler(TxHandler txHandler) {
 		this.txHandler = txHandler;
+	}
+
+	@Override
+	public void setPap(PAP pap) {
+		this.pap = pap;
 	}
 
 	@Override
@@ -57,12 +62,12 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
 	@Override
 	public ObligationsStore obligations() {
-		return new Neo4jEmbeddedObligationStore(txHandler, classLoader);
+		return new Neo4jEmbeddedObligationStore(txHandler, pap);
 	}
 
 	@Override
 	public OperationsStore operations() {
-		return new Neo4jEmbeddedOperationsStore(txHandler, classLoader);
+		return new Neo4jEmbeddedOperationsStore(txHandler, pap);
 	}
 
 	@Override

@@ -2,11 +2,13 @@ package gov.nist.csd.pm.core.pap.query;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
@@ -14,6 +16,7 @@ import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.util.SamplePolicy;
 import java.io.IOException;
 import java.util.Collection;
@@ -106,5 +109,27 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
             assertThrows(OperationDoesNotExistException.class, () -> pap.query().operations().getOperation("op1"));
         }
 
+    }
+
+    @Test
+    void testBulkListingMixesNativeAndPmlAndProtectedOperations() throws PMException, IOException {
+        SamplePolicy.loadSamplePolicyFromPML(pap);
+
+        pap.nativeOperations().register(op1);
+        pap.modify().operations().createOperation(op1);
+        pap.executePML(NodeUserContext.of("u1"), "adminop pml_op() { }");
+
+        Collection<Operation<?>> operations = pap.query().operations().getOperations();
+        Set<String> names = operations.stream().map(Operation::getName).collect(java.util.stream.Collectors.toSet());
+
+        assertTrue(names.contains("op1"), "expected the user-registered native operation in the bulk listing");
+        assertTrue(names.contains("pml_op"), "expected the PML-defined operation in the bulk listing");
+        assertTrue(names.contains("assign"), "expected a protected built-in in the bulk listing, resolved without ever being createOperation'd");
+
+        Operation<?> resolvedNative = operations.stream().filter(o -> o.getName().equals("op1")).findFirst().orElseThrow();
+        Operation<?> resolvedPml = operations.stream().filter(o -> o.getName().equals("pml_op")).findFirst().orElseThrow();
+
+        assertEquals(op1, resolvedNative);
+        assertInstanceOf(PMLOperation.class, resolvedPml);
     }
 }

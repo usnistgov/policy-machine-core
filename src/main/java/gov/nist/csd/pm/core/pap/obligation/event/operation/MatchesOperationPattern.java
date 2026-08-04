@@ -15,14 +15,24 @@ public final class MatchesOperationPattern extends OperationPattern {
     private final String opName;
     private final OnPattern onPattern;
 
+    // whether an `on (...) { ... }` clause was actually authored, vs. synthesized by the no-on-clause
+    // constructor purely so match-time code always has an OnPattern to invoke. Only an authored clause is
+    // re-emitted by toFormattedString() -- otherwise recompiling persisted PML text for a bare
+    // `matches "opName"` (no on-clause) would spuriously require opName to resolve to a real operation at
+    // compile time (needed only to type-check an on-clause's event params), when the original text never
+    // demanded that.
+    private final boolean explicitOnPattern;
+
     public MatchesOperationPattern(String opName, OnPattern onPattern) {
         this.opName = opName;
         this.onPattern = onPattern;
+        this.explicitOnPattern = true;
     }
 
     public MatchesOperationPattern(String opName, Set<String> argNames, PMLStmtsRoutine<Boolean> func) {
         this.opName = opName;
         this.onPattern = new OnPattern(argNames, func);
+        this.explicitOnPattern = true;
     }
 
     public MatchesOperationPattern(String opName) {
@@ -32,6 +42,7 @@ public final class MatchesOperationPattern extends OperationPattern {
             new PMLStmtsRoutine<>("", BasicTypes.BOOLEAN_TYPE, List.of(), new PMLStatementBlock(List.of(
                 new ReturnStatement(new BoolLiteralExpression(true))
             ))));
+        this.explicitOnPattern = false;
     }
 
     public String getOpName() {
@@ -44,6 +55,10 @@ public final class MatchesOperationPattern extends OperationPattern {
 
     @Override
     public String toFormattedString(int indentLevel) {
+        if (!explicitOnPattern) {
+            return String.format("\"%s\"", opName);
+        }
+
         return String.format("\"%s\"%s", opName, onPattern.toFormattedString(indentLevel));
     }
 

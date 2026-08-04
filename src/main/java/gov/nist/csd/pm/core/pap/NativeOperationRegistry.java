@@ -4,8 +4,11 @@ import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -82,5 +85,26 @@ public class NativeOperationRegistry {
      */
     public void requireRegistered(String name) throws OperationDoesNotExistException {
         get(name);
+    }
+
+    /**
+     * For internal library use only, not part of the public embedding-application API surface. Used to append
+     * the always-present protected built-ins to a bulk operation listing — they have no store row of their own.
+     * @return The protected built-in operations, unconditionally seeded on every registry.
+     */
+    public Collection<Operation<?>> getProtectedOperations() {
+        List<Operation<?>> protectedOperations = new ArrayList<>();
+        for (String name : protectedNames) {
+            protectedOperations.add(operations.get(name));
+        }
+        return protectedOperations;
+    }
+
+    /**
+     * For internal library use only, not part of the public embedding-application API surface.
+     * @return The names of the protected built-in operations, unconditionally seeded on every registry.
+     */
+    public Set<String> getProtectedNames() {
+        return new HashSet<>(protectedNames);
     }
 }

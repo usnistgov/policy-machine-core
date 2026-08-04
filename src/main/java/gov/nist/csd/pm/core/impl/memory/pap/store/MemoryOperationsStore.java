@@ -4,7 +4,9 @@ import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.store.TxCmd.DeleteOperation;
 import gov.nist.csd.pm.core.pap.operation.Operation;
+import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,6 +54,15 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
             throw new OperationDoesNotExistException(name);
         }
         return operation;
+    }
+
+    @Override
+    public OperationKind getOperationKind(String name) throws PMException {
+        Operation<?> operation = policy.operations.get(name);
+        if (operation == null) {
+            throw new OperationDoesNotExistException(name);
+        }
+        return operation instanceof PMLOperation ? OperationKind.PML : OperationKind.NATIVE;
     }
 
     @Override
