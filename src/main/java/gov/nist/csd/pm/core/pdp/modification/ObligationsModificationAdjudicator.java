@@ -9,12 +9,9 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.modification.ObligationsModification;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.obligation.CreateObligationOp;
 import gov.nist.csd.pm.core.pap.operation.obligation.DeleteObligationOp;
-import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pdp.adjudication.Adjudicator;
 
@@ -27,17 +24,14 @@ public class ObligationsModificationAdjudicator extends Adjudicator implements O
     }
 
     @Override
-    public void createObligation(NodeUserContext author,
-                                 String name,
-                                 EventPattern eventPattern,
-                                 ObligationResponse response) throws PMException {
-        long authorId = author.resolveNodeIds(pap.query().graph()).iterator().next();
+    public void createObligation(Obligation obligation) throws PMException {
+        long authorId = obligation.getAuthor().resolveNodeIds(pap.query().graph()).iterator().next();
         CreateObligationOp op = new CreateObligationOp();
         Args args = new Args()
             .put(AUTHOR_PARAM, authorId)
-            .put(NAME_PARAM, name)
-            .put(EVENT_PATTERN_PARAM, eventPattern)
-            .put(OBLIGATION_RESPONSE_PARAM, response);
+            .put(NAME_PARAM, obligation.getName())
+            .put(EVENT_PATTERN_PARAM, obligation.getEventPattern())
+            .put(OBLIGATION_RESPONSE_PARAM, obligation.getResponse());
 
         op.canExecute(pap, userCtx, args);
         op.execute(pap, userCtx, args);

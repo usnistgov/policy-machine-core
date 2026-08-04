@@ -75,9 +75,9 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             Obligation obligation2 = obligation2();
             Obligation obligation3 = obligation3();
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
-            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
-            pap.modify().obligations().createObligation(obligation3.getAuthor(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
+            pap.modify().obligations().createObligation(obligation1);
+            pap.modify().obligations().createObligation(obligation2);
+            pap.modify().obligations().createObligation(obligation3);
 
             Collection<Obligation> obligations = pap.query().obligations().getObligations();
             assertEquals(3, obligations.size());
@@ -113,9 +113,9 @@ public abstract class ObligationsQuerierTest extends PAPTestInitializer {
             Obligation obligation2 = obligation2();
             Obligation obligation3 = obligation3();
 
-            pap.modify().obligations().createObligation(obligation1.getAuthor(), obligation1.getName(), obligation1.getEventPattern(), obligation1.getResponse());
-            pap.modify().obligations().createObligation(obligation2.getAuthor(), obligation2.getName(), obligation2.getEventPattern(), obligation2.getResponse());
-            pap.modify().obligations().createObligation(obligation3.getAuthor(), obligation3.getName(), obligation3.getEventPattern(), obligation3.getResponse());
+            pap.modify().obligations().createObligation(obligation1);
+            pap.modify().obligations().createObligation(obligation2);
+            pap.modify().obligations().createObligation(obligation3);
 
 
             Obligation obligation = pap.query().obligations().getObligation(obligation1.getName());

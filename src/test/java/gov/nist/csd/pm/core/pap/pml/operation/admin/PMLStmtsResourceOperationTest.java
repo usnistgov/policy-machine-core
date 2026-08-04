@@ -23,12 +23,14 @@ class PMLStmtsResourceOperationTest {
     void testNonPMLResourceOpInvokedInPML() throws PMException {
         MemoryPAP memoryPAP = new MemoryPAP();
         memoryPAP.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
-        memoryPAP.modify().operations().createOperation(new ResourceOperation<>("op1", STRING_TYPE, List.of(), List.of()) {
+        ResourceOperation<String> op1 = new ResourceOperation<>("op1", STRING_TYPE, List.of(), List.of()) {
             @Override
             public String execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
                 return "test";
             }
-        });
+        };
+        memoryPAP.nativeOperations().register(op1);
+        memoryPAP.modify().operations().createOperation(op1);
 
         memoryPAP.executePML(NodeUserContext.of("u1"), """
             t := op1()

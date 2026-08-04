@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.common.exception.ProhibitionDoesNotExistException;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
@@ -41,10 +42,10 @@ class DeleteStatementTest {
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
         UserContext userContext = NodeUserContext.of("u1");
-        pap.modify().obligations().createObligation(NodeUserContext.of(id("u1")), "o1",
+        pap.modify().obligations().createObligation(new Obligation(NodeUserContext.of(id("u1")), "o1",
                 new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                 new ObligationResponse("e", List.of())
-        );
+        ));
         pap.modify().prohibitions().createNodeProhibition("p1",
                 id("ua1"),
 		        new AccessRightSet("read"),

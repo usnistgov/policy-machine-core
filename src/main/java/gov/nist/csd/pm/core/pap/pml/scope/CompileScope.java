@@ -1,20 +1,11 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
-import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
-
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
-import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.AdminOperations;
-import gov.nist.csd.pm.core.pap.operation.Function;
 import gov.nist.csd.pm.core.pap.operation.Operation;
-import gov.nist.csd.pm.core.pap.operation.QueryOperation;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
-import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
-import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature.OperationType;
 import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinOperations;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +14,7 @@ import java.util.Map;
 public class CompileScope extends Scope<Variable, PMLOperationSignature> {
 
     public CompileScope(PAP pap) throws PMException {
-        super(pap, loadConstants(), loadOperations(pap));
+        super(pap, ScopeSeeds.loadConstants(), loadOperations(pap));
     }
 
     private CompileScope(PAP pap,
@@ -49,7 +40,7 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
     public CompileScope copyFunctionsOnly() {
         Map<String, PMLOperationSignature> operations = new HashMap<>();
         for (PMLOperationSignature op : getOperations().values()) {
-            if (!(op.getType() == OperationType.FUNCTION)) {
+            if (!ScopeSeeds.isFunction(op)) {
                 continue;
             }
 
@@ -69,7 +60,7 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
     public CompileScope copyFunctionsAndQueriesOnly() {
         Map<String, PMLOperationSignature> filteredOps = new HashMap<>();
         for (PMLOperationSignature function : getOperations().values()) {
-            if (function.getType() == OperationType.FUNCTION || function.getType() == OperationType.QUERY) {
+            if (ScopeSeeds.isFunctionOrQuery(function)) {
                 filteredOps.put(function.getName(), function);
             }
         }
@@ -83,54 +74,25 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
         );
     }
 
-    private static Map<String, Variable> loadConstants() {
-        Map<String, Variable> constants = new HashMap<>();
-        for (AdminPolicyNode adminPolicyNode : AdminPolicyNode.values()) {
-            constants.put(adminPolicyNode.constantName(), new Variable(adminPolicyNode.constantName(), STRING_TYPE, true));
-        }
-
-        return constants;
-    }
-
     private static Map<String, PMLOperationSignature> loadOperations(PAP pap) throws PMException {
         Map<String, PMLOperationSignature> operationSignatures = new HashMap<>();
 
         // add builtin operations and routines stored in PAP
         Map<String, Operation<?>> builtinFuncs = PMLBuiltinOperations.builtinOperations();
         builtinFuncs.values().forEach(f -> {
-            operationSignatures.put(f.getName(), createOperationSignature(f));
+            operationSignatures.put(f.getName(), ScopeSeeds.createOperationSignature(f));
         });
 
         Collection<Operation<?>> operations = pap.query().operations().getOperations();
         for (Operation<?> op : operations) {
-            operationSignatures.put(op.getName(), createOperationSignature(op));
+            operationSignatures.put(op.getName(), ScopeSeeds.createOperationSignature(op));
         }
 
         // add admin ops
         for (Operation<?> adminOperation : AdminOperations.ADMIN_OPERATIONS) {
-            operationSignatures.put(adminOperation.getName(), createOperationSignature(adminOperation));
+            operationSignatures.put(adminOperation.getName(), ScopeSeeds.createOperationSignature(adminOperation));
         }
 
         return operationSignatures;
-    }
-
-    private static PMLOperationSignature createOperationSignature(Operation<?> op) {
-        return switch (op) {
-            case Function<?> function -> new PMLOperationSignature(
-                OperationType.FUNCTION, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                function.getRequiredCapabilities());
-            case QueryOperation<?> queryOperation -> new PMLOperationSignature(
-                OperationType.QUERY, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                queryOperation.getRequiredCapabilities());
-            case AdminOperation<?> adminOperation -> new PMLOperationSignature(
-                OperationType.ADMINOP, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                adminOperation.getRequiredCapabilities());
-            case Routine<?> routine -> new PMLOperationSignature(
-                OperationType.ROUTINE, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                routine.getRequiredCapabilities());
-            case ResourceOperation<?> resourceOperation -> new PMLOperationSignature(
-                OperationType.RESOURCEOP, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                resourceOperation.getRequiredCapabilities());
-        };
     }
 }

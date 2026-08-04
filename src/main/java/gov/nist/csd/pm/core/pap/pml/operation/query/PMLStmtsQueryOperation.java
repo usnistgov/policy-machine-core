@@ -59,6 +59,11 @@ public class PMLStmtsQueryOperation<T> extends PMLQueryOperation<T> implements P
     }
 
     @Override
+    public String toString() {
+        return toFormattedString(0);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

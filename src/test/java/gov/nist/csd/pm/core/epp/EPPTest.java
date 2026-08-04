@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventContextUser;
 import gov.nist.csd.pm.core.common.graph.node.NodeType;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
@@ -94,6 +95,7 @@ class EPPTest {
             }
         };
 
+        pap.nativeOperations().register(op2);
         pap.modify().operations().createOperation(op2);
 
         pap.executePML(u1, """
@@ -292,7 +294,7 @@ class EPPTest {
         });
 
         pdp.runTx(NodeUserContext.of(id("u1")), (policy) -> {
-            policy.modify().obligations().createObligation(NodeUserContext.of(id("u1")), "test",
+            policy.modify().obligations().createObligation(new Obligation(NodeUserContext.of(id("u1")), "test",
                 new EventPattern(new SubjectPattern(), new MatchesOperationPattern(AdminAccessRight.ADMIN_GRAPH_NODE_CREATE.toString())),
                 new ObligationResponse("evtCtx", List.of(
                     new CreateNonPCStatement(
@@ -304,7 +306,7 @@ class EPPTest {
                     // expect error for node already exists
                     new CreatePolicyClassStatement(new StringLiteralExpression("pc1"))
                 ))
-            );
+            ));
 
             return null;
         });

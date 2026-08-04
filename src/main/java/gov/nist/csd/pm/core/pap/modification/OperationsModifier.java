@@ -6,19 +6,19 @@ import static gov.nist.csd.pm.core.pap.operation.accessright.AccessRightValidato
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PluginRegistry;
-import gov.nist.csd.pm.core.pap.operation.AdminOperations;
+import gov.nist.csd.pm.core.pap.NativeOperationRegistry;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
 public class OperationsModifier extends Modifier implements OperationsModification {
 
-    private PluginRegistry pluginRegistry;
+    private final NativeOperationRegistry nativeOperationRegistry;
 
-    public OperationsModifier(PolicyStore store, PluginRegistry pluginRegistry) {
+    public OperationsModifier(PolicyStore store, NativeOperationRegistry nativeOperationRegistry) {
         super(store);
-        this.pluginRegistry = pluginRegistry;
+        this.nativeOperationRegistry = nativeOperationRegistry;
     }
 
     @Override
@@ -34,13 +34,18 @@ public class OperationsModifier extends Modifier implements OperationsModificati
             throw new OperationExistsException(operation.getName());
         }
 
+        if (!(operation instanceof PMLOperation)) {
+            // native operation: must already be registered (two-step register-then-create lifecycle)
+            nativeOperationRegistry.requireRegistered(operation.getName());
+        }
+
         policyStore.operations().createOperation(operation);
     }
 
     @Override
     public void deleteOperation(String name) throws PMException {
-        if (pluginRegistry.pluginExists(name)) {
-            throw new CannotDeletePluginOperationException(name);
+        if (nativeOperationRegistry.isProtected(name)) {
+            throw new CannotDeleteProtectedOperationException(name);
         } else if (!policyStore.operations().operationExists(name)) {
             return;
         }
@@ -63,15 +68,14 @@ public class OperationsModifier extends Modifier implements OperationsModificati
      * check if operation exists with the name
      */
     private boolean operationExists(String name) throws PMException {
-        return AdminOperations.isAdminOperation(name)
-            || policyStore.operations().operationExists(name)
-            || pluginRegistry.pluginExists(name);
+        return nativeOperationRegistry.isProtected(name)
+            || policyStore.operations().operationExists(name);
     }
 
-    static class CannotDeletePluginOperationException extends PMException {
+    public static class CannotDeleteProtectedOperationException extends PMException {
 
-        public CannotDeletePluginOperationException(String name) {
-            super("cannot delete plugin operation " + name);
+        public CannotDeleteProtectedOperationException(String name) {
+            super("cannot delete protected operation " + name);
         }
     }
 }

@@ -20,6 +20,7 @@ import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
@@ -123,12 +124,12 @@ class PDPTest {
             });
         });
 
-        pap.modify().obligations().createObligation(
+        pap.modify().obligations().createObligation(new Obligation(
             NodeUserContext.of(id("u1")),
             "obl1",
             new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
             new ObligationResponse("evt", List.of())
-        );
+        ));
 
         assertThrows(BootstrapExistingPolicyException.class, () -> {
             pdp.bootstrap(new PolicyBootstrapper() {
@@ -279,14 +280,16 @@ class PDPTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        pap.modify().operations().createOperation(new Routine<>("routine1", STRING_TYPE, List.of(a)) {
+        Routine<String> routine1 = new Routine<>("routine1", STRING_TYPE, List.of(a)) {
             @Override
             public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass(args.get(a));
                 return "test1";
             }
 
-        });
+        };
+        pap.nativeOperations().register(routine1);
+        pap.modify().operations().createOperation(routine1);
         pap.executePML(NodeUserContext.of("u1"), """
                 routine routine2() map[string]string {
                     create PC "test2"

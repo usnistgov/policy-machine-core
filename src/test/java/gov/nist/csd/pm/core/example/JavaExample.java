@@ -69,6 +69,7 @@ public class JavaExample {
                 return null;
             }
         };
+        pap.nativeOperations().register(resourceOp);
         pap.modify().operations().createOperation(resourceOp);
 
         // create a custom administration operation
@@ -86,6 +87,7 @@ public class JavaExample {
                 return null;
             }
         };
+        pap.nativeOperations().register(adminOp);
         pap.modify().operations().createOperation(adminOp);
 
         // - create an obligation on the custom admin operation that when ever a user is created, add an object to their

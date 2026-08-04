@@ -11,12 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.AdminAccessRightExistsException;
+import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.PAPTestInitializer;
-import gov.nist.csd.pm.core.pap.modification.OperationsModifier.CannotDeletePluginOperationException;
+import gov.nist.csd.pm.core.pap.modification.OperationsModifier.CannotDeleteProtectedOperationException;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
@@ -60,6 +61,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testSuccess() throws PMException {
+            pap.nativeOperations().register(testOp);
             pap.modify().operations().createOperation(testOp);
 
             assertDoesNotThrow(() -> pap.query().operations().getOperation(testOp.getName()));
@@ -67,16 +69,18 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testOperationExists() throws PMException {
+            pap.nativeOperations().register(testOp);
             pap.modify().operations().createOperation(testOp);
 
             assertThrows(OperationExistsException.class,
                     () -> pap.modify().operations().createOperation(new AssignOp()));
             assertThrows(OperationExistsException.class,
                     () -> pap.modify().operations().createOperation(testOp));
+        }
 
-            pap.modify().operations().deleteOperation(testOp.getName());
-            pap.plugins().addOperation(testOp);
-            assertThrows(OperationExistsException.class,
+        @Test
+        void testRequiresRegistrationFirst() {
+            assertThrows(OperationDoesNotExistException.class,
                 () -> pap.modify().operations().createOperation(testOp));
         }
     }
@@ -132,6 +136,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
+            pap.nativeOperations().register(routine1);
             pap.modify().operations().createOperation(routine1);
 
             assertTrue(pap.query().operations().getOperations().contains(routine1));
@@ -141,27 +146,27 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testRoutineExists() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
+            pap.nativeOperations().register(routine1);
             pap.modify().operations().createOperation(routine1);
 
             assertThrows(OperationExistsException.class, () -> {
                 pap.modify().operations().createOperation(routine1);
             });
-
-            pap.modify().operations().deleteOperation(routine1.getName());
-            pap.plugins().addOperation(routine1);
-            assertThrows(OperationExistsException.class,
-                () -> pap.modify().operations().createOperation(routine1));
         }
 
         @Test
         void testTx() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
+            pap.nativeOperations().register(routine1);
+            pap.nativeOperations().register(routine2);
             pap.runTx(tx -> {
                 tx.modify().operations().createOperation(routine1);
                 tx.modify().operations().createOperation(routine2);
             });
 
+            pap.nativeOperations().register(routine3);
+            pap.nativeOperations().register(routine4);
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
                 tx.modify().operations().createOperation(routine3);
                 tx.modify().operations().createOperation(routine4);
@@ -181,22 +186,24 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
+            pap.nativeOperations().register(routine1);
             pap.modify().operations().createOperation(routine1);
 
             pap.modify().operations().deleteOperation("routine1");
             assertFalse(pap.query().operations().getOperations().contains(routine1));
 
-            pap.plugins().addOperation(routine1);
+            // a deleted native operation remains registered (delete only toggles store-level
+            // persistence/activation) and can be re-created without re-registering
+            assertDoesNotThrow(() -> pap.modify().operations().createOperation(routine1));
             assertTrue(pap.query().operations().getOperations().contains(routine1));
-            assertThrows(CannotDeletePluginOperationException.class, () ->
-                pap.modify().operations().deleteOperation(routine1.getName()));
-            assertDoesNotThrow(() -> pap.query().operations().getOperation(routine1.getName()));
         }
 
         @Test
         void testTx() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
+            pap.nativeOperations().register(routine1);
+            pap.nativeOperations().register(routine2);
             pap.runTx(tx -> {
                 tx.modify().operations().createOperation(routine1);
                 tx.modify().operations().createOperation(routine2);
@@ -214,7 +221,8 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testCannotDeleteBuiltinOperation() {
-            assertDoesNotThrow(() -> pap.modify().operations().deleteOperation("assign"));
+            assertThrows(CannotDeleteProtectedOperationException.class,
+                () -> pap.modify().operations().deleteOperation("assign"));
             assertDoesNotThrow(() -> pap.query().operations().getOperation("assign"));
         }
     }

@@ -3,8 +3,6 @@ package gov.nist.csd.pm.core.impl.memory.pap.store;
 import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import java.util.ArrayList;
@@ -18,9 +16,7 @@ public class MemoryObligationsStore extends MemoryStore implements ObligationsSt
     }
 
     @Override
-    public void createObligation(NodeUserContext author, String name, EventPattern eventPattern, ObligationResponse response) throws PMException {
-        Obligation obligation = new Obligation(author, name, eventPattern, response);
-
+    public void createObligation(Obligation obligation) throws PMException {
         policy.obligations.add(obligation);
 
         txCmdTracker.trackOp(tx, new TxCmd.CreateObligationTxCmd(obligation));

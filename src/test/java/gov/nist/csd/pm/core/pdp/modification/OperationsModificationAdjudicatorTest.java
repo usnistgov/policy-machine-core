@@ -83,6 +83,7 @@ class OperationsModificationAdjudicatorTest {
 
         };
 
+        pap.nativeOperations().register(op1);
         assertDoesNotThrow(() -> ok.createOperation(op1));
         assertTrue(pap.query().operations().getOperations().contains(op1));
         assertThrows(UnauthorizedException.class, () -> fail.createOperation(op1));
@@ -98,6 +99,7 @@ class OperationsModificationAdjudicatorTest {
             }
 
         };
+        pap.nativeOperations().register(op1);
         ok.createOperation(op1);
 
         assertDoesNotThrow(() -> ok.deleteOperation("op1"));
@@ -114,6 +116,7 @@ class OperationsModificationAdjudicatorTest {
 
         };
 
+        pap.nativeOperations().register(routine1);
         assertDoesNotThrow(() -> ok.createOperation(routine1));
         assertTrue(pap.query().operations().getOperations().contains(routine1));
         assertThrows(UnauthorizedException.class, () -> fail.createOperation(routine1));

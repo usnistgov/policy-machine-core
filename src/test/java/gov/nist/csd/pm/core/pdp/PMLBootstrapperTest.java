@@ -12,6 +12,7 @@ import gov.nist.csd.pm.core.pap.operation.AdminOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
+import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -59,10 +60,21 @@ class PMLBootstrapperTest {
 
         };
 
-        pap.plugins().addOperation(op1);
-        pap.plugins().addOperation(routine1);
+        pap.nativeOperations().register(op1);
+        pap.nativeOperations().register(routine1);
 
-        pdp.bootstrap(new PMLBootstrapper("u1", input));
+        // register() alone has no policy effect (so it doesn't trip bootstrap's empty-policy
+        // check); createOperation() must run inside the bootstrap tx itself, before the PML
+        // that invokes op1()/routine1() executes.
+        pdp.bootstrap(new PolicyBootstrapper() {
+            @Override
+            public void bootstrap(PAP tx) throws PMException {
+                tx.modify().operations().createOperation(op1);
+                tx.modify().operations().createOperation(routine1);
+
+                new PMLBootstrapper("u1", input).bootstrap(tx);
+            }
+        });
 
         assertTrue(pap.query().graph().nodeExists("pc1"));
         assertTrue(pap.query().graph().nodeExists("op1"));

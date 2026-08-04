@@ -18,6 +18,7 @@ import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.csd.pm.core.pap.pml.expression.Expression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
+import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 
 import java.util.Objects;
 
@@ -114,6 +115,23 @@ public class CreateObligationStatement extends OperationStatement {
 
     private static String operationPatternToString(int indentLevel, OperationPattern operationPattern) {
         return operationPattern.toFormattedString(indentLevel);
+    }
+
+    /**
+     * Reconstruct a live {@link Obligation} from this compiled statement, combining the recompiled event
+     * pattern/response with an out-of-band author (the {@code create obligation} grammar has no author
+     * clause, so it is never part of the PML text and must be supplied by the caller, e.g. from a separate
+     * store property). The mirror of {@link #fromObligation(Obligation)}.
+     * @param author The obligation's author, persisted separately from the PML text.
+     * @return A live Obligation equivalent to the one that produced this statement's PML text.
+     */
+    public Obligation toObligation(NodeUserContext author) {
+        if (!(name instanceof StringLiteralExpression stringLiteralExpression)) {
+            throw new IllegalStateException(
+                "cannot convert create obligation statement to an Obligation because its name is not a literal string");
+        }
+
+        return new Obligation(author, stringLiteralExpression.getValue(), eventPattern, response);
     }
 
     public static CreateObligationStatement fromObligation(Obligation obligation) {

@@ -27,6 +27,11 @@ public class ResourceOpDefinitionStatement extends OperationStatement implements
     }
 
     @Override
+    public PMLStmtsResourceOperation<?> getOperation() {
+        return pmlResourceOperation;
+    }
+
+    @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args().put(CreateOperationOp.OPERATION_PARAM, pmlResourceOperation);
     }

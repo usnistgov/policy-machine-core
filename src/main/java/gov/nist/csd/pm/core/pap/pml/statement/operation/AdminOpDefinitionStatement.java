@@ -30,6 +30,11 @@ public class AdminOpDefinitionStatement extends OperationStatement implements Op
     }
 
     @Override
+    public PMLStmtsAdminOperation<?> getOperation() {
+        return pmlStmtsOperation;
+    }
+
+    @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args().put(OPERATION_PARAM, pmlStmtsOperation);
     }

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.google.gson.Gson;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
@@ -63,9 +64,11 @@ class JSONSerializerTest {
         EventPattern eventPattern = new EventPattern(new SubjectPattern(), new AnyOperationPattern());
 
         // obligation authored with UserIdContext
-        pap.modify().obligations().createObligation(NodeUserContext.of(u1), "obl-by-id", eventPattern, new ObligationResponse("ctx", List.of()));
+        pap.modify().obligations().createObligation(
+            new Obligation(NodeUserContext.of(u1), "obl-by-id", eventPattern, new ObligationResponse("ctx", List.of())));
         // obligation authored with UsernameContext
-        pap.modify().obligations().createObligation(NodeUserContext.of("u1"), "obl-by-name", eventPattern, new ObligationResponse("ctx", List.of()));
+        pap.modify().obligations().createObligation(
+            new Obligation(NodeUserContext.of("u1"), "obl-by-name", eventPattern, new ObligationResponse("ctx", List.of())));
 
         JSONSerializer serializer = new JSONSerializer();
         JSONPolicy jsonPolicy = serializer.buildJSONPolicy(pap.query());

@@ -22,6 +22,7 @@ import gov.nist.csd.pm.core.pap.operation.OperationExecutor;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.result.ReturnResult;
 import gov.nist.csd.pm.core.pap.pml.statement.result.StatementResult;
@@ -37,10 +38,8 @@ import gov.nist.csd.pm.core.pap.serialization.PolicyDeserializer;
 import gov.nist.csd.pm.core.pap.serialization.PolicySerializer;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The Policy Administration Point: provides modification and query access to policy held in a
@@ -58,36 +57,43 @@ public class PAP implements OperationExecutor, Transactional {
     private PolicyStore policyStore;
     private PolicyModifier modifier;
     private PolicyQuerier querier;
-    private PluginRegistry pluginRegistry;
+    private NativeOperationRegistry nativeOperationRegistry;
 
     public PAP(PolicyStore policyStore) throws PMException {
-        this.pluginRegistry = new PluginRegistry();
+        this(policyStore, new NativeOperationRegistry());
+    }
+
+    public PAP(PolicyStore policyStore, NativeOperationRegistry nativeOperationRegistry) throws PMException {
+        this.nativeOperationRegistry = nativeOperationRegistry;
 
         this.querier = new PolicyQuerier(
             new GraphQuerier(policyStore),
             new ProhibitionsQuerier(policyStore),
             new ObligationsQuerier(policyStore),
-            new OperationsQuerier(policyStore, pluginRegistry),
+            new OperationsQuerier(policyStore, nativeOperationRegistry),
             new AccessQuerier(policyStore)
         );
         this.modifier = new PolicyModifier(
             new GraphModifier(policyStore, new RandomIdGenerator()),
             new ProhibitionsModifier(policyStore),
             new ObligationsModifier(policyStore),
-            new OperationsModifier(policyStore, pluginRegistry)
+            new OperationsModifier(policyStore, nativeOperationRegistry)
         );
         this.policyStore = policyStore;
-        this.pluginRegistry.setOperationsQuery(this.querier.operations());
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
+
+        // fail-fast: every persisted native-operation reference must have a live implementation
+        // registered in the supplied registry
+        validateNativeOperationsAreRegistered();
     }
 
     protected PAP(PAP pap) throws PMException {
         this.policyStore = pap.policyStore();
         this.modifier = pap.modifier;
         this.querier = pap.querier;
-        this.pluginRegistry = pap.pluginRegistry;
+        this.nativeOperationRegistry = pap.nativeOperationRegistry;
     }
 
     public PAP withPolicyStore(PolicyStore policyStore) {
@@ -117,8 +123,8 @@ public class PAP implements OperationExecutor, Transactional {
         return policyStore;
     }
 
-    public PluginRegistry plugins() {
-        return pluginRegistry;
+    public NativeOperationRegistry nativeOperations() {
+        return nativeOperationRegistry;
     }
 
     public PAP withIdGenerator(IdGenerator idGenerator) {
@@ -267,21 +273,27 @@ public class PAP implements OperationExecutor, Transactional {
         // ignore admin nodes
         nodes.removeIf(n -> AdminPolicyNode.isAdminPolicyNode(n.getId()));
 
-        // ignore plugin registry ops
-        Collection<String> operationNames = query().operations()
-            .getOperations()
-            .stream()
-            .map(Operation::getName)
-            .collect(Collectors.toSet());
-
-        operationNames.removeAll(pluginRegistry.getOperationsList().stream().map(Operation::getName).toList());
-
-        boolean opsEmpty = operationNames.isEmpty();
+        boolean opsEmpty = query().operations().getOperations().isEmpty();
 
         return nodes.isEmpty()
             && prohibitionsEmpty
             && obligationsEmpty
             && resOpsEmpty
             && opsEmpty;
+    }
+
+    /**
+     * Cross-check every persisted native-operation reference against {@code nativeOperationRegistry},
+     * throwing immediately if any name has no live implementation registered. There is no lazy-miss case at
+     * invocation time — a missing implementation can only ever surface here, at construction.
+     */
+    private void validateNativeOperationsAreRegistered() throws PMException {
+        for (Operation<?> operation : query().operations().getOperations()) {
+            if (operation instanceof PMLOperation) {
+                continue;
+            }
+
+            nativeOperationRegistry.requireRegistered(operation.getName());
+        }
     }
 }

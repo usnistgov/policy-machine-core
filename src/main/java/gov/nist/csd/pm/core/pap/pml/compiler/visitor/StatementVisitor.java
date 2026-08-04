@@ -1,19 +1,81 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
+import gov.nist.csd.pm.core.common.exception.PMException;
+import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
+import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.FunctionDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.QueryOpDefinitionStatementContext;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser.ResourceOpDefinitionStatementContext;
+import gov.nist.csd.pm.core.pap.pml.compiler.error.ErrorLog;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationDefinitionVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.OperationSignatureVisitor;
 import gov.nist.csd.pm.core.pap.pml.compiler.visitor.operation.RequireStatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
+import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.csd.pm.core.pap.pml.scope.NarrowCompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
     public StatementVisitor(VisitorContext visitorCtx) {
         super(visitorCtx);
+    }
+
+    /**
+     * Narrow compile entry point (precedent: {@link ExpressionVisitor#fromString}) for recompiling a single
+     * already-persisted {@code create X operation}/{@code create obligation} statement read back from a
+     * {@code Store}, e.g. its {@code toString()}/{@code toFormattedString(0)} rendering. Compiles against a
+     * {@link NarrowCompileScope}, which does not eagerly seed the full operation/function symbol table the way
+     * {@link gov.nist.csd.pm.core.pap.pml.scope.CompileScope} does — a {@code Store}'s read path recompiling a
+     * single row via this method must not trigger a bulk {@code getOperations()} call, which would recurse
+     * straight back into every other stored PML row.
+     * <p>
+     * A persisted definition was already valid PML when first created, so this does not re-validate it against
+     * every sibling operation the way a whole-program {@code pap.compilePML()} would.
+     * @param pap The PAP to lazily resolve cross-references (to other operations/functions invoked in the body)
+     *            against.
+     * @param input A single statement's PML text.
+     * @return The compiled statement — an {@code OperationDefinitionStatement} or a {@code CreateObligationStatement}.
+     * @throws PMException If the input fails to compile.
+     */
+    public static PMLStatement<?> fromString(PAP pap, String input) throws PMException {
+        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
+
+        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(pmlErrorHandler);
+
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        PMLParser parser = new PMLParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(pmlErrorHandler);
+
+        PMLParser.StatementContext stmtCtx = parser.statement();
+        if (!pmlErrorHandler.getErrors().isEmpty()) {
+            throw new PMLCompilationException(pmlErrorHandler.getErrors());
+        }
+
+        ErrorLog errorLog = new ErrorLog();
+        VisitorContext visitorCtx = new VisitorContext(tokens, new NarrowCompileScope(pap), errorLog, pmlErrorHandler);
+        StatementVisitor visitor = new StatementVisitor(visitorCtx);
+
+        PMLStatement<?> statement = null;
+        try {
+            statement = visitor.visitStatement(stmtCtx);
+        } catch (PMLCompilationRuntimeException e) {
+            errorLog.addErrors(e.getErrors());
+        }
+
+        if (!errorLog.getErrors().isEmpty()) {
+            throw new PMLCompilationException(errorLog.getErrors());
+        }
+
+        return statement;
     }
 
     @Override

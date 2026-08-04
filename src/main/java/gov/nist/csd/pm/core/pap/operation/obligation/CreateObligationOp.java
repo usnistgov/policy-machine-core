@@ -5,6 +5,7 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
@@ -39,12 +40,14 @@ public class CreateObligationOp extends AdminOperation<Void> {
 
     @Override
     public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
-        pap.modify().obligations().createObligation(
+        Obligation obligation = new Obligation(
             NodeUserContext.of(args.get(AUTHOR_PARAM)),
             args.get(NAME_PARAM),
             args.get(EVENT_PATTERN_PARAM),
             args.get(OBLIGATION_RESPONSE_PARAM)
         );
+
+        pap.modify().obligations().createObligation(obligation);
         return null;
     }
 }

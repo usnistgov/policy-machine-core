@@ -2,8 +2,7 @@ package gov.nist.csd.pm.core.pap.modification;
 
 import gov.nist.csd.pm.core.common.exception.ObligationNameExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 
@@ -14,13 +13,10 @@ public class ObligationsModifier extends Modifier implements ObligationsModifica
     }
 
     @Override
-    public void createObligation(NodeUserContext author,
-                                 String name,
-                                 EventPattern eventPattern,
-                                 ObligationResponse response) throws PMException {
-        checkCreateInput(author, name);
+    public void createObligation(Obligation obligation) throws PMException {
+        checkCreateInput(obligation.getAuthor(), obligation.getName());
 
-        policyStore.obligations().createObligation(author, name, eventPattern, response);
+        policyStore.obligations().createObligation(obligation);
     }
 
     @Override

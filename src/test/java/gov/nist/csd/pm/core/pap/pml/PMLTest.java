@@ -87,9 +87,10 @@ public class PMLTest {
             }
 
         };
+        pap.nativeOperations().register(op1);
         pap.modify().operations().createOperation(op1);
 
-        pap.modify().operations().createOperation(new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
+        Routine<Void> routine1 = new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
             @Override
             public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.executeOperation(op1, userCtx, args);
@@ -97,7 +98,9 @@ public class PMLTest {
                 return null;
             }
 
-        });
+        };
+        pap.nativeOperations().register(routine1);
+        pap.modify().operations().createOperation(routine1);
 
         PDP pdp = new PDP(pap);
         pdp.executePML(NodeUserContext.of("u1"), """

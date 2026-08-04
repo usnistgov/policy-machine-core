@@ -27,6 +27,11 @@ public class RoutineDefinitionStatement extends OperationStatement implements Op
     }
 
     @Override
+    public PMLStmtsRoutine<?> getOperation() {
+        return pmlStmtsRoutine;
+    }
+
+    @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args()
             .put(CreateOperationOp.OPERATION_PARAM, pmlStmtsRoutine);

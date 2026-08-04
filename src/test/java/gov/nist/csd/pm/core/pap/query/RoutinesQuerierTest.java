@@ -39,23 +39,30 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
 
     };
 
+    // must be static: an anonymous class defined inside a non-static test method captures the
+    // enclosing test instance, which breaks Neo4j's Java-serialization write path
+    static Routine<Void> r3 = new Routine<>("r3", VOID_TYPE, List.of()) {
+        @Override
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
+            return null;
+        }
+
+    };
+
     @Test
     void testGetAdminRoutineNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
+        pap.nativeOperations().register(r1);
+        pap.nativeOperations().register(r2);
         pap.modify().operations().createOperation(r1);
         pap.modify().operations().createOperation(r2);
 
         Collection<String> names = pap.query().operations().getOperationNames();
         assertEquals(Set.of("r1", "r2", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"), new HashSet<>(names));
 
-        pap.plugins().addOperation(new Routine<>("r3", VOID_TYPE, List.of()) {
-            @Override
-            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                return null;
-            }
-
-        });
+        pap.nativeOperations().register(r3);
+        pap.modify().operations().createOperation(r3);
         names = pap.query().operations().getOperationNames();
         assertEquals(Set.of("r1", "r2", "r3", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"), new HashSet<>(names));
     }
@@ -67,12 +74,14 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
+            pap.nativeOperations().register(r1);
             pap.modify().operations().createOperation(r1);
 
             Operation<?> actual = pap.query().operations().getOperation(r1.getName());
             assertEquals(r1, actual);
 
-            pap.plugins().addOperation(r2);
+            pap.nativeOperations().register(r2);
+            pap.modify().operations().createOperation(r2);
             actual = pap.query().operations().getOperation(r2.getName());
             assertEquals(r2, actual);
         }

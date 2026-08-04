@@ -32,32 +32,37 @@ class PMLOperationWrapperTest {
 
         FormalParameter<String> a = new FormalParameter<>("a", STRING_TYPE);
 
-        operations.createOperation(new AdminOperation<>("op1", STRING_TYPE, List.of(a), List.of()) {
-            
+        AdminOperation<String> op1 = new AdminOperation<>("op1", STRING_TYPE, List.of(a), List.of()) {
+
             @Override
             public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return args.get(a);
             }
 
-        });
+        };
+        AdminOperation<String> op2 = new AdminOperation<>("op2", STRING_TYPE, List.of(a), List.of()) {
 
-        operations.createOperation(new AdminOperation<>("op2", STRING_TYPE, List.of(a), List.of()) {
-            
             @Override
             public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return args.get(a);
             }
 
-        });
+        };
+        AdminOperation<String> op3 = new AdminOperation<>("op3", STRING_TYPE, List.of(a), List.of()) {
 
-        operations.createOperation(new AdminOperation<>("op3", STRING_TYPE, List.of(a), List.of()) {
-            
             @Override
             public String execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return args.get(a);
             }
 
-        });
+        };
+
+        pap.nativeOperations().register(op1);
+        pap.nativeOperations().register(op2);
+        pap.nativeOperations().register(op3);
+        operations.createOperation(op1);
+        operations.createOperation(op2);
+        operations.createOperation(op3);
 
         pap.executePML(NodeUserContext.of(1), pml);
 

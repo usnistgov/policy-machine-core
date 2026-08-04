@@ -2,22 +2,20 @@ package gov.nist.csd.pm.core.pap.query;
 
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PluginRegistry;
-import gov.nist.csd.pm.core.pap.operation.AdminOperations;
+import gov.nist.csd.pm.core.pap.NativeOperationRegistry;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class OperationsQuerier extends Querier implements OperationsQuery {
 
-    private final PluginRegistry pluginRegistry;
+    private final NativeOperationRegistry nativeOperationRegistry;
 
-    public OperationsQuerier(PolicyStore store, PluginRegistry pluginRegistry) {
+    public OperationsQuerier(PolicyStore store, NativeOperationRegistry nativeOperationRegistry) {
         super(store);
-        this.pluginRegistry = pluginRegistry;
+        this.nativeOperationRegistry = nativeOperationRegistry;
     }
 
     @Override
@@ -27,24 +25,18 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
 
     @Override
     public Collection<Operation<?>> getOperations() throws PMException {
-        List<Operation<?>> operations = new ArrayList<>(store.operations().getOperations());
-        operations.addAll(pluginRegistry.getOperationsList());
-        return operations;
+        return new ArrayList<>(store.operations().getOperations());
     }
 
     @Override
     public Collection<String> getOperationNames() throws PMException {
-        List<String> operationNames = new ArrayList<>(store.operations().getOperationNames());
-        operationNames.addAll(pluginRegistry.getOperations().keySet());
-        return operationNames;
+        return new ArrayList<>(store.operations().getOperationNames());
     }
 
     @Override
     public Operation<?> getOperation(String name) throws PMException {
-        if (pluginRegistry.pluginExists(name)) {
-            return pluginRegistry.getOperation(name);
-        } else if (AdminOperations.isAdminOperation(name)) {
-            return AdminOperations.get(name);
+        if (nativeOperationRegistry.isProtected(name)) {
+            return nativeOperationRegistry.get(name);
         } else if (!store.operations().operationExists(name)) {
             throw new OperationDoesNotExistException(name);
         }
@@ -54,6 +46,6 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
 
     @Override
     public boolean operationExists(String operationName) throws PMException {
-        return pluginRegistry.pluginExists(operationName) || store.operations().operationExists(operationName);
+        return nativeOperationRegistry.isProtected(operationName) || store.operations().operationExists(operationName);
     }
 }

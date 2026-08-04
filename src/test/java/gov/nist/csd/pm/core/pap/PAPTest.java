@@ -4,24 +4,22 @@ import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gov.nist.csd.pm.core.common.exception.BootstrapExistingPolicyException;
 import gov.nist.csd.pm.core.common.exception.NodeDoesNotExistException;
-import gov.nist.csd.pm.core.common.exception.OperationExistsException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
 import gov.nist.csd.pm.core.pap.operation.Routine;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.operation.arg.Args;
 import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
 import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
 import gov.nist.csd.pm.core.pdp.bootstrap.PolicyBootstrapper;
 import gov.nist.csd.pm.core.util.SamplePolicy;
@@ -42,6 +40,22 @@ public abstract class PAPTest extends PAPTestInitializer {
             return null;
         }
 
+    };
+
+    // must be static: an anonymous class defined inside a non-static test method captures the
+    // enclosing test instance, which breaks Neo4j's Java-serialization write path
+    static AdminOperation<Void> nativeOp1 = new AdminOperation<>("nativeOp1", VOID_TYPE, List.of(), List.of()) {
+        @Override
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
+            return null;
+        }
+    };
+
+    static Routine<Void> nativeRoutine1 = new Routine<>("nativeRoutine1", VOID_TYPE, List.of()) {
+        @Override
+        public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
+            return null;
+        }
     };
 
     @Test
@@ -87,6 +101,7 @@ public abstract class PAPTest extends PAPTestInitializer {
         try {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
+            pap.nativeOperations().register(op);
             pap.modify().operations().createOperation(op);
 
             pap.executePML(NodeUserContext.of(id("u1")), "create ua \"ua4\" in [\"Location\"]\ntestFunc()");
@@ -170,52 +185,23 @@ public abstract class PAPTest extends PAPTestInitializer {
     }
 
     @Test
-    void testPluginRegistry() throws PMException {
-        AdminOperation<Void> op1 = new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
+    void testNativeOperationRegistrationLifecycle() throws PMException {
+        pap.nativeOperations().register(nativeOp1);
+        pap.nativeOperations().register(nativeRoutine1);
 
-            @Override
-            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                return null;
-            }
+        // registering alone makes the implementation available in-process, but has no policy
+        // effect until createOperation persists a reference to it
+        assertFalse(pap.query().operations().getOperations().containsAll(List.of(nativeOp1, nativeRoutine1)));
 
-        };
-        pap.plugins().addOperation(op1);
+        pap.modify().operations().createOperation(nativeOp1);
+        pap.modify().operations().createOperation(nativeRoutine1);
 
-        Routine<Void> routine1 = new Routine<>("routine1", VOID_TYPE, List.of()) {
-            @Override
-            public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
-                return null;
-            }
-
-        };
-        pap.plugins().addOperation(routine1);
-
-        assertTrue(pap.plugins().getOperationsList().containsAll(List.of(op1, routine1)));
-        assertTrue(pap.query().operations().getOperations().containsAll(List.of(op1, routine1)));
-    }
-
-    static ResourceOperation<Void> a = new ResourceOperation<>("a", VOID_TYPE, List.of(), List.of()) {
-        @Override
-        public Void execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
-            return null;
-        }
-    };
-
-    @Test
-    void testPluginExistsCausesAddOperationToFail() throws PMException {
-        pap.plugins().addOperation(a);
-        assertThrows(OperationExistsException.class, () -> pap.modify().operations().createOperation(a));
+        assertTrue(pap.query().operations().getOperations().containsAll(List.of(nativeOp1, nativeRoutine1)));
     }
 
     @Test
-    void testOperationExistsCausesPluginAddOperationToFail() throws PMException {
-        pap.modify().operations().createOperation(a);
-        assertThrows(OperationExistsException.class, () -> pap.plugins().addOperation(a));
-    }
-
-    @Test
-    void testBootstrapDoesNotThrowExceptionWhenPluginRegistryHasPlugins() throws PMException {
-        pap.plugins().addOperation(new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
+    void testBootstrapDoesNotThrowExceptionWhenNativeOperationRegistryHasRegistrations() throws PMException {
+        pap.nativeOperations().register(new AdminOperation<>("op1", VOID_TYPE, List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 return null;

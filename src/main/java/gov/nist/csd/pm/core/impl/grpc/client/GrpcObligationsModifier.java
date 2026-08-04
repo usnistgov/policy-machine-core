@@ -4,9 +4,6 @@ import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.csd.pm.core.pap.modification.ObligationsModification;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
-import gov.nist.csd.pm.core.pap.obligation.response.ObligationResponse;
-import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.ExecutePMLRequest;
 import gov.nist.csd.pm.proto.v1.pdp.adjudication.OperationRequest;
@@ -21,10 +18,9 @@ public class GrpcObligationsModifier implements ObligationsModification {
     }
 
     @Override
-    public void createObligation(NodeUserContext author, String name, EventPattern eventPattern,
-                                 ObligationResponse response) throws PMException {
+    public void createObligation(Obligation obligation) throws PMException {
         ExecutePMLRequest request = ExecutePMLRequest.newBuilder()
-            .setPml(new Obligation(author, name, eventPattern, response).toString())
+            .setPml(obligation.toString())
             .build();
 
         blockingStub.executePML(request);

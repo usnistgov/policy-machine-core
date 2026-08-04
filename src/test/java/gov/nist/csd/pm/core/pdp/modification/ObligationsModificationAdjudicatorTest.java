@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.epp.EPP;
 import gov.nist.csd.pm.core.pap.PAP;
+import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.obligation.event.EventPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.operation.AnyOperationPattern;
 import gov.nist.csd.pm.core.pap.obligation.event.subject.SubjectPattern;
@@ -64,23 +65,23 @@ class ObligationsModificationAdjudicatorTest {
 
     @Test
     void createObligation() {
-        assertDoesNotThrow(() -> ok.createObligation(NodeUserContext.of(id("u1")), "name",
+        assertDoesNotThrow(() -> ok.createObligation(new Obligation(NodeUserContext.of(id("u1")), "name",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
 
-        ));
+        )));
     }
 
     @Test
     void deleteObligation() throws PMException {
-        ok.createObligation(NodeUserContext.of(id("u1")), "test",
+        ok.createObligation(new Obligation(NodeUserContext.of(id("u1")), "test",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
-        );
-        ok.createObligation(NodeUserContext.of(id("u1")), "test2",
+        ));
+        ok.createObligation(new Obligation(NodeUserContext.of(id("u1")), "test2",
                         new EventPattern(new SubjectPattern(), new AnyOperationPattern()),
                         new ObligationResponse("e", List.of())
-        );
+        ));
         assertDoesNotThrow(() -> ok.deleteObligation("test"));
         assertThrows(UnauthorizedException.class, () -> fail.deleteObligation("test2"));
     }

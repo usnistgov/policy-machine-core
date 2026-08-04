@@ -27,6 +27,11 @@ public class FunctionDefinitionStatement extends OperationStatement implements O
     }
 
     @Override
+    public PMLStmtsFunctionOperation<?> getOperation() {
+        return function;
+    }
+
+    @Override
     public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
         return new Args()
             .put(CreateOperationOp.OPERATION_PARAM, function);
