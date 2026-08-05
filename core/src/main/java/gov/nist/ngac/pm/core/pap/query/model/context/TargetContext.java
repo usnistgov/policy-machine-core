@@ -10,6 +10,14 @@ import java.util.Collection;
  */
 public abstract class TargetContext implements Serializable {
 
+    /**
+     * Resolves this context to the concrete node ids it refers to, looking up names via the given lookup
+     * if needed.
+     *
+     * @param nodeLookup used to resolve any node names to ids
+     * @return the resolved node ids
+     * @throws PMException if a name lookup fails
+     */
     public abstract Collection<Long> resolveNodeIds(NodeLookup nodeLookup) throws PMException;
 
 }

@@ -10,10 +10,16 @@ import java.util.List;
  */
 public class NodeTargetContext extends TargetContext {
 
+    /**
+     * Builds a target context for the node with the given id.
+     */
     public static NodeTargetContext of(long id) {
         return new NodeTargetContext(id, null);
     }
 
+    /**
+     * Builds a target context for the node with the given name.
+     */
     public static NodeTargetContext of(String name) {
         return new NodeTargetContext(-1, name);
     }

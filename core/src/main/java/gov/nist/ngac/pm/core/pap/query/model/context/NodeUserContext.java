@@ -12,18 +12,30 @@ import java.util.Objects;
  */
 public class NodeUserContext extends UserContext {
 
+    /**
+     * Builds a user context for the node with the given id, acting as the given process.
+     */
     public static NodeUserContext of(long id, String process) {
         return new NodeUserContext(process, id, null);
     }
 
+    /**
+     * Builds a user context for the node with the given id.
+     */
     public static NodeUserContext of(long id) {
         return new NodeUserContext(null, id, null);
     }
 
+    /**
+     * Builds a user context for the node with the given name, acting as the given process.
+     */
     public static NodeUserContext of(String name, String process) {
         return new NodeUserContext(process, -1, name);
     }
 
+    /**
+     * Builds a user context for the node with the given name.
+     */
     public static NodeUserContext of(String name) {
         return new NodeUserContext(null, -1, name);
     }

@@ -13,10 +13,16 @@ import java.util.Set;
  */
 public class AnonymousTargetContext extends TargetContext {
 
+    /**
+     * Builds an anonymous target context identified by object attribute ids.
+     */
     public static AnonymousTargetContext ofIds(Set<Long> attributeIds) {
         return new AnonymousTargetContext(attributeIds, null);
     }
 
+    /**
+     * Builds an anonymous target context identified by object attribute names.
+     */
     public static AnonymousTargetContext ofNames(Set<String> attributeNames) {
         return new AnonymousTargetContext(null, attributeNames);
     }

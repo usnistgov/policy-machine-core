@@ -9,20 +9,36 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Represents an anonymous user context identified by a set of user attribute ids or names, rather than
+ * a specific user node.
+ */
 public class AnonymousUserContext extends UserContext{
 
+    /**
+     * Builds an anonymous user context identified by user attribute ids, acting as the given process.
+     */
     public static AnonymousUserContext ofIds(Set<Long> attributeIds, String process) {
         return new AnonymousUserContext(process, attributeIds, null);
     }
 
+    /**
+     * Builds an anonymous user context identified by user attribute ids.
+     */
     public static AnonymousUserContext ofIds(Set<Long> attributeIds) {
         return new AnonymousUserContext(null, attributeIds, null);
     }
 
+    /**
+     * Builds an anonymous user context identified by user attribute names, acting as the given process.
+     */
     public static AnonymousUserContext ofNames(Set<String> attributeNames, String process) {
         return new AnonymousUserContext(process, null, attributeNames);
     }
 
+    /**
+     * Builds an anonymous user context identified by user attribute names.
+     */
     public static AnonymousUserContext ofNames(Set<String> attributeNames) {
         return new AnonymousUserContext(null, null, attributeNames);
     }
