@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link ObligationsStore} implementation backed by the in-memory {@link MemoryPolicy} obligation list.
+ */
 public class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
 
     public MemoryObligationsStore(MemoryPolicy policy, MemoryTx tx, TxCmdTracker txCmdTracker) {

@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * A single node in the in-memory graph, tracking its own adjacent assignments and associations.
+ */
 public abstract class Vertex {
 
     protected long id;
@@ -37,9 +40,24 @@ public abstract class Vertex {
     protected abstract Collection<Association> getOutgoingAssociations();
     protected abstract Collection<Association> getIncomingAssociations();
 
+    /**
+     * Records this vertex as adjacent-descendant of the given ascendant.
+     */
     protected abstract void addAssignment(long ascendant, long descendant);
+
+    /**
+     * Removes a previously recorded assignment between this vertex and the given ascendant/descendant.
+     */
     protected abstract void deleteAssignment(long ascendant, long descendant);
+
+    /**
+     * Records an association from this vertex, as the user attribute, to the given target.
+     */
     protected abstract void addAssociation(long ua, long target, AccessRightSet accessRightSet);
+
+    /**
+     * Removes a previously recorded association between this vertex and the given user attribute/target.
+     */
     protected abstract void deleteAssociation(long ua, long target);
 
 }

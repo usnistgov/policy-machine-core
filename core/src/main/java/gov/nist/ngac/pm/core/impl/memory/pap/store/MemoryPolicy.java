@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The in-memory policy state — graph, prohibitions, obligations, and operations — shared by all of the
+ * memory sub-stores.
+ */
 public class MemoryPolicy {
 
     protected Map<Long, Vertex> graph;
@@ -31,6 +35,9 @@ public class MemoryPolicy {
         reset();
     }
 
+    /**
+     * Clears all policy state back to an empty policy.
+     */
     public void reset() {
         this.graph = new Long2ObjectOpenHashMap<>();
         this.nameToIds = new Object2LongOpenHashMap<>();
@@ -42,6 +49,12 @@ public class MemoryPolicy {
         this.operations = new HashMap<>();
     }
 
+    /**
+     * Adds a vertex to the graph, indexing it by id and name, and tracking it as a policy class if its
+     * type is PC.
+     *
+     * @param vertex the vertex to add
+     */
     public void addNode(Vertex vertex) {
         graph.put(vertex.getId(), vertex);
         nameToIds.put(vertex.getName(), vertex.getId());
@@ -51,6 +64,11 @@ public class MemoryPolicy {
         }
     }
 
+    /**
+     * Indexes a prohibition by its subject node id or process, depending on its concrete type.
+     *
+     * @param prohibition the prohibition to add
+     */
     public void addProhibition(Prohibition prohibition) {
         switch (prohibition) {
             case NodeProhibition nodeProhibition ->
@@ -60,6 +78,11 @@ public class MemoryPolicy {
         }
     }
 
+    /**
+     * Removes a prohibition from its subject's index, added by {@link #addProhibition}.
+     *
+     * @param prohibition the prohibition to remove
+     */
     public void deleteProhibition(Prohibition prohibition) {
         switch (prohibition) {
             case NodeProhibition nodeProhibition ->

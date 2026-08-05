@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * {@link OperationsStore} implementation backed by the in-memory {@link MemoryPolicy} operation map.
+ */
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 
     public MemoryOperationsStore(MemoryPolicy policy, MemoryTx tx, TxCmdTracker txCmdTracker) {

@@ -5,6 +5,10 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Decorates a {@link Vertex} with a properties map, delegating all graph-structure behavior to the
+ * wrapped vertex.
+ */
 public class VertexWithProps extends Vertex{
 
     private final Vertex vertex;

@@ -12,6 +12,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * {@link ProhibitionsStore} implementation backed by the in-memory {@link MemoryPolicy} prohibition
+ * indexes.
+ */
 public class MemoryProhibitionsStore extends MemoryStore implements ProhibitionsStore {
 
     public MemoryProhibitionsStore(MemoryPolicy policy, MemoryTx tx, TxCmdTracker txCmdTracker) {
