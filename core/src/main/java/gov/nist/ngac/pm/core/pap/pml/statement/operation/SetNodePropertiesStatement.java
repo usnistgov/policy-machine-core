@@ -11,6 +11,9 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * PML "set properties of ... to ..." statement: replaces a node's properties.
+ */
 public class SetNodePropertiesStatement extends OperationStatement {
 
     private final Expression<String> nameExpr;

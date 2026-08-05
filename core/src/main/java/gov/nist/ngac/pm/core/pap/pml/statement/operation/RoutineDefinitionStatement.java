@@ -11,6 +11,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.OperationDefinitionStatement;
 import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
+/**
+ * PML "create routine" statement: creates the routine in the policy and registers it in the current
+ * scope so later statements can call it.
+ */
 public class RoutineDefinitionStatement extends OperationStatement implements OperationDefinitionStatement {
 
     protected PMLStmtsRoutine<?> pmlStmtsRoutine;

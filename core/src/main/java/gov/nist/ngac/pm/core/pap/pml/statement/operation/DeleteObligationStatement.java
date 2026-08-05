@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.operation.obligation.DeleteObligationOp;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 
+/**
+ * PML "delete obligation ..." statement.
+ */
 public class DeleteObligationStatement extends DeleteStatement {
 
     public DeleteObligationStatement(Expression<String> expression, boolean ifExists) {

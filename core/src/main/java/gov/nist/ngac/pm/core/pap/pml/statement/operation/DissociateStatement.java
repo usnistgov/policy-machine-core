@@ -9,6 +9,10 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.query.GraphQuery;
 import java.util.Objects;
 
+/**
+ * PML "dissociate ... from ..." statement: removes the association between a user attribute and a
+ * target.
+ */
 public class DissociateStatement extends OperationStatement {
 
     private final Expression<String> uaExpr;

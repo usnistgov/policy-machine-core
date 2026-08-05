@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML "deassign ... from ..." statement: removes an ascendant node's assignment from one or more
+ * descendant nodes.
+ */
 public class DeassignStatement extends OperationStatement {
 
     private final Expression<String> ascendant;

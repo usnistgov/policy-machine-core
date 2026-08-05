@@ -22,6 +22,11 @@ import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 
 import java.util.Objects;
 
+/**
+ * PML "create obligation" statement: creates an obligation from a name, event pattern, and response body.
+ * Can also be built from (via {@link #fromObligation}) or converted back to (via {@link #toObligation})
+ * a live {@link Obligation}.
+ */
 public class CreateObligationStatement extends OperationStatement {
 
     private final Expression<String> name;
@@ -95,6 +100,13 @@ public class CreateObligationStatement extends OperationStatement {
         );
     }
 
+    /**
+     * Formats an event pattern's "when ... performs ..." clause for {@link #toFormattedString}.
+     *
+     * @param indentLevel the indent level to format at
+     * @param eventPattern the event pattern to format
+     * @return the formatted clause
+     */
     public static String eventPatternToString(int indentLevel, EventPattern eventPattern) {
         return String.format("""
             when %s
@@ -103,6 +115,13 @@ public class CreateObligationStatement extends OperationStatement {
             operationPatternToString(indentLevel, eventPattern.getOperationPattern()));
     }
 
+    /**
+     * Formats an obligation response's "do (...) { ... }" clause for {@link #toFormattedString}.
+     *
+     * @param indentLevel the indent level to format at
+     * @param obligationResponse the response to format
+     * @return the formatted clause
+     */
     public static String responseToString(int indentLevel, ObligationResponse obligationResponse) {
         return String.format("do (%s) %s",
             obligationResponse.getEventCtxVariable(),
@@ -132,6 +151,14 @@ public class CreateObligationStatement extends OperationStatement {
         return new Obligation(author, stringLiteralExpression.getValue(), eventPattern, response);
     }
 
+    /**
+     * Builds a "create obligation" statement equivalent to the given live {@link Obligation}. The mirror
+     * of {@link #toObligation(NodeUserContext)}.
+     *
+     * @param obligation the obligation to convert
+     * @return the equivalent statement
+     * @throws IllegalStateException if the obligation's response is not an {@link ObligationResponse}
+     */
     public static CreateObligationStatement fromObligation(Obligation obligation) {
         EventPattern event = obligation.getEventPattern();
         ObligationResponse response = obligation.getResponse();

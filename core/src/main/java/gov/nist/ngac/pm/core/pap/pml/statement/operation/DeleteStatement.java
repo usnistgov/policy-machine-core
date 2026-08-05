@@ -8,6 +8,10 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
+/**
+ * Base class for "delete ... if exists" PML statements; when the "if exists" clause is present and the
+ * named entity does not exist, execution is skipped instead of failing.
+ */
 public abstract class DeleteStatement extends OperationStatement {
 
     protected Type type;
@@ -21,6 +25,15 @@ public abstract class DeleteStatement extends OperationStatement {
         this.ifExists = ifExists;
     }
 
+    /**
+     * Checks whether the named entity of this statement's {@link Type} currently exists, used to
+     * short-circuit execution when the "if exists" clause is present.
+     *
+     * @param pap the PAP to check against
+     * @param name the entity name to check
+     * @return whether the entity exists
+     * @throws PMException if the existence check fails
+     */
     public abstract boolean exists(PAP pap, String name) throws PMException;
 
     @Override
@@ -89,6 +102,9 @@ public abstract class DeleteStatement extends OperationStatement {
         return Objects.hash(type, nameExpression, ifExists);
     }
 
+    /**
+     * The kind of entity a {@link DeleteStatement} deletes.
+     */
     public enum Type {
         NODE,
         PROHIBITION,

@@ -10,6 +10,9 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
+/**
+ * PML "create PC ..." statement: creates a new policy class.
+ */
 public class CreatePolicyClassStatement extends OperationStatement {
 
     private final Expression<String> name;

@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML "assign ... to ..." statement: assigns an ascendant node to one or more descendant nodes.
+ */
 public class AssignStatement extends OperationStatement {
 
     private final Expression<String> ascendant;

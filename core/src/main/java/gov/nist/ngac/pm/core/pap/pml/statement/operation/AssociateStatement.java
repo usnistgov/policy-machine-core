@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML "associate ... to ... with ..." statement: creates an association between a user attribute and a
+ * target with the given access rights.
+ */
 public class AssociateStatement extends OperationStatement {
 
     private final Expression<String> ua;

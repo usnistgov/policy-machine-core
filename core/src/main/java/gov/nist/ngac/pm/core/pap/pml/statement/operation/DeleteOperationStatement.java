@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.operation.operation.DeleteOperationOp;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 
+/**
+ * PML "delete operation ..." statement.
+ */
 public class DeleteOperationStatement extends DeleteStatement{
 
     public DeleteOperationStatement(Expression<String> nameExpression, boolean ifExists) {

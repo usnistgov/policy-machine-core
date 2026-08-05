@@ -31,6 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML "create ... prohibition ..." statement, for either a node or process prohibition depending on
+ * which of {@link #nodeProhibition} / {@link #processProhibition} built it. Can also be built from
+ * (via {@link #fromProhibition}) an existing {@link Prohibition}.
+ */
 public class CreateProhibitionStatement extends OperationStatement {
 
     public static CreateProhibitionStatement nodeProhibition(Expression<String> name,
@@ -165,6 +170,15 @@ public class CreateProhibitionStatement extends OperationStatement {
             isConjunctive);
     }
 
+    /**
+     * Builds a "create ... prohibition ..." statement equivalent to the given {@link Prohibition},
+     * resolving its node id references to names via the given query.
+     *
+     * @param policyQuery used to resolve node ids to names
+     * @param prohibition the prohibition to convert
+     * @return the equivalent statement
+     * @throws PMException if a referenced node cannot be resolved
+     */
     public static CreateProhibitionStatement fromProhibition(PolicyQuery policyQuery, Prohibition prohibition) throws PMException {
         List<Expression<String>> accessRightsList = new ArrayList<>();
         for (String ar : prohibition.getAccessRightSet()) {
