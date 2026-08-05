@@ -13,6 +13,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * {@link GraphWalker} that visits each level of adjacent nodes before recursing into the next, evaluating
+ * short circuits and propagating a level at a time rather than per node.
+ */
 public class BreadthFirstGraphWalker extends GraphWalker {
 
     public BreadthFirstGraphWalker(AdjacencyRetriever adjacencyRetriever) {

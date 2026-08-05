@@ -2,6 +2,10 @@ package gov.nist.ngac.pm.core.pap.graph.dag;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 
+/**
+ * Callback a {@link GraphWalker} uses to carry information from a just-visited node back to the node it
+ * was reached from.
+ */
 public interface Propagator {
 
     /**

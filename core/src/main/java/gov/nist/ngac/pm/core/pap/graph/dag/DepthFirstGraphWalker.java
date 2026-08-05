@@ -11,6 +11,10 @@ import gov.nist.ngac.pm.core.pap.graph.dag.ShortCircuit;
 import gov.nist.ngac.pm.core.pap.graph.dag.Visitor;
 import java.util.Collection;
 
+/**
+ * {@link GraphWalker} that recurses fully into each adjacent node before visiting it, so a node is
+ * visited only after all of its adjacents have been.
+ */
 public class DepthFirstGraphWalker extends GraphWalker {
 
     public DepthFirstGraphWalker(AdjacencyRetriever adjacencyRetriever) {
