@@ -29,31 +29,6 @@ The library is split into 3 artifacts so consumers only pull the dependency foot
 
 Add `policy-machine-neo4j` and/or `policy-machine-grpc` alongside `policy-machine-core` as needed, using the same groupId and version.
 
-### Install using Jitpack
-Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import with maven.
-
-First, add jitpack as a repository
-```xml
-<project>
-  --
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-  --
-</project>
-```
-
-Then, add the maven dependency
-```xml
-<dependency>
-  <groupId>com.github.usnistgov</groupId>
-  <artifactId>policy-machine-core</artifactId>
-  <version>x.y.z</version>
-</dependency>
-```
 ## Package Description
 
 - `common` - Objects common to other packages.
