@@ -3,7 +3,7 @@ package gov.nist.ngac.pm.core.pap.query;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.pap.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.store.GraphStore;
 import gov.nist.ngac.pm.core.pap.store.ObligationsStore;

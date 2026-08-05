@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.query;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.pap.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.OperationKind;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;

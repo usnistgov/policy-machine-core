@@ -2,7 +2,7 @@ package gov.nist.ngac.pm.core.impl.memory.pap;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.impl.memory.pap.store.MemoryPolicyStore;
-import gov.nist.ngac.pm.core.pap.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
 import gov.nist.ngac.pm.core.pap.PAP;
 
 /**

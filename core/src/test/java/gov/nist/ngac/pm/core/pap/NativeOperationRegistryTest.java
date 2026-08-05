@@ -11,6 +11,7 @@ import gov.nist.ngac.pm.core.common.exception.OperationExistsException;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.operation.AdminOperation;
 import gov.nist.ngac.pm.core.pap.operation.AdminOperations;
+import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.arg.Args;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;

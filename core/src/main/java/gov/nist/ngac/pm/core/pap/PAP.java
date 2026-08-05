@@ -17,6 +17,7 @@ import gov.nist.ngac.pm.core.pap.modification.OperationsModifier;
 import gov.nist.ngac.pm.core.pap.modification.PolicyModification;
 import gov.nist.ngac.pm.core.pap.modification.PolicyModifier;
 import gov.nist.ngac.pm.core.pap.modification.ProhibitionsModifier;
+import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.OperationExecutor;
 import gov.nist.ngac.pm.core.pap.operation.arg.Args;

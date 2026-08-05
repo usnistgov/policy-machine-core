@@ -6,7 +6,7 @@ import static gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightValidat
 import gov.nist.ngac.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.ngac.pm.core.common.exception.OperationExistsException;
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.pap.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperation;

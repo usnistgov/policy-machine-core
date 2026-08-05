@@ -1,9 +1,7 @@
-package gov.nist.ngac.pm.core.pap;
+package gov.nist.ngac.pm.core.pap.operation;
 
 import gov.nist.ngac.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.ngac.pm.core.common.exception.OperationExistsException;
-import gov.nist.ngac.pm.core.pap.operation.AdminOperations;
-import gov.nist.ngac.pm.core.pap.operation.Operation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
