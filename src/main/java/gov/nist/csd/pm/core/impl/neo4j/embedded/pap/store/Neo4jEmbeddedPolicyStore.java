@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.store.GraphStore;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
@@ -26,7 +25,6 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 	}
 
 	private TxHandler txHandler;
-	private PAP pap;
 
 	/**
 	 * Constructor starts a new transaction
@@ -46,11 +44,6 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 	}
 
 	@Override
-	public void setPap(PAP pap) {
-		this.pap = pap;
-	}
-
-	@Override
 	public GraphStore graph() {
 		return new Neo4jEmbeddedGraphStore(txHandler);
 	}
@@ -62,12 +55,12 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
 	@Override
 	public ObligationsStore obligations() {
-		return new Neo4jEmbeddedObligationStore(txHandler, pap);
+		return new Neo4jEmbeddedObligationStore(txHandler);
 	}
 
 	@Override
 	public OperationsStore operations() {
-		return new Neo4jEmbeddedOperationsStore(txHandler, pap);
+		return new Neo4jEmbeddedOperationsStore(txHandler);
 	}
 
 	@Override

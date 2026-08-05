@@ -39,7 +39,6 @@ import gov.nist.csd.pm.core.pap.pml.PMLCompiler;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
 import gov.nist.csd.pm.core.pap.pml.expression.literal.StringLiteralExpression;
-import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.operation.routine.PMLStmtsRoutine;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
@@ -330,18 +329,19 @@ class EPPTest {
     void testCustomOperationInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        PMLAdminOperation<?> pmlAdminOperation = new PMLAdminOperation<>("testFunc", new VoidType(), List.of()) {
-
+        // a native (Java-implemented) operation, not a PMLOperation -- it has no PML body to persist as text,
+        // so it must go through the NativeOperationRegistry like any other native operation
+        AdminOperation<Void> testFunc = new AdminOperation<>("testFunc", new VoidType(), List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
                 pap.modify().graph().createPolicyClass("test");
 
                 return null;
             }
-
         };
 
-        pap.modify().operations().createOperation(pmlAdminOperation);
+        pap.nativeOperations().register(testFunc);
+        pap.modify().operations().createOperation(testFunc);
 
         PDP pdp = new PDP(pap);
         EPP epp = new EPP(pdp, pap);

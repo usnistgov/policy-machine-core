@@ -8,11 +8,7 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OBLIG
 import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PML_TEXT_PROPERTY;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementVisitor;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.store.ObligationsStore;
 import java.util.ArrayList;
@@ -26,11 +22,9 @@ import org.neo4j.graphdb.ResourceIterator;
 public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 
 	private final TxHandler txHandler;
-	private final PAP pap;
 
-	public Neo4jEmbeddedObligationStore(TxHandler txHandler, PAP pap) {
+	public Neo4jEmbeddedObligationStore(TxHandler txHandler) {
 		this.txHandler = txHandler;
-		this.pap = pap;
 	}
 
 	@Override
@@ -68,26 +62,6 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public Collection<Obligation> getObligations() throws PMException {
-		List<ObligationRow> rows = new ArrayList<>();
-
-		txHandler.runTx(tx -> {
-			try (ResourceIterator<Node> nodes = tx.findNodes(OBLIGATION_LABEL)) {
-				while (nodes.hasNext()) {
-					rows.add(readRow(nodes.next()));
-				}
-			}
-		});
-
-		List<Obligation> obligations = new ArrayList<>();
-		for (ObligationRow row : rows) {
-			obligations.add(toObligation(row));
-		}
-
-		return obligations;
-	}
-
-	@Override
 	public boolean obligationExists(String name) throws PMException {
 		AtomicBoolean b = new AtomicBoolean(false);
 		txHandler.runTx(tx -> {
@@ -99,8 +73,8 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 	}
 
 	@Override
-	public Obligation getObligation(String name) throws PMException {
-		AtomicReference<ObligationRow> rowRef = new AtomicReference<>();
+	public ObligationPml getObligationPml(String name) throws PMException {
+		AtomicReference<ObligationPml> rowRef = new AtomicReference<>();
 
 		txHandler.runTx(tx -> {
 			Node node = tx.findNode(OBLIGATION_LABEL, NAME_PROPERTY, name);
@@ -111,19 +85,40 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 			rowRef.set(readRow(node));
 		});
 
-		ObligationRow row = rowRef.get();
-		if (row == null) {
-			return null;
-		}
-
-		return toObligation(row);
+		return rowRef.get();
 	}
 
 	@Override
-	public Collection<Obligation> getObligationsWithAuthor(NodeUserContext authorCtx) throws PMException {
-		Collection<Obligation> obligations = new ArrayList<>(getObligations());
-		obligations.removeIf(o -> !authorCtx.equals(o.getAuthor()));
-		return obligations;
+	public Collection<ObligationPml> getObligationPmls() throws PMException {
+		List<ObligationPml> rows = new ArrayList<>();
+
+		txHandler.runTx(tx -> {
+			try (ResourceIterator<Node> nodes = tx.findNodes(OBLIGATION_LABEL)) {
+				while (nodes.hasNext()) {
+					rows.add(readRow(nodes.next()));
+				}
+			}
+		});
+
+		return rows;
+	}
+
+	@Override
+	public Collection<String> getObligationNamesWithAuthor(NodeUserContext author) throws PMException {
+		List<String> names = new ArrayList<>();
+
+		txHandler.runTx(tx -> {
+			try (ResourceIterator<Node> nodes = tx.findNodes(OBLIGATION_LABEL)) {
+				while (nodes.hasNext()) {
+					Node node = nodes.next();
+					if (author.equals(readAuthor(node))) {
+						names.add((String) node.getProperty(NAME_PROPERTY));
+					}
+				}
+			}
+		});
+
+		return names;
 	}
 
 	@Override
@@ -141,19 +136,19 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 
 	}
 
-	private static ObligationRow readRow(Node node) {
+	private static ObligationPml readRow(Node node) {
+		String name = (String) node.getProperty(NAME_PROPERTY);
+		String pmlText = (String) node.getProperty(PML_TEXT_PROPERTY);
+
+		return new ObligationPml(name, pmlText, readAuthor(node));
+	}
+
+	private static NodeUserContext readAuthor(Node node) {
 		Long authorId = node.hasProperty(AUTHOR_ID_PROPERTY) ? (Long) node.getProperty(AUTHOR_ID_PROPERTY) : null;
 		String authorName = node.hasProperty(AUTHOR_NAME_PROPERTY) ? (String) node.getProperty(AUTHOR_NAME_PROPERTY) : null;
 		String authorProcess = node.hasProperty(AUTHOR_PROCESS_PROPERTY) ? (String) node.getProperty(AUTHOR_PROCESS_PROPERTY) : null;
-		String pmlText = (String) node.getProperty(PML_TEXT_PROPERTY);
 
-		return new ObligationRow(pmlText, authorId, authorName, authorProcess);
-	}
-
-	private Obligation toObligation(ObligationRow row) throws PMException {
-		NodeUserContext author = toAuthor(row.authorId(), row.authorName(), row.authorProcess());
-		PMLStatement<?> statement = StatementVisitor.fromString(pap, row.pmlText());
-		return ((CreateObligationStatement) statement).toObligation(author);
+		return toAuthor(authorId, authorName, authorProcess);
 	}
 
 	private static NodeUserContext toAuthor(Long id, String name, String process) {
@@ -162,8 +157,5 @@ public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 		}
 
 		return process != null ? NodeUserContext.of(id, process) : NodeUserContext.of(id);
-	}
-
-	private record ObligationRow(String pmlText, Long authorId, String authorName, String authorProcess) {
 	}
 }

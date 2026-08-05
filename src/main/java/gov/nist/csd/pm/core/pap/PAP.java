@@ -58,15 +58,15 @@ public abstract class PAP implements OperationExecutor, Transactional {
     public PAP(PolicyStore policyStore, NativeOperationRegistry nativeOperationRegistry) throws PMException {
         this.nativeOperationRegistry = nativeOperationRegistry;
 
-        // give the store a handle back to this PAP before it's used for anything, so a store that needs to
-        // recompile persisted PML text on read (e.g. Neo4j) can resolve lazy cross-references through it
-        policyStore.setPap(this);
-
+        // OperationsQuerier resolves its own cross-references (an operation body invoking another operation)
+        // by passing itself as the OperationsQuery, so it needs no outside handle back to this PAP.
+        // ObligationsQuerier borrows that same capability for obligations, which can invoke operations too.
+        OperationsQuerier operationsQuerier = new OperationsQuerier(policyStore, nativeOperationRegistry);
         this.querier = new PolicyQuerier(
             new GraphQuerier(policyStore),
             new ProhibitionsQuerier(policyStore),
-            new ObligationsQuerier(policyStore),
-            new OperationsQuerier(policyStore, nativeOperationRegistry),
+            new ObligationsQuerier(policyStore, operationsQuerier),
+            operationsQuerier,
             new AccessQuerier(policyStore)
         );
         this.modifier = new PolicyModifier(
@@ -93,7 +93,6 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     public PAP withPolicyStore(PolicyStore policyStore) {
-        policyStore.setPap(this);
         this.policyStore = policyStore;
         return this;
     }

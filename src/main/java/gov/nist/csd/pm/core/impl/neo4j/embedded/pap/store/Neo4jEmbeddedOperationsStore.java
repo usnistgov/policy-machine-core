@@ -9,21 +9,16 @@ import static gov.nist.csd.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOU
 
 import gov.nist.csd.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementVisitor;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
-import gov.nist.csd.pm.core.pap.pml.statement.OperationDefinitionStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
@@ -32,11 +27,9 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	private static final String RESOURCE_ACCESS_RIGHTS_NODE_NAME = "resource_access_rights";
 	private final TxHandler txHandler;
-	private final PAP pap;
 
-	public Neo4jEmbeddedOperationsStore(TxHandler txHandler, PAP pap) {
+	public Neo4jEmbeddedOperationsStore(TxHandler txHandler) {
 		this.txHandler = txHandler;
-		this.pap = pap;
 	}
 
 	@Override
@@ -99,38 +92,6 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 		return resourceOperations;
 	}
 
-	/**
-	 * Only PML-kind rows can be materialized here (a NATIVE row has no body, only the
-	 * {@code NativeOperationRegistry} it was registered with can produce a live instance). Callers must
-	 * branch on {@link #getOperationKind(String)} before calling {@link #getOperation(String)} for a
-	 * possibly-native name.
-	 */
-	@Override
-	public Collection<Operation<?>> getOperations() throws PMException {
-		Map<String, String> pmlTextByName = new LinkedHashMap<>();
-
-		txHandler.runTx(tx -> {
-			ResourceIterator<Node> nodes = tx.findNodes(OPERATION_LABEL);
-			if (nodes == null) {
-				return;
-			}
-
-			while (nodes.hasNext()) {
-				Node next = nodes.next();
-				if (kindOf(next) == OperationKind.PML) {
-					pmlTextByName.put((String) next.getProperty(NAME_PROPERTY), (String) next.getProperty(PML_TEXT_PROPERTY));
-				}
-			}
-		});
-
-		List<Operation<?>> operations = new ArrayList<>();
-		for (String pmlText : pmlTextByName.values()) {
-			operations.add(toOperation(pmlText));
-		}
-
-		return operations;
-	}
-
 	@Override
 	public Collection<String> getOperationNames() throws PMException {
 		List<String> names = new ArrayList<>();
@@ -150,18 +111,13 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	@Override
-	public Operation<?> getOperation(String name) throws PMException {
+	public Optional<String> getOperationPml(String name) throws PMException {
 		OperationRow row = readRow(name);
-		if (row == null) {
-			return null;
+		if (row == null || row.kind() == OperationKind.NATIVE) {
+			return Optional.empty();
 		}
 
-		if (row.kind() == OperationKind.NATIVE) {
-			throw new IllegalStateException(
-				"cannot reconstruct native operation '" + name + "' from the store; resolve it through the NativeOperationRegistry instead");
-		}
-
-		return toOperation(row.pmlText());
+		return Optional.of(row.pmlText());
 	}
 
 	@Override
@@ -226,11 +182,6 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	private static OperationKind kindOf(Node node) {
 		return OperationKind.valueOf((String) node.getProperty(OPERATION_KIND_PROPERTY));
-	}
-
-	private Operation<?> toOperation(String pmlText) throws PMException {
-		PMLStatement<?> statement = StatementVisitor.fromString(pap, pmlText);
-		return ((OperationDefinitionStatement) statement).getOperation();
 	}
 
 	private record OperationRow(OperationKind kind, String pmlText) {

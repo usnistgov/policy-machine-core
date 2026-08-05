@@ -82,7 +82,7 @@ class StatementVisitorFromStringTest {
 
         Obligation original = pap.query().obligations().getObligation("test_obligation");
 
-        PMLStatement<?> compiled = StatementVisitor.fromString(pap, original.toString());
+        PMLStatement<?> compiled = StatementVisitor.fromString(pap.query().operations(), original.toString());
         assertInstanceOf(CreateObligationStatement.class, compiled);
 
         Obligation recompiled = ((CreateObligationStatement) compiled).toObligation(original.getAuthor());
@@ -104,7 +104,7 @@ class StatementVisitorFromStringTest {
         pap.withPolicyQuerier(new PolicyQuerier(
             new GraphQuerier(store),
             new ProhibitionsQuerier(store),
-            new ObligationsQuerier(store),
+            new ObligationsQuerier(store, throwingOperationsQuerier),
             throwingOperationsQuerier,
             new AccessQuerier(store)
         ));
@@ -114,7 +114,7 @@ class StatementVisitorFromStringTest {
         String definitionReferencingExistingOp = "adminop calls_existing_op() { existing_op() }";
 
         PMLStatement<?> compiled = assertDoesNotThrow(
-            () -> StatementVisitor.fromString(pap, definitionReferencingExistingOp));
+            () -> StatementVisitor.fromString(throwingOperationsQuerier, definitionReferencingExistingOp));
         assertInstanceOf(OperationDefinitionStatement.class, compiled);
     }
 
@@ -128,7 +128,8 @@ class StatementVisitorFromStringTest {
         // operation by going around the restriction via a store lookup.
         String queryOpInvokingAdminOp = "query test_query_op() { existing_op() }";
 
-        assertThrows(PMLCompilationException.class, () -> StatementVisitor.fromString(pap, queryOpInvokingAdminOp));
+        assertThrows(PMLCompilationException.class,
+            () -> StatementVisitor.fromString(pap.query().operations(), queryOpInvokingAdminOp));
     }
 
     private void assertOperationRoundTrips(String definitionPml, String name) throws PMException {
@@ -136,7 +137,7 @@ class StatementVisitorFromStringTest {
 
         Operation<?> original = pap.query().operations().getOperation(name);
 
-        PMLStatement<?> compiled = StatementVisitor.fromString(pap, original.toString());
+        PMLStatement<?> compiled = StatementVisitor.fromString(pap.query().operations(), original.toString());
         assertInstanceOf(OperationDefinitionStatement.class, compiled);
 
         Operation<?> recompiled = ((OperationDefinitionStatement) compiled).getOperation();

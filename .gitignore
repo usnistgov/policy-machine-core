@@ -4,4 +4,5 @@ policy-machine-core.iml
 /target
 .DS_Store
 **/gen/
+.scratch
 /src/main/antlr4/gov/nist/csd/pm/core/pap/pml/antlr/PMLLexer.tokens

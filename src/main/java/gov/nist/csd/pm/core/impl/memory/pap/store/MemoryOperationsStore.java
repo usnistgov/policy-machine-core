@@ -10,6 +10,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.csd.pm.core.pap.store.OperationsStore;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 
@@ -38,22 +39,18 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
     }
 
     @Override
-    public Collection<Operation<?>> getOperations() throws PMException {
-        return new ArrayList<>(policy.operations.values());
-    }
-
-    @Override
     public Collection<String> getOperationNames() throws PMException {
         return new ArrayList<>(policy.operations.keySet());
     }
 
     @Override
-    public Operation<?> getOperation(String name) throws PMException {
+    public Optional<String> getOperationPml(String name) throws PMException {
         Operation<?> operation = policy.operations.get(name);
-        if (operation == null) {
-            throw new OperationDoesNotExistException(name);
+        if (!(operation instanceof PMLOperation)) {
+            return Optional.empty();
         }
-        return operation;
+
+        return Optional.of(operation.toString());
     }
 
     @Override

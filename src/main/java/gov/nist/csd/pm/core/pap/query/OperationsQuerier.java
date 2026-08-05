@@ -5,6 +5,8 @@ import gov.nist.csd.pm.core.pap.NativeOperationRegistry;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.operation.OperationKind;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementVisitor;
+import gov.nist.csd.pm.core.pap.pml.statement.OperationDefinitionStatement;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,14 +72,18 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     /**
-     * Resolve a persisted (non-protected) row by name: NATIVE-kind through the registry, PML-kind by asking
-     * the store to recompile it.
+     * Resolve a persisted (non-protected) row by name: NATIVE-kind through the registry, PML-kind by
+     * recompiling the store's persisted PML text. Passes {@code this} as the {@link OperationsQuery} that
+     * resolves any cross-reference (another operation invoked in the body) -- resolving "what does operation
+     * X look like" is this class's own job, so it needs no outside handle to do it.
      */
     private Operation<?> resolveStoreOperation(String name) throws PMException {
         if (store.operations().getOperationKind(name) == OperationKind.NATIVE) {
             return nativeOperationRegistry.get(name);
         }
 
-        return store.operations().getOperation(name);
+        String pmlText = store.operations().getOperationPml(name).orElseThrow(() -> new IllegalStateException(
+            "operation '" + name + "' expected to be PML but no text was found"));
+        return StatementVisitor.fromString(this, pmlText, OperationDefinitionStatement.class, OperationDefinitionStatement::getOperation);
     }
 }

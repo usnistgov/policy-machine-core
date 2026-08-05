@@ -70,6 +70,9 @@ class CreateObligationStatementTest {
         pap.modify().graph().createUser("u2", ids("ua2"));
         pap.modify().graph().createObjectAttribute("oa1", ids("pc1"));
         pap.modify().graph().createObjectAttribute("oa2", ids("pc1"));
+        // the obligation's "on (opnd1)" clause resolves "e1" at recompile time to type-check the clause's
+        // event params, so a real operation named "e1" must exist
+        pap.executePML(NodeUserContext.of(id("u2")), "resourceop e1(@Node string opnd1) { }");
         ExecutionContext execCtx = new ExecutionContext(NodeUserContext.of(id("u2")), pap);
 
         stmt.execute(execCtx, pap);

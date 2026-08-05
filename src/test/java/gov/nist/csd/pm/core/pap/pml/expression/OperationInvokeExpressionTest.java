@@ -25,7 +25,7 @@ import gov.nist.csd.pm.core.pap.pml.operation.admin.PMLStmtsAdminOperation;
 import gov.nist.csd.pm.core.pap.pml.scope.CompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatementBlock;
 import gov.nist.csd.pm.core.pap.pml.statement.basic.ReturnStatement;
-import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableAssignmentStatement;
+import gov.nist.csd.pm.core.pap.pml.statement.basic.VariableDeclarationStatement;
 import gov.nist.csd.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 import gov.nist.csd.pm.core.util.TestPAP;
 import java.util.List;
@@ -50,7 +50,8 @@ class OperationInvokeExpressionTest {
             List.of(a, b),
         List.of(),
             new PMLStatementBlock(List.of(
-                    new VariableAssignmentStatement("x", false, new StringLiteralExpression("test")),
+                    new VariableDeclarationStatement(List.of(
+                        new VariableDeclarationStatement.Declaration("x", new StringLiteralExpression("test")))),
                     new ReturnStatement(new StringLiteralExpression("test_ret"))
             )));
 

@@ -3,7 +3,10 @@ package gov.nist.csd.pm.core.pap.query;
 import gov.nist.csd.pm.core.common.exception.ObligationDoesNotExistException;
 import gov.nist.csd.pm.core.common.exception.PMException;
 import gov.nist.csd.pm.core.pap.obligation.Obligation;
+import gov.nist.csd.pm.core.pap.pml.compiler.visitor.StatementVisitor;
+import gov.nist.csd.pm.core.pap.pml.statement.operation.CreateObligationStatement;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
+import gov.nist.csd.pm.core.pap.store.ObligationsStore.ObligationPml;
 import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,8 +14,11 @@ import java.util.List;
 
 public class ObligationsQuerier extends Querier implements ObligationsQuery {
 
-    public ObligationsQuerier(PolicyStore store) {
+    private final OperationsQuery operationsQuery;
+
+    public ObligationsQuerier(PolicyStore store, OperationsQuery operationsQuery) {
         super(store);
+        this.operationsQuery = operationsQuery;
     }
 
     @Override
@@ -21,12 +27,17 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
             throw new ObligationDoesNotExistException(name);
         }
 
-        return store.obligations().getObligation(name);
+        return compile(store.obligations().getObligationPml(name));
     }
 
     @Override
     public Collection<Obligation> getObligations() throws PMException {
-        return store.obligations().getObligations();
+        List<Obligation> obligations = new ArrayList<>();
+        for (ObligationPml row : store.obligations().getObligationPmls()) {
+            obligations.add(compile(row));
+        }
+
+        return obligations;
     }
 
     @Override
@@ -36,7 +47,7 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
 
     @Override
     public Collection<Obligation> getObligationsWithAuthor(NodeUserContext author) throws PMException {
-        Collection<Obligation> obligations = store.obligations().getObligations();
+        Collection<Obligation> obligations = getObligations();
         List<Obligation> withAuthor = new ArrayList<>();
         for (Obligation obligation : obligations) {
             if(obligation.getAuthor().equals(author)) {
@@ -45,5 +56,14 @@ public class ObligationsQuerier extends Querier implements ObligationsQuery {
         }
 
         return withAuthor;
+    }
+
+    private Obligation compile(ObligationPml row) throws PMException {
+        if (row == null) {
+            return null;
+        }
+
+        return StatementVisitor.fromString(operationsQuery, row.pmlText(), CreateObligationStatement.class,
+            stmt -> stmt.toObligation(row.author()));
     }
 }

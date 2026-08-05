@@ -35,22 +35,18 @@ final class ScopeSeeds {
     }
 
     static PMLOperationSignature createOperationSignature(Operation<?> op) {
+        return new PMLOperationSignature(
+            operationTypeOf(op), op.getName(), op.getReturnType(), op.getFormalParameters(),
+            op.getEventParameters(), op.getRequiredCapabilities());
+    }
+
+    private static OperationType operationTypeOf(Operation<?> op) {
         return switch (op) {
-            case Function<?> function -> new PMLOperationSignature(
-                OperationType.FUNCTION, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                function.getRequiredCapabilities());
-            case QueryOperation<?> queryOperation -> new PMLOperationSignature(
-                OperationType.QUERY, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                queryOperation.getRequiredCapabilities());
-            case AdminOperation<?> adminOperation -> new PMLOperationSignature(
-                OperationType.ADMINOP, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                adminOperation.getRequiredCapabilities());
-            case Routine<?> routine -> new PMLOperationSignature(
-                OperationType.ROUTINE, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                routine.getRequiredCapabilities());
-            case ResourceOperation<?> resourceOperation -> new PMLOperationSignature(
-                OperationType.RESOURCEOP, op.getName(), op.getReturnType(), op.getFormalParameters(),
-                resourceOperation.getRequiredCapabilities());
+            case Function<?> function -> OperationType.FUNCTION;
+            case QueryOperation<?> queryOperation -> OperationType.QUERY;
+            case AdminOperation<?> adminOperation -> OperationType.ADMINOP;
+            case Routine<?> routine -> OperationType.ROUTINE;
+            case ResourceOperation<?> resourceOperation -> OperationType.RESOURCEOP;
         };
     }
 

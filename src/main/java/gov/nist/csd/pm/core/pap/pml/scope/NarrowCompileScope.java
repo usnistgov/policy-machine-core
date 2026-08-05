@@ -1,27 +1,29 @@
 package gov.nist.csd.pm.core.pap.pml.scope;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.operation.AdminOperations;
 import gov.nist.csd.pm.core.pap.operation.Operation;
 import gov.nist.csd.pm.core.pap.pml.compiler.Variable;
 import gov.nist.csd.pm.core.pap.pml.operation.PMLOperationSignature;
 import gov.nist.csd.pm.core.pap.pml.operation.builtin.PMLBuiltinOperations;
+import gov.nist.csd.pm.core.pap.query.OperationsQuery;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * A {@link Scope} used to recompile a single already-persisted PML definition (an operation or an obligation)
  * read back from a {@code Store}, without the cost/recursion risk of {@link CompileScope}'s eager
- * {@code pap.query().operations().getOperations()} symbol-table seed: a {@code Store}'s read path for a
- * PML-kind row drives this scope, and if that scope itself called {@code getOperations()} to seed, it would
- * recurse straight back into every other stored PML row.
+ * {@code operationsQuery.getOperations()} symbol-table seed: a {@code Store}'s read path for a PML-kind row
+ * drives this scope, and if that scope itself called {@code getOperations()} to seed, it would recurse
+ * straight back into every other stored PML row.
  * <p>
  * A persisted definition was already valid PML when it was first created, so it doesn't need eager
  * re-validation against every sibling operation. Only the fixed, cheap sets (builtins, protected admin
  * operations) are seeded eagerly; any other name referenced in the body (a cross-reference to another
- * user-defined operation/function) is resolved lazily, one name at a time, via {@code pap.query().operations()}
- * only when actually looked up.
+ * user-defined operation/function) is resolved lazily, one name at a time, via the {@link OperationsQuery}
+ * only when actually looked up. Depending on {@code OperationsQuery} rather than a whole {@code PAP} keeps
+ * this scope usable by whatever narrowly owns operation resolution -- e.g. {@code OperationsQuerier} passing
+ * itself in for its own cross-references, without needing a live handle back to the owning PAP.
  */
 public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
 
@@ -31,19 +33,21 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
         FUNCTIONS_ONLY
     }
 
+    private final OperationsQuery operationsQuery;
     private final Visibility visibility;
 
-    public NarrowCompileScope(PAP pap) {
-        this(pap, ScopeSeeds.loadConstants(), new HashMap<>(), seedOperations(), null, Visibility.ALL);
+    public NarrowCompileScope(OperationsQuery operationsQuery) {
+        this(operationsQuery, ScopeSeeds.loadConstants(), new HashMap<>(), seedOperations(), null, Visibility.ALL);
     }
 
-    private NarrowCompileScope(PAP pap,
+    private NarrowCompileScope(OperationsQuery operationsQuery,
                                Map<String, Variable> constants,
                                Map<String, Variable> variables,
                                Map<String, PMLOperationSignature> operations,
                                Scope<Variable, PMLOperationSignature> parentScope,
                                Visibility visibility) {
-        super(pap, constants, variables, operations, parentScope);
+        super(null, constants, variables, operations, parentScope);
+        this.operationsQuery = operationsQuery;
         this.visibility = visibility;
     }
 
@@ -68,7 +72,7 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
             return signature;
         }
 
-        signature = resolveFromPap(name);
+        signature = resolveFromQuery(name);
         if (signature == null) {
             throw new UnknownOperationInScopeException(name);
         }
@@ -79,12 +83,12 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
 
     @Override
     public boolean operationExists(String name) {
-        return getOperations().containsKey(name) || resolveFromPap(name) != null;
+        return getOperations().containsKey(name) || resolveFromQuery(name) != null;
     }
 
-    private PMLOperationSignature resolveFromPap(String name) {
+    private PMLOperationSignature resolveFromQuery(String name) {
         try {
-            Operation<?> op = getPap().query().operations().getOperation(name);
+            Operation<?> op = operationsQuery.getOperation(name);
             PMLOperationSignature signature = ScopeSeeds.createOperationSignature(op);
             return isVisible(signature) ? signature : null;
         } catch (PMException e) {
@@ -95,7 +99,7 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
     @Override
     public NarrowCompileScope copy() {
         return new NarrowCompileScope(
-            getPap(),
+            operationsQuery,
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
             new HashMap<>(getOperations()),
@@ -123,7 +127,7 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
         }
 
         return new NarrowCompileScope(
-            getPap(),
+            operationsQuery,
             new HashMap<>(getConstants()),
             new HashMap<>(getVariables()),
             filtered,

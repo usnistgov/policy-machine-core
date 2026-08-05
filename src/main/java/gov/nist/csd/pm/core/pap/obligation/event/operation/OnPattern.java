@@ -9,7 +9,7 @@ public record OnPattern(Set<String> patternArgs, PMLStmtsRoutine<Boolean> func) 
 
     @Override
     public String toFormattedString(int indentLevel) {
-        return String.format(" on (%s) %s", String.join(" ", patternArgs), func.getStatements().toFormattedString(indentLevel));
+        return String.format(" on (%s) %s", String.join(", ", patternArgs), func.getStatements().toFormattedString(indentLevel));
     }
 
     @Override

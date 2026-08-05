@@ -28,7 +28,6 @@ import gov.nist.csd.pm.core.pap.admin.AdminPolicy;
 import gov.nist.csd.pm.core.pap.admin.AdminPolicyNode;
 import gov.nist.csd.pm.core.pap.graph.Association;
 import gov.nist.csd.pm.core.pap.id.IdGenerator;
-import gov.nist.csd.pm.core.pap.obligation.Obligation;
 import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.csd.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.csd.pm.core.pap.graph.dag.DepthFirstGraphWalker;
@@ -38,7 +37,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 public class GraphModifier extends Modifier implements GraphModification {
 
@@ -249,14 +247,12 @@ public class GraphModifier extends Modifier implements GraphModification {
      * @throws PMException If any PM related exceptions occur in the implementing class.
      */
     protected void checkIfNodeIsObligationAuthor(long id) throws PMException {
-        Collection<Obligation> obligationsWithAuthor = policyStore.obligations().getObligationsWithAuthor(NodeUserContext.of(id));
-        if (obligationsWithAuthor.isEmpty()) {
+        Collection<String> namesWithAuthor = policyStore.obligations().getObligationNamesWithAuthor(NodeUserContext.of(id));
+        if (namesWithAuthor.isEmpty()) {
             return;
         }
 
-        throw new NodeReferencedInObligationException(
-            policyStore.graph().getNodeById(id).getName(),
-            obligationsWithAuthor.stream().map(Obligation::getName).collect(Collectors.toSet()));
+        throw new NodeReferencedInObligationException(policyStore.graph().getNodeById(id).getName(), namesWithAuthor);
     }
 
     /**

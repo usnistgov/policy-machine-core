@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pap.pml.compiler.visitor;
 
 import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.pap.PAP;
 import gov.nist.csd.pm.core.pap.pml.PMLErrorHandler;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLLexer;
 import gov.nist.csd.pm.core.pap.pml.antlr.PMLParser;
@@ -17,6 +16,8 @@ import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationException;
 import gov.nist.csd.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.csd.pm.core.pap.pml.scope.NarrowCompileScope;
 import gov.nist.csd.pm.core.pap.pml.statement.PMLStatement;
+import gov.nist.csd.pm.core.pap.query.OperationsQuery;
+import java.util.function.Function;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -37,13 +38,13 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
      * <p>
      * A persisted definition was already valid PML when first created, so this does not re-validate it against
      * every sibling operation the way a whole-program {@code pap.compilePML()} would.
-     * @param pap The PAP to lazily resolve cross-references (to other operations/functions invoked in the body)
-     *            against.
+     * @param operationsQuery The query to lazily resolve cross-references (to other operations/functions
+     *                        invoked in the body) against.
      * @param input A single statement's PML text.
      * @return The compiled statement — an {@code OperationDefinitionStatement} or a {@code CreateObligationStatement}.
      * @throws PMException If the input fails to compile.
      */
-    public static PMLStatement<?> fromString(PAP pap, String input) throws PMException {
+    public static PMLStatement<?> fromString(OperationsQuery operationsQuery, String input) throws PMException {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 
         PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
@@ -61,7 +62,7 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
         }
 
         ErrorLog errorLog = new ErrorLog();
-        VisitorContext visitorCtx = new VisitorContext(tokens, new NarrowCompileScope(pap), errorLog, pmlErrorHandler);
+        VisitorContext visitorCtx = new VisitorContext(tokens, new NarrowCompileScope(operationsQuery), errorLog, pmlErrorHandler);
         StatementVisitor visitor = new StatementVisitor(visitorCtx);
 
         PMLStatement<?> statement = null;
@@ -76,6 +77,25 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
         }
 
         return statement;
+    }
+
+    /**
+     * {@link #fromString(OperationsQuery, String)}, then cast the result to {@code statementType} and pull the
+     * domain object back out via {@code extractor} -- the "recompile a persisted row, cast, unwrap" shape
+     * shared by every store-backed reader ({@code ObligationsQuerier}, {@code OperationsQuerier}). A wrong
+     * {@code statementType} fails with {@link ClassCastException}, same as the manual cast this replaces.
+     * @param operationsQuery The query to lazily resolve cross-references against.
+     * @param input A single statement's PML text.
+     * @param statementType The concrete statement type {@code input} is expected to compile to.
+     * @param extractor Pulls the live domain object (an {@code Obligation}, an {@code Operation}) out of the
+     *                  compiled statement.
+     * @return The extracted domain object.
+     * @throws PMException If the input fails to compile.
+     */
+    public static <S, T> T fromString(OperationsQuery operationsQuery, String input, Class<S> statementType,
+                                      Function<S, T> extractor) throws PMException {
+        PMLStatement<?> statement = fromString(operationsQuery, input);
+        return extractor.apply(statementType.cast(statement));
     }
 
     @Override
