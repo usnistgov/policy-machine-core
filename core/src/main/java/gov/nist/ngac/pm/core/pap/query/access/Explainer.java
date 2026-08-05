@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Builds a full {@link Explain} for a user's access to a target: the granted and denied privileges, the
+ * satisfied prohibitions, and the per-policy-class paths (with associations) that justify them.
+ */
 public class Explainer {
 
 	private final PolicyStore policyStore;
@@ -32,6 +36,14 @@ public class Explainer {
 		this.policyStore = policyStore;
 	}
 
+	/**
+	 * Computes the full explanation of a user's access to a target.
+	 *
+	 * @param userCtx the user to explain access for
+	 * @param targetCtx the target to explain access to
+	 * @return the privileges, denied privileges, satisfied prohibitions, and justifying paths
+	 * @throws PMException if evaluation fails
+	 */
 	public Explain explain(UserContext userCtx, TargetContext targetCtx) throws PMException {
 		// resolve paths from u to target
 		List<PolicyClassExplain> resolvedPaths = resolvePaths(userCtx, targetCtx);

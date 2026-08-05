@@ -13,6 +13,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link TargetEvaluator} that reuses its visited-node privilege map across {@link #evaluate} calls for
+ * the same {@link UserDagResult}, so repeated evaluations against different targets for the same user
+ * don't recompute privileges for nodes already visited. The cache is cleared whenever the user context
+ * changes.
+ */
 public class CachedTargetEvaluator extends TargetEvaluator {
 
     private UserDagResult cachedUserDagResult;

@@ -13,6 +13,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Computes a {@link UserDagResult} for a user by breadth-first walking their ascendant graph and
+ * collecting the border targets reached via associations and the prohibitions that apply to them.
+ */
 public class UserEvaluator {
 
 	private final PolicyStore policyStore;

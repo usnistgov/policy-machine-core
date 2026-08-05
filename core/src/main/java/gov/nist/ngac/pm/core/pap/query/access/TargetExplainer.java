@@ -20,6 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Walks the target's ascendant graph to find, per policy class reached, every path from the target to
+ * that policy class along with the associations touching each node on the path.
+ */
 public class TargetExplainer {
 
 	private final PolicyStore policyStore;
@@ -28,6 +32,14 @@ public class TargetExplainer {
 		this.policyStore = policyStore;
 	}
 
+	/**
+	 * Finds every ascendant path from the target to each policy class it reaches.
+	 *
+	 * @param targetCtx the target to explain
+	 * @return a map from policy class node to its paths from the target, each path paired with the
+	 * associations touching a node on that path
+	 * @throws PMException if the walk fails
+	 */
 	public Map<Node, Map<Path, List<Association>>> explainTarget(TargetContext targetCtx) throws PMException {
 		Collection<Long> policyClasses = policyStore.graph().getPolicyClasses();
 

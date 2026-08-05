@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Computes, per policy class, the privileges a user's {@link UserDagResult} grants on a target by
+ * depth-first walking the target's ascendant graph and merging in the border-target access rights
+ * reached along the way.
+ */
 public class TargetEvaluator {
 
 	protected final PolicyStore policyStore;
@@ -82,6 +87,11 @@ public class TargetEvaluator {
 		return merged;
 	}
 
+	/**
+	 * Builds the mutable traversal state for one {@link #evaluate} call: the target's first-level
+	 * ascendants to seed the walk, the node ids the user's prohibitions reference, and empty maps to
+	 * accumulate visited privileges and prohibition hits into.
+	 */
 	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
 		Collection<Long> firstLevelDescs = new LongArrayList();
 		Collection<Long> resolvedIds = targetCtx.resolveNodeIds(policyStore.graph());
@@ -126,6 +136,10 @@ public class TargetEvaluator {
 		);
 	}
 
+	/**
+	 * Builds the depth-first {@link GraphWalker} used to traverse the target's ascendant graph, wired
+	 * with this evaluator's visitor and propagator.
+	 */
 	protected GraphWalker createDepthFirstWalker(UserDagResult userDagResult, TraversalState state) throws PMException {
 		Visitor nodeVisitor = createVisitor(userDagResult, state);
 		Propagator privilegePropagator = createPropagator(state);
@@ -135,6 +149,11 @@ public class TargetEvaluator {
 			.withPropagator(privilegePropagator);
 	}
 
+	/**
+	 * Builds the {@link Visitor} that, for each ascendant node visited, records it as a reached
+	 * prohibition target if applicable, seeds its privileges when it's a policy class, and merges in the
+	 * user's border-target access rights when the node is itself a border target.
+	 */
 	protected Visitor createVisitor(UserDagResult userDagResult, TraversalState state) throws PMException {
 		Collection<Long> policyClasses = policyStore.graph().getPolicyClasses();
 		AccessRightSet adminPrivilegesOnPCs = computePrivilegesOnPCs(userDagResult, state.firstLevelDescs, policyClasses);
@@ -156,6 +175,10 @@ public class TargetEvaluator {
 		};
 	}
 
+	/**
+	 * Builds the {@link Propagator} that merges a visited descendant's per-policy-class privileges into
+	 * its ascendant as the walk moves up the target graph.
+	 */
 	protected Propagator createPropagator(TraversalState state) {
 		return (descendantId, ascendantId) -> {
 			Map<Long, AccessRightSet> descsPrivs = state.visitedNodes.get(descendantId);
@@ -171,6 +194,11 @@ public class TargetEvaluator {
 		};
 	}
 
+	/**
+	 * Redirects a target context that resolves to a policy class node to the PM_ADMIN_POLICY_CLASSES
+	 * node, since a policy class has no ascendants of its own to walk; other target contexts pass through
+	 * unchanged.
+	 */
 	protected TargetContext prepareTargetCtx(TargetContext targetContext) throws PMException {
 		// if already a list of attributes, nothing to prepare
 		if (targetContext instanceof AnonymousTargetContext) {
@@ -188,6 +216,10 @@ public class TargetEvaluator {
 		return targetContext;
 	}
 
+	/**
+	 * Collects every node id referenced in the inclusion or exclusion set of any of the given
+	 * prohibitions.
+	 */
 	protected Set<Long> collectUserProhibitionAttributes(Set<Prohibition> prohibitions) {
 		Set<Long> userProhibitionAttrs = new HashSet<>();
 		for (Prohibition prohibition : prohibitions) {
@@ -198,6 +230,11 @@ public class TargetEvaluator {
 		return userProhibitionAttrs;
 	}
 
+	/**
+	 * Mutable state threaded through one target-side traversal: the target's first-level ascendants, the
+	 * node ids referenced by the user's prohibitions, the per-node per-policy-class privileges
+	 * accumulated so far, and the prohibition targets reached during the walk.
+	 */
 	protected record TraversalState(Collection<Long> firstLevelDescs,
 									Set<Long> userProhibitionTargets,
 									Map<Long, Map<Long, AccessRightSet>> visitedNodes,

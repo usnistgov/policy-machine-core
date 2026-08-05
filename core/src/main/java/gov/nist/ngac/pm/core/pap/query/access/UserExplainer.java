@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Walks the user's ascendant graph, but only along paths that lead to a user attribute referenced by the
+ * given target-side association paths, to find how the user reaches each such user attribute.
+ */
 public class UserExplainer {
 
 	private final PolicyStore policyStore;
@@ -24,6 +28,17 @@ public class UserExplainer {
 		this.policyStore = policyStore;
 	}
 
+	/**
+	 * Finds every ascendant path from the user to a user attribute that appears as an association source
+	 * in the given target paths, intersecting the user's reachable attributes with the ones the target
+	 * side found relevant.
+	 *
+	 * @param userCtx the user to explain
+	 * @param targetPaths the target-side paths (from {@link TargetExplainer#explainTarget}) to intersect
+	 * against
+	 * @return a map from user attribute node to the user's paths reaching it
+	 * @throws PMException if the walk fails
+	 */
 	public Map<Node, Set<Path>> explainIntersectionOfTargetPaths(UserContext userCtx, Map<Node, Map<Path, List<Association>>> targetPaths) throws PMException {
 		// initialize map with the UAs of the target path associations
 		Map<Node, Set<Path>> associationUAPaths = new HashMap<>();

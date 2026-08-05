@@ -4,6 +4,10 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The result of walking a target's ascendant graph: the access rights reachable under each policy class,
+ * and the prohibition-referenced node ids reached during the walk.
+ */
 public record TargetDagResult(Map<Long, AccessRightSet> pcMap, Set<Long> reachedTargets) {
 
 }
