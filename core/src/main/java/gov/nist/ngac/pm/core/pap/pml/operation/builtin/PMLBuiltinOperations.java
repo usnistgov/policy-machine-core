@@ -4,6 +4,9 @@ import gov.nist.ngac.pm.core.pap.operation.Operation;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Registry of the PML built-in operations, keyed by their PML operation name.
+ */
 public class PMLBuiltinOperations {
 
     // util operations
@@ -75,6 +78,11 @@ public class PMLBuiltinOperations {
         BUILTIN_OPERATIONS.put(isNull.getName(), isNull);
     }
 
+    /**
+     * Returns a copy of the built-in operations, keyed by their PML operation name.
+     *
+     * @return a new map of built-in operations
+     */
     public static Map<String, Operation<?>> builtinOperations() {
         return new HashMap<>(BUILTIN_OPERATIONS);
     }

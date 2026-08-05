@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 
+/**
+ * PML built-in query node_exists(node): returns whether a node with the given name exists.
+ */
 public class NodeExists extends PMLQueryOperation<Boolean> {
 
     public NodeExists() {

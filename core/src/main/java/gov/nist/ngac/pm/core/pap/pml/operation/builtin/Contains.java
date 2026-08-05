@@ -10,6 +10,9 @@ import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
+/**
+ * PML built-in function contains(arr, element): returns whether arr contains element.
+ */
 public class Contains extends PMLFunctionOperation<Boolean> {
 
     public static final FormalParameter<List<Object>> ARR_PARAM = new FormalParameter<>("arr", ListType.of(ANY_TYPE));

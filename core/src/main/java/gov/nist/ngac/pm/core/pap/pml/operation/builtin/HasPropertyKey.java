@@ -13,6 +13,9 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 
+/**
+ * PML built-in query has_property_key(node, key): returns whether the node has the given property key.
+ */
 public class HasPropertyKey extends PMLQueryOperation<Boolean> {
 
     public HasPropertyKey() {

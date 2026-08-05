@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
+/**
+ * PML built-in function is_null(obj): returns whether obj is null.
+ */
 public class IsNull extends PMLFunctionOperation<Boolean> {
 
     private static final FormalParameter<Object> OBJ_PARAM = new FormalParameter<>("obj", ANY_TYPE);

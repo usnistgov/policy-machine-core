@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
+/**
+ * PML built-in function append(dst, src): appends src to the dst list in place and returns dst.
+ */
 public class Append extends PMLFunctionOperation<List<Object>> {
 
     public static final FormalParameter<List<Object>> DST_PARAM = new FormalParameter<>("dst", ListType.of(ANY_TYPE));

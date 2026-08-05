@@ -13,6 +13,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * PML built-in query self_compute_privileges(node_name): returns the caller's privileges on the given
+ * node.
+ */
 public class SelfAccessComputePrivileges extends QueryOperation<List<String>> {
 
     private static final NodeNameFormalParameter NODE_NAME_PARAM =

@@ -18,6 +18,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PML built-in query search(type, properties): returns the nodes matching the given type and property
+ * filters, each as a map with "name", "type", and "properties" entries.
+ */
 public class Search extends PMLQueryOperation<List<Map<String, Object>>> {
 
     public static final FormalParameter<String> TYPE_PARAM = new FormalParameter<>("type", STRING_TYPE);

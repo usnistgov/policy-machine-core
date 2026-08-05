@@ -15,6 +15,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 
+/**
+ * PML built-in query has_property_value(node, key, value): returns whether the node has the given
+ * property key set to the given value.
+ */
 public class HasPropertyValue extends PMLQueryOperation<Boolean> {
 
     public static final FormalParameter<String> VALUE_PARAM = new FormalParameter<>("value", STRING_TYPE);

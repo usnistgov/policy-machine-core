@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
+/**
+ * PML built-in function env(key): returns the value of the named OS environment variable.
+ */
 public class Env extends PMLFunctionOperation<String> {
 
 	public static final FormalParameter<String> KEY_PARAM = new FormalParameter<>("key", STRING_TYPE);

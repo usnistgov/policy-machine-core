@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * PML built-in query get_adjacent_ascendants(node): returns the names of the nodes directly ascendant
+ * to the given node.
+ */
 public class GetAdjacentAscendants extends PMLQueryOperation<List<String>> {
 
     private static final Type<List<String>> returnType = ListType.of(STRING_TYPE);

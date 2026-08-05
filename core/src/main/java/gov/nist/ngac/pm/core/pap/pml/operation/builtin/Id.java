@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * PML built-in query id(name): returns the node id for the given node name.
+ */
 public class Id extends PMLQueryOperation<Long> {
 
     public Id() {

@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PML built-in function contains_key(map, key): returns whether map contains key.
+ */
 public class ContainsKey extends PMLFunctionOperation<Boolean> {
 
     public static final FormalParameter<Map<Object, Object>> MAP_PARAM = new FormalParameter<>("map", MapType.of(

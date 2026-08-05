@@ -16,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PML built-in query self_compute_subgraph_privileges(node_name): returns the caller's privileges over
+ * the given node and its descendant subgraph, flattened into a map keyed by node name.
+ */
 public class SelfAccessComputeSubgraphPrivileges extends QueryOperation<Map<String, List<String>>> {
 
     private static final NodeNameFormalParameter NODE_NAME_PARAM =

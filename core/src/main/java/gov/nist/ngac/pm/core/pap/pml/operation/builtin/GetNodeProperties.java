@@ -14,6 +14,9 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PML built-in query get_node_properties(node): returns the node's properties.
+ */
 public class GetNodeProperties extends QueryOperation<Map<String, String>> {
 
     private static final Type<Map<String, String>> returnType = MapType.of(STRING_TYPE, STRING_TYPE);

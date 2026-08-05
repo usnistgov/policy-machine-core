@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * PML built-in query get_policy_class_ids(): returns the ids of all policy classes.
+ */
 public class GetPolicyClassIds extends QueryOperation<List<Long>> {
 
     public GetPolicyClassIds() {

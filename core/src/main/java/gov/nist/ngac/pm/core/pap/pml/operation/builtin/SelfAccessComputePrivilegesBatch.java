@@ -15,6 +15,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * PML built-in query self_compute_privileges_batch(node_names): returns the caller's privileges on each
+ * of the given nodes, in the same order.
+ */
 public class SelfAccessComputePrivilegesBatch extends QueryOperation<List<List<String>>> {
 
     private static final FormalParameter<List<String>> NODE_NAMES_PARAM =
