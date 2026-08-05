@@ -7,6 +7,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
 import java.util.Map;
 
+/**
+ * Client-side handle for the resource adjudication gRPC service, scoped to a single user/process pair.
+ */
 public class GrpcResourcePDP {
 
     private final ManagedChannel managedChannel;
@@ -19,6 +22,13 @@ public class GrpcResourcePDP {
         this.process = process;
     }
 
+    /**
+     * Adjudicates a single resource operation by name against the remote PDP.
+     *
+     * @param name the name of the operation to adjudicate
+     * @param args the operation's argument values, keyed by parameter name
+     * @return the operation's return value, or null if it has none
+     */
     public Object adjudicateOperation(String name, Map<String, Object> args) {
         ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub stub =
             ResourceAdjudicationServiceGrpc.newBlockingStub(managedChannel)

@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Client-side handle for the admin adjudication gRPC service, scoped to a single user/process pair.
+ */
 public class GrpcAdminPDP {
 
     private final ManagedChannel managedChannel;
@@ -29,6 +32,13 @@ public class GrpcAdminPDP {
         this.process = process;
     }
 
+    /**
+     * Adjudicates a single admin operation by name against the remote PDP.
+     *
+     * @param name the name of the operation to adjudicate
+     * @param args the operation's argument values, keyed by parameter name
+     * @return the operation's return value, or null if it has none
+     */
     public Object adjudicateOperation(String name, Map<String, Object> args) {
         AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
             .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
@@ -47,6 +57,11 @@ public class GrpcAdminPDP {
         return null;
     }
 
+    /**
+     * Adjudicates a routine as a single batch of admin operations against the remote PDP.
+     *
+     * @param operations the ordered list of operations to execute as one routine
+     */
     public void adjudicateRoutine(List<gov.nist.ngac.pm.core.pdp.adjudication.OperationRequest> operations) {
         AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
             .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
@@ -66,6 +81,12 @@ public class GrpcAdminPDP {
         stub.adjudicateRoutine(request);
     }
 
+    /**
+     * Compiles and executes a PML script against the remote PDP as this user/process.
+     *
+     * @param pml the PML source to execute
+     * @return the script's return value, or null if it has none
+     */
     public Object executePML(String pml) {
         AdminAdjudicationServiceBlockingStub stub = AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
             .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process)));
@@ -83,6 +104,11 @@ public class GrpcAdminPDP {
         return null;
     }
 
+    /**
+     * Returns a modifier for issuing policy modification operations as this user/process.
+     *
+     * @return a modifier scoped to this handle's user/process
+     */
     public GrpcPolicyModifier modify() {
         return new GrpcPolicyModifier(AdminAdjudicationServiceGrpc.newBlockingStub(managedChannel)
             .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(buildHeaders(user, process))));

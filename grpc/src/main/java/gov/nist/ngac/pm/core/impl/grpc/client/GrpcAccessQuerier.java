@@ -39,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link AccessQuery} implementation that delegates to a remote PDP over the gRPC policy query service.
+ */
 public class GrpcAccessQuerier implements AccessQuery {
 
     private PolicyQueryServiceBlockingStub blockingStub;

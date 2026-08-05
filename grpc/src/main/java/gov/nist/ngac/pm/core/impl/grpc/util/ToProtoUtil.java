@@ -34,8 +34,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Converts core policy-machine model types into their corresponding gRPC wire proto messages.
+ */
 public class ToProtoUtil {
 
+    /**
+     * Converts a core user context into its proto representation.
+     *
+     * @param userCtx the user context to convert
+     * @return the converted proto user context
+     */
     public static UserContext toUserContextProto(gov.nist.ngac.pm.core.pap.query.model.context.UserContext userCtx) {
         UserContext.Builder builder = UserContext.newBuilder();
         if (userCtx.getProcess() != null) {
@@ -66,6 +75,12 @@ public class ToProtoUtil {
         return builder.build();
     }
 
+    /**
+     * Converts a core target context into its proto representation.
+     *
+     * @param targetCtx the target context to convert
+     * @return the converted proto target context
+     */
     public static TargetContext toTargetContextProto(gov.nist.ngac.pm.core.pap.query.model.context.TargetContext targetCtx) {
         TargetContext.Builder builder = TargetContext.newBuilder();
 
@@ -89,18 +104,36 @@ public class ToProtoUtil {
         return builder.build();
     }
 
+    /**
+     * Builds a proto node reference by id.
+     *
+     * @param id the node id
+     * @return a node reference carrying the id
+     */
     public static NodeRef toNodeRefProto(long id) {
         return NodeRef.newBuilder()
             .setId(id)
             .build();
     }
 
+    /**
+     * Builds a proto node reference by name.
+     *
+     * @param name the node name
+     * @return a node reference carrying the name
+     */
     public static NodeRef toNodeRefProto(String name) {
         return NodeRef.newBuilder()
             .setName(name)
             .build();
     }
 
+    /**
+     * Converts a core EPP event context into its proto representation.
+     *
+     * @param eventContext the event context to convert
+     * @return the converted proto event context
+     */
     public static EventContext toEventContextProto(gov.nist.ngac.pm.core.epp.EventContext eventContext) {
         gov.nist.ngac.pm.proto.v1.epp.EventContext.Builder builder = gov.nist.ngac.pm.proto.v1.epp.EventContext.newBuilder();
 
@@ -124,6 +157,12 @@ public class ToProtoUtil {
         return builder.build();
     }
 
+    /**
+     * Converts a plain string-keyed map into a proto value map via {@link #toValueProto}.
+     *
+     * @param objectMap the map to convert
+     * @return the converted proto value map
+     */
     public static ValueMap toValueMapProto(Map<String, Object> objectMap) {
         Map<String, Value> converted = new HashMap<>();
 
@@ -134,6 +173,13 @@ public class ToProtoUtil {
         return ValueMap.newBuilder().putAllValues(converted).build();
     }
 
+    /**
+     * Same conversion as {@link #toValueMapProto}, but returns the raw entry map rather than a wrapped
+     * {@link ValueMap} — used where the target proto field is a map rather than a message.
+     *
+     * @param objectMap the map to convert
+     * @return the converted entries, keyed by string
+     */
     public static Map<String, Value> toStringValueMapProto(Map<String, Object> objectMap) {
         Map<String, Value> converted = new HashMap<>();
 
@@ -144,6 +190,14 @@ public class ToProtoUtil {
         return converted;
     }
 
+    /**
+     * Converts a plain Java value (Long, Boolean, String, List, or Map) into its proto {@link Value},
+     * recursing into list and map elements. Map keys that aren't strings are converted via
+     * {@link Object#toString()}; any other unrecognized type produces an empty value.
+     *
+     * @param o the value to convert
+     * @return the converted proto value
+     */
     public static Value toValueProto(Object o) {
         Value.Builder builder = Value.newBuilder();
         if (o instanceof Long l) {
@@ -179,6 +233,15 @@ public class ToProtoUtil {
         return Value.newBuilder().build();
     }
 
+    /**
+     * Converts a core obligation into its proto representation, resolving the author to a single node id
+     * and serializing the whole obligation back to PML for the proto's PML field.
+     *
+     * @param obligation the obligation to convert
+     * @param pap the PAP used to resolve the author's node id
+     * @return the converted proto obligation
+     * @throws PMException if the author's node id cannot be resolved
+     */
     public static Obligation toObligationProto(gov.nist.ngac.pm.core.pap.obligation.Obligation obligation, PAP pap) throws
                                                                                                               PMException {
         gov.nist.ngac.pm.proto.v1.model.Obligation.Builder builder = gov.nist.ngac.pm.proto.v1.model.Obligation.newBuilder()
@@ -190,6 +253,12 @@ public class ToProtoUtil {
         return builder.build();
     }
 
+    /**
+     * Converts a core node into its proto representation.
+     *
+     * @param node the node to convert
+     * @return the converted proto node
+     */
     public static gov.nist.ngac.pm.proto.v1.model.Node toNodeProto(Node node) {
         ValueMap.Builder valueMap = ValueMap.newBuilder();
 
@@ -205,6 +274,15 @@ public class ToProtoUtil {
             .build();
     }
 
+    /**
+     * Converts a core prohibition into its proto representation, setting the node or process field
+     * depending on whether it is a {@link NodeProhibition} or {@link ProcessProhibition}.
+     *
+     * @param prohibition the prohibition to convert
+     * @param query used to resolve the inclusion/exclusion set and subject node ids to full nodes
+     * @return the converted proto prohibition
+     * @throws PMException if a referenced node cannot be resolved
+     */
     public static Prohibition toProhibitionProto(gov.nist.ngac.pm.core.common.prohibition.Prohibition prohibition, PolicyQuery query) throws PMException {
         List<gov.nist.ngac.pm.proto.v1.model.Node> inclusionNodes = new ArrayList<>();
         for (long node : prohibition.getInclusionSet()) {
@@ -220,7 +298,7 @@ public class ToProtoUtil {
             .setName(prohibition.getName())
             .addAllArset(prohibition.getAccessRightSet())
             .addAllInclusionSet(inclusionNodes)
-            .addAllInclusionSet(exclusionNodes)
+            .addAllExclusionSet(exclusionNodes)
             .setIsConjunctive(prohibition.isConjunctive());
 
         if (prohibition instanceof NodeProhibition nodeProhibition) {
@@ -232,6 +310,15 @@ public class ToProtoUtil {
         return builder.build();
     }
 
+    /**
+     * Converts a core {@link Explain} result into its proto response, or an empty response if the
+     * explain argument is null.
+     *
+     * @param explain the explain result to convert, or null
+     * @param query used to resolve prohibition subject/inclusion/exclusion node ids to full nodes
+     * @return the converted proto explain response
+     * @throws PMException if a referenced node cannot be resolved
+     */
     public static gov.nist.ngac.pm.proto.v1.pdp.query.ExplainResponse buildExplainProto(Explain explain, PolicyQuery query) throws PMException {
         if (explain == null) {
             return gov.nist.ngac.pm.proto.v1.pdp.query.ExplainResponse.newBuilder().build();

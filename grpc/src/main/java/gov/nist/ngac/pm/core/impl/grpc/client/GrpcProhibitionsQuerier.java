@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link ProhibitionsQuery} implementation that delegates to a remote PDP over the gRPC policy query
+ * service.
+ */
 public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;

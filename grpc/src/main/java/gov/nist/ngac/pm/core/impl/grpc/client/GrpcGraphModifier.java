@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * {@link GraphModification} implementation that submits each operation as an admin adjudication request
+ * over gRPC.
+ */
 public class GrpcGraphModifier implements GraphModification {
 
     private final AdminAdjudicationServiceBlockingStub blockingStub;

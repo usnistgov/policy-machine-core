@@ -17,6 +17,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * {@link ObligationsQuery} implementation that delegates to a remote PDP over the gRPC policy query service.
+ */
 public class GrpcObligationsQuerier implements ObligationsQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;

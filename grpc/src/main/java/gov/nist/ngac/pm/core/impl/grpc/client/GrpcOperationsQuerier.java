@@ -30,6 +30,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link OperationsQuery} implementation that delegates to a remote PDP over the gRPC policy query service,
+ * reconstructing {@link Operation} signatures from the wire proto since the operation bodies themselves
+ * are not executable locally.
+ */
 public class GrpcOperationsQuerier implements OperationsQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;

@@ -44,6 +44,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link GraphQuery} implementation that delegates to a remote PDP over the gRPC policy query service.
+ */
 public class GrpcGraphQuerier implements GraphQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;

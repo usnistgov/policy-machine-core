@@ -8,6 +8,10 @@ import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
 
+/**
+ * {@link PolicyQuery} implementation backed by a gRPC channel, attaching the user/process headers to
+ * every call via a shared {@link GrpcPolicyQuerier}.
+ */
 public class GrpcQueryPDP implements PolicyQuery {
 
     private GrpcPolicyQuerier grpcPolicyQuerier;

@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link SelfAccessQuery} implementation that delegates to a remote PDP over the gRPC policy query
+ * service, resolving privileges for the caller identified by the gRPC request headers.
+ */
 public class GrpcSelfAccessQuerier implements SelfAccessQuery {
 
     private final PolicyQueryServiceBlockingStub blockingStub;
@@ -41,6 +45,12 @@ public class GrpcSelfAccessQuerier implements SelfAccessQuery {
         return new AccessRightSet(response.getPrivilegesList());
     }
 
+    /**
+     * Convenience overload of {@link #computePrivileges(TargetContext)} for a target identified by node id.
+     *
+     * @param id the target node's id
+     * @return the caller's privileges on the target
+     */
     public AccessRightSet computePrivileges(long id) {
         SelfComputePrivilegesRequest request = SelfComputePrivilegesRequest.newBuilder()
             .setTargetCtx(ToProtoUtil.toTargetContextProto(NodeTargetContext.of(id)))
@@ -49,6 +59,12 @@ public class GrpcSelfAccessQuerier implements SelfAccessQuery {
         return new AccessRightSet(response.getPrivilegesList());
     }
 
+    /**
+     * Convenience overload of {@link #computePrivileges(TargetContext)} for a target identified by node name.
+     *
+     * @param name the target node's name
+     * @return the caller's privileges on the target
+     */
     public AccessRightSet computePrivileges(String name) {
         SelfComputePrivilegesRequest request = SelfComputePrivilegesRequest.newBuilder()
             .setTargetCtx(ToProtoUtil.toTargetContextProto(NodeTargetContext.of(name)))
@@ -80,6 +96,12 @@ public class GrpcSelfAccessQuerier implements SelfAccessQuery {
         return FromProtoUtil.fromProtoSubgraphPrivileges(response.getSubgraphPrivileges());
     }
 
+    /**
+     * Convenience overload of {@link #computeSubgraphPrivileges(long)} for a root identified by node name.
+     *
+     * @param root the root node's name
+     * @return the caller's privileges over the root and its descendant subgraph
+     */
     public SubgraphPrivileges computeSubgraphPrivileges(String root) {
         SelfComputeSubgraphPrivilegesRequest request = SelfComputeSubgraphPrivilegesRequest.newBuilder()
             .setRoot(ToProtoUtil.toNodeRefProto(root))
@@ -97,6 +119,13 @@ public class GrpcSelfAccessQuerier implements SelfAccessQuery {
         return FromProtoUtil.nodePrivilegesToNodeMap(response.getNodePrivilegesList());
     }
 
+    /**
+     * Convenience overload of {@link #computeAdjacentAscendantPrivileges(long)} for a root identified by
+     * node name.
+     *
+     * @param root the root node's name
+     * @return the caller's privileges on each node directly ascendant to the root
+     */
     public Map<Node, AccessRightSet> computeAdjacentAscendantPrivileges(String root) {
         SelfComputeAdjacentAscendantPrivilegesRequest request = SelfComputeAdjacentAscendantPrivilegesRequest.newBuilder()
             .setRoot(ToProtoUtil.toNodeRefProto(root))

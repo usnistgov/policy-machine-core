@@ -8,6 +8,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Client-side handle for submitting events to the remote Event Processing Point over gRPC.
+ */
 public class GrpcEPP {
 
     private static final Logger logger = LoggerFactory.getLogger(GrpcEPP.class);
@@ -22,6 +25,12 @@ public class GrpcEPP {
         this.process = process;
     }
 
+    /**
+     * Builds an {@link EventContext} from this handle's user/process and sends it to the remote EPP service.
+     *
+     * @param operation the name of the operation that triggered the event
+     * @param args the operation's argument values, keyed by parameter name
+     */
     public void processEvent(String operation, Map<String, Object> args) {
         new GrpcEventSubscriber(EPPServiceGrpc.newBlockingStub(managedChannel))
             .processEvent(

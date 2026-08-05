@@ -4,6 +4,10 @@ import gov.nist.ngac.pm.core.pap.modification.PolicyModification;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
 
+/**
+ * {@link PolicyModification} implementation that vends gRPC-backed modifiers for each policy sub-area,
+ * all sharing the same admin adjudication stub.
+ */
 public class GrpcPolicyModifier implements PolicyModification {
 
     private AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub stub;

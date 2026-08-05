@@ -11,6 +11,10 @@ import gov.nist.ngac.pm.proto.v1.pdp.adjudication.OperationRequest;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * {@link OperationsModification} implementation that submits each operation as an admin adjudication
+ * request over gRPC.
+ */
 public class GrpcOperationsModifier implements OperationsModification {
 
     private final AdminAdjudicationServiceBlockingStub blockingStub;

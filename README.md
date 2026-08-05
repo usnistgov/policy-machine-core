@@ -4,7 +4,45 @@ The core components of the NIST Policy Machine, a reference implementation of th
 
 ## Installation
 
-### Install to maven local
+The library is split into 3 artifacts, all under the groupId `gov.nist.ngac.pm.core`, so consumers only pull the
+dependency footprint they need:
+
+- `policy-machine-core` - `pap`/`pdp`/`common`/`epp` interfaces plus the in-memory implementation. No external service
+  dependency. Required by the other two artifacts.
+- `policy-machine-neo4j` - the embedded Neo4j-backed implementation of the `PolicyStore`.
+- `policy-machine-grpc` - the gRPC client implementation for talking to a remote Policy Machine server.
+
+`policy-machine-neo4j` and `policy-machine-grpc` each depend on `policy-machine-core`, so add either (or both)
+alongside it, using the same version.
+
+### From Maven Central
+
+```xml
+<dependency>
+    <groupId>gov.nist.ngac.pm.core</groupId>
+    <artifactId>policy-machine-core</artifactId>
+    <version>x.y.z</version>
+</dependency>
+
+<!-- optional: embedded Neo4j-backed policy store -->
+<dependency>
+    <groupId>gov.nist.ngac.pm.core</groupId>
+    <artifactId>policy-machine-neo4j</artifactId>
+    <version>x.y.z</version>
+</dependency>
+
+<!-- optional: gRPC client for a remote Policy Machine server -->
+<dependency>
+    <groupId>gov.nist.ngac.pm.core</groupId>
+    <artifactId>policy-machine-grpc</artifactId>
+    <version>x.y.z</version>
+</dependency>
+```
+
+### Install to Maven local
+
+To build and use a version that hasn't been published yet:
+
 ```
 git clone https://github.com/usnistgov/policy-machine-core.git
 
@@ -13,21 +51,7 @@ cd policy-machine-core
 mvn clean install
 ```
 
-```
-<dependency>
-    <groupId>gov.nist.ngac.pm.core</groupId>
-    <artifactId>policy-machine-core</artifactId>
-    <version>x.y.z</version>
-</dependency>
-```
-
-The library is split into 3 artifacts so consumers only pull the dependency footprint they need:
-
-- `policy-machine-core` - `pap`/`pdp`/`common`/`epp` interfaces plus the in-memory implementation. No external service dependency.
-- `policy-machine-neo4j` - the embedded Neo4j-backed implementation. Depends on `policy-machine-core`.
-- `policy-machine-grpc` - the gRPC client implementation. Depends on `policy-machine-core`.
-
-Add `policy-machine-neo4j` and/or `policy-machine-grpc` alongside `policy-machine-core` as needed, using the same groupId and version.
+Then depend on the artifacts as above, using the version from the project's `pom.xml`.
 
 ## Package Description
 
