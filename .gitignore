@@ -1,8 +1,8 @@
 .idea
 .vscode
 policy-machine-core.iml
-/target
+target/
 .DS_Store
 **/gen/
 .scratch
-/src/main/antlr4/gov/nist/csd/pm/core/pap/pml/antlr/PMLLexer.tokens
+/core/src/main/antlr4/gov/nist/ngac/pm/core/pap/pml/antlr/PMLLexer.tokens

@@ -15,11 +15,19 @@ mvn clean install
 
 ```
 <dependency>
-    <groupId>gov.nist.csd.pm</groupId>
+    <groupId>gov.nist.ngac.pm.core</groupId>
     <artifactId>policy-machine-core</artifactId>
     <version>x.y.z</version>
 </dependency>
 ```
+
+The library is split into 3 artifacts so consumers only pull the dependency footprint they need:
+
+- `policy-machine-core` - `pap`/`pdp`/`common`/`epp` interfaces plus the in-memory implementation. No external service dependency.
+- `policy-machine-neo4j` - the embedded Neo4j-backed implementation. Depends on `policy-machine-core`.
+- `policy-machine-grpc` - the gRPC client implementation. Depends on `policy-machine-core`.
+
+Add `policy-machine-neo4j` and/or `policy-machine-grpc` alongside `policy-machine-core` as needed, using the same groupId and version.
 
 ### Install using Jitpack
 Policy Machine Core uses [JitPack](https://jitpack.io/) to compile and build the artifact to import with maven.
@@ -82,31 +90,31 @@ uses the Java API to create and test a policy. The second defines the policy in 
 ### Java
 
 ```java
-package gov.nist.csd.pm.core.example;
+package gov.nist.ngac.pm.core.example;
 
-import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
-import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.epp.EPP;
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.operation.AdminOperation;
-import gov.nist.csd.pm.core.pap.operation.ResourceOperation;
-import gov.nist.csd.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.core.pap.operation.accessright.AdminAccessRight;
-import gov.nist.csd.pm.core.pap.operation.arg.Args;
-import gov.nist.csd.pm.core.pap.operation.param.FormalParameter;
-import gov.nist.csd.pm.core.pap.operation.param.NodeNameFormalParameter;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredCapability;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
-import gov.nist.csd.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
-import gov.nist.csd.pm.core.pap.query.PolicyQuery;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.epp.EPP;
+import gov.nist.ngac.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.operation.AdminOperation;
+import gov.nist.ngac.pm.core.pap.operation.ResourceOperation;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AdminAccessRight;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.ngac.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredCapability;
+import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
+import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
+import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import gov.nist.ngac.pm.core.pdp.PDP;
+import gov.nist.ngac.pm.core.pdp.UnauthorizedException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -217,19 +225,19 @@ public class JavaExample {
 ### PML
 
 ```java
-package gov.nist.csd.pm.core.example;
+package gov.nist.ngac.pm.core.example;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import gov.nist.csd.pm.core.common.exception.PMException;
-import gov.nist.csd.pm.core.epp.EPP;
-import gov.nist.csd.pm.core.impl.memory.pap.MemoryPAP;
-import gov.nist.csd.pm.core.pap.PAP;
-import gov.nist.csd.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.core.pdp.PDP;
-import gov.nist.csd.pm.core.pdp.UnauthorizedException;
-import gov.nist.csd.pm.core.pdp.bootstrap.PMLBootstrapper;
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.epp.EPP;
+import gov.nist.ngac.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import gov.nist.ngac.pm.core.pdp.PDP;
+import gov.nist.ngac.pm.core.pdp.UnauthorizedException;
+import gov.nist.ngac.pm.core.pdp.bootstrap.PMLBootstrapper;
 import org.junit.jupiter.api.Test;
 
 public class PMLExample {
@@ -337,13 +345,13 @@ Operations are a fundamental part of NGAC and the policy-machine-core library. T
 - Routines: A set of operations, with access checks on each statement rather than the routine itself or its args.
 - Functions: Reusable utility operations that do not access the policy.
 
-Only `Admin` and `Resource` operations emit events to the EPP. All operations define a set of [FormalParameters](./src/main/java/gov/nist/csd/pm/core/pap/operation/param/FormalParameter.java).
+Only `Admin` and `Resource` operations emit events to the EPP. All operations define a set of [FormalParameters](./core/src/main/java/gov/nist/ngac/pm/core/pap/operation/param/FormalParameter.java).
 `Admin`, `Resource`, and `Query` operations can define FormalParameters with RequiredCapabilities which are a set of access rights 
 a user needs on the actual argument in the call to the operation in order to successfully execute the operation. The
 access rights defined in the RequiredCapabilities must be 
-[resource access rights](./src/main/java/gov/nist/csd/pm/core/pap/modification/OperationsModification.java) 
+[resource access rights](./core/src/main/java/gov/nist/ngac/pm/core/pap/modification/OperationsModification.java) 
 or 
-[admin access rights](./src/main/java/gov/nist/csd/pm/core/pap/admin/AdminAccessRights.java).
+[admin access rights](./core/src/main/java/gov/nist/ngac/pm/core/pap/admin/AdminAccessRights.java).
 
 ### Define an operation
 Define an admin and resource operation using PML.
@@ -424,7 +432,7 @@ easier to use and maintainable than using the Java API. See the full [PML specif
 
 ## JSON Serialization
 
-Policies can be exported and imported using the Policy Machine [JSON schema](./src/main/resources/json/pm.schema.json).
+Policies can be exported and imported using the Policy Machine [JSON schema](./core/src/main/resources/json/pm.schema.json).
 
 ```java
 String json = pap.serialize(new JSONSerializer());
@@ -436,8 +444,8 @@ newPap.deserialize(json, new JSONDeserializer());
 
 ## Custom Policy Store Implementations
 
-[In memory and Neo4j embedded implementations](/src/main/java/gov/nist/csd/pm/core/impl/) of the 
-[PAP](/src/main/java/gov/nist/csd/pm/core/pap/PAP.java)  and [PolicyStore](/src/main/java/gov/nist/csd/pm/core/pap/store/PolicyStore.java) are provided.
+[In memory](/core/src/main/java/gov/nist/ngac/pm/core/impl/memory/) and [Neo4j embedded](/neo4j/src/main/java/gov/nist/ngac/pm/core/impl/neo4j/) implementations of the 
+[PAP](/core/src/main/java/gov/nist/ngac/pm/core/pap/PAP.java)  and [PolicyStore](/core/src/main/java/gov/nist/ngac/pm/core/pap/store/PolicyStore.java) are provided.
 
 To implement a custom policy store:
 
@@ -455,14 +463,14 @@ public class CustomPolicyStore implements PolicyStore {
 - `OperationsStore`
 - `RoutinesStore`
 
-3. Create a Custom PAP that extends [PAP](/src/main/java/gov/nist/csd/pm/core/pap/PAP.java).
+3. Create a Custom PAP that extends [PAP](/core/src/main/java/gov/nist/ngac/pm/core/pap/PAP.java).
 
-See the [MemoryPAP implementation](src/main/java/gov/nist/csd/pm/core/impl/memory/pap/MemoryPAP.java) for a complete example.
+See the [MemoryPAP implementation](core/src/main/java/gov/nist/ngac/pm/core/impl/memory/pap/MemoryPAP.java) for a complete example.
 
 ## Update Protocol Buffers
 ```
-git submodule update --remote --merge protos
-git add protos
+git submodule update --remote --merge grpc/protos
+git add grpc/protos
 git commit -m "Update protos submodule"
 git push
 ```

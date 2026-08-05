@@ -1,0 +1,39 @@
+package gov.nist.ngac.pm.core.pap.operation;
+
+import static gov.nist.ngac.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.util.TestPAP;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+class PrivilegeCheckerTest {
+
+	@Test
+	void testEmptyToCheck() throws PMException {
+		String pml = """
+				set resource access rights ["read"]
+
+				create pc "pc1"
+				create ua "ua1" in ["pc1"]
+				create ua "ua2" in ["pc1"]
+				create oa "oa1" in ["pc1"]
+
+				associate "ua1" to "oa1" with ["read"]
+
+				create u "u1" in ["ua1"]
+				create u "u2" in ["ua2"]
+				create o "o1" in ["oa1"]
+				""";
+
+		TestPAP pap = new TestPAP();
+		pap.executePML(NodeUserContext.of(id("u1")), pml);
+
+		assertDoesNotThrow(() -> pap.check(NodeUserContext.of(id("u1")), id("o1"), List.of()));
+		assertThrows(PMException.class, () -> pap.check(NodeUserContext.of(id("u2")), id("o1"), List.of()));
+	}
+
+}

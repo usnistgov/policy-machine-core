@@ -1,0 +1,126 @@
+package gov.nist.ngac.pm.core.pap.query;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import gov.nist.ngac.pm.core.common.exception.ObligationDoesNotExistException;
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAPTestInitializer;
+import gov.nist.ngac.pm.core.pap.obligation.Obligation;
+import gov.nist.ngac.pm.core.pap.obligation.event.EventPattern;
+import gov.nist.ngac.pm.core.pap.obligation.event.operation.MatchesOperationPattern;
+import gov.nist.ngac.pm.core.pap.obligation.event.subject.SubjectPattern;
+import gov.nist.ngac.pm.core.pap.obligation.response.ObligationResponse;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
+import java.util.Collection;
+import java.util.List;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+public abstract class ObligationsQuerierTest extends PAPTestInitializer {
+
+    public Obligation obligation1() throws PMException {
+        return new Obligation(
+            NodeUserContext.of(id("u1")),
+            "obl1",
+            new EventPattern(
+                new SubjectPattern(),
+                new MatchesOperationPattern("test_event")
+            ),
+            new ObligationResponse("evtCtx", List.of(
+                new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
+            ))
+        );
+    }
+
+    public Obligation obligation2() throws PMException {
+        return new Obligation(
+            NodeUserContext.of(id("u1")),
+            "label2",
+            new EventPattern(
+                new SubjectPattern(),
+                new MatchesOperationPattern("test_event")
+            ),
+            new ObligationResponse("evtCtx", List.of(
+                new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
+            ))
+        );
+    }
+
+    public Obligation obligation3() throws PMException {
+        return new Obligation(
+            NodeUserContext.of(id("u1")),
+            "label3",
+            new EventPattern(
+                new SubjectPattern(),
+                new MatchesOperationPattern("test_event")
+            ),
+            new ObligationResponse("evtCtx", List.of(
+                new CreatePolicyClassStatement(new StringLiteralExpression("test_pc"))
+            ))
+        );
+    }
+
+    @Nested
+    class GetAll {
+        @Test
+        void testGetObligations() throws PMException {
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+            long u1 = pap.modify().graph().createUser("u1", List.of(ua1));
+
+            Obligation obligation1 = obligation1();
+            Obligation obligation2 = obligation2();
+            Obligation obligation3 = obligation3();
+
+            pap.modify().obligations().createObligation(obligation1);
+            pap.modify().obligations().createObligation(obligation2);
+            pap.modify().obligations().createObligation(obligation3);
+
+            Collection<Obligation> obligations = pap.query().obligations().getObligations();
+            assertEquals(3, obligations.size());
+            for (Obligation obligation : obligations) {
+                if (obligation.getName().equals(obligation1.getName())) {
+                    assertEquals(obligation1, obligation);
+                } else if (obligation.getName().equals(obligation2.getName())){
+                    assertEquals(obligation2, obligation);
+                } else {
+                    assertEquals(obligation3, obligation);
+                }
+            }
+        }
+    }
+
+    @Nested
+    class Get {
+
+        @Test
+        void testObligationDoesNotExistException() {
+            assertThrows(
+                ObligationDoesNotExistException.class,
+                () -> pap.query().obligations().getObligation("test"));
+        }
+
+        @Test
+        void testGetObligation() throws PMException {
+            long pc1 = pap.modify().graph().createPolicyClass("pc1");
+            long ua1 = pap.modify().graph().createUserAttribute("ua1", List.of(pc1));
+            pap.modify().graph().createUser("u1", List.of(ua1));
+
+            Obligation obligation1 = obligation1();
+            Obligation obligation2 = obligation2();
+            Obligation obligation3 = obligation3();
+
+            pap.modify().obligations().createObligation(obligation1);
+            pap.modify().obligations().createObligation(obligation2);
+            pap.modify().obligations().createObligation(obligation3);
+
+
+            Obligation obligation = pap.query().obligations().getObligation(obligation1.getName());
+            assertEquals(obligation1, obligation);
+        }
+    }
+
+}

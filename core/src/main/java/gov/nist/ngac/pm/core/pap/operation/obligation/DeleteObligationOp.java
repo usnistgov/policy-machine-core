@@ -1,0 +1,31 @@
+package gov.nist.ngac.pm.core.pap.operation.obligation;
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.admin.AdminPolicyNode;
+import gov.nist.ngac.pm.core.pap.operation.AdminOperation;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AdminAccessRight;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import java.util.List;
+
+public class DeleteObligationOp extends AdminOperation<Void> {
+
+    public DeleteObligationOp() {
+        super(
+            "delete_obligation",
+            VOID_TYPE,
+            List.of(NAME_PARAM),
+            AdminPolicyNode.PM_ADMIN_OBLIGATIONS,
+            AdminAccessRight.ADMIN_OBLIGATION_DELETE
+        );
+    }
+
+    @Override
+    public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
+        pap.modify().obligations().deleteObligation(args.get(NAME_PARAM));
+        return null;
+    }
+}
