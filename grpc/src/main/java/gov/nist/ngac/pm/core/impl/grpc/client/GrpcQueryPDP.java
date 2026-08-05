@@ -4,7 +4,7 @@ import static gov.nist.ngac.pm.core.impl.grpc.client.GrpcHeaders.buildHeaders;
 
 import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
+import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
 

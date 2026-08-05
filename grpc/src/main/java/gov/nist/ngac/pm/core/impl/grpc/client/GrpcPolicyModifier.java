@@ -1,8 +1,8 @@
 package gov.nist.ngac.pm.core.impl.grpc.client;
 
 import gov.nist.ngac.pm.core.pap.modification.PolicyModification;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
 
 public class GrpcPolicyModifier implements PolicyModification {
 

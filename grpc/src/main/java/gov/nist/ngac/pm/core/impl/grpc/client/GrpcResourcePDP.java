@@ -2,7 +2,7 @@ package gov.nist.ngac.pm.core.impl.grpc.client;
 
 import static gov.nist.ngac.pm.core.impl.grpc.client.GrpcHeaders.buildHeaders;
 
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.ResourceAdjudicationServiceGrpc;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.ResourceAdjudicationServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
 import java.util.Map;

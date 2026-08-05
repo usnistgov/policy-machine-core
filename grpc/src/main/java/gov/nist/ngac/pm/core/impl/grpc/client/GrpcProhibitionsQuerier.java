@@ -3,18 +3,18 @@ package gov.nist.ngac.pm.core.impl.grpc.client;
 import gov.nist.ngac.pm.core.common.prohibition.Prohibition;
 import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.query.ProhibitionsQuery;
-import gov.nist.csd.pm.proto.v1.model.NodeRef;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetInheritedProhibitionsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetInheritedProhibitionsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionsBySubjectRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionsBySubjectResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionsWithContainerRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetProhibitionsWithContainerResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.model.NodeRef;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetInheritedProhibitionsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetInheritedProhibitionsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionsBySubjectRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionsBySubjectResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionsWithContainerRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetProhibitionsWithContainerResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +31,7 @@ public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
     public Collection<Prohibition> getProhibitions() {
         GetProhibitionsResponse response = blockingStub.getProhibitions(GetProhibitionsRequest.newBuilder().build());
         List<Prohibition> prohibitions = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
             prohibitions.add(FromProtoUtil.fromProtoProhibition(proto));
         }
         return prohibitions;
@@ -44,7 +44,7 @@ public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
             .build();
         GetProhibitionsBySubjectResponse response = blockingStub.getProhibitionsBySubject(request);
         List<Prohibition> prohibitions = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
             prohibitions.add(FromProtoUtil.fromProtoProhibition(proto));
         }
         return prohibitions;
@@ -57,7 +57,7 @@ public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
             .build();
         GetProhibitionsBySubjectResponse response = blockingStub.getProhibitionsBySubject(request);
         List<Prohibition> prohibitions = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
             prohibitions.add(FromProtoUtil.fromProtoProhibition(proto));
         }
         return prohibitions;
@@ -89,7 +89,7 @@ public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
             .build();
         GetInheritedProhibitionsResponse response = blockingStub.getInheritedProhibitions(request);
         List<Prohibition> prohibitions = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
             prohibitions.add(FromProtoUtil.fromProtoProhibition(proto));
         }
         return prohibitions;
@@ -102,7 +102,7 @@ public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
             .build();
         GetProhibitionsWithContainerResponse response = blockingStub.getProhibitionsWithContainer(request);
         List<Prohibition> prohibitions = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Prohibition proto : response.getProhibitionsList()) {
             prohibitions.add(FromProtoUtil.fromProtoProhibition(proto));
         }
         return prohibitions;

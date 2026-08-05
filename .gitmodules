@@ -1,4 +1,4 @@
 [submodule "grpc/protos"]
 	path = grpc/protos
 	url = https://github.com/usnistgov/policy-machine-protos.git
-	branch = main
+	branch = package-rename

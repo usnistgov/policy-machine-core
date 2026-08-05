@@ -5,9 +5,9 @@ import gov.nist.ngac.pm.core.impl.grpc.util.ToProtoUtil;
 import gov.nist.ngac.pm.core.pap.modification.OperationsModification;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.ExecutePMLRequest;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.OperationRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.ExecutePMLRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.OperationRequest;
 import java.util.ArrayList;
 import java.util.Map;
 

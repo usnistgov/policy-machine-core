@@ -2,8 +2,8 @@ package gov.nist.ngac.pm.core.impl.grpc.client;
 
 import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
-import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
-import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
+import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 
 public class GrpcPolicyQuerier implements PolicyQuery {
 

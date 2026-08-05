@@ -7,38 +7,38 @@ import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.graph.Association;
 import gov.nist.ngac.pm.core.pap.query.GraphQuery;
 import gov.nist.ngac.pm.core.pap.query.model.subgraph.Subgraph;
-import gov.nist.csd.pm.proto.v1.model.NodeRef;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAdjacentAscendantsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAdjacentAscendantsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAdjacentDescendantsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAdjacentDescendantsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAscendantSubgraphRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAscendantSubgraphResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAssociationsWithSourceRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAssociationsWithSourceResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAssociationsWithTargetRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAssociationsWithTargetResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAttributeDescendantsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetAttributeDescendantsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetDescendantSubgraphRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetDescendantSubgraphResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetNodeIdRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetNodeIdResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetNodeRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetNodeResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetPolicyClassDescendantsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetPolicyClassDescendantsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetPolicyClassesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetPolicyClassesResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.IsAscendantRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.IsAscendantResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.IsDescendantRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.IsDescendantResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.NodeExistsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.NodeExistsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
-import gov.nist.csd.pm.proto.v1.pdp.query.SearchNodesRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.SearchNodesResponse;
+import gov.nist.ngac.pm.proto.v1.model.NodeRef;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAdjacentAscendantsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAdjacentAscendantsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAdjacentDescendantsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAdjacentDescendantsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAscendantSubgraphRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAscendantSubgraphResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAssociationsWithSourceRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAssociationsWithSourceResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAssociationsWithTargetRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAssociationsWithTargetResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAttributeDescendantsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetAttributeDescendantsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetDescendantSubgraphRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetDescendantSubgraphResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetNodeIdRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetNodeIdResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetNodeRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetNodeResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetPolicyClassDescendantsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetPolicyClassDescendantsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetPolicyClassesRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetPolicyClassesResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.IsAscendantRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.IsAscendantResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.IsDescendantRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.IsDescendantResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.NodeExistsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.NodeExistsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.pdp.query.SearchNodesRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.SearchNodesResponse;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,14 +101,14 @@ public class GrpcGraphQuerier implements GraphQuery {
     public Collection<Node> search(NodeType type, Map<String, String> properties) throws PMException {
         SearchNodesRequest.Builder builder = SearchNodesRequest.newBuilder();
         if (type != null) {
-            builder.setType(gov.nist.csd.pm.proto.v1.model.NodeType.valueOf(type.name()));
+            builder.setType(gov.nist.ngac.pm.proto.v1.model.NodeType.valueOf(type.name()));
         }
         if (properties != null) {
             builder.putAllProperties(properties);
         }
         SearchNodesResponse response = blockingStub.searchNodes(builder.build());
         List<Node> nodes = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Node protoNode : response.getNodesList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Node protoNode : response.getNodesList()) {
             nodes.add(FromProtoUtil.fromProtoNode(protoNode));
         }
         return nodes;
@@ -118,7 +118,7 @@ public class GrpcGraphQuerier implements GraphQuery {
     public Collection<Long> getPolicyClasses() throws PMException {
         GetPolicyClassesResponse response = blockingStub.getPolicyClasses(GetPolicyClassesRequest.newBuilder().build());
         List<Long> ids = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Node node : response.getPolicyClassesList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Node node : response.getPolicyClassesList()) {
             ids.add(node.getId());
         }
         return ids;
@@ -131,7 +131,7 @@ public class GrpcGraphQuerier implements GraphQuery {
             .build();
         GetAdjacentDescendantsResponse response = blockingStub.getAdjacentDescendants(request);
         List<Long> ids = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Node node : response.getNodesList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Node node : response.getNodesList()) {
             ids.add(node.getId());
         }
         return ids;
@@ -144,7 +144,7 @@ public class GrpcGraphQuerier implements GraphQuery {
             .build();
         GetAdjacentAscendantsResponse response = blockingStub.getAdjacentAscendants(request);
         List<Long> ids = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Node node : response.getNodesList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Node node : response.getNodesList()) {
             ids.add(node.getId());
         }
         return ids;
@@ -157,7 +157,7 @@ public class GrpcGraphQuerier implements GraphQuery {
             .build();
         GetAssociationsWithSourceResponse response = blockingStub.getAssociationsWithSource(request);
         List<Association> associations = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Association protoAssoc : response.getAssociationsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Association protoAssoc : response.getAssociationsList()) {
             associations.add(FromProtoUtil.fromAssociationProto(protoAssoc));
         }
         return associations;
@@ -170,7 +170,7 @@ public class GrpcGraphQuerier implements GraphQuery {
             .build();
         GetAssociationsWithTargetResponse response = blockingStub.getAssociationsWithTarget(request);
         List<Association> associations = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Association protoAssoc : response.getAssociationsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Association protoAssoc : response.getAssociationsList()) {
             associations.add(FromProtoUtil.fromAssociationProto(protoAssoc));
         }
         return associations;
@@ -201,7 +201,7 @@ public class GrpcGraphQuerier implements GraphQuery {
             .build();
         GetAttributeDescendantsResponse response = blockingStub.getAttributeDescendants(request);
         List<Long> ids = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Node node : response.getNodesList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Node node : response.getNodesList()) {
             ids.add(node.getId());
         }
         return ids;
@@ -214,7 +214,7 @@ public class GrpcGraphQuerier implements GraphQuery {
             .build();
         GetPolicyClassDescendantsResponse response = blockingStub.getPolicyClassDescendants(request);
         List<Long> ids = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Node node : response.getNodesList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Node node : response.getNodesList()) {
             ids.add(node.getId());
         }
         return ids;

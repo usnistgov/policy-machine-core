@@ -30,14 +30,14 @@ import gov.nist.ngac.pm.core.pap.query.model.explain.Path;
 import gov.nist.ngac.pm.core.pap.query.model.explain.PolicyClassExplain;
 import gov.nist.ngac.pm.core.pap.query.model.subgraph.Subgraph;
 import gov.nist.ngac.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
-import gov.nist.csd.pm.proto.v1.model.NodeRef;
-import gov.nist.csd.pm.proto.v1.model.Value;
-import gov.nist.csd.pm.proto.v1.model.ValueList;
-import gov.nist.csd.pm.proto.v1.model.ValueMap;
-import gov.nist.csd.pm.proto.v1.pdp.query.ExplainResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.NodePrivileges;
-import gov.nist.csd.pm.proto.v1.pdp.query.Param;
-import gov.nist.csd.pm.proto.v1.pdp.query.ParamType;
+import gov.nist.ngac.pm.proto.v1.model.NodeRef;
+import gov.nist.ngac.pm.proto.v1.model.Value;
+import gov.nist.ngac.pm.proto.v1.model.ValueList;
+import gov.nist.ngac.pm.proto.v1.model.ValueMap;
+import gov.nist.ngac.pm.proto.v1.pdp.query.ExplainResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.NodePrivileges;
+import gov.nist.ngac.pm.proto.v1.pdp.query.Param;
+import gov.nist.ngac.pm.proto.v1.pdp.query.ParamType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 public class FromProtoUtil {
 
     public static UserContext fromUserContextProto(PAP pap,
-                                                   gov.nist.csd.pm.proto.v1.pdp.query.UserContext userCtxProto) throws PMException {
+                                                   gov.nist.ngac.pm.proto.v1.pdp.query.UserContext userCtxProto) throws PMException {
         String process = userCtxProto.getProcess();
 
         return switch (userCtxProto.getUserCase()) {
@@ -65,7 +65,7 @@ public class FromProtoUtil {
     }
 
     public static TargetContext fromTargetContextProto(PAP pap,
-                                                       gov.nist.csd.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
+                                                       gov.nist.ngac.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
         return switch (targetCtxProto.getTargetCase()) {
             case ID -> NodeTargetContext.of(targetCtxProto.getId());
             case NAME -> NodeTargetContext.of(targetCtxProto.getName());
@@ -92,7 +92,7 @@ public class FromProtoUtil {
         return nodeRefIds;
     }
 
-    public static Node fromProtoNode(gov.nist.csd.pm.proto.v1.model.Node protoNode) {
+    public static Node fromProtoNode(gov.nist.ngac.pm.proto.v1.model.Node protoNode) {
         NodeType nodeType = switch (protoNode.getType()) {
             case PC -> NodeType.PC;
             case UA -> NodeType.UA;
@@ -122,7 +122,7 @@ public class FromProtoUtil {
     }
 
     public static SubgraphPrivileges fromProtoSubgraphPrivileges(
-            gov.nist.csd.pm.proto.v1.pdp.query.SubgraphPrivileges proto) {
+            gov.nist.ngac.pm.proto.v1.pdp.query.SubgraphPrivileges proto) {
         Node node = fromProtoNode(proto.getNode());
         AccessRightSet privileges = new AccessRightSet(proto.getArsetList());
         List<SubgraphPrivileges> ascendants = proto.getAscendantsList().stream()
@@ -147,7 +147,7 @@ public class FromProtoUtil {
     }
 
     public static PolicyClassExplain fromProtoPolicyClassExplain(
-            gov.nist.csd.pm.proto.v1.pdp.query.PolicyClassExplain proto) {
+            gov.nist.ngac.pm.proto.v1.pdp.query.PolicyClassExplain proto) {
         Node pc = fromProtoNode(proto.getPc());
         AccessRightSet arset = new AccessRightSet(proto.getArsetList());
         Collection<List<ExplainNode>> paths = proto.getPathsList().stream()
@@ -158,7 +158,7 @@ public class FromProtoUtil {
         return new PolicyClassExplain(pc, arset, paths);
     }
 
-    public static ExplainNode fromProtoExplainNode(gov.nist.csd.pm.proto.v1.pdp.query.ExplainNode proto) {
+    public static ExplainNode fromProtoExplainNode(gov.nist.ngac.pm.proto.v1.pdp.query.ExplainNode proto) {
         Node node = fromProtoNode(proto.getNode());
         Collection<ExplainAssociation> associations = proto.getAssociationsList().stream()
             .map(FromProtoUtil::fromProtoExplainAssociation)
@@ -167,13 +167,13 @@ public class FromProtoUtil {
     }
 
     public static ExplainAssociation fromProtoExplainAssociation(
-            gov.nist.csd.pm.proto.v1.pdp.query.ExplainAssociation proto) {
+            gov.nist.ngac.pm.proto.v1.pdp.query.ExplainAssociation proto) {
         Node ua = fromProtoNode(proto.getUa());
         AccessRightSet arset = new AccessRightSet(proto.getArsetList());
         Collection<Path> userPaths = proto.getUserPathsList().stream()
             .map(protoPath -> {
                 Path path = new Path();
-                for (gov.nist.csd.pm.proto.v1.model.Node n : protoPath.getNodesList()) {
+                for (gov.nist.ngac.pm.proto.v1.model.Node n : protoPath.getNodesList()) {
                     path.add(fromProtoNode(n));
                 }
                 return path;
@@ -182,14 +182,14 @@ public class FromProtoUtil {
         return new ExplainAssociation(ua, arset, userPaths);
     }
 
-    public static Prohibition fromProtoProhibition(gov.nist.csd.pm.proto.v1.model.Prohibition proto) {
+    public static Prohibition fromProtoProhibition(gov.nist.ngac.pm.proto.v1.model.Prohibition proto) {
         String name = proto.getName();
         AccessRightSet arset = new AccessRightSet(proto.getArsetList());
         Set<Long> inclusionSet = proto.getInclusionSetList().stream()
-            .map(gov.nist.csd.pm.proto.v1.model.Node::getId)
+            .map(gov.nist.ngac.pm.proto.v1.model.Node::getId)
             .collect(Collectors.toSet());
         Set<Long> exclusionSet = proto.getExclusionSetList().stream()
-            .map(gov.nist.csd.pm.proto.v1.model.Node::getId)
+            .map(gov.nist.ngac.pm.proto.v1.model.Node::getId)
             .collect(Collectors.toSet());
         boolean isConjunctive = proto.getIsConjunctive();
 
@@ -202,14 +202,14 @@ public class FromProtoUtil {
         }
     }
 
-    public static Association fromAssociationProto(gov.nist.csd.pm.proto.v1.model.Association proto) {
+    public static Association fromAssociationProto(gov.nist.ngac.pm.proto.v1.model.Association proto) {
         long source = proto.getUa().getId();
         long target = proto.getTarget().getId();
         AccessRightSet arset = new AccessRightSet(proto.getArsetList());
         return new Association(source, target, arset);
     }
 
-    public static Subgraph fromSubgraphProto(gov.nist.csd.pm.proto.v1.pdp.query.Subgraph proto) {
+    public static Subgraph fromSubgraphProto(gov.nist.ngac.pm.proto.v1.pdp.query.Subgraph proto) {
         Node node = fromProtoNode(proto.getNode());
         List<Subgraph> subgraphs = proto.getSubgraphsList().stream()
             .map(FromProtoUtil::fromSubgraphProto)
@@ -217,7 +217,7 @@ public class FromProtoUtil {
         return new Subgraph(node, subgraphs);
     }
 
-    public static Obligation fromObligationProto(gov.nist.csd.pm.proto.v1.model.Obligation proto) {
+    public static Obligation fromObligationProto(gov.nist.ngac.pm.proto.v1.model.Obligation proto) {
         Obligation obligation = new Obligation();
         obligation.setName(proto.getName());
         if (proto.hasAuthor()) {
@@ -305,7 +305,7 @@ public class FromProtoUtil {
 
 
 
-    public static EventContext fromEventContextProto(gov.nist.csd.pm.proto.v1.epp.EventContext proto) {
+    public static EventContext fromEventContextProto(gov.nist.ngac.pm.proto.v1.epp.EventContext proto) {
         String process = proto.getProcess();
 
         EventContextUser user = switch (proto.getUserCase()) {

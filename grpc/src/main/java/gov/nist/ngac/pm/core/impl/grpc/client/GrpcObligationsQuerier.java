@@ -4,14 +4,14 @@ import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.obligation.Obligation;
 import gov.nist.ngac.pm.core.pap.query.ObligationsQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
-import gov.nist.csd.pm.proto.v1.model.NodeRef;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationsByAuthorRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationsByAuthorResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationsRequest;
-import gov.nist.csd.pm.proto.v1.pdp.query.GetObligationsResponse;
-import gov.nist.csd.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.model.NodeRef;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetObligationRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetObligationResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetObligationsByAuthorRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetObligationsByAuthorResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetObligationsRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.query.GetObligationsResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,7 +29,7 @@ public class GrpcObligationsQuerier implements ObligationsQuery {
     public Collection<Obligation> getObligations() {
         GetObligationsResponse response = blockingStub.getObligations(GetObligationsRequest.newBuilder().build());
         List<Obligation> obligations = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Obligation proto : response.getObligationsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Obligation proto : response.getObligationsList()) {
             obligations.add(FromProtoUtil.fromObligationProto(proto));
         }
         return obligations;
@@ -59,7 +59,7 @@ public class GrpcObligationsQuerier implements ObligationsQuery {
             .build();
         GetObligationsByAuthorResponse response = blockingStub.getObligationsByAuthor(request);
         List<Obligation> obligations = new ArrayList<>();
-        for (gov.nist.csd.pm.proto.v1.model.Obligation proto : response.getObligationsList()) {
+        for (gov.nist.ngac.pm.proto.v1.model.Obligation proto : response.getObligationsList()) {
             obligations.add(FromProtoUtil.fromObligationProto(proto));
         }
         return obligations;

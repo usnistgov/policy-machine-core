@@ -2,7 +2,7 @@ package gov.nist.ngac.pm.core.impl.grpc.client;
 
 import gov.nist.ngac.pm.core.epp.EventContext;
 import gov.nist.ngac.pm.core.pap.obligation.event.EventContextUser;
-import gov.nist.csd.pm.proto.v1.epp.EPPServiceGrpc;
+import gov.nist.ngac.pm.proto.v1.epp.EPPServiceGrpc;
 import io.grpc.ManagedChannel;
 import java.util.Map;
 import org.slf4j.Logger;

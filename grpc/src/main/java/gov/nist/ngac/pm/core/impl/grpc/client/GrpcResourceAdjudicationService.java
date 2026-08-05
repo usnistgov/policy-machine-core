@@ -2,9 +2,9 @@ package gov.nist.ngac.pm.core.impl.grpc.client;
 
 import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.impl.grpc.util.ToProtoUtil;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.AdjudicateOperationResponse;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.OperationRequest;
-import gov.nist.csd.pm.proto.v1.pdp.adjudication.ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdjudicateOperationResponse;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.OperationRequest;
+import gov.nist.ngac.pm.proto.v1.pdp.adjudication.ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub;
 import java.util.Map;
 
 public class GrpcResourceAdjudicationService {
