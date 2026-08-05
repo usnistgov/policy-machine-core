@@ -42,17 +42,9 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * The Policy Administration Point: provides modification and query access to policy held in a
- * {@link PolicyStore}, with no access checks of its own (see {@link gov.nist.csd.pm.core.pdp.PDP}
- * for privilege-checked access to the same operations).
- * <p>
- * {@code PAP} itself holds no concurrency state; its thread-safety contract is entirely
- * determined by the {@link PolicyStore} implementation it wraps. Consult that store's
- * documentation before sharing a {@code PAP} instance across threads — the in-memory store
- * ({@link gov.nist.csd.pm.core.impl.memory.pap.MemoryPolicyStore}) supports only a single
- * thread per transaction and fails fast on concurrent misuse.
+ * PAP exposes the APIs used to interact with the policy in the PIP.
  */
-public class PAP implements OperationExecutor, Transactional {
+public abstract class PAP implements OperationExecutor, Transactional {
 
     private PolicyStore policyStore;
     private PolicyModifier modifier;

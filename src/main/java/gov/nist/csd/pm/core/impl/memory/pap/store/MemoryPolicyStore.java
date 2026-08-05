@@ -5,14 +5,8 @@ import gov.nist.csd.pm.core.pap.store.PolicyStore;
 import java.util.List;
 
 /**
- * A {@link PolicyStore} backed by plain in-memory collections. This implementation is intended
- * for testing and single-threaded embedding only, not as a production data store: it holds no
- * durable state (all policy is lost on JVM exit) and provides no isolation between an in-flight
- * transaction and concurrent readers. A thread other than the one that started the active
- * transaction will fail fast with {@link ConcurrentTxException} rather than corrupt policy
- * state — see {@link MemoryTx}. For durable or concurrent production deployments, use the
- * embedded Neo4j backend ({@code impl/neo4j}), the gRPC client to a remote PDP ({@code impl/grpc}),
- * or a custom {@link PolicyStore} implementation.
+ * In memory implementation of the {@link PolicyStore} interface with transaction support. Transactions modify the
+ * current state while tracking events in case of rollback.
  */
 public class MemoryPolicyStore implements PolicyStore {
 
