@@ -13,6 +13,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.basic.IfStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Compiles a PML "if / else if / else" statement into an {@link IfStatement}, compiling each branch in
+ * its own scope copy and merging outer-scope variable updates back after each branch.
+ */
 public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
     public IfStmtVisitor(VisitorContext visitorCtx) {

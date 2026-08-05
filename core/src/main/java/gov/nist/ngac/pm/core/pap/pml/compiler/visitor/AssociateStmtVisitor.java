@@ -10,6 +10,9 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.AssociateStatement;
 import java.util.List;
 
 
+/**
+ * Compiles a PML "associate ... to ... with ..." statement into an {@link AssociateStatement}.
+ */
 public class AssociateStmtVisitor extends PMLBaseVisitor<AssociateStatement> {
 
     public AssociateStmtVisitor(VisitorContext visitorCtx) {

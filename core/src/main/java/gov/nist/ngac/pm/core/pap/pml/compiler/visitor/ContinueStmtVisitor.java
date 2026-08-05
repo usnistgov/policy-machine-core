@@ -6,6 +6,10 @@ import gov.nist.ngac.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
 import gov.nist.ngac.pm.core.pap.pml.statement.basic.ContinueStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+/**
+ * Compiles a PML "continue" statement into a {@link ContinueStatement}, rejecting it if it does not
+ * appear inside a foreach loop.
+ */
 public class ContinueStmtVisitor extends PMLBaseVisitor<ContinueStatement> {
 
     public ContinueStmtVisitor(VisitorContext visitorCtx) {

@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
 import java.util.List;
 
 
+/**
+ * Compiles a PML "create OA/UA/O/U ... in ..." statement into a {@link CreateNonPCStatement}.
+ */
 public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement> {
 
     public CreateNonPCStmtVisitor(VisitorContext visitorCtx) {

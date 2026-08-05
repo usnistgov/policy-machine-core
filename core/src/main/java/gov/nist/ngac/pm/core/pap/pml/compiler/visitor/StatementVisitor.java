@@ -21,6 +21,10 @@ import java.util.function.Function;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+/**
+ * Dispatches a single PML statement parse context to the visitor for its specific statement kind,
+ * compiling it into a {@link PMLStatement}.
+ */
 public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
     public StatementVisitor(VisitorContext visitorCtx) {

@@ -10,6 +10,9 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.DeassignStatement;
 import java.util.List;
 
 
+/**
+ * Compiles a PML "deassign ... from ..." statement into a {@link DeassignStatement}.
+ */
 public class DeassignStmtVisitor extends PMLBaseVisitor<DeassignStatement> {
 
     public DeassignStmtVisitor(VisitorContext visitorCtx) {

@@ -10,6 +10,9 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.SetNodePropertiesStatem
 import java.util.Map;
 
 
+/**
+ * Compiles a PML "set properties of ... to ..." statement into a {@link SetNodePropertiesStatement}.
+ */
 public class SetNodePropertiesStmtVisitor extends PMLBaseVisitor<SetNodePropertiesStatement> {
 
     public SetNodePropertiesStmtVisitor(VisitorContext visitorCtx) {

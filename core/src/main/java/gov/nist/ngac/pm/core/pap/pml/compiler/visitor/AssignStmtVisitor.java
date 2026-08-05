@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.pml.statement.operation.AssignStatement;
 import java.util.List;
 
+/**
+ * Compiles a PML "assign ... to ..." statement into an {@link AssignStatement}.
+ */
 public class AssignStmtVisitor extends PMLBaseVisitor<AssignStatement> {
 
     public AssignStmtVisitor(VisitorContext visitorCtx) {

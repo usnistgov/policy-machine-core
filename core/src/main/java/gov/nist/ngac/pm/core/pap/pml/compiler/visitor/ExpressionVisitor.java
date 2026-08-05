@@ -66,6 +66,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+/**
+ * Compiles a PML expression parse tree into an {@link Expression}, inserting an {@link ExpressionWrapper}
+ * when the expression's static type needs coercing to an expected type.
+ */
 public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
     public static <T> Expression<T> compile(VisitorContext visitorCtx,
@@ -95,6 +99,15 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return visitor.visit(ctx);
     }
 
+    /**
+     * Lexes, parses, and compiles a single PML expression from its source text.
+     *
+     * @param visitorCtx the shared compiler context to compile against
+     * @param input the expression's PML source text
+     * @param expectedType the type the expression must produce (or be coercible to)
+     * @return the compiled expression
+     * @throws PMLCompilationRuntimeException if lexing, parsing, or compiling the expression fails
+     */
     public static <T> Expression<T> fromString(VisitorContext visitorCtx, String input, Type<T> expectedType) {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
 
@@ -396,6 +409,12 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
         return mapType;
     }
 
+    /**
+     * Strips the surrounding quote characters from a parsed string-literal token's text.
+     *
+     * @param lit the parsed string-literal context
+     * @return the literal's text with the leading and trailing quote removed
+     */
     public static String removeQuotes(StringLitContext lit) {
         String str = lit.getText();
         return str.trim().substring(1, str.length() - 1);

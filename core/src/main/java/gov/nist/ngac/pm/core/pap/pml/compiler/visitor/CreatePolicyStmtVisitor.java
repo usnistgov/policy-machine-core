@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.pml.statement.operation.CreatePolicyClassStatement;
 
 
+/**
+ * Compiles a PML "create PC ..." statement into a {@link CreatePolicyClassStatement}.
+ */
 public class CreatePolicyStmtVisitor extends PMLBaseVisitor<CreatePolicyClassStatement> {
 
     public CreatePolicyStmtVisitor(VisitorContext visitorCtx) {

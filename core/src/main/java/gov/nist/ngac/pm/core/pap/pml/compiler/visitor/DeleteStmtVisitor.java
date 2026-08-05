@@ -18,6 +18,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.DeleteStatement;
 
 
 
+/**
+ * Compiles a PML "delete ..." statement into the {@link DeleteStatement} subclass matching the parsed
+ * delete type (node, prohibition, obligation, or operation).
+ */
 public class DeleteStmtVisitor extends PMLBaseVisitor<DeleteStatement> {
 
     public DeleteStmtVisitor(VisitorContext visitorCtx) {

@@ -15,6 +15,11 @@ import gov.nist.ngac.pm.core.pap.pml.type.TypeStringer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Compiles a PML statement block (function/operation body, on-pattern block, or a nested statement
+ * block) into a {@link Result}, checking whether every control-flow path through the block returns a
+ * value matching the expected return type.
+ */
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
     private final Type<?> returnType;
@@ -171,6 +176,9 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
         return checkAllPathsReturned(visitorCtx, ifStatement.getElseBlock().getStmts(), returnType);
     }
 
+    /**
+     * A compiled statement block, plus whether every control-flow path through it returns a value.
+     */
     public record Result(boolean allPathsReturned, PMLStatementBlock stmts) {
 
     }

@@ -17,6 +17,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.basic.ForeachStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Compiles a PML "foreach" statement into a {@link ForeachStatement}, binding the loop variable(s) to
+ * the element type of the iterated list or the key/value types of the iterated map.
+ */
 public class ForeachStmtVisitor extends PMLBaseVisitor<ForeachStatement> {
 
     public ForeachStmtVisitor(VisitorContext visitorCtx) {

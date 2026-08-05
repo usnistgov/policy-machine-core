@@ -17,6 +17,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.basic.VariableDeclarationStatemen
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Compiles PML variable statements — "var" declarations, ":=" short declarations, and assignments —
+ * registering or updating the variable in the current scope as it goes.
+ */
 public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
 
 
