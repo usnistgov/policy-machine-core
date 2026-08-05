@@ -58,22 +58,6 @@ The `pap` package allows you to create NAGC policies without access checks on ad
 to wrap the features of the `pap` and perform access checks on administrative operations. The `epp` package provides a means
 of subscribing to PDP events and processing obligations defined in the PAP.
 
-## Backend Selection & Concurrency
-
-`MemoryPAP` (`impl/memory`) is **for testing and single-threaded embedding only** — it holds no
-durable state (policy is lost on JVM exit) and does not support concurrent transactions. A
-transaction started on one thread must be committed or rolled back by that same thread; a
-different thread attempting to participate throws `ConcurrentTxException` rather than silently
-corrupting policy state.
-
-For production use, choose one of:
-- The embedded Neo4j backend (`impl/neo4j`) for a durable, single-JVM store.
-- The gRPC client (`impl/grpc`) to delegate to a remote PDP service.
-- A custom `PolicyStore` implementation (see [Custom Policy Store Implementations](#custom-policy-store-implementations)).
-
-`PDP` and `PAP` themselves hold no concurrency state of their own — their thread-safety is
-determined entirely by the `PolicyStore` they wrap.
-
 ## Getting Started
 
 In general, to start using this library:

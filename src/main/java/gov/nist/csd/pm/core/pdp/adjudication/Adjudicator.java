@@ -37,10 +37,8 @@ public abstract class Adjudicator {
     }
 
     /**
-     * Removes any item from {@code items} for which {@code checkFn} throws {@link UnauthorizedException}.
-     * Any other {@link PMException} thrown by {@code checkFn} propagates as a checked exception, never as
-     * an unchecked {@code RuntimeException} — despite {@code checkFn} running inside a {@code removeIf}
-     * predicate, whose functional method cannot declare checked exceptions.
+     * Removes any item from items for which checkFn throws {@link UnauthorizedException}.
+     * Other {@link PMException}s propagate as checked, not wrapped in a RuntimeException.
      */
     protected <T> void filterUnauthorized(Collection<T> items, PMConsumer<T> checkFn) throws PMException {
         try {

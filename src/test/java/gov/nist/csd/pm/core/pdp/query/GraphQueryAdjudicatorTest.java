@@ -36,10 +36,6 @@ class GraphQueryAdjudicatorTest {
 
     @Test
     void testFilterNodesPropagatesPMExceptionInsteadOfRuntimeException() {
-        // a node id that does not exist in the graph causes the access-check lambda inside
-        // filterNodes' removeIf to throw a checked PMException (NodeDoesNotExistException),
-        // not UnauthorizedException. This must propagate as a checked PMException, not an
-        // undeclared RuntimeException/PMRuntimeException.
         assertThrows(NodeDoesNotExistException.class, () ->
             adjudicator.filterNodes(new ArrayList<>(List.of(123456789L)), AdminAccessRight.ADMIN_GRAPH_ASSIGNMENT_LIST));
     }

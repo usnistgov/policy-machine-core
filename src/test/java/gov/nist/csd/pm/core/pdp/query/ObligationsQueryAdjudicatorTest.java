@@ -36,10 +36,6 @@ class ObligationsQueryAdjudicatorTest {
 
     @Test
     void testFilterObligationsPropagatesPMExceptionInsteadOfRuntimeException() {
-        // an obligation authored by a node id that no longer exists causes the access-check
-        // lambda inside filterObligations' removeIf to throw a checked PMException
-        // (NodeDoesNotExistException), not UnauthorizedException. This must propagate as a
-        // checked PMException, not an undeclared RuntimeException.
         Obligation obligation = new Obligation(NodeUserContext.of(123456789L), "ob1", null, null);
 
         assertThrows(NodeDoesNotExistException.class, () ->
