@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * In-process registry of live native (non-PML) {@link Operation} instances. A store persists only a
+ * In-process registry of live Java (non-PML) {@link Operation} instances. A store persists only a
  * reference to an operation's name. {@link #register(Operation)} is what makes that name resolvable to a
  * live instance on this process.
  */
-public class NativeOperationRegistry {
+public class JavaOperationRegistry {
 
     private final Map<String, Operation<?>> operations;
     private final Set<String> protectedNames;
 
-    public NativeOperationRegistry() {
+    public JavaOperationRegistry() {
         this.operations = new HashMap<>();
         this.protectedNames = new HashSet<>();
 
@@ -31,7 +31,7 @@ public class NativeOperationRegistry {
     }
 
     /**
-     * Register a live native operation implementation. The name cannot conflict with an already-registered
+     * Register a live Java operation implementation. The name cannot conflict with an already-registered
      * name (protected built-in or previously registered). There is no way to mark a caller-registered operation
      * as protected.
      * @param operation The operation to register.

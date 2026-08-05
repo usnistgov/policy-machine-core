@@ -20,7 +20,7 @@ public interface OperationsStore extends OperationsModification, Transactional {
 
     /**
      * The persisted PML text for an operation row. Empty if the row doesn't exist or is
-     * {@link OperationKind#NATIVE}, which has no PML body.
+     * {@link OperationKind#JAVA}, which has no PML body.
      * @param name The name of the operation.
      * @return The operation's PML text, or empty.
      * @throws PMException If there is an error in the PM.

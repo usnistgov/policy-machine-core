@@ -6,7 +6,7 @@ import static gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightValidat
 import gov.nist.ngac.pm.core.common.exception.AdminAccessRightExistsException;
 import gov.nist.ngac.pm.core.common.exception.OperationExistsException;
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.JavaOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperation;
@@ -14,11 +14,11 @@ import gov.nist.ngac.pm.core.pap.store.PolicyStore;
 
 public class OperationsModifier extends Modifier implements OperationsModification {
 
-    private final NativeOperationRegistry nativeOperationRegistry;
+    private final JavaOperationRegistry javaOperationRegistry;
 
-    public OperationsModifier(PolicyStore store, NativeOperationRegistry nativeOperationRegistry) {
+    public OperationsModifier(PolicyStore store, JavaOperationRegistry javaOperationRegistry) {
         super(store);
-        this.nativeOperationRegistry = nativeOperationRegistry;
+        this.javaOperationRegistry = javaOperationRegistry;
     }
 
     @Override
@@ -35,9 +35,9 @@ public class OperationsModifier extends Modifier implements OperationsModificati
         }
 
         if (!(operation instanceof PMLOperation)) {
-            // native operation: must already be registered (two-step register-then-create lifecycle);
+            // Java operation: must already be registered (two-step register-then-create lifecycle);
             // return value ignored, get() throws OperationDoesNotExistException if unregistered
-            nativeOperationRegistry.get(operation.getName());
+            javaOperationRegistry.get(operation.getName());
         }
 
         policyStore.operations().createOperation(operation);
@@ -45,7 +45,7 @@ public class OperationsModifier extends Modifier implements OperationsModificati
 
     @Override
     public void deleteOperation(String name) throws PMException {
-        if (nativeOperationRegistry.isProtected(name)) {
+        if (javaOperationRegistry.isProtected(name)) {
             throw new CannotDeleteProtectedOperationException(name);
         } else if (!policyStore.operations().operationExists(name)) {
             return;
@@ -69,7 +69,7 @@ public class OperationsModifier extends Modifier implements OperationsModificati
      * check if operation exists with the name
      */
     private boolean operationExists(String name) throws PMException {
-        return nativeOperationRegistry.isProtected(name)
+        return javaOperationRegistry.isProtected(name)
             || policyStore.operations().operationExists(name);
     }
 

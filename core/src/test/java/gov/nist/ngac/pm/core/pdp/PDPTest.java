@@ -288,7 +288,7 @@ class PDPTest {
             }
 
         };
-        pap.nativeOperations().register(routine1);
+        pap.javaOperations().register(routine1);
         pap.modify().operations().createOperation(routine1);
         pap.executePML(NodeUserContext.of("u1"), """
                 routine routine2() map[string]string {

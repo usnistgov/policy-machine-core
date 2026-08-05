@@ -42,7 +42,7 @@ public interface OperationsQuery {
     Operation<?> getOperation(String name) throws PMException;
 
     /**
-     * Get the kind (native vs. PML-backed) of a persisted operation row, without materializing it.
+     * Get the kind (Java vs. PML-backed) of a persisted operation row, without materializing it.
      * @param name The name of the operation.
      * @return The row's {@link OperationKind}.
      * @throws OperationDoesNotExistException If no operation with this name is persisted.

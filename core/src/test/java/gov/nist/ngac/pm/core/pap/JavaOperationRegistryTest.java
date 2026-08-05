@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.common.exception.OperationExistsException;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.operation.AdminOperation;
 import gov.nist.ngac.pm.core.pap.operation.AdminOperations;
-import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.JavaOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.arg.Args;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-class NativeOperationRegistryTest {
+class JavaOperationRegistryTest {
 
     private static AdminOperation<Void> testOp(String name) {
         return new AdminOperation<>(name, VOID_TYPE, List.of(), List.of()) {
@@ -33,8 +33,8 @@ class NativeOperationRegistryTest {
     }
 
     @Test
-    void testRegisterAndGetNativeOperation() throws PMException {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+    void testRegisterAndGetJavaOperation() throws PMException {
+        JavaOperationRegistry registry = new JavaOperationRegistry();
         Operation<?> op = testOp("op1");
 
         registry.register(op);
@@ -44,7 +44,7 @@ class NativeOperationRegistryTest {
 
     @Test
     void testRegisterThrowsOnDuplicateName() throws PMException {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
         registry.register(testOp("op1"));
 
         assertThrows(OperationExistsException.class, () -> registry.register(testOp("op1")));
@@ -52,21 +52,21 @@ class NativeOperationRegistryTest {
 
     @Test
     void testRegisterThrowsWhenNameConflictsWithProtectedBuiltin() {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
 
         assertThrows(OperationExistsException.class, () -> registry.register(testOp("assign")));
     }
 
     @Test
     void testGetThrowsForUnregisteredOperation() {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
 
         assertThrows(OperationDoesNotExistException.class, () -> registry.get("nonexistent"));
     }
 
     @Test
     void testFreshRegistryIsProtectedForEveryAdminBuiltin() {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
 
         for (Operation<?> op : AdminOperations.ADMIN_OPERATIONS) {
             assertTrue(registry.isProtected(op.getName()), "Expected isProtected to be true for: " + op.getName());
@@ -75,7 +75,7 @@ class NativeOperationRegistryTest {
 
     @Test
     void testIsProtectedFalseForFreshlyRegisteredOperation() throws PMException {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
         registry.register(testOp("op1"));
 
         assertFalse(registry.isProtected("op1"));
@@ -83,7 +83,7 @@ class NativeOperationRegistryTest {
 
     @Test
     void testGetProtectedNamesReturnsEveryAdminOperationName() {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
 
         Set<String> expected = AdminOperations.ADMIN_OPERATIONS.stream().map(Operation::getName).collect(Collectors.toSet());
 
@@ -92,7 +92,7 @@ class NativeOperationRegistryTest {
 
     @Test
     void testGetProtectedNamesExcludesFreshlyRegisteredOperation() throws PMException {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
         registry.register(testOp("op1"));
 
         assertFalse(registry.getProtectedNames().contains("op1"));
@@ -100,7 +100,7 @@ class NativeOperationRegistryTest {
 
     @Test
     void testGetProtectedOperationsReturnsEveryAdminOperation() {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
+        JavaOperationRegistry registry = new JavaOperationRegistry();
 
         Collection<Operation<?>> protectedOperations = registry.getProtectedOperations();
 
@@ -110,7 +110,7 @@ class NativeOperationRegistryTest {
 
     @Test
     void testNoPublicPathToMarkRegisteredOperationAsProtected() {
-        long publicRegistrationMethods = java.util.Arrays.stream(NativeOperationRegistry.class.getMethods())
+        long publicRegistrationMethods = java.util.Arrays.stream(JavaOperationRegistry.class.getMethods())
             .filter(m -> m.getName().equals("register"))
             .count();
 

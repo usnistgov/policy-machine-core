@@ -60,8 +60,8 @@ class PMLBootstrapperTest {
 
         };
 
-        pap.nativeOperations().register(op1);
-        pap.nativeOperations().register(routine1);
+        pap.javaOperations().register(op1);
+        pap.javaOperations().register(routine1);
 
         // register() alone has no policy effect (so it doesn't trip bootstrap's empty-policy
         // check); createOperation() must run inside the bootstrap tx itself, before the PML

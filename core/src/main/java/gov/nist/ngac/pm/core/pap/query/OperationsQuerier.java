@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.query;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.JavaOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.OperationKind;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
@@ -13,11 +13,11 @@ import java.util.Collection;
 
 public class OperationsQuerier extends Querier implements OperationsQuery {
 
-    private final NativeOperationRegistry nativeOperationRegistry;
+    private final JavaOperationRegistry javaOperationRegistry;
 
-    public OperationsQuerier(PolicyStore store, NativeOperationRegistry nativeOperationRegistry) {
+    public OperationsQuerier(PolicyStore store, JavaOperationRegistry javaOperationRegistry) {
         super(store);
-        this.nativeOperationRegistry = nativeOperationRegistry;
+        this.javaOperationRegistry = javaOperationRegistry;
     }
 
     @Override
@@ -26,12 +26,12 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     /**
-     * Resolves every persisted row plus the always-present protected built-ins. NATIVE-kind rows are always
-     * resolved through the {@link NativeOperationRegistry}, never via a store shortcut.
+     * Resolves every persisted row plus the always-present protected built-ins. JAVA-kind rows are always
+     * resolved through the {@link JavaOperationRegistry}, never via a store shortcut.
      */
     @Override
     public Collection<Operation<?>> getOperations() throws PMException {
-        Collection<Operation<?>> operations = new ArrayList<>(nativeOperationRegistry.getProtectedOperations());
+        Collection<Operation<?>> operations = new ArrayList<>(javaOperationRegistry.getProtectedOperations());
 
         for (String name : store.operations().getOperationNames()) {
             operations.add(resolveStoreOperation(name));
@@ -42,15 +42,15 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
 
     @Override
     public Collection<String> getOperationNames() throws PMException {
-        Collection<String> names = new ArrayList<>(nativeOperationRegistry.getProtectedNames());
+        Collection<String> names = new ArrayList<>(javaOperationRegistry.getProtectedNames());
         names.addAll(store.operations().getOperationNames());
         return names;
     }
 
     @Override
     public Operation<?> getOperation(String name) throws PMException {
-        if (nativeOperationRegistry.isProtected(name)) {
-            return nativeOperationRegistry.get(name);
+        if (javaOperationRegistry.isProtected(name)) {
+            return javaOperationRegistry.get(name);
         }
 
         return resolveStoreOperation(name);
@@ -58,8 +58,8 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
 
     @Override
     public OperationKind getOperationKind(String name) throws PMException {
-        if (nativeOperationRegistry.isProtected(name)) {
-            return OperationKind.NATIVE;
+        if (javaOperationRegistry.isProtected(name)) {
+            return OperationKind.JAVA;
         }
 
         return store.operations().getOperationKind(name);
@@ -67,16 +67,16 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
 
     @Override
     public boolean operationExists(String operationName) throws PMException {
-        return nativeOperationRegistry.isProtected(operationName) || store.operations().operationExists(operationName);
+        return javaOperationRegistry.isProtected(operationName) || store.operations().operationExists(operationName);
     }
 
     /**
-     * Resolve a persisted operation by name: NATIVE-kind through the registry, PML-kind by
+     * Resolve a persisted operation by name: JAVA-kind through the registry, PML-kind by
      * recompiling the store's persisted PML text.
      */
     private Operation<?> resolveStoreOperation(String name) throws PMException {
-        if (store.operations().getOperationKind(name) == OperationKind.NATIVE) {
-            return nativeOperationRegistry.get(name);
+        if (store.operations().getOperationKind(name) == OperationKind.JAVA) {
+            return javaOperationRegistry.get(name);
         }
 
         String pmlText = store.operations().getOperationPml(name).orElseThrow(() -> new IllegalStateException(

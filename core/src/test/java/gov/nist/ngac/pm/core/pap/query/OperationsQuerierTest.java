@@ -68,15 +68,15 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
     void testGetAdminOperationNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.nativeOperations().register(op1);
-        pap.nativeOperations().register(op2);
+        pap.javaOperations().register(op1);
+        pap.javaOperations().register(op2);
         pap.modify().operations().createOperation(op1);
         pap.modify().operations().createOperation(op2);
 
         Collection<String> adminOperationNames = pap.query().operations().getOperationNames();
         assertTrue(adminOperationNames.containsAll(Set.of("op1", "op2")));
 
-        pap.nativeOperations().register(op3);
+        pap.javaOperations().register(op3);
         pap.modify().operations().createOperation(op3);
 
         adminOperationNames = pap.query().operations().getOperationNames();
@@ -90,13 +90,13 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.nativeOperations().register(op1);
+            pap.javaOperations().register(op1);
             pap.modify().operations().createOperation(op1);
 
             Operation<?> actual = pap.query().operations().getOperation(op1.getName());
             assertEquals(op1, actual);
 
-            pap.nativeOperations().register(op2);
+            pap.javaOperations().register(op2);
             pap.modify().operations().createOperation(op2);
             actual = pap.query().operations().getOperation(op2.getName());
             assertEquals(op2, actual);
@@ -112,24 +112,24 @@ public abstract class OperationsQuerierTest extends PAPTestInitializer {
     }
 
     @Test
-    void testBulkListingMixesNativeAndPmlAndProtectedOperations() throws PMException, IOException {
+    void testBulkListingMixesJavaAndPmlAndProtectedOperations() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.nativeOperations().register(op1);
+        pap.javaOperations().register(op1);
         pap.modify().operations().createOperation(op1);
         pap.executePML(NodeUserContext.of("u1"), "adminop pml_op() { }");
 
         Collection<Operation<?>> operations = pap.query().operations().getOperations();
         Set<String> names = operations.stream().map(Operation::getName).collect(java.util.stream.Collectors.toSet());
 
-        assertTrue(names.contains("op1"), "expected the user-registered native operation in the bulk listing");
+        assertTrue(names.contains("op1"), "expected the user-registered Java operation in the bulk listing");
         assertTrue(names.contains("pml_op"), "expected the PML-defined operation in the bulk listing");
         assertTrue(names.contains("assign"), "expected a protected built-in in the bulk listing, resolved without ever being createOperation'd");
 
-        Operation<?> resolvedNative = operations.stream().filter(o -> o.getName().equals("op1")).findFirst().orElseThrow();
+        Operation<?> resolvedJava = operations.stream().filter(o -> o.getName().equals("op1")).findFirst().orElseThrow();
         Operation<?> resolvedPml = operations.stream().filter(o -> o.getName().equals("pml_op")).findFirst().orElseThrow();
 
-        assertEquals(op1, resolvedNative);
+        assertEquals(op1, resolvedJava);
         assertInstanceOf(PMLOperation.class, resolvedPml);
     }
 }

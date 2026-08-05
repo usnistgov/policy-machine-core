@@ -94,7 +94,7 @@ class EPPTest {
             }
         };
 
-        pap.nativeOperations().register(op2);
+        pap.javaOperations().register(op2);
         pap.modify().operations().createOperation(op2);
 
         pap.executePML(u1, """
@@ -329,8 +329,8 @@ class EPPTest {
     void testCustomOperationInResponse() throws PMException {
         MemoryPAP pap = new TestPAP();
 
-        // a native (Java-implemented) operation, not a PMLOperation -- it has no PML body to persist as text,
-        // so it must go through the NativeOperationRegistry like any other native operation
+        // a Java-implemented operation, not a PMLOperation -- it has no PML body to persist as text,
+        // so it must go through the JavaOperationRegistry like any other Java operation
         AdminOperation<Void> testFunc = new AdminOperation<>("testFunc", new VoidType(), List.of(), List.of()) {
             @Override
             public Void execute(PAP pap, UserContext userCtx, Args args) throws PMException {
@@ -340,7 +340,7 @@ class EPPTest {
             }
         };
 
-        pap.nativeOperations().register(testFunc);
+        pap.javaOperations().register(testFunc);
         pap.modify().operations().createOperation(testFunc);
 
         PDP pdp = new PDP(pap);

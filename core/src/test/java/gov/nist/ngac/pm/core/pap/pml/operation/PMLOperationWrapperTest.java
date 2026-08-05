@@ -57,9 +57,9 @@ class PMLOperationWrapperTest {
 
         };
 
-        pap.nativeOperations().register(op1);
-        pap.nativeOperations().register(op2);
-        pap.nativeOperations().register(op3);
+        pap.javaOperations().register(op1);
+        pap.javaOperations().register(op2);
+        pap.javaOperations().register(op3);
         operations.createOperation(op1);
         operations.createOperation(op2);
         operations.createOperation(op3);

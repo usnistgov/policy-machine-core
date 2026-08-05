@@ -59,7 +59,7 @@ public class MemoryOperationsStore extends MemoryStore implements OperationsStor
         if (operation == null) {
             throw new OperationDoesNotExistException(name);
         }
-        return operation instanceof PMLOperation ? OperationKind.PML : OperationKind.NATIVE;
+        return operation instanceof PMLOperation ? OperationKind.PML : OperationKind.JAVA;
     }
 
     @Override

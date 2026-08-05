@@ -29,7 +29,7 @@ class PMLStmtsResourceOperationTest {
                 return "test";
             }
         };
-        memoryPAP.nativeOperations().register(op1);
+        memoryPAP.javaOperations().register(op1);
         memoryPAP.modify().operations().createOperation(op1);
 
         memoryPAP.executePML(NodeUserContext.of("u1"), """

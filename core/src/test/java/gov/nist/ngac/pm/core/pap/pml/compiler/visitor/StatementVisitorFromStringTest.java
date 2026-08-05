@@ -95,7 +95,7 @@ class StatementVisitorFromStringTest {
         pap.executePML(U1, "adminop existing_op() { }");
 
         PolicyStore store = pap.policyStore();
-        OperationsQuerier throwingOperationsQuerier = new OperationsQuerier(store, pap.nativeOperations()) {
+        OperationsQuerier throwingOperationsQuerier = new OperationsQuerier(store, pap.javaOperations()) {
             @Override
             public Collection<Operation<?>> getOperations() throws PMException {
                 throw new AssertionError("narrow compile entry point must not trigger a bulk getOperations() call");

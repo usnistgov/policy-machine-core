@@ -17,7 +17,7 @@ import gov.nist.ngac.pm.core.pap.modification.OperationsModifier;
 import gov.nist.ngac.pm.core.pap.modification.PolicyModification;
 import gov.nist.ngac.pm.core.pap.modification.PolicyModifier;
 import gov.nist.ngac.pm.core.pap.modification.ProhibitionsModifier;
-import gov.nist.ngac.pm.core.pap.operation.NativeOperationRegistry;
+import gov.nist.ngac.pm.core.pap.operation.JavaOperationRegistry;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 import gov.nist.ngac.pm.core.pap.operation.OperationExecutor;
 import gov.nist.ngac.pm.core.pap.operation.arg.Args;
@@ -50,19 +50,19 @@ public abstract class PAP implements OperationExecutor, Transactional {
     private PolicyStore policyStore;
     private PolicyModifier modifier;
     private PolicyQuerier querier;
-    private NativeOperationRegistry nativeOperationRegistry;
+    private JavaOperationRegistry javaOperationRegistry;
 
     public PAP(PolicyStore policyStore) throws PMException {
-        this(policyStore, new NativeOperationRegistry());
+        this(policyStore, new JavaOperationRegistry());
     }
 
-    public PAP(PolicyStore policyStore, NativeOperationRegistry nativeOperationRegistry) throws PMException {
-        this.nativeOperationRegistry = nativeOperationRegistry;
+    public PAP(PolicyStore policyStore, JavaOperationRegistry javaOperationRegistry) throws PMException {
+        this.javaOperationRegistry = javaOperationRegistry;
 
         // OperationsQuerier resolves its own cross-references (an operation body invoking another operation)
         // by passing itself as the OperationsQuery, so it needs no outside handle back to this PAP.
         // ObligationsQuerier borrows that same capability for obligations, which can invoke operations too.
-        OperationsQuerier operationsQuerier = new OperationsQuerier(policyStore, nativeOperationRegistry);
+        OperationsQuerier operationsQuerier = new OperationsQuerier(policyStore, javaOperationRegistry);
         this.querier = new PolicyQuerier(
             new GraphQuerier(policyStore),
             new ProhibitionsQuerier(policyStore),
@@ -74,23 +74,23 @@ public abstract class PAP implements OperationExecutor, Transactional {
             new GraphModifier(policyStore, new RandomIdGenerator()),
             new ProhibitionsModifier(policyStore),
             new ObligationsModifier(policyStore),
-            new OperationsModifier(policyStore, nativeOperationRegistry)
+            new OperationsModifier(policyStore, javaOperationRegistry)
         );
         this.policyStore = policyStore;
 
         // verify admin policy
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
 
-        // fail-fast: every persisted native-operation reference must have a live implementation
+        // fail-fast: every persisted Java-operation reference must have a live implementation
         // registered in the supplied registry
-        validateNativeOperationsAreRegistered();
+        validateJavaOperationsAreRegistered();
     }
 
     protected PAP(PAP pap) throws PMException {
         this.policyStore = pap.policyStore();
         this.modifier = pap.modifier;
         this.querier = pap.querier;
-        this.nativeOperationRegistry = pap.nativeOperationRegistry;
+        this.javaOperationRegistry = pap.javaOperationRegistry;
     }
 
     public PAP withPolicyStore(PolicyStore policyStore) {
@@ -120,8 +120,8 @@ public abstract class PAP implements OperationExecutor, Transactional {
         return policyStore;
     }
 
-    public NativeOperationRegistry nativeOperations() {
-        return nativeOperationRegistry;
+    public JavaOperationRegistry javaOperations() {
+        return javaOperationRegistry;
     }
 
     public PAP withIdGenerator(IdGenerator idGenerator) {
@@ -282,17 +282,17 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Cross-check every persisted native-operation reference against nativeOperationRegistry, throwing
+     * Cross-check every persisted Java-operation reference against {@link #javaOperationRegistry}, throwing
      * immediately if any name has no live implementation registered.
      */
-    private void validateNativeOperationsAreRegistered() throws PMException {
+    private void validateJavaOperationsAreRegistered() throws PMException {
         for (Operation<?> operation : query().operations().getOperations()) {
             if (operation instanceof PMLOperation) {
                 continue;
             }
 
             // return value ignored: get() throws OperationDoesNotExistException if unregistered, which is all we need here
-            nativeOperationRegistry.get(operation.getName());
+            javaOperationRegistry.get(operation.getName());
         }
     }
 }

@@ -87,7 +87,7 @@ public class PMLTest {
             }
 
         };
-        pap.nativeOperations().register(op1);
+        pap.javaOperations().register(op1);
         pap.modify().operations().createOperation(op1);
 
         Routine<Void> routine1 = new Routine<>("routine1", VOID_TYPE, List.of(ARGA, ARGB, ARGC)) {
@@ -99,7 +99,7 @@ public class PMLTest {
             }
 
         };
-        pap.nativeOperations().register(routine1);
+        pap.javaOperations().register(routine1);
         pap.modify().operations().createOperation(routine1);
 
         PDP pdp = new PDP(pap);

@@ -50,7 +50,7 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	@Override
 	public void createOperation(Operation<?> operation) throws PMException {
 		boolean isPml = operation instanceof PMLOperation;
-		OperationKind kind = isPml ? OperationKind.PML : OperationKind.NATIVE;
+		OperationKind kind = isPml ? OperationKind.PML : OperationKind.JAVA;
 		String pmlText = isPml ? operation.toString() : null;
 
 		txHandler.runTx(tx -> {
@@ -113,7 +113,7 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	@Override
 	public Optional<String> getOperationPml(String name) throws PMException {
 		OperationRow row = readRow(name);
-		if (row == null || row.kind() == OperationKind.NATIVE) {
+		if (row == null || row.kind() == OperationKind.JAVA) {
 			return Optional.empty();
 		}
 

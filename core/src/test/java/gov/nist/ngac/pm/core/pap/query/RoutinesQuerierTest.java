@@ -55,8 +55,8 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
     void testGetAdminRoutineNames() throws PMException, IOException {
         SamplePolicy.loadSamplePolicyFromPML(pap);
 
-        pap.nativeOperations().register(r1);
-        pap.nativeOperations().register(r2);
+        pap.javaOperations().register(r1);
+        pap.javaOperations().register(r2);
         pap.modify().operations().createOperation(r1);
         pap.modify().operations().createOperation(r2);
 
@@ -70,7 +70,7 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         expected.addAll(Set.of("r1", "r2", "deleteAllProjects", "deleteProject", "createProject", "deleteReadme", "createProjectAdmin"));
         assertEquals(expected, new HashSet<>(names));
 
-        pap.nativeOperations().register(r3);
+        pap.javaOperations().register(r3);
         pap.modify().operations().createOperation(r3);
         names = pap.query().operations().getOperationNames();
         expected.add("r3");
@@ -84,13 +84,13 @@ public abstract class RoutinesQuerierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.nativeOperations().register(r1);
+            pap.javaOperations().register(r1);
             pap.modify().operations().createOperation(r1);
 
             Operation<?> actual = pap.query().operations().getOperation(r1.getName());
             assertEquals(r1, actual);
 
-            pap.nativeOperations().register(r2);
+            pap.javaOperations().register(r2);
             pap.modify().operations().createOperation(r2);
             actual = pap.query().operations().getOperation(r2.getName());
             assertEquals(r2, actual);

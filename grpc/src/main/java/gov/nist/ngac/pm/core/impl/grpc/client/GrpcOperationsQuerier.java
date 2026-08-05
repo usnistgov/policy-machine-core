@@ -78,7 +78,7 @@ public class GrpcOperationsQuerier implements OperationsQuery {
 
     @Override
     public OperationKind getOperationKind(String name) {
-        // the Signature proto carries no native-vs-PML discriminator; the embedded backends' NATIVE/PML
+        // the Signature proto carries no Java-vs-PML discriminator; the embedded backends' JAVA/PML
         // split is out of scope for the gRPC wire protocol (see ADR 0001's out-of-scope section)
         throw new UnsupportedOperationException("operation kind is not exposed over the gRPC query API");
     }

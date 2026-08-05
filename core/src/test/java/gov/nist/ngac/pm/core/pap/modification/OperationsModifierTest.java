@@ -61,7 +61,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testSuccess() throws PMException {
-            pap.nativeOperations().register(testOp);
+            pap.javaOperations().register(testOp);
             pap.modify().operations().createOperation(testOp);
 
             assertDoesNotThrow(() -> pap.query().operations().getOperation(testOp.getName()));
@@ -69,7 +69,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
 
         @Test
         void testOperationExists() throws PMException {
-            pap.nativeOperations().register(testOp);
+            pap.javaOperations().register(testOp);
             pap.modify().operations().createOperation(testOp);
 
             assertThrows(OperationExistsException.class,
@@ -136,7 +136,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.nativeOperations().register(routine1);
+            pap.javaOperations().register(routine1);
             pap.modify().operations().createOperation(routine1);
 
             assertTrue(pap.query().operations().getOperations().contains(routine1));
@@ -146,7 +146,7 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testRoutineExists() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.nativeOperations().register(routine1);
+            pap.javaOperations().register(routine1);
             pap.modify().operations().createOperation(routine1);
 
             assertThrows(OperationExistsException.class, () -> {
@@ -158,15 +158,15 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testTx() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.nativeOperations().register(routine1);
-            pap.nativeOperations().register(routine2);
+            pap.javaOperations().register(routine1);
+            pap.javaOperations().register(routine2);
             pap.runTx(tx -> {
                 tx.modify().operations().createOperation(routine1);
                 tx.modify().operations().createOperation(routine2);
             });
 
-            pap.nativeOperations().register(routine3);
-            pap.nativeOperations().register(routine4);
+            pap.javaOperations().register(routine3);
+            pap.javaOperations().register(routine4);
             assertThrows(PMException.class, () -> pap.runTx(tx -> {
                 tx.modify().operations().createOperation(routine3);
                 tx.modify().operations().createOperation(routine4);
@@ -186,13 +186,13 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         @Test
         void testSuccess() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
-            pap.nativeOperations().register(routine1);
+            pap.javaOperations().register(routine1);
             pap.modify().operations().createOperation(routine1);
 
             pap.modify().operations().deleteOperation("routine1");
             assertFalse(pap.query().operations().getOperations().contains(routine1));
 
-            // a deleted native operation remains registered (delete only toggles store-level
+            // a deleted Java operation remains registered (delete only toggles store-level
             // persistence/activation) and can be re-created without re-registering
             assertDoesNotThrow(() -> pap.modify().operations().createOperation(routine1));
             assertTrue(pap.query().operations().getOperations().contains(routine1));
@@ -202,8 +202,8 @@ public abstract class OperationsModifierTest extends PAPTestInitializer {
         void testTx() throws PMException, IOException {
             SamplePolicy.loadSamplePolicyFromPML(pap);
 
-            pap.nativeOperations().register(routine1);
-            pap.nativeOperations().register(routine2);
+            pap.javaOperations().register(routine1);
+            pap.javaOperations().register(routine2);
             pap.runTx(tx -> {
                 tx.modify().operations().createOperation(routine1);
                 tx.modify().operations().createOperation(routine2);
