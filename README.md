@@ -449,3 +449,6 @@ git add grpc/protos
 git commit -m "Update protos submodule"
 git push
 ```
+
+## Developed with AI Coding Assistants
+This library was developed with the assistance of AI coding agents. Agents were used to review, plan, and update parts of the codebase. All content, has been reviewed and verified by the authors to ensure accuracy.
