@@ -13,6 +13,10 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 
+/**
+ * Shared Neo4j labels, property keys, relationship types, and conversion helpers used across the
+ * embedded Neo4j store implementations.
+ */
 public class Neo4jUtil {
 
 	public static final Label NODE_LABEL = Label.label("Node");
@@ -47,6 +51,13 @@ public class Neo4jUtil {
 	public static final RelationshipType PROHIBITION_SUBJECT_REL_TYPE = RelationshipType.withName("prohibition_subject");
 	public static final RelationshipType PROHIBITION_CONTAINER_REL_TYPE = RelationshipType.withName("prohibition_container");
 
+	/**
+	 * Resolves a Neo4j node's {@link NodeType} by matching its labels against the known type names.
+	 *
+	 * @param node the Neo4j node to inspect
+	 * @return the matching node type
+	 * @throws UnknownTypeException if none of the node's labels match a known node type
+	 */
 	public static NodeType getNodeType(Node node) throws UnknownTypeException {
 		for (Label label : node.getLabels()) {
 			String labelName = label.name();
@@ -60,6 +71,13 @@ public class Neo4jUtil {
 		throw new UnknownTypeException(null);
 	}
 
+	/**
+	 * Reconstructs a {@link Prohibition} from a Neo4j prohibition node's properties, resolving to a
+	 * {@link ProcessProhibition} or {@link NodeProhibition} depending on whether a process is set.
+	 *
+	 * @param prohibitionNode the Neo4j node holding the prohibition's properties
+	 * @return the reconstructed prohibition
+	 */
 	public static Prohibition getProhibitionFromNode(Node prohibitionNode) {
 		String name = String.valueOf(prohibitionNode.getProperty(NAME_PROPERTY));
 		long nodeId = (long) prohibitionNode.getProperty(NODE_ID_PROPERTY);
@@ -74,6 +92,13 @@ public class Neo4jUtil {
 			: new ProcessProhibition(name, nodeId, process, accessRights, inclusion, exclusion, isConjunctive);
 	}
 
+	/**
+	 * Maps a {@link NodeType} to its Neo4j label; types without a dedicated label, such as ANY, fall
+	 * back to an empty label.
+	 *
+	 * @param type the node type to map
+	 * @return the corresponding Neo4j label
+	 */
 	public static Label typeToLabel(NodeType type) {
 		return switch (type) {
 			case OA -> OA_LABEL;

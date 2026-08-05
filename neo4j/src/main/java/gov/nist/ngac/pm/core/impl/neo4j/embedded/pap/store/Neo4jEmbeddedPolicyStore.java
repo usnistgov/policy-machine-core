@@ -9,8 +9,17 @@ import gov.nist.ngac.pm.core.pap.store.ProhibitionsStore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
+/**
+ * {@link PolicyStore} implementation backed by an embedded Neo4j database, vending sub-stores that all
+ * share a single {@link TxHandler} so operations across sub-areas participate in the same transaction.
+ */
 public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
+	/**
+	 * Creates the indexes used by this store's queries, if they don't already exist.
+	 *
+	 * @param graphDb the database to create indexes on
+	 */
 	public static void createIndexes(GraphDatabaseService graphDb) {
 		// create the indexes
 		try (Transaction tx = graphDb.beginTx()) {

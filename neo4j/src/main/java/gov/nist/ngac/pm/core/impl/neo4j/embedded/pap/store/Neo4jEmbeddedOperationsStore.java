@@ -23,6 +23,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 
+/**
+ * {@link OperationsStore} implementation backed by an embedded Neo4j database, storing PML operations
+ * and the resource access right set as labeled Neo4j nodes.
+ */
 public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	private static final String RESOURCE_ACCESS_RIGHTS_NODE_NAME = "resource_access_rights";
