@@ -28,20 +28,11 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     /**
-     * Narrow compile entry point (precedent: {@link ExpressionVisitor#fromString}) for recompiling a single
-     * already-persisted {@code create X operation}/{@code create obligation} statement read back from a
-     * {@code Store}, e.g. its {@code toString()}/{@code toFormattedString(0)} rendering. Compiles against a
-     * {@link NarrowCompileScope}, which does not eagerly seed the full operation/function symbol table the way
-     * {@link gov.nist.csd.pm.core.pap.pml.scope.CompileScope} does — a {@code Store}'s read path recompiling a
-     * single row via this method must not trigger a bulk {@code getOperations()} call, which would recurse
-     * straight back into every other stored PML row.
-     * <p>
-     * A persisted definition was already valid PML when first created, so this does not re-validate it against
-     * every sibling operation the way a whole-program {@code pap.compilePML()} would.
-     * @param operationsQuery The query to lazily resolve cross-references (to other operations/functions
-     *                        invoked in the body) against.
+     * Recompiles a single already-persisted operation/obligation statement, using a {@link NarrowCompileScope}
+     * so it doesn't eagerly seed the full symbol table and recurse back into every other stored PML row.
+     * @param operationsQuery The query to lazily resolve cross-references against.
      * @param input A single statement's PML text.
-     * @return The compiled statement — an {@code OperationDefinitionStatement} or a {@code CreateObligationStatement}.
+     * @return The compiled statement.
      * @throws PMException If the input fails to compile.
      */
     public static PMLStatement<?> fromString(OperationsQuery operationsQuery, String input) throws PMException {
@@ -80,15 +71,12 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     /**
-     * {@link #fromString(OperationsQuery, String)}, then cast the result to {@code statementType} and pull the
-     * domain object back out via {@code extractor} -- the "recompile a persisted row, cast, unwrap" shape
-     * shared by every store-backed reader ({@code ObligationsQuerier}, {@code OperationsQuerier}). A wrong
-     * {@code statementType} fails with {@link ClassCastException}, same as the manual cast this replaces.
+     * Like {@link #fromString(OperationsQuery, String)}, but casts the result to statementType and pulls the
+     * domain object back out via extractor. A wrong statementType fails with {@link ClassCastException}.
      * @param operationsQuery The query to lazily resolve cross-references against.
      * @param input A single statement's PML text.
-     * @param statementType The concrete statement type {@code input} is expected to compile to.
-     * @param extractor Pulls the live domain object (an {@code Obligation}, an {@code Operation}) out of the
-     *                  compiled statement.
+     * @param statementType The concrete statement type input is expected to compile to.
+     * @param extractor Pulls the live domain object out of the compiled statement.
      * @return The extracted domain object.
      * @throws PMException If the input fails to compile.
      */

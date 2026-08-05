@@ -118,10 +118,8 @@ public class CreateObligationStatement extends OperationStatement {
     }
 
     /**
-     * Reconstruct a live {@link Obligation} from this compiled statement, combining the recompiled event
-     * pattern/response with an out-of-band author (the {@code create obligation} grammar has no author
-     * clause, so it is never part of the PML text and must be supplied by the caller, e.g. from a separate
-     * store property). The mirror of {@link #fromObligation(Obligation)}.
+     * Reconstruct a live {@link Obligation} from this compiled statement. The author is supplied out-of-band
+     * since the "create obligation" grammar has no author clause. The mirror of {@link #fromObligation(Obligation)}.
      * @param author The obligation's author, persisted separately from the PML text.
      * @return A live Obligation equivalent to the one that produced this statement's PML text.
      */

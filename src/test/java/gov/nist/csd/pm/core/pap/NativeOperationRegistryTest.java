@@ -1,7 +1,6 @@
 package gov.nist.csd.pm.core.pap;
 
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.VOID_TYPE;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -62,21 +61,6 @@ class NativeOperationRegistryTest {
         NativeOperationRegistry registry = new NativeOperationRegistry();
 
         assertThrows(OperationDoesNotExistException.class, () -> registry.get("nonexistent"));
-    }
-
-    @Test
-    void testRequireRegisteredDoesNotThrowForRegisteredOperation() throws PMException {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
-        registry.register(testOp("op1"));
-
-        assertDoesNotThrow(() -> registry.requireRegistered("op1"));
-    }
-
-    @Test
-    void testRequireRegisteredThrowsForUnregisteredOperation() {
-        NativeOperationRegistry registry = new NativeOperationRegistry();
-
-        assertThrows(OperationDoesNotExistException.class, () -> registry.requireRegistered("nonexistent"));
     }
 
     @Test

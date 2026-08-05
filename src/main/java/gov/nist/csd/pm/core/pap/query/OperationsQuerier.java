@@ -26,9 +26,8 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     /**
-     * Resolves every persisted row plus the always-present protected built-ins. NATIVE-kind rows are resolved
-     * through the {@code NativeOperationRegistry} uniformly on both backends — never via a store shortcut, even
-     * though {@code MemoryOperationsStore} could technically return its own held object directly.
+     * Resolves every persisted row plus the always-present protected built-ins. NATIVE-kind rows are always
+     * resolved through the {@link NativeOperationRegistry}, never via a store shortcut.
      */
     @Override
     public Collection<Operation<?>> getOperations() throws PMException {
@@ -72,10 +71,8 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     /**
-     * Resolve a persisted (non-protected) row by name: NATIVE-kind through the registry, PML-kind by
-     * recompiling the store's persisted PML text. Passes {@code this} as the {@link OperationsQuery} that
-     * resolves any cross-reference (another operation invoked in the body) -- resolving "what does operation
-     * X look like" is this class's own job, so it needs no outside handle to do it.
+     * Resolve a persisted operation by name: NATIVE-kind through the registry, PML-kind by
+     * recompiling the store's persisted PML text.
      */
     private Operation<?> resolveStoreOperation(String name) throws PMException {
         if (store.operations().getOperationKind(name) == OperationKind.NATIVE) {

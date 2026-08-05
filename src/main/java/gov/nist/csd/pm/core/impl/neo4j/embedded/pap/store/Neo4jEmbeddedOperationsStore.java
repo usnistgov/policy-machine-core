@@ -132,8 +132,8 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
 	/**
 	 * Reads a row's kind and PML text (if any) while the underlying Neo4j transaction is still open — a
-	 * {@link Node} becomes unusable once {@code txHandler.runTx} returns, so every property read must happen
-	 * inside the lambda, never on the {@code Node} reference afterward.
+	 * {@link Node} becomes unusable once the transaction closes, so every property read must happen inside
+	 * the lambda.
 	 */
 	private OperationRow readRow(String name) throws PMException {
 		AtomicReference<OperationRow> rowRef = new AtomicReference<>();

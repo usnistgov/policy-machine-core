@@ -13,12 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * In-process registry of live native (non-PML) {@link Operation} instances, replacing {@code PluginRegistry}.
- * A {@code Store} never persists the object itself, only a reference to its name — registering an operation
- * here is what makes that name resolvable to a live instance on this process. Registering is step one of a
- * two-step lifecycle: {@link #register(Operation)} only makes the implementation available, it does not persist
- * anything or make the operation exist in the policy; {@code OperationsModification.createOperation} is what
- * persists the reference and activates it.
+ * In-process registry of live native (non-PML) {@link Operation} instances. A store persists only a
+ * reference to an operation's name. {@link #register(Operation)} is what makes that name resolvable to a
+ * live instance on this process.
  */
 public class NativeOperationRegistry {
 
@@ -73,18 +70,6 @@ public class NativeOperationRegistry {
         }
 
         return operation;
-    }
-
-    /**
-     * For internal library use only, not part of the public embedding-application API surface. Checks that a
-     * live implementation is registered for the given name without returning it — used at both write-path
-     * (two-step {@code createOperation} lifecycle enforcement) and construction-time (fail-fast validation)
-     * call sites that only care whether the name resolves, not what it resolves to.
-     * @param name The operation name.
-     * @throws OperationDoesNotExistException If no operation with this name is registered.
-     */
-    public void requireRegistered(String name) throws OperationDoesNotExistException {
-        get(name);
     }
 
     /**

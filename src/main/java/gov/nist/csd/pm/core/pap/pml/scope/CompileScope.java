@@ -14,7 +14,7 @@ import java.util.Map;
 public class CompileScope extends Scope<Variable, PMLOperationSignature> {
 
     public CompileScope(PAP pap) throws PMException {
-        super(pap, ScopeSeeds.loadConstants(), loadOperations(pap));
+        super(pap, ScopeUtil.loadConstants(), loadOperations(pap));
     }
 
     private CompileScope(PAP pap,
@@ -40,7 +40,7 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
     public CompileScope copyFunctionsOnly() {
         Map<String, PMLOperationSignature> operations = new HashMap<>();
         for (PMLOperationSignature op : getOperations().values()) {
-            if (!ScopeSeeds.isFunction(op)) {
+            if (!ScopeUtil.isFunction(op)) {
                 continue;
             }
 
@@ -60,7 +60,7 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
     public CompileScope copyFunctionsAndQueriesOnly() {
         Map<String, PMLOperationSignature> filteredOps = new HashMap<>();
         for (PMLOperationSignature function : getOperations().values()) {
-            if (ScopeSeeds.isFunctionOrQuery(function)) {
+            if (ScopeUtil.isFunctionOrQuery(function)) {
                 filteredOps.put(function.getName(), function);
             }
         }
@@ -80,17 +80,17 @@ public class CompileScope extends Scope<Variable, PMLOperationSignature> {
         // add builtin operations and routines stored in PAP
         Map<String, Operation<?>> builtinFuncs = PMLBuiltinOperations.builtinOperations();
         builtinFuncs.values().forEach(f -> {
-            operationSignatures.put(f.getName(), ScopeSeeds.createOperationSignature(f));
+            operationSignatures.put(f.getName(), ScopeUtil.createOperationSignature(f));
         });
 
         Collection<Operation<?>> operations = pap.query().operations().getOperations();
         for (Operation<?> op : operations) {
-            operationSignatures.put(op.getName(), ScopeSeeds.createOperationSignature(op));
+            operationSignatures.put(op.getName(), ScopeUtil.createOperationSignature(op));
         }
 
         // add admin ops
         for (Operation<?> adminOperation : AdminOperations.ADMIN_OPERATIONS) {
-            operationSignatures.put(adminOperation.getName(), ScopeSeeds.createOperationSignature(adminOperation));
+            operationSignatures.put(adminOperation.getName(), ScopeUtil.createOperationSignature(adminOperation));
         }
 
         return operationSignatures;

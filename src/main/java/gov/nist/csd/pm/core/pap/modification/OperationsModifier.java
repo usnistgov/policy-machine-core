@@ -35,8 +35,9 @@ public class OperationsModifier extends Modifier implements OperationsModificati
         }
 
         if (!(operation instanceof PMLOperation)) {
-            // native operation: must already be registered (two-step register-then-create lifecycle)
-            nativeOperationRegistry.requireRegistered(operation.getName());
+            // native operation: must already be registered (two-step register-then-create lifecycle);
+            // return value ignored, get() throws OperationDoesNotExistException if unregistered
+            nativeOperationRegistry.get(operation.getName());
         }
 
         policyStore.operations().createOperation(operation);

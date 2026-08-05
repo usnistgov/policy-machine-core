@@ -281,9 +281,8 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Cross-check every persisted native-operation reference against {@code nativeOperationRegistry},
-     * throwing immediately if any name has no live implementation registered. There is no lazy-miss case at
-     * invocation time — a missing implementation can only ever surface here, at construction.
+     * Cross-check every persisted native-operation reference against nativeOperationRegistry, throwing
+     * immediately if any name has no live implementation registered.
      */
     private void validateNativeOperationsAreRegistered() throws PMException {
         for (Operation<?> operation : query().operations().getOperations()) {
@@ -291,7 +290,8 @@ public abstract class PAP implements OperationExecutor, Transactional {
                 continue;
             }
 
-            nativeOperationRegistry.requireRegistered(operation.getName());
+            // return value ignored: get() throws OperationDoesNotExistException if unregistered, which is all we need here
+            nativeOperationRegistry.get(operation.getName());
         }
     }
 }

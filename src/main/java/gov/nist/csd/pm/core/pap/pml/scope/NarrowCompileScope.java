@@ -11,19 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link Scope} used to recompile a single already-persisted PML definition (an operation or an obligation)
- * read back from a {@code Store}, without the cost/recursion risk of {@link CompileScope}'s eager
- * {@code operationsQuery.getOperations()} symbol-table seed: a {@code Store}'s read path for a PML-kind row
- * drives this scope, and if that scope itself called {@code getOperations()} to seed, it would recurse
- * straight back into every other stored PML row.
- * <p>
- * A persisted definition was already valid PML when it was first created, so it doesn't need eager
- * re-validation against every sibling operation. Only the fixed, cheap sets (builtins, protected admin
- * operations) are seeded eagerly; any other name referenced in the body (a cross-reference to another
- * user-defined operation/function) is resolved lazily, one name at a time, via the {@link OperationsQuery}
- * only when actually looked up. Depending on {@code OperationsQuery} rather than a whole {@code PAP} keeps
- * this scope usable by whatever narrowly owns operation resolution -- e.g. {@code OperationsQuerier} passing
- * itself in for its own cross-references, without needing a live handle back to the owning PAP.
+ * A {@link Scope} for recompiling a single already-persisted PML definition. Unlike {@link CompileScope},
+ * it seeds only the fixed builtin/admin operations eagerly and resolves any other referenced name lazily
+ * via {@link OperationsQuery}, avoiding recursion back into every other stored PML row.
  */
 public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
 
@@ -37,7 +27,7 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
     private final Visibility visibility;
 
     public NarrowCompileScope(OperationsQuery operationsQuery) {
-        this(operationsQuery, ScopeSeeds.loadConstants(), new HashMap<>(), seedOperations(), null, Visibility.ALL);
+        this(operationsQuery, ScopeUtil.loadConstants(), new HashMap<>(), seedOperations(), null, Visibility.ALL);
     }
 
     private NarrowCompileScope(OperationsQuery operationsQuery,
@@ -55,11 +45,11 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
         Map<String, PMLOperationSignature> operationSignatures = new HashMap<>();
 
         for (Operation<?> op : PMLBuiltinOperations.builtinOperations().values()) {
-            operationSignatures.put(op.getName(), ScopeSeeds.createOperationSignature(op));
+            operationSignatures.put(op.getName(), ScopeUtil.createOperationSignature(op));
         }
 
         for (Operation<?> op : AdminOperations.ADMIN_OPERATIONS) {
-            operationSignatures.put(op.getName(), ScopeSeeds.createOperationSignature(op));
+            operationSignatures.put(op.getName(), ScopeUtil.createOperationSignature(op));
         }
 
         return operationSignatures;
@@ -89,7 +79,7 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
     private PMLOperationSignature resolveFromQuery(String name) {
         try {
             Operation<?> op = operationsQuery.getOperation(name);
-            PMLOperationSignature signature = ScopeSeeds.createOperationSignature(op);
+            PMLOperationSignature signature = ScopeUtil.createOperationSignature(op);
             return isVisible(signature) ? signature : null;
         } catch (PMException e) {
             return null;
@@ -143,8 +133,8 @@ public class NarrowCompileScope extends Scope<Variable, PMLOperationSignature> {
     private static boolean isVisibleUnder(Visibility v, PMLOperationSignature signature) {
         return switch (v) {
             case ALL -> true;
-            case FUNCTIONS_AND_QUERIES -> ScopeSeeds.isFunctionOrQuery(signature);
-            case FUNCTIONS_ONLY -> ScopeSeeds.isFunction(signature);
+            case FUNCTIONS_AND_QUERIES -> ScopeUtil.isFunctionOrQuery(signature);
+            case FUNCTIONS_ONLY -> ScopeUtil.isFunction(signature);
         };
     }
 }

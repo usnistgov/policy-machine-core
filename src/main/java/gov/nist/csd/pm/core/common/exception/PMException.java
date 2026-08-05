@@ -1,8 +1,7 @@
 package gov.nist.csd.pm.core.common.exception;
 
 /**
- * Root exception to cover any possible error in the Policy Machine interfaces. This is to support multiple implementations
- * of the same interfaces that may have different and unplanned exceptions. These exceptions can be wrapped in a PMException.
+ * Base exception for policy machine related exceptions.
  */
 public class PMException extends Exception {
 

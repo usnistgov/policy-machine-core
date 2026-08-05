@@ -16,13 +16,11 @@ import java.util.Map;
 import static gov.nist.csd.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
 
 /**
- * Seeding logic shared by {@link CompileScope} and {@link NarrowCompileScope} — the two scopes differ only
- * in how eagerly/broadly they populate their operations map, not in how a single constant or operation
- * signature is built.
+ * Seeding logic shared by {@link CompileScope} and {@link NarrowCompileScope}.
  */
-final class ScopeSeeds {
+final class ScopeUtil {
 
-    private ScopeSeeds() {
+    private ScopeUtil() {
     }
 
     static Map<String, Variable> loadConstants() {
