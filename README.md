@@ -326,7 +326,7 @@ a user needs on the actual argument in the call to the operation in order to suc
 access rights defined in the RequiredCapabilities must be 
 [resource access rights](./core/src/main/java/gov/nist/ngac/pm/core/pap/modification/OperationsModification.java) 
 or 
-[admin access rights](./core/src/main/java/gov/nist/ngac/pm/core/pap/admin/AdminAccessRights.java).
+[admin access rights](./core/src/main/java/gov/nist/ngac/pm/core/pap/operation/accessright/AdminAccessRight.java).
 
 ### Define an operation
 Define an admin and resource operation using PML.
@@ -381,7 +381,7 @@ Now when the PDP executes an operation:
 UserContext userCtx = new UserContext(adminUserId);
 
 PDP pdp = new PDP(pap);
-pdp.adjudicateResourceOperation(userCtx, "read_file", Map.of("filename", "file1.txt"))
+pdp.adjudicateOperation(userCtx, "read_file", Map.of("filename", "file1.txt"))
 ```
 
 It will emit an event:
@@ -436,7 +436,6 @@ public class CustomPolicyStore implements PolicyStore {
 - `ProhibitionsStore`
 - `ObligationsStore`
 - `OperationsStore`
-- `RoutinesStore`
 
 3. Create a Custom PAP that extends [PAP](/core/src/main/java/gov/nist/ngac/pm/core/pap/PAP.java).
 
