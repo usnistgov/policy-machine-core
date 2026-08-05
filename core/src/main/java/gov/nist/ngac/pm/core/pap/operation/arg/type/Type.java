@@ -10,11 +10,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The static type of a PML value, used to type-check expressions and formal parameters at compile time
+ * and to cast argument values at runtime.
+ */
 public sealed abstract class Type<T> implements Serializable
     permits AdminOperationType, AnyType, FunctionType, BooleanType, EventPatternType,
     ListType, LongType, MapType, ObligationResponseType, ResourceOperationType, RoutineType,
     StringType, VoidType, QueryOperationType {
 
+    /**
+     * Infers the {@link Type} of a runtime Java value. A list or map resolves to ANY_TYPE unless every
+     * element/key/value shares a single inferred type.
+     *
+     * @param o the value to infer a type for
+     * @return the inferred type
+     */
     public static Type<?> resolveTypeOfObject(Object o) {
         return switch (o) {
             case String s -> STRING_TYPE;
@@ -98,6 +109,14 @@ public sealed abstract class Type<T> implements Serializable
      */
     public abstract T cast(Object obj);
 
+    /**
+     * Checks whether a value of this type can be used where the target type is expected — always true if
+     * either type is ANY_TYPE, or, for list/map types, if their element/key/value types are recursively
+     * castable.
+     *
+     * @param targetType the type to check castability to
+     * @return whether this type is castable to the target type
+     */
     public boolean isCastableTo(Type<?> targetType) {
         if (this.equals(ANY_TYPE)) {
             return true;
@@ -127,6 +146,13 @@ public sealed abstract class Type<T> implements Serializable
     }
 
     
+    /**
+     * Returns this type viewed as the target type, without converting any value.
+     *
+     * @param targetType the type to view this type as
+     * @return this instance, unsafely cast to the target type parameter
+     * @throws IllegalArgumentException if this type is not castable to the target type
+     */
     public <S> Type<S> asType(Type<S> targetType) {
         if (!this.isCastableTo(targetType)) {
             throw new IllegalArgumentException("Cannot cast from " + this + " to " + targetType);

@@ -4,8 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * The PML type of a map whose keys and values are each of a single, uniform type.
+ */
 public final class MapType<K, V> extends Type<Map<K, V>> {
 
+    /**
+     * Builds a map type with the given key and value types.
+     *
+     * @param keyType the key type
+     * @param valueType the value type
+     * @return the map type
+     */
     public static <K, V> MapType<K, V> of(Type<K> keyType, Type<V> valueType) {
         return new MapType<>(keyType.asType(keyType), valueType.asType(valueType));
     }

@@ -1,5 +1,8 @@
 package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
+/**
+ * The PML boolean type.
+ */
 public final class BooleanType extends Type<Boolean> {
 
     @Override

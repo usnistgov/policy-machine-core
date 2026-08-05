@@ -2,6 +2,9 @@ package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 
+/**
+ * The PML type of a first-class reference to an {@link Operation}.
+ */
 public final class AdminOperationType extends Type<Operation<?>> {
 
     @Override

@@ -1,5 +1,8 @@
 package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
+/**
+ * Shared singleton instances of the primitive PML {@link Type}s.
+ */
 public class BasicTypes {
 
     public static StringType STRING_TYPE = new StringType();

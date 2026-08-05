@@ -2,6 +2,9 @@ package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
 import gov.nist.ngac.pm.core.pap.operation.Function;
 
+/**
+ * The PML type of a first-class reference to a {@link Function}.
+ */
 public final class FunctionType extends Type<Function<?>> {
 
     @Override

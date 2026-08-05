@@ -4,8 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The PML type of a list whose elements are of a single, uniform type.
+ */
 public final class ListType<E> extends Type<List<E>> {
 
+    /**
+     * Builds a list type with the given element type.
+     *
+     * @param type the element type
+     * @return the list type
+     */
     public static <T> ListType<T> of(Type<T> type) {
         return new ListType<>(type);
     }

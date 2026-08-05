@@ -2,6 +2,9 @@ package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
 import gov.nist.ngac.pm.core.pap.operation.ResourceOperation;
 
+/**
+ * The PML type of a first-class reference to a {@link ResourceOperation}.
+ */
 public final class ResourceOperationType extends Type<ResourceOperation> {
 
     @Override

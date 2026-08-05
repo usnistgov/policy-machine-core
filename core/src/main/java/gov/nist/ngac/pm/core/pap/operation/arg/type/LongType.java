@@ -1,5 +1,8 @@
 package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
+/**
+ * The PML integer type, backed by a Java {@link Long}.
+ */
 public final class LongType extends Type<Long> {
 
     @Override
