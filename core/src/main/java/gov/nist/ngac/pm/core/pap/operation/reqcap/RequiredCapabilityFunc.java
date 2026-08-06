@@ -12,6 +12,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link RequiredCapability} satisfied by custom logic (e.g. a PML "@ReqCap(...)" block) rather than a
+ * declared set of {@link gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilege}s.
+ */
 public abstract class RequiredCapabilityFunc extends RequiredCapability {
 
     public RequiredCapabilityFunc() {

@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A {@link RequiredPrivilege} satisfied when the acting user holds the required access rights on every
+ * node the given {@link NodeFormalParameter} argument resolves to.
+ */
 public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
 
     private final NodeFormalParameter<?> param;
@@ -64,6 +68,9 @@ public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
         return !privs.isEmpty() && privs.containsAll(required);
     }
 
+    /**
+     * Returns the formal parameter whose resolved node(s) this requirement checks privileges against.
+     */
     public NodeFormalParameter<?> param() {
         return param;
     }

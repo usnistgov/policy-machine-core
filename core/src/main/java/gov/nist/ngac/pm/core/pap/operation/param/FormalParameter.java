@@ -4,6 +4,12 @@ import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A single declared parameter of an {@link gov.nist.ngac.pm.core.pap.operation.Operation}: its name,
+ * type, and whether it's required.
+ *
+ * @param <T> the parameter's Java type
+ */
 public class FormalParameter<T> implements Serializable {
 
 	private final String name;

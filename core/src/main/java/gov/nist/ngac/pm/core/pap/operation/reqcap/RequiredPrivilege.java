@@ -8,6 +8,11 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A single access-right requirement within a {@link RequiredCapability}, checked either against a fixed
+ * node ({@link RequiredPrivilegeOnNode}) or against the node(s) an argument resolves to
+ * ({@link RequiredPrivilegeOnParameter}).
+ */
 public abstract sealed class RequiredPrivilege implements Serializable permits RequiredPrivilegeOnNode, RequiredPrivilegeOnParameter {
 
     private final AccessRightSet required;

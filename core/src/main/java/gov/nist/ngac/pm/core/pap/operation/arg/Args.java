@@ -8,8 +8,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
+/**
+ * A type-safe, immutable-keyed map of an operation invocation's argument values, keyed by
+ * {@link FormalParameter} rather than name.
+ */
 public class Args {
 
+	/**
+	 * Builds an {@link Args} by matching each of the operation's formal parameters to its actual value by
+	 * name, casting each value to its formal parameter's type.
+	 *
+	 * @param function the operation whose formal parameters to match against
+	 * @param actualArgs the actual argument values, keyed by parameter name
+	 * @return the built args
+	 * @throws IllegalArgumentException if the argument counts don't match, a formal parameter has no
+	 * matching actual argument, or a value can't be cast to its formal parameter's type
+	 */
 	public static Args of(Operation<?> function, Map<String, Object> actualArgs) {
 		List<FormalParameter<?>> formalParameters = function.getFormalParameters();
 
@@ -47,20 +61,48 @@ public class Args {
 		this.map = map;
 	}
 
+	/**
+	 * Returns the value for the given formal parameter, cast to its expected type.
+	 *
+	 * @param <T> the parameter's Java type
+	 * @param formalParameter the parameter to look up
+	 * @return the parameter's value
+	 */
 	public <T> T get(FormalParameter<T> formalParameter) {
 		return formalParameter.toExpectedType(map.get(formalParameter));
 	}
 
+	/**
+	 * Sets a value for the given formal parameter without type-checking it against the parameter's
+	 * declared type.
+	 *
+	 * @param formalParameter the parameter to set
+	 * @param value the value to set, unchecked against the parameter's declared type
+	 * @return this instance, for chaining
+	 */
 	public Args putUnchecked(FormalParameter<?> formalParameter, Object value) {
 		map.put(formalParameter, value);
 		return this;
 	}
 
+	/**
+	 * Sets a value for the given formal parameter.
+	 *
+	 * @param <T> the parameter's Java type
+	 * @param formalParameter the parameter to set
+	 * @param value the value to set
+	 * @return this instance, for chaining
+	 */
 	public <T> Args put(FormalParameter<T> formalParameter, T value) {
 		map.put(formalParameter, value);
 		return this;
 	}
 
+	/**
+	 * Invokes the given consumer with each formal parameter/value pair.
+	 *
+	 * @param consumer the callback to invoke per entry
+	 */
 	public void foreach(BiConsumer<FormalParameter<?>, Object> consumer) {
 		for (Entry<FormalParameter<?>, Object> e : map.entrySet()) {
 			consumer.accept(e.getKey(), e.getValue());
@@ -71,6 +113,11 @@ public class Args {
 		return map;
 	}
 
+	/**
+	 * Returns a copy of this args as a plain map, keyed by parameter name instead of formal parameter.
+	 *
+	 * @return the copied map
+	 */
 	public Map<String, Object> toMap() {
 		Map<String, Object> m = new HashMap<>();
 		for (Entry<FormalParameter<?>, Object> e : map.entrySet()) {

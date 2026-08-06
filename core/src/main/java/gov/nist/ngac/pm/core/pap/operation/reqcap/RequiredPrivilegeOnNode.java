@@ -9,6 +9,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.NodeTargetContext;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.Objects;
 
+/**
+ * A {@link RequiredPrivilege} satisfied when the acting user holds the required access rights on a fixed,
+ * named node.
+ */
 public final class RequiredPrivilegeOnNode extends RequiredPrivilege{
 
     private final String name;
