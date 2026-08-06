@@ -14,6 +14,8 @@ import java.util.List;
 /**
  * Base class for query operations defined in PML, carrying the {@link PMLOperationSignature} and
  * {@link ExecutionContext} a {@link PMLOperation} needs.
+ *
+ * @param <T> the operation's return type
  */
 public abstract class PMLQueryOperation<T> extends QueryOperation<T> implements PMLOperation {
 

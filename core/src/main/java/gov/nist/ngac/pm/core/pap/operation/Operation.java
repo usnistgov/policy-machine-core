@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
  * {@link gov.nist.ngac.pm.core.pap.PAP} and so can modify the policy, {@link ResourceOperation}s and
  * {@link QueryOperation}s are restricted to read-only policy queries, and {@link Function}s have no
  * policy access at all.
+ *
+ * @param <R> the operation's return type
  */
 public abstract sealed class Operation<R> permits AdminOperation, ResourceOperation,
     QueryOperation, Routine, Function {

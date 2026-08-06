@@ -9,6 +9,10 @@ import java.util.Objects;
 /**
  * The explanation of a user's access under a single policy class: the resolved access rights and the
  * paths through the graph that justify them.
+ *
+ * @param pc the policy class node
+ * @param arset the resolved access rights under this policy class
+ * @param paths the paths through the graph that justify the access rights
  */
 public record PolicyClassExplain(Node pc, AccessRightSet arset, Collection<List<ExplainNode>> paths) {
 

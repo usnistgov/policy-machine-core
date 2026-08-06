@@ -15,6 +15,8 @@ import java.util.List;
 /**
  * Base class for functions defined in PML, carrying the {@link PMLOperationSignature} and
  * {@link ExecutionContext} a {@link PMLOperation} needs.
+ *
+ * @param <T> the function's return type
  */
 public abstract class PMLFunctionOperation<T> extends Function<T> implements PMLOperation {
 

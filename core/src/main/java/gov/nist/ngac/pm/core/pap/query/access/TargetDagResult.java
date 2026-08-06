@@ -7,6 +7,9 @@ import java.util.Set;
 /**
  * The result of walking a target's ascendant graph: the access rights reachable under each policy class,
  * and the prohibition-referenced node ids reached during the walk.
+ *
+ * @param pcMap the access rights reachable under each policy class node id
+ * @param reachedTargets the prohibition-referenced node ids reached during the walk
  */
 public record TargetDagResult(Map<Long, AccessRightSet> pcMap, Set<Long> reachedTargets) {
 

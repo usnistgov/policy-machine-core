@@ -11,6 +11,8 @@ import java.util.Objects;
 /**
  * PML bracket-index expression (e.g. "arr[i]" or "map[key]"): indexes into a list or map value by an
  * evaluated key/index expression.
+ *
+ * @param <T> the type this expression evaluates to
  */
 public class BracketIndexExpression<T> extends Expression<T> {
     private final Expression<?> baseExpr;

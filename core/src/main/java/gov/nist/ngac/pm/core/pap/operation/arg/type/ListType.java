@@ -6,6 +6,8 @@ import java.util.Objects;
 
 /**
  * The PML type of a list whose elements are of a single, uniform type.
+ *
+ * @param <E> the Java type of the list's elements
  */
 public final class ListType<E> extends Type<List<E>> {
 

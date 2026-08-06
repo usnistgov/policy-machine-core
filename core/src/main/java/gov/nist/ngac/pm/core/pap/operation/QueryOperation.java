@@ -12,6 +12,8 @@ import java.util.List;
 
 /**
  * Base class for query operations: {@link Operation}s restricted to read-only {@link PolicyQuery} access.
+ *
+ * @param <R> the operation's return type
  */
 public abstract non-sealed class QueryOperation<R> extends Operation<R> {
 

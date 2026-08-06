@@ -38,6 +38,8 @@ public class AccessRightSet extends ObjectOpenHashSet<String> {
 
     /**
      * Returns a set containing only the "*" wildcard, matching every access right.
+     *
+     * @return a new set containing only the "*" wildcard
      */
     public static AccessRightSet wildcard() {
         return new AccessRightSet(WildcardAccessRight.WILDCARD.toString());
@@ -45,6 +47,8 @@ public class AccessRightSet extends ObjectOpenHashSet<String> {
 
     /**
      * Returns a set containing only the "admin:*" wildcard, matching every admin access right.
+     *
+     * @return a new set containing only the "admin:*" wildcard
      */
     public static AccessRightSet adminWildcard() {
         return new AccessRightSet(WildcardAccessRight.ADMIN_WILDCARD.toString());
@@ -52,6 +56,8 @@ public class AccessRightSet extends ObjectOpenHashSet<String> {
 
     /**
      * Returns a set containing only the "resource:*" wildcard, matching every resource access right.
+     *
+     * @return a new set containing only the "resource:*" wildcard
      */
     public static AccessRightSet resourceWildcard() {
         return new AccessRightSet(WildcardAccessRight.RESOURCE_WILDCARD.toString());

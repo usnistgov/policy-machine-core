@@ -10,6 +10,8 @@ import java.util.Objects;
 
 /**
  * PML dot-index expression (e.g. "ctx.args.name"): looks up a fixed string key on a map-typed value.
+ *
+ * @param <T> the type this expression evaluates to
  */
 public class DotIndexExpression<T> extends Expression<T> {
     private final Expression<?> baseExpr;

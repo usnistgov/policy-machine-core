@@ -8,6 +8,9 @@ import java.util.Objects;
 
 /**
  * A single node on an explain path, paired with the associations reached at that node.
+ *
+ * @param node the node on the path
+ * @param associations the associations reached at that node
  */
 public record ExplainNode(Node node, Collection<ExplainAssociation> associations) {
 

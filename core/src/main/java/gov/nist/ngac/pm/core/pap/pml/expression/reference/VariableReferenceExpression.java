@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * PML expression that reads the current value of a named variable from scope.
+ *
+ * @param <T> the type this expression evaluates to
  */
 public class VariableReferenceExpression<T> extends Expression<T> {
     private final String varName;

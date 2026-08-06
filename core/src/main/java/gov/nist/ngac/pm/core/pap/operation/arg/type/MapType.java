@@ -6,6 +6,9 @@ import java.util.Objects;
 
 /**
  * The PML type of a map whose keys and values are each of a single, uniform type.
+ *
+ * @param <K> the Java type of the map's keys
+ * @param <V> the Java type of the map's values
  */
 public final class MapType<K, V> extends Type<Map<K, V>> {
 

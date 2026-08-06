@@ -178,6 +178,9 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
 
     /**
      * A compiled statement block, plus whether every control-flow path through it returns a value.
+     *
+     * @param allPathsReturned whether every control-flow path through the block returns a value
+     * @param stmts the compiled statement block
      */
     public record Result(boolean allPathsReturned, PMLStatementBlock stmts) {
 

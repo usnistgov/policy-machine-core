@@ -13,6 +13,8 @@ import java.util.Objects;
 /**
  * A PML function definition's runtime form: executes its {@link PMLStatementBlock} body and casts the
  * result to the declared return type.
+ *
+ * @param <T> the function's return type
  */
 public class PMLStmtsFunctionOperation<T> extends PMLFunctionOperation<T> implements PMLStatementSerializable {
 

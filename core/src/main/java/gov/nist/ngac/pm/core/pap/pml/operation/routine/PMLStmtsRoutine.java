@@ -14,6 +14,8 @@ import java.util.Objects;
 
 /**
  * A PML "create routine" definition's runtime form, executing its {@link PMLStatementBlock} body.
+ *
+ * @param <T> the routine's return type
  */
 public class PMLStmtsRoutine<T> extends PMLRoutine<T> implements PMLStatementSerializable {
 

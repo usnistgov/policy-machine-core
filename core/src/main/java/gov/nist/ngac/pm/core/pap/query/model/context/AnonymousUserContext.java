@@ -17,6 +17,10 @@ public class AnonymousUserContext extends UserContext{
 
     /**
      * Builds an anonymous user context identified by user attribute ids, acting as the given process.
+     *
+     * @param attributeIds the user attribute ids identifying the context
+     * @param process the acting process
+     * @return the built context
      */
     public static AnonymousUserContext ofIds(Set<Long> attributeIds, String process) {
         return new AnonymousUserContext(process, attributeIds, null);
@@ -24,6 +28,9 @@ public class AnonymousUserContext extends UserContext{
 
     /**
      * Builds an anonymous user context identified by user attribute ids.
+     *
+     * @param attributeIds the user attribute ids identifying the context
+     * @return the built context
      */
     public static AnonymousUserContext ofIds(Set<Long> attributeIds) {
         return new AnonymousUserContext(null, attributeIds, null);
@@ -31,6 +38,10 @@ public class AnonymousUserContext extends UserContext{
 
     /**
      * Builds an anonymous user context identified by user attribute names, acting as the given process.
+     *
+     * @param attributeNames the user attribute names identifying the context
+     * @param process the acting process
+     * @return the built context
      */
     public static AnonymousUserContext ofNames(Set<String> attributeNames, String process) {
         return new AnonymousUserContext(process, null, attributeNames);
@@ -38,6 +49,9 @@ public class AnonymousUserContext extends UserContext{
 
     /**
      * Builds an anonymous user context identified by user attribute names.
+     *
+     * @param attributeNames the user attribute names identifying the context
+     * @return the built context
      */
     public static AnonymousUserContext ofNames(Set<String> attributeNames) {
         return new AnonymousUserContext(null, null, attributeNames);

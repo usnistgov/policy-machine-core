@@ -11,6 +11,8 @@ import java.util.List;
 /**
  * Base class for pure functions: {@link Operation}s with no access to the PAP or policy state, computing
  * a result from their arguments alone.
+ *
+ * @param <R> the function's return type
  */
 public abstract non-sealed class Function<R> extends Operation<R>{
 
@@ -22,6 +24,10 @@ public abstract non-sealed class Function<R> extends Operation<R>{
 
     /**
      * Computes this function's result from its arguments.
+     *
+     * @param args the function's argument values
+     * @return the function's result
+     * @throws PMException if execution fails
      */
     public abstract R execute(Args args) throws PMException;
 

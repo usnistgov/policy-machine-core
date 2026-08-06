@@ -13,6 +13,8 @@ import java.util.Objects;
 
 /**
  * PML array literal expression, evaluating each element expression into a list.
+ *
+ * @param <E> the Java type of the list's elements
  */
 public class ArrayLiteralExpression<E> extends Expression<List<E>> {
 

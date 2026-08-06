@@ -16,6 +16,8 @@ import java.util.Objects;
 /**
  * A PML "create resource operation" definition's runtime form: executes its {@link PMLStatementBlock}
  * body and casts the result to the declared return type.
+ *
+ * @param <T> the operation's return type
  */
 public class PMLStmtsResourceOperation<T> extends PMLResourceOperation<T> implements PMLStatementSerializable {
 

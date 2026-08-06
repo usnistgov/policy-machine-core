@@ -13,6 +13,8 @@ import java.util.Map;
 /**
  * The static type of a PML value, used to type-check expressions and formal parameters at compile time
  * and to cast argument values at runtime.
+ *
+ * @param <T> the Java type this PML type maps to
  */
 public sealed abstract class Type<T> implements Serializable
     permits AdminOperationType, AnyType, FunctionType, BooleanType, EventPatternType,
@@ -149,6 +151,7 @@ public sealed abstract class Type<T> implements Serializable
     /**
      * Returns this type viewed as the target type, without converting any value.
      *
+     * @param <S> the target Java type
      * @param targetType the type to view this type as
      * @return this instance, unsafely cast to the target type parameter
      * @throws IllegalArgumentException if this type is not castable to the target type

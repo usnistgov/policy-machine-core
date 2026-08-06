@@ -6,6 +6,10 @@ import java.util.List;
 
 /**
  * A node paired with the caller's privileges on it, plus the same for each ascendant, recursively.
+ *
+ * @param node the node
+ * @param privileges the caller's privileges on the node
+ * @param ascendants the same information for each of the node's ascendants
  */
 public record SubgraphPrivileges(Node node, AccessRightSet privileges, List<SubgraphPrivileges> ascendants) {
 }

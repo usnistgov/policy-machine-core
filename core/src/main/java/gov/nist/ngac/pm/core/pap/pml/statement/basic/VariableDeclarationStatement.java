@@ -63,6 +63,9 @@ public class VariableDeclarationStatement extends BasicStatement<VoidResult> {
 
     /**
      * A single variable name paired with its initializing expression.
+     *
+     * @param id the variable name
+     * @param expression the initializing expression
      */
     public record Declaration(String id, Expression<?> expression) {
 

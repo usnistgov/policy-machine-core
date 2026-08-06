@@ -14,6 +14,8 @@ import java.util.List;
 /**
  * Base class for admin operations defined in PML, carrying the {@link PMLOperationSignature} and
  * {@link ExecutionContext} a {@link PMLOperation} needs.
+ *
+ * @param <T> the operation's return type
  */
 public abstract class PMLAdminOperation<T> extends AdminOperation<T> implements PMLOperation {
 

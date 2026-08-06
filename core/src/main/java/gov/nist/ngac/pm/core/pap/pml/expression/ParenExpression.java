@@ -8,6 +8,8 @@ import java.util.Objects;
 
 /**
  * A parenthesized PML expression, evaluating to its wrapped expression's value unchanged.
+ *
+ * @param <T> the type this expression evaluates to
  */
 public class ParenExpression<T> extends Expression<T> {
 

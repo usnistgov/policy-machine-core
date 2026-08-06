@@ -14,6 +14,9 @@ import java.util.Objects;
 
 /**
  * PML map literal expression, evaluating each key/value expression pair into a map.
+ *
+ * @param <K> the Java type of the map's keys
+ * @param <V> the Java type of the map's values
  */
 public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
 

@@ -58,6 +58,10 @@ public class AccessRightResolver {
     /**
      * Returns the union of access rights denied by every prohibition, among the given set, whose
      * inclusion/exclusion condition is satisfied against the target's reached nodes.
+     *
+     * @param prohibitions the prohibitions to check
+     * @param targetCtx the target's DAG evaluation result
+     * @return the union of denied access rights
      */
     public static AccessRightSet resolveDeniedAccessRights(Set<Prohibition> prohibitions, TargetDagResult targetCtx) {
         AccessRightSet denied = new AccessRightSet();
@@ -75,6 +79,10 @@ public class AccessRightResolver {
     /**
      * Returns every prohibition of the user's, among those in the given DAG results, whose
      * inclusion/exclusion condition is satisfied against the target's reached nodes.
+     *
+     * @param userDagResult the user's DAG evaluation result, supplying the prohibitions to check
+     * @param targetDagResult the target's DAG evaluation result
+     * @return the satisfied prohibitions
      */
     public static List<Prohibition> computeSatisfiedProhibitions(UserDagResult userDagResult, TargetDagResult targetDagResult) {
         List<Prohibition> satisfied = new ArrayList<>();

@@ -7,6 +7,9 @@ import org.antlr.v4.runtime.misc.Interval;
 
 /**
  * A single compile error: its source position and message.
+ *
+ * @param position the error's source position
+ * @param errorMessage the error message
  */
 public record CompileError(Position position, String errorMessage) {
 

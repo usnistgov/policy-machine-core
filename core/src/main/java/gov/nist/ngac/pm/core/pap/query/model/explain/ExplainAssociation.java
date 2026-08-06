@@ -10,6 +10,10 @@ import java.util.Objects;
 /**
  * A single association reached on an explain path: the user attribute source, the access rights it
  * grants, and the paths from the user to that user attribute.
+ *
+ * @param ua the association's user attribute source
+ * @param arset the access rights the association grants
+ * @param userPaths the paths from the user to the user attribute
  */
 public record ExplainAssociation(Node ua, AccessRightSet arset, Collection<Path> userPaths) {
 

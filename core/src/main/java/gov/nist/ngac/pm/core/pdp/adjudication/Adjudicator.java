@@ -27,6 +27,9 @@ public abstract class Adjudicator {
     /**
      * Checks that the user holds every required access right on the target.
      *
+     * @param userCtx the user to check
+     * @param targetCtx the target to check privileges against
+     * @param required the access rights the user must hold
      * @throws UnauthorizedException if the user is missing any required access right, or holds none at all
      * @throws PMException if computing the user's privileges fails
      */
@@ -41,10 +44,12 @@ public abstract class Adjudicator {
         throw UnauthorizedException.of(pap.query().graph(), userCtx, targetCtx, computed, requiredSet);
     }
 
-    @FunctionalInterface
     /**
      * Callback invoked per item by {@link #filterUnauthorized}.
+     *
+     * @param <T> the item type
      */
+    @FunctionalInterface
     protected interface PMConsumer<T> {
         void accept(T t) throws PMException;
     }
@@ -52,6 +57,11 @@ public abstract class Adjudicator {
     /**
      * Removes any item from items for which checkFn throws {@link UnauthorizedException}.
      * Other {@link PMException}s propagate as checked, not wrapped in a RuntimeException.
+     *
+     * @param <T> the item type
+     * @param items the collection to filter in place
+     * @param checkFn the per-item check; an {@link UnauthorizedException} removes the item
+     * @throws PMException if checkFn throws any exception other than {@link UnauthorizedException}
      */
     protected <T> void filterUnauthorized(Collection<T> items, PMConsumer<T> checkFn) throws PMException {
         try {

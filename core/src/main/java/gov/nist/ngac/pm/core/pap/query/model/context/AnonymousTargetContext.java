@@ -15,6 +15,9 @@ public class AnonymousTargetContext extends TargetContext {
 
     /**
      * Builds an anonymous target context identified by object attribute ids.
+     *
+     * @param attributeIds the object attribute ids identifying the context
+     * @return the built context
      */
     public static AnonymousTargetContext ofIds(Set<Long> attributeIds) {
         return new AnonymousTargetContext(attributeIds, null);
@@ -22,6 +25,9 @@ public class AnonymousTargetContext extends TargetContext {
 
     /**
      * Builds an anonymous target context identified by object attribute names.
+     *
+     * @param attributeNames the object attribute names identifying the context
+     * @return the built context
      */
     public static AnonymousTargetContext ofNames(Set<String> attributeNames) {
         return new AnonymousTargetContext(null, attributeNames);

@@ -12,6 +12,9 @@ import java.util.Objects;
  * A lexical scope of PML variables and callable operations, with an optional parent scope for outer
  * variable/operation lookups; the variable value type and operation type differ between compile-time
  * ({@link CompileScope}) and execution-time ({@link ExecuteScope}) use.
+ *
+ * @param <V> the variable value type
+ * @param <F> the operation type
  */
 public abstract class Scope<V, F> implements Serializable {
 

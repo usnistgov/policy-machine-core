@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 /**
  * Base class for PML grammar-context visitors, giving each visitor access to the shared
  * {@link VisitorContext} (symbol scope, error log) for the compilation in progress.
+ *
+ * @param <S> the type this visitor produces from a grammar context
  */
 public abstract class PMLBaseVisitor<S> extends PMLParserBaseVisitor<S> {
 

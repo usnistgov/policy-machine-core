@@ -14,6 +14,11 @@ import org.antlr.v4.runtime.ListTokenSource;
 /**
  * Compile-time context threaded through the PML compiler visitors: the token stream being compiled, the
  * current compile {@link Scope}, and the error log/handler to record failures to.
+ *
+ * @param tokens the token stream being compiled
+ * @param scope the current compile scope
+ * @param errorLog the log to record compile errors to
+ * @param pmlErrorHandler the ANTLR listener that records lexer/parser syntax errors
  */
 public record VisitorContext(CommonTokenStream tokens, Scope<Variable, PMLOperationSignature> scope, ErrorLog errorLog, PMLErrorHandler pmlErrorHandler) {
 

@@ -105,6 +105,9 @@ public class IfStatement extends BasicStatement<StatementResult> {
 
     /**
      * A single "if"/"else if" branch: the condition guarding it and the block to run when it's true.
+     *
+     * @param condition the branch's guarding condition
+     * @param block the block to run when the condition is true
      */
     public record ConditionalBlock(Expression<Boolean> condition, PMLStatementBlock block) implements Serializable { }
 } 

@@ -13,6 +13,8 @@ import java.util.List;
 /**
  * Base class for routines defined in PML, carrying the {@link PMLOperationSignature} and
  * {@link ExecutionContext} a {@link PMLOperation} needs.
+ *
+ * @param <T> the routine's return type
  */
 public abstract class PMLRoutine<T> extends Routine<T> implements PMLOperation {
 

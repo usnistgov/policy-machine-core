@@ -5,6 +5,9 @@ import java.util.Collection;
 
 /**
  * A node paired with its descendant (or ascendant) subgraph, recursively.
+ *
+ * @param node the node
+ * @param subgraphs the node's child subgraphs
  */
 public record Subgraph(Node node, Collection<Subgraph> subgraphs) {
 }

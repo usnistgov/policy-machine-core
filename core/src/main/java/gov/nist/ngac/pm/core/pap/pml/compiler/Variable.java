@@ -6,6 +6,10 @@ import java.util.Objects;
 
 /**
  * A compile-time record of a PML variable's name, static type, and whether it is a constant.
+ *
+ * @param name the variable's name
+ * @param type the variable's static type
+ * @param isConst whether the variable is a constant
  */
 public record Variable(String name, Type<?> type, boolean isConst) implements Serializable {
 

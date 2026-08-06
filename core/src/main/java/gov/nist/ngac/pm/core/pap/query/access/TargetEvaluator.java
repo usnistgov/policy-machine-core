@@ -234,6 +234,11 @@ public class TargetEvaluator {
 	 * Mutable state threaded through one target-side traversal: the target's first-level ascendants, the
 	 * node ids referenced by the user's prohibitions, the per-node per-policy-class privileges
 	 * accumulated so far, and the prohibition targets reached during the walk.
+	 *
+	 * @param firstLevelDescs the target's first-level ascendants, seeding the walk
+	 * @param userProhibitionTargets node ids referenced by the user's prohibitions
+	 * @param visitedNodes per-node, per-policy-class privileges accumulated so far
+	 * @param visitedProhibitionTargets prohibition-referenced node ids reached during the walk
 	 */
 	protected record TraversalState(Collection<Long> firstLevelDescs,
 									Set<Long> userProhibitionTargets,
