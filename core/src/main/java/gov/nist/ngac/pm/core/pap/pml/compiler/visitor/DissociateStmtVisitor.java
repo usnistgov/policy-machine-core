@@ -9,7 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.DissociateStatement;
 
 
 /**
- * Compiles a PML "dissociate ... from ..." statement into a {@link DissociateStatement}.
+ * Compiles a PML dissociate ... from ... statement into a {@link DissociateStatement}.
  */
 public class DissociateStmtVisitor extends PMLBaseVisitor<DissociateStatement> {
 

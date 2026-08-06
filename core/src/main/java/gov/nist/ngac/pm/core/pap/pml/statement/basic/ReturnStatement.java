@@ -12,7 +12,7 @@ import java.util.Objects;
 
 
 /**
- * PML "return" statement, with or without a return value.
+ * PML return statement, with or without a return value.
  */
 public class ReturnStatement extends BasicStatement<StatementResult> {
 

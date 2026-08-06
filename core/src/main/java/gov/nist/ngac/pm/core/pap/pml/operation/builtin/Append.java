@@ -10,7 +10,7 @@ import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
 /**
- * PML built-in function append(dst, src): appends src to the dst list in place and returns dst.
+ * PML built-in function append(dst, src). Appends src to the dst list in place and returns dst.
  */
 public class Append extends PMLFunctionOperation<List<Object>> {
 

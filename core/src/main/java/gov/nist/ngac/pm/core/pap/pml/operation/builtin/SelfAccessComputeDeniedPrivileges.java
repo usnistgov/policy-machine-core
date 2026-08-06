@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PML built-in query self_compute_denied_privileges(node_name): returns the caller's denied privileges
+ * PML built-in query self_compute_denied_privileges(node_name). Returns the caller's denied privileges
  * on the given node.
  */
 public class SelfAccessComputeDeniedPrivileges extends QueryOperation<List<String>> {

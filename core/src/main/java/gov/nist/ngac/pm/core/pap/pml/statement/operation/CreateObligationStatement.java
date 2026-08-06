@@ -23,7 +23,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Objects;
 
 /**
- * PML "create obligation" statement: creates an obligation from a name, event pattern, and response body.
+ * PML create obligation statement. Creates an obligation from a name, event pattern, and response body.
  * Can also be built from (via {@link #fromObligation}) or converted back to (via {@link #toObligation})
  * a live {@link Obligation}.
  */
@@ -101,7 +101,7 @@ public class CreateObligationStatement extends OperationStatement {
     }
 
     /**
-     * Formats an event pattern's "when ... performs ..." clause for {@link #toFormattedString}.
+     * Formats an event pattern's when ... performs ... clause for {@link #toFormattedString}.
      *
      * @param indentLevel the indent level to format at
      * @param eventPattern the event pattern to format
@@ -116,7 +116,7 @@ public class CreateObligationStatement extends OperationStatement {
     }
 
     /**
-     * Formats an obligation response's "do (...) { ... }" clause for {@link #toFormattedString}.
+     * Formats an obligation response's do (...) { ... } clause for {@link #toFormattedString}.
      *
      * @param indentLevel the indent level to format at
      * @param obligationResponse the response to format
@@ -138,7 +138,7 @@ public class CreateObligationStatement extends OperationStatement {
 
     /**
      * Reconstruct a live {@link Obligation} from this compiled statement. The author is supplied out-of-band
-     * since the "create obligation" grammar has no author clause. The mirror of {@link #fromObligation(Obligation)}.
+     * since the create obligation grammar has no author clause. The mirror of {@link #fromObligation(Obligation)}.
      * @param author The obligation's author, persisted separately from the PML text.
      * @return A live Obligation equivalent to the one that produced this statement's PML text.
      */
@@ -152,7 +152,7 @@ public class CreateObligationStatement extends OperationStatement {
     }
 
     /**
-     * Builds a "create obligation" statement equivalent to the given live {@link Obligation}. The mirror
+     * Builds a PML create obligation statement equivalent to the given live {@link Obligation}. The mirror
      * of {@link #toObligation(NodeUserContext)}.
      *
      * @param obligation the obligation to convert

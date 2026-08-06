@@ -7,7 +7,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * PML "!" subject pattern negation.
+ * PML ! subject pattern negation.
  */
 public class NegateSubjectPatternExpression extends SubjectPatternExpression {
 

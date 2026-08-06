@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 /**
- * PML operation-call expression: invokes a named operation with the given argument expressions and
+ * PML operation-call expression. Invokes a named operation with the given argument expressions and
  * evaluates to its return value.
  *
  * @param <T> the invoked operation's return type

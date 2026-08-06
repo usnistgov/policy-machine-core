@@ -13,7 +13,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "delete_node": deletes a node by id.
+ * Admin operation "delete_node". Deletes a node by id.
  */
 public class DeleteNodeOp extends AdminOperation<Void> {
 

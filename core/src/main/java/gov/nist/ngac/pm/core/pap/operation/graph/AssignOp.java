@@ -15,7 +15,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "assign": assigns an ascendant node to one or more descendant nodes.
+ * Admin operation "assign". Assigns an ascendant node to one or more descendant nodes.
  */
 public class AssignOp extends AdminOperation<Void> {
 

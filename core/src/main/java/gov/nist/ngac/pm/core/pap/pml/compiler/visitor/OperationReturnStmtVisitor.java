@@ -8,7 +8,7 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.pml.statement.basic.ReturnStatement;
 
 /**
- * Compiles a PML "return" statement into a {@link ReturnStatement}, producing a value-less return when
+ * Compiles a PML return statement into a {@link ReturnStatement}, producing a value-less return when
  * no expression is given.
  */
 public class OperationReturnStmtVisitor extends PMLBaseVisitor<ReturnStatement> {

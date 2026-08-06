@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
 /**
- * The PML "any" type: matches any value and casts without conversion.
+ * The PML any type. Matches any value and casts without conversion.
  */
 public final class AnyType extends Type<Object> {
 

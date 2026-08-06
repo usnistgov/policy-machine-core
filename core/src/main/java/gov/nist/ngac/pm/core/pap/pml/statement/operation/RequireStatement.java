@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML "require ... on ..." statement: throws {@link UnauthorizedException} unless the executing user
+ * PML require ... on ... statement. Throws {@link UnauthorizedException} unless the executing user
  * holds every listed access right on every listed target.
  */
 public class RequireStatement extends PMLStatement<VoidResult> {

@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
 /**
- * PML built-in function append_all(dst, src): appends every element of the src list to dst in place and
+ * PML built-in function append_all(dst, src). Appends every element of the src list to dst in place and
  * returns dst.
  */
 public class AppendAll extends PMLFunctionOperation<List<Object>> {

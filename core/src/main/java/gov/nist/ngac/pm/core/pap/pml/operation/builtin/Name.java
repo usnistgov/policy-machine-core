@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * PML built-in query name(id): returns the node name for the given node id.
+ * PML built-in query name(id). Returns the node name for the given node id.
  */
 public class Name extends PMLQueryOperation<String> {
 

@@ -7,7 +7,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.basic.BreakStatement;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Compiles a PML "break" statement into a {@link BreakStatement}, rejecting it if it does not appear
+ * Compiles a PML break statement into a {@link BreakStatement}, rejecting it if it does not appear
  * inside a foreach loop.
  */
 public class BreakStmtVisitor extends PMLBaseVisitor<BreakStatement> {

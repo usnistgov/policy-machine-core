@@ -13,7 +13,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "dissociate": removes the association between a user attribute and a target.
+ * Admin operation "dissociate". Removes the association between a user attribute and a target.
  */
 public class DissociateOp extends AdminOperation<Void> {
 

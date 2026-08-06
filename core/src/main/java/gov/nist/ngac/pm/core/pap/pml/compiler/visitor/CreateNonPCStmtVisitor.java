@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * Compiles a PML "create OA/UA/O/U ... in ..." statement into a {@link CreateNonPCStatement}.
+ * Compiles a PML create OA/UA/O/U ... in ... statement into a {@link CreateNonPCStatement}.
  */
 public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement> {
 

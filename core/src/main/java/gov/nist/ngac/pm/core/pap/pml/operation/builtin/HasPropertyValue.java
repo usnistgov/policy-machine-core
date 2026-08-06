@@ -16,7 +16,7 @@ import java.util.List;
 
 
 /**
- * PML built-in query has_property_value(node, key, value): returns whether the node has the given
+ * PML built-in query has_property_value(node, key, value). Returns whether the node has the given
  * property key set to the given value.
  */
 public class HasPropertyValue extends PMLQueryOperation<Boolean> {

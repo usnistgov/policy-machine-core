@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.obligation.event.operation;
 
 /**
- * PML "any operation" pattern: matches every operation.
+ * PML any operation pattern. Matches every operation.
  */
 public final class AnyOperationPattern extends OperationPattern {
 

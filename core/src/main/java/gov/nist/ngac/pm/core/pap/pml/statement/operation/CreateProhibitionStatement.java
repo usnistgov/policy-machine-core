@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML "create ... prohibition ..." statement, for either a node or process prohibition depending on
+ * PML create ... prohibition ... statement, for either a node or process prohibition depending on
  * which of {@link #nodeProhibition} / {@link #processProhibition} built it. Can also be built from
  * (via {@link #fromProhibition}) an existing {@link Prohibition}.
  */
@@ -171,7 +171,7 @@ public class CreateProhibitionStatement extends OperationStatement {
     }
 
     /**
-     * Builds a "create ... prohibition ..." statement equivalent to the given {@link Prohibition},
+     * Builds a PML create ... prohibition ... statement equivalent to the given {@link Prohibition},
      * resolving its node id references to names via the given query.
      *
      * @param policyQuery used to resolve node ids to names

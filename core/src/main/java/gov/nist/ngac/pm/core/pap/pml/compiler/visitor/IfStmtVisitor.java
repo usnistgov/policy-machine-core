@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compiles a PML "if / else if / else" statement into an {@link IfStatement}, compiling each branch in
+ * Compiles a PML if / else if / else statement into an {@link IfStatement}, compiling each branch in
  * its own scope copy and merging outer-scope variable updates back after each branch.
  */
 public class IfStmtVisitor extends PMLBaseVisitor<PMLStatement<?>> {

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML "create ... in ..." statement for node types other than policy classes (UA/OA/U/O), selecting the
+ * PML create ... in ... statement for node types other than policy classes (UA/OA/U/O), selecting the
  * matching create operation from the node type at construction time.
  */
 public class CreateNonPCStatement extends OperationStatement {

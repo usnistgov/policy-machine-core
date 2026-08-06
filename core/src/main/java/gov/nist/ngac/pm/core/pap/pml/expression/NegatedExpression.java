@@ -9,7 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * PML "!" boolean negation expression.
+ * PML ! boolean negation expression.
  */
 public class NegatedExpression extends Expression<Boolean> {
 

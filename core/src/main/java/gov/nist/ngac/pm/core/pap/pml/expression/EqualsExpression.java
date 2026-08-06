@@ -9,7 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * PML "==" / "!=" expression.
+ * PML == / != expression.
  */
 public class EqualsExpression extends Expression<Boolean> {
 

@@ -15,7 +15,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "associate": creates an association between a user attribute and a target with the
+ * Admin operation "associate". Creates an association between a user attribute and a target with the
  * given access rights.
  */
 public class AssociateOp extends AdminOperation<Void> {

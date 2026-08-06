@@ -9,7 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * PML "&amp;&amp;" / "||" expression.
+ * PML &amp;&amp; / || expression.
  */
 public class LogicalExpression extends Expression<Boolean> {
 

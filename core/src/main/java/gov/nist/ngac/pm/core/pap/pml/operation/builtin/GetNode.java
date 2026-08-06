@@ -17,7 +17,7 @@ import java.util.Map;
 
 
 /**
- * PML built-in query get_node(node): returns the node's name, type, and properties as a map.
+ * PML built-in query get_node(node). Returns the node's name, type, and properties as a map.
  */
 public class GetNode extends PMLQueryOperation<Map<String, Object>> {
 

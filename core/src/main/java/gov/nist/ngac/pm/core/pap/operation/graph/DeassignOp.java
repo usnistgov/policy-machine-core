@@ -14,7 +14,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "deassign": removes an ascendant node's assignment from one or more descendant nodes.
+ * Admin operation "deassign". Removes an ascendant node's assignment from one or more descendant nodes.
  */
 public class DeassignOp extends AdminOperation<Void> {
 

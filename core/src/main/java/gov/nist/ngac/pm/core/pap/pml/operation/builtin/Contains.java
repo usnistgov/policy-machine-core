@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
 /**
- * PML built-in function contains(arr, element): returns whether arr contains element.
+ * PML built-in function contains(arr, element). Returns whether arr contains element.
  */
 public class Contains extends PMLFunctionOperation<Boolean> {
 

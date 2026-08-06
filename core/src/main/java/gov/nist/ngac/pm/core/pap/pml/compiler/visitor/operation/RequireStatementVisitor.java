@@ -12,7 +12,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.RequireStatement;
 import java.util.List;
 
 /**
- * Compiles a PML "require ... on ..." statement into a {@link RequireStatement}.
+ * Compiles a PML require ... on ... statement into a {@link RequireStatement}.
  */
 public class RequireStatementVisitor extends PMLBaseVisitor<RequireStatement> {
     public RequireStatementVisitor(VisitorContext visitorCtx) {

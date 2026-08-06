@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compiles a PML "create ... prohibition ..." statement into a {@link CreateProhibitionStatement},
+ * Compiles a PML create ... prohibition ... statement into a {@link CreateProhibitionStatement},
  * choosing a node or process prohibition based on the parsed entity clause.
  */
 public class CreateProhibitionStmtVisitor extends PMLBaseVisitor<CreateProhibitionStatement> {

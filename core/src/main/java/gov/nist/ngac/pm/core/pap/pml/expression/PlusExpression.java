@@ -9,7 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * PML "+" string concatenation expression.
+ * PML + string concatenation expression.
  */
 public class PlusExpression extends Expression<String> {
 

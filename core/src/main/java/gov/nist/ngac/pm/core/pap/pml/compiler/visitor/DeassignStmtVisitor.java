@@ -11,7 +11,7 @@ import java.util.List;
 
 
 /**
- * Compiles a PML "deassign ... from ..." statement into a {@link DeassignStatement}.
+ * Compiles a PML deassign ... from ... statement into a {@link DeassignStatement}.
  */
 public class DeassignStmtVisitor extends PMLBaseVisitor<DeassignStatement> {
 

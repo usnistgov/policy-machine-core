@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * An obligation's "do (ctx) { ... }" response body: the statements to run and the variable name the
+ * An obligation's do (ctx) { ... } response body: the statements to run and the variable name the
  * triggering event's context is bound to.
  */
 public class ObligationResponse implements Serializable {

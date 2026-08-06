@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in query self_compute_personal_object_system(): returns the caller's privileges across
+ * PML built-in query self_compute_personal_object_system(). Returns the caller's privileges across
  * their personal object system, keyed by node name.
  */
 public class SelfAccessComputePersonalObjectSystem extends QueryOperation<Map<String, List<String>>> {

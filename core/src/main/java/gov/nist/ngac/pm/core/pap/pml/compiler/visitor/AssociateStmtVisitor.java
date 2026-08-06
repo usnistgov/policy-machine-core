@@ -11,7 +11,7 @@ import java.util.List;
 
 
 /**
- * Compiles a PML "associate ... to ... with ..." statement into an {@link AssociateStatement}.
+ * Compiles a PML associate ... to ... with ... statement into an {@link AssociateStatement}.
  */
 public class AssociateStmtVisitor extends PMLBaseVisitor<AssociateStatement> {
 

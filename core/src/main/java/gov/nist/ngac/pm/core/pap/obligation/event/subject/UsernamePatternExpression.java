@@ -8,7 +8,7 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
 /**
- * PML "user &lt;name&gt;" subject pattern: matches an event whose acting user's name equals the given name.
+ * PML user &lt;name&gt; subject pattern. Matches an event whose acting user's name equals the given name.
  */
 public class UsernamePatternExpression extends SubjectPatternExpression {
 

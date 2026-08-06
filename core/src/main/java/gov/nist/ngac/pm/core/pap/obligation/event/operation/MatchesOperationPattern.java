@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * PML "matches &lt;name&gt;" pattern, with an optional "on (...) { ... }" clause: matches events for the
+ * PML matches &lt;name&gt; pattern, with an optional on (...) { ... } clause. Matches events for the
  * named operation, and only if the on-clause (when present) evaluates true.
  */
 public final class MatchesOperationPattern extends OperationPattern {

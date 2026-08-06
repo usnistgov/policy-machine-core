@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * PML "set properties of ... to ..." statement: replaces a node's properties.
+ * PML set properties of ... to ... statement. Replaces a node's properties.
  */
 public class SetNodePropertiesStatement extends OperationStatement {
 

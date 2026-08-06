@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML "if / else if / else" statement: executes the block of the first condition (if or else-if) that
+ * PML if / else if / else statement. Executes the block of the first condition (if or else-if) that
  * evaluates true, falling back to the else block if none do.
  */
 public class IfStatement extends BasicStatement<StatementResult> {
@@ -104,7 +104,7 @@ public class IfStatement extends BasicStatement<StatementResult> {
     }
 
     /**
-     * A single "if"/"else if" branch: the condition guarding it and the block to run when it's true.
+     * A single if / else if branch. The condition guarding it and the block to run when it's true.
      *
      * @param condition the branch's guarding condition
      * @param block the block to run when the condition is true
