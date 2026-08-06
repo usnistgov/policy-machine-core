@@ -1,6 +1,6 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
-import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.PAP;
 import gov.nist.ngac.pm.core.pap.operation.AdminOperation;
 import gov.nist.ngac.pm.core.pap.operation.Function;

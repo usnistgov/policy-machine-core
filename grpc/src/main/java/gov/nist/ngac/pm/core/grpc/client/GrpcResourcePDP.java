@@ -1,6 +1,6 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
-import static gov.nist.ngac.pm.core.impl.grpc.client.GrpcHeaders.buildHeaders;
+import static gov.nist.ngac.pm.core.grpc.client.GrpcHeaders.buildHeaders;
 
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.ResourceAdjudicationServiceGrpc;
 import io.grpc.ManagedChannel;

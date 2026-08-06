@@ -1,4 +1,4 @@
-package gov.nist.ngac.pm.core.impl.grpc.util;
+package gov.nist.ngac.pm.core.grpc.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

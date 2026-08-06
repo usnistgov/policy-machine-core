@@ -1,9 +1,9 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.graph.node.Node;
 import gov.nist.ngac.pm.core.common.graph.node.NodeType;
-import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.graph.Association;
 import gov.nist.ngac.pm.core.pap.query.GraphQuery;
 import gov.nist.ngac.pm.core.pap.query.model.subgraph.Subgraph;

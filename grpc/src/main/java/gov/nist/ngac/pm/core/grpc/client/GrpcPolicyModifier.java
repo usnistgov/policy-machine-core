@@ -1,4 +1,4 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
 import gov.nist.ngac.pm.core.pap.modification.PolicyModification;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc;

@@ -1,7 +1,7 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
 import gov.nist.ngac.pm.core.common.prohibition.Prohibition;
-import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.query.ProhibitionsQuery;
 import gov.nist.ngac.pm.proto.v1.model.NodeRef;
 import gov.nist.ngac.pm.proto.v1.pdp.query.GetInheritedProhibitionsRequest;

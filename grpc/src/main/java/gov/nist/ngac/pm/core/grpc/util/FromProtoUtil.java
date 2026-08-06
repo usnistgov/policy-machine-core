@@ -1,4 +1,4 @@
-package gov.nist.ngac.pm.core.impl.grpc.util;
+package gov.nist.ngac.pm.core.grpc.util;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.graph.node.Node;

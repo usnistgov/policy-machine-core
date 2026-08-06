@@ -1,7 +1,7 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
-import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
-import gov.nist.ngac.pm.core.impl.grpc.util.ToProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.FromProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.ToProtoUtil;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdjudicateOperationResponse;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.OperationRequest;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.ResourceAdjudicationServiceGrpc.ResourceAdjudicationServiceBlockingStub;

@@ -1,9 +1,9 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.graph.node.Node;
-import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
-import gov.nist.ngac.pm.core.impl.grpc.util.ToProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.FromProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.ToProtoUtil;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.ngac.pm.core.pap.query.AccessQuery;
 import gov.nist.ngac.pm.core.pap.query.SelfAccessQuery;
@@ -11,7 +11,6 @@ import gov.nist.ngac.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import gov.nist.ngac.pm.core.pap.query.model.explain.Explain;
 import gov.nist.ngac.pm.core.pap.query.model.subgraph.SubgraphPrivileges;
-import gov.nist.ngac.pm.core.pdp.query.SelfAccessQueryAdjudicator;
 import gov.nist.ngac.pm.proto.v1.pdp.query.ComputeACLRequest;
 import gov.nist.ngac.pm.proto.v1.pdp.query.ComputeACLResponse;
 import gov.nist.ngac.pm.proto.v1.pdp.query.ComputeAdjacentAscendantPrivilegesRequest;
@@ -34,7 +33,6 @@ import gov.nist.ngac.pm.proto.v1.pdp.query.ExplainRequest;
 import gov.nist.ngac.pm.proto.v1.pdp.query.ExplainResponse;
 import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

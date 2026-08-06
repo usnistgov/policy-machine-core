@@ -1,4 +1,4 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
 import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;

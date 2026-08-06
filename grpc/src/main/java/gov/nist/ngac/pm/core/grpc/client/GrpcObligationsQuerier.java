@@ -1,6 +1,6 @@
-package gov.nist.ngac.pm.core.impl.grpc.client;
+package gov.nist.ngac.pm.core.grpc.client;
 
-import gov.nist.ngac.pm.core.impl.grpc.util.FromProtoUtil;
+import gov.nist.ngac.pm.core.grpc.util.FromProtoUtil;
 import gov.nist.ngac.pm.core.pap.obligation.Obligation;
 import gov.nist.ngac.pm.core.pap.query.ObligationsQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
