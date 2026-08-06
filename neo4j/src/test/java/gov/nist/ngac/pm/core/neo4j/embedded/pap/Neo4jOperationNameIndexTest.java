@@ -1,6 +1,6 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap;
 
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.Neo4jTestInitializer.getTx;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.Neo4jTestInitializer.getTx;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.nio.file.Path;

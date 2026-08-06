@@ -1,11 +1,11 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap.store;
 
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_KIND_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PML_TEXT_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_ARS_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.DATA_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_KIND_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.OPERATION_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.PML_TEXT_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.RESOURCE_ARS_LABEL;
 
 import gov.nist.ngac.pm.core.common.exception.OperationDoesNotExistException;
 import gov.nist.ngac.pm.core.common.exception.PMException;

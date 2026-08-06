@@ -1,14 +1,14 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap.store;
 
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ARSET_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.EXCLUSION_SET_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.INCLUSION_SET_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.IS_CONJUNCTIVE_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NODE_ID_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROCESS_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.getProhibitionFromNode;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.ARSET_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.EXCLUSION_SET_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.INCLUSION_SET_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.IS_CONJUNCTIVE_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.NODE_ID_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.PROCESS_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.getProhibitionFromNode;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.prohibition.ProcessProhibition;

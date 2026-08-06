@@ -1,7 +1,7 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jEmbeddedPolicyStore;
+import gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jEmbeddedPolicyStore;
 import gov.nist.ngac.pm.core.pap.operation.JavaOperationRegistry;
 import gov.nist.ngac.pm.core.pap.PAP;
 

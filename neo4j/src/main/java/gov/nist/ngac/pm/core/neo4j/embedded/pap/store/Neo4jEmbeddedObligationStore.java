@@ -1,11 +1,11 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap.store;
 
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_ID_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_NAME_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_PROCESS_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OBLIGATION_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PML_TEXT_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_ID_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_NAME_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_PROCESS_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.OBLIGATION_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.PML_TEXT_PROPERTY;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.obligation.Obligation;

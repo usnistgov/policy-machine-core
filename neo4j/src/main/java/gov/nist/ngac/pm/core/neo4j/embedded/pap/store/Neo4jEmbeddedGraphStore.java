@@ -1,17 +1,17 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap.store;
 
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ARSET_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ASSIGNMENT_RELATIONSHIP_TYPE;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ASSOCIATION_RELATIONSHIP_TYPE;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.ID_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.NODE_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.OA_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PC_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_SUBJECT_REL_TYPE;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.UA_LABEL;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.getNodeType;
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jUtil.typeToLabel;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.ARSET_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.ASSIGNMENT_RELATIONSHIP_TYPE;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.ASSOCIATION_RELATIONSHIP_TYPE;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.ID_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.NAME_PROPERTY;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.NODE_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.OA_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.PC_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.PROHIBITION_SUBJECT_REL_TYPE;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.UA_LABEL;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.getNodeType;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.typeToLabel;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.graph.node.Node;

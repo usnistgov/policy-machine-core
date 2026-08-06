@@ -1,10 +1,10 @@
-package gov.nist.ngac.pm.core.impl.neo4j.embedded.pap;
+package gov.nist.ngac.pm.core.neo4j.embedded.pap;
 
-import static gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.Neo4jTestInitializer.init;
+import static gov.nist.ngac.pm.core.neo4j.embedded.pap.Neo4jTestInitializer.init;
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
 import gov.nist.ngac.pm.core.common.exception.PMException;
-import gov.nist.ngac.pm.core.impl.neo4j.embedded.pap.store.Neo4jEmbeddedPolicyStore;
+import gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jEmbeddedPolicyStore;
 import gov.nist.ngac.pm.core.pap.PAP;
 import gov.nist.ngac.pm.core.pap.PAPTest;
 import gov.nist.ngac.pm.core.pap.modification.GraphModifierTest;
