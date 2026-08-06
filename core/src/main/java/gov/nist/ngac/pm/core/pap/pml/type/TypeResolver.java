@@ -15,8 +15,15 @@ import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.Int64TypeContext;
 import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.MapVarTypeContext;
 import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.StringTypeContext;
 
+/**
+ * Resolves a parsed PML type annotation into its core {@link Type}.
+ */
 public class TypeResolver {
 
+    /**
+     * Converts a parsed variable-type context into its core {@link Type}, recursing into list and map
+     * element types; an unrecognized context resolves to ANY_TYPE.
+     */
     public static Type<?> resolveFromParserCtx(PMLParser.VariableTypeContext ctx) {
         return switch (ctx) {
             case StringTypeContext stringTypeContext -> STRING_TYPE;

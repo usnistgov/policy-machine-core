@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Objects;
 
 
+/**
+ * An ordered list of PML statements executed as a single block (e.g. a function body or an if/else
+ * branch).
+ */
 public class PMLStatementBlock extends PMLStatement<StatementResult> {
 
     private List<PMLStatement<?>> stmts;
@@ -57,6 +61,9 @@ public class PMLStatementBlock extends PMLStatement<StatementResult> {
         return sb.append(indent(indentLevel)).append("}").toString();
     }
 
+    /**
+     * Executes this block's statements in order via {@link ExecutionContext#executeStatements}.
+     */
     public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         return ctx.executeStatements(stmts, new Args());
     }

@@ -2,6 +2,10 @@ package gov.nist.ngac.pm.core.pap.pml.statement.result;
 
 import java.util.Objects;
 
+/**
+ * Signals that a {@link gov.nist.ngac.pm.core.pap.pml.statement.basic.ReturnStatement} was executed,
+ * carrying its value (or null) out to the caller.
+ */
 public class ReturnResult extends StatementResult{
 
     private Object value;

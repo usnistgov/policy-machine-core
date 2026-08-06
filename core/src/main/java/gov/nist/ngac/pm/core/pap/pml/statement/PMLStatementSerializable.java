@@ -2,6 +2,9 @@ package gov.nist.ngac.pm.core.pap.pml.statement;
 
 import java.io.Serializable;
 
+/**
+ * Anything that can render itself back to PML source text, at a given indent level.
+ */
 public interface PMLStatementSerializable extends Serializable {
 
     String toFormattedString(int indentLevel);

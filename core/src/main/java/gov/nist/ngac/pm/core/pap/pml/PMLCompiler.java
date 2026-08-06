@@ -14,16 +14,31 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+/**
+ * Lexes, parses, and compiles a PML source string into its list of top-level statements.
+ */
 public class PMLCompiler {
 
     public PMLCompiler() {
     }
 
+    /**
+     * Compiles the given PML source against a fresh {@link CompileScope} built from the PAP's current
+     * policy state.
+     *
+     * @throws PMException if compilation fails
+     */
     public List<PMLStatement<?>> compilePML(PAP pap, String input) throws PMException {
         CompileScope scope = new CompileScope(pap);
         return compilePMLWithScope(scope, input);
     }
 
+    /**
+     * Compiles the given PML source against the provided scope, letting the caller seed or reuse a scope
+     * rather than building a fresh one from the PAP.
+     *
+     * @throws PMException if compilation fails
+     */
     public List<PMLStatement<?>> compilePML(PAP pap, CompileScope scope, String input) throws PMException {
         return compilePMLWithScope(scope, input);
     }

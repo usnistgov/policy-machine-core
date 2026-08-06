@@ -8,6 +8,10 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
+/**
+ * ANTLR error listener that collects lexer/parser syntax errors as {@link CompileError}s instead of
+ * printing them.
+ */
 public class PMLErrorHandler extends BaseErrorListener {
 
     private final List<CompileError> errors = new ArrayList<>();

@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.pap.pml.compiler.error.ErrorLog;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Thrown when PML compilation fails, carrying the full list of {@link CompileError}s encountered.
+ */
 public class PMLCompilationException extends PMException {
 
     private final List<CompileError> errors;
