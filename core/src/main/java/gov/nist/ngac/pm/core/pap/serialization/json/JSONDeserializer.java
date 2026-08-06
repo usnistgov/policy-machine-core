@@ -23,6 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link PolicyDeserializer} that rebuilds policy state from a {@link JSONPolicy} document, tolerating
+ * null sections in the JSON schema.
+ */
 public class JSONDeserializer implements PolicyDeserializer {
 
     @Override

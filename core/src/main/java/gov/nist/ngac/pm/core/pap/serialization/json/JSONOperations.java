@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+/**
+ * JSON DTO for the policy's operations, grouped by kind (admin, resource, routine, query, function),
+ * each stored as its PML source text.
+ */
 public class JSONOperations {
 
     private List<String> admin;
@@ -68,6 +72,9 @@ public class JSONOperations {
         this.function = function;
     }
 
+    /**
+     * Returns every operation's PML source, across all kinds, in a single flat list.
+     */
     public List<String> getAll() {
         List<String> all = new ArrayList<>();
         Stream.of(admin, resource, routine, query, function)

@@ -2,6 +2,9 @@ package gov.nist.ngac.pm.core.pap.serialization.json;
 
 import java.util.Objects;
 
+/**
+ * JSON DTO for a single node property key/value pair.
+ */
 public class JSONProperty {
     private String key;
     private String value;

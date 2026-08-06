@@ -6,8 +6,19 @@ import gov.nist.ngac.pm.core.pap.query.NodeLookup;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Objects;
 
+/**
+ * JSON DTO for an obligation, storing its author as a resolved node id and its body as raw PML text.
+ */
 public class JSONObligation {
 
+    /**
+     * Converts a live obligation into its JSON DTO, resolving its author to a node id.
+     *
+     * @param o the obligation to convert; its author must be a {@link NodeUserContext}
+     * @param graphQuery used to resolve the author's node id
+     * @return the JSON DTO
+     * @throws PMException if resolving the author's node id fails
+     */
     public static JSONObligation fromObligation(Obligation o, NodeLookup graphQuery) throws PMException {
         long authorId = ((NodeUserContext) o.getAuthor()).resolveNodeIds(graphQuery).iterator().next();
         return new JSONObligation(o.getName(), authorId, o.toString());

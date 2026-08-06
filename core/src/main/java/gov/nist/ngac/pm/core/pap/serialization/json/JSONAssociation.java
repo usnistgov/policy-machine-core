@@ -3,6 +3,10 @@ package gov.nist.ngac.pm.core.pap.serialization.json;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Objects;
 
+/**
+ * JSON DTO for an association's target and access rights, nested under a {@link JSONNode}'s outgoing
+ * associations.
+ */
 public class JSONAssociation {
 
     private long target;

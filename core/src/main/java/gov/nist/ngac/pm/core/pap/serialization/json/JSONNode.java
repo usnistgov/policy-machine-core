@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * JSON DTO for a graph node: its id, name, properties, descendant assignments, and outgoing associations.
+ */
 public class JSONNode {
 
     private long id;

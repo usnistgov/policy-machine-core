@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link PolicySerializer} that renders the policy state as JSON, via {@link JSONPolicy}.
+ */
 public class JSONSerializer implements PolicySerializer {
 
     @Override
@@ -34,6 +37,14 @@ public class JSONSerializer implements PolicySerializer {
         return buildJSONPolicy(policyQuery).toString();
     }
 
+    /**
+     * Builds the {@link JSONPolicy} DTO for the current policy state, omitting sections (prohibitions,
+     * obligations, operations) that are empty.
+     *
+     * @param policyQuery the policy state to serialize
+     * @return the JSON DTO
+     * @throws PMException if querying the policy state fails
+     */
     public JSONPolicy buildJSONPolicy(PolicyQuery policyQuery) throws PMException {
         return new JSONPolicy(
             policyQuery.operations().getResourceAccessRights(),

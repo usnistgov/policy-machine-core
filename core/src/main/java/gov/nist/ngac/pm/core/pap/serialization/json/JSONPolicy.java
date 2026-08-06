@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.common.prohibition.Prohibition;
 import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.List;
 
+/**
+ * JSON DTO for a full policy: resource access rights, graph, prohibitions, obligations, and operations.
+ */
 public class JSONPolicy {
 
     private AccessRightSet resourceAccessRights;
@@ -75,6 +78,9 @@ public class JSONPolicy {
                 .toJson(this);
     }
 
+    /**
+     * Parses a JSON policy document into a {@link JSONPolicy}.
+     */
     public static JSONPolicy fromJSON(String json) {
         return new Gson().fromJson(json, JSONPolicy.class);
     }

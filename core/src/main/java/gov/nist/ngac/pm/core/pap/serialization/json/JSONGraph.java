@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * JSON DTO for the graph, with nodes grouped by type.
+ */
 public class JSONGraph {
 
     List<JSONNode> pcs;
