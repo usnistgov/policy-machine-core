@@ -18,6 +18,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * The compiled signature of a PML operation: its kind, name, return type, formal and event parameters,
+ * and required capabilities. Renders back to PML source via {@link #toFormattedString}.
+ */
 public class PMLOperationSignature implements PMLStatementSerializable {
 
     private final OperationType type;
@@ -75,6 +79,10 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return reqCaps;
     }
 
+    /**
+     * Formats the "@EventCtx(...)" annotation, or an empty string if the event parameters are identical
+     * to the formal parameters (i.e. no annotation is needed).
+     */
     protected String serializeEventArgs() {
         if (eventParameters.equals(formalParameters)) {
             return "";
@@ -101,6 +109,10 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return sb.toString();
     }
 
+    /**
+     * Formats the comma-separated formal parameter list for the operation's PML source, prefixing
+     * node-typed parameters with "@Node" and suffixing optional parameters with "?".
+     */
     protected String serializeFormalArgs() {
         String pml = "";
         for (FormalParameter<?> formalParameter : getFormalParameters()) {
@@ -204,6 +216,9 @@ public class PMLOperationSignature implements PMLStatementSerializable {
         return Objects.hash(type, name, returnType, formalParameters, eventParameters, reqCaps);
     }
 
+    /**
+     * The kind of operation a {@link PMLOperationSignature} describes.
+     */
     public enum OperationType {
         ADMINOP,
         RESOURCEOP,

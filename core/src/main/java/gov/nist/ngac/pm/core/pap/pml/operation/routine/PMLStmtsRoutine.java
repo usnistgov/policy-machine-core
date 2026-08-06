@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A PML "create routine" definition's runtime form, executing its {@link PMLStatementBlock} body.
+ */
 public class PMLStmtsRoutine<T> extends PMLRoutine<T> implements PMLStatementSerializable {
 
     private PMLStatementBlock statements;

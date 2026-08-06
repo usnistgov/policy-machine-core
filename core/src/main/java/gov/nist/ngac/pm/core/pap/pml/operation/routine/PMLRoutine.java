@@ -10,6 +10,10 @@ import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperationSignature.OperationTy
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base class for routines defined in PML, carrying the {@link PMLOperationSignature} and
+ * {@link ExecutionContext} a {@link PMLOperation} needs.
+ */
 public abstract class PMLRoutine<T> extends Routine<T> implements PMLOperation {
 
     private final Type<T> returnType;
@@ -42,6 +46,11 @@ public abstract class PMLRoutine<T> extends Routine<T> implements PMLOperation {
         return pmlFormalParameters;
     }
 
+    /**
+     * Returns the execution context this routine is currently running under.
+     *
+     * @throws IllegalArgumentException if no context has been set yet
+     */
     public ExecutionContext getCtx() {
         if (ctx == null) {
             throw new IllegalArgumentException("execution context has not been set");

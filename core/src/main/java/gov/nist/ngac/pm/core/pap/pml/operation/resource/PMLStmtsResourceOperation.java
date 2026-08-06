@@ -13,6 +13,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A PML "create resource operation" definition's runtime form: executes its {@link PMLStatementBlock}
+ * body and casts the result to the declared return type.
+ */
 public class PMLStmtsResourceOperation<T> extends PMLResourceOperation<T> implements PMLStatementSerializable {
 
     private final PMLStatementBlock body;

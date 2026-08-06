@@ -12,6 +12,10 @@ import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperationSignature.OperationTy
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base class for functions defined in PML, carrying the {@link PMLOperationSignature} and
+ * {@link ExecutionContext} a {@link PMLOperation} needs.
+ */
 public abstract class PMLFunctionOperation<T> extends Function<T> implements PMLOperation {
 
 	public static final FormalParameter<String> NODE_NAME_PARAM = new FormalParameter<>("node_name", STRING_TYPE);
@@ -49,6 +53,11 @@ public abstract class PMLFunctionOperation<T> extends Function<T> implements PML
 		return returnType;
 	}
 
+	/**
+	 * Returns the execution context this operation is currently running under.
+	 *
+	 * @throws IllegalArgumentException if no context has been set yet
+	 */
 	public ExecutionContext getCtx() {
 		if (ctx == null) {
 			throw new IllegalArgumentException("execution context has not been set");

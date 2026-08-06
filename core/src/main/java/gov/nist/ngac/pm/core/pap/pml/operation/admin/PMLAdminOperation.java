@@ -11,6 +11,10 @@ import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperationSignature.OperationTy
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base class for admin operations defined in PML, carrying the {@link PMLOperationSignature} and
+ * {@link ExecutionContext} a {@link PMLOperation} needs.
+ */
 public abstract class PMLAdminOperation<T> extends AdminOperation<T> implements PMLOperation {
 
     private final Type<T> returnType;
@@ -55,6 +59,11 @@ public abstract class PMLAdminOperation<T> extends AdminOperation<T> implements 
         return returnType;
     }
 
+    /**
+     * Returns the execution context this operation is currently running under.
+     *
+     * @throws IllegalArgumentException if no context has been set yet
+     */
     public ExecutionContext getCtx() {
         if (ctx == null) {
             throw new IllegalArgumentException("execution context has not been set");
