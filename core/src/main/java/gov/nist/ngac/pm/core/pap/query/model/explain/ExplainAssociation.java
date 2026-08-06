@@ -7,6 +7,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
+/**
+ * A single association reached on an explain path: the user attribute source, the access rights it
+ * grants, and the paths from the user to that user attribute.
+ */
 public record ExplainAssociation(Node ua, AccessRightSet arset, Collection<Path> userPaths) {
 
 	@Override

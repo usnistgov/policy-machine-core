@@ -11,6 +11,10 @@ import gov.nist.ngac.pm.core.pap.store.PolicyStore;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * {@link OperationsQuery} implementation backed by the
+ * {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s operations store.
+ */
 public class OperationsQuerier extends Querier implements OperationsQuery {
 
     private final JavaOperationRegistry javaOperationRegistry;

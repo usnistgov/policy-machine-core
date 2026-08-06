@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * An ordered path of nodes from a target (or user) up through the graph, used to explain an access
+ * decision.
+ */
 public class Path extends ArrayList<Node> {
 
     public Path(int initialCapacity) {

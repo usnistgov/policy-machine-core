@@ -12,6 +12,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link GraphQuery} implementation backed by the {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s
+ * graph store.
+ */
 public class GraphQuerier extends Querier implements GraphQuery {
 
     public GraphQuerier(PolicyStore store) {

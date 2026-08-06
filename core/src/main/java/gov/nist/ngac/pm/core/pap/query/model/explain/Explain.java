@@ -8,6 +8,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The full explanation of a user's access decision on a target: the granted and denied privileges, the
+ * per-policy-class paths that justify the grant, and the prohibitions that were satisfied.
+ */
 public class Explain {
     private AccessRightSet privileges;
     private Collection<PolicyClassExplain> policyClasses;

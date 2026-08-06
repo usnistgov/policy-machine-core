@@ -6,6 +6,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The explanation of a user's access under a single policy class: the resolved access rights and the
+ * paths through the graph that justify them.
+ */
 public record PolicyClassExplain(Node pc, AccessRightSet arset, Collection<List<ExplainNode>> paths) {
 
     @Override

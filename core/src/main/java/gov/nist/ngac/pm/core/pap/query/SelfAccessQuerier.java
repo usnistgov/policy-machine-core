@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link SelfAccessQuery} implementation that delegates to an {@link AccessQuerier}, fixed to a single
+ * user context.
+ */
 public class SelfAccessQuerier implements SelfAccessQuery{
 
     private AccessQuerier accessQuerier;

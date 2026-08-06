@@ -35,12 +35,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link AccessQuery} implementation that computes access decisions by walking the graph's user and
+ * target DAGs and resolving the results against the policy's prohibitions.
+ */
 public class AccessQuerier extends Querier implements AccessQuery {
 
     public AccessQuerier(PolicyStore store) {
         super(store);
     }
 
+    /**
+     * Returns a self-access querier scoped to the given user.
+     */
     public SelfAccessQuery self(UserContext userCtx) {
         return new SelfAccessQuerier(this, userCtx);
     }

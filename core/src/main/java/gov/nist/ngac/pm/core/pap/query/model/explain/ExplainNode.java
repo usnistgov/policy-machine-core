@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
+/**
+ * A single node on an explain path, paired with the associations reached at that node.
+ */
 public record ExplainNode(Node node, Collection<ExplainAssociation> associations) {
 
 	@Override

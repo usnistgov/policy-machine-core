@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link ProhibitionsQuery} implementation backed by the
+ * {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s prohibitions store.
+ */
 public class ProhibitionsQuerier extends Querier implements ProhibitionsQuery {
 
     public ProhibitionsQuerier(PolicyStore store) {

@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * {@link ObligationsQuery} implementation backed by the
+ * {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s obligations store.
+ */
 public class ObligationsQuerier extends Querier implements ObligationsQuery {
 
     private final OperationsQuery operationsQuery;
