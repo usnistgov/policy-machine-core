@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link ObligationsStore} implementation backed by the in-memory {@link MemoryPolicy} obligation list.
+ * An {@link ObligationsStore} implementation backed by an in-memory list of obligations.
  */
 public class MemoryObligationsStore extends MemoryStore implements ObligationsStore {
 

@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
 /**
- * The PML type of an operation with no return value. Casting always yields null, regardless of input.
+ * Supported type for Void.
  */
 public final class VoidType extends Type<Void> {
 

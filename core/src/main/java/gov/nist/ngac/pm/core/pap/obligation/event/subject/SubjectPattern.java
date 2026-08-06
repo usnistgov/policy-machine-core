@@ -9,8 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * The subject half of an {@link gov.nist.ngac.pm.core.pap.obligation.event.EventPattern}: either matches
- * any user ("any user") or a specific {@link SubjectPatternExpression}.
+ * The subject part of an event pattern, matching either any user or a specific subject-pattern expression.
  */
 public class SubjectPattern implements Serializable, PMLStatementSerializable {
 
@@ -39,7 +38,7 @@ public class SubjectPattern implements Serializable, PMLStatementSerializable {
      * Returns true if the given value matches this pattern. If the value is null, then return false.
      *
      * @param user the user.
-     * @param ctx
+     * @param ctx the event context information.
      * @param pap  The PolicyQuery object to get policy information relevant to the value and pattern.
      * @return True if the value matches this pattern.
      */
@@ -52,8 +51,7 @@ public class SubjectPattern implements Serializable, PMLStatementSerializable {
     }
 
     /**
-     * The match logic behind {@link #matches}, invoked only once the user has already been confirmed
-     * non-null.
+     * The match logic behind {@link #matches}, run once the user is already confirmed non-null.
      */
     public boolean matchesInternal(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
         return isAny || subjectPatternExpression.matches(user, ctx, pap);

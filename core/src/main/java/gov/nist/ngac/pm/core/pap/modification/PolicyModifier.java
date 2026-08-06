@@ -3,7 +3,7 @@ package gov.nist.ngac.pm.core.pap.modification;
 import gov.nist.ngac.pm.core.pap.id.IdGenerator;
 
 /**
- * {@link PolicyModification} implementation that vends the modifiers for each policy sub-area.
+ * {@link PolicyModification} implementation used by the PAP.
  */
 public class PolicyModifier implements PolicyModification {
 

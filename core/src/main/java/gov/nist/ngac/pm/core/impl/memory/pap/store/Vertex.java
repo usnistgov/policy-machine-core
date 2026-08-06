@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * A single node in the in-memory graph, tracking its own adjacent assignments and associations.
+ * A node in the in-memory graph, tracking its own assignments and associations.
  */
 public abstract class Vertex {
 
@@ -41,22 +41,22 @@ public abstract class Vertex {
     protected abstract Collection<Association> getIncomingAssociations();
 
     /**
-     * Records this vertex as adjacent-descendant of the given ascendant.
+     * Creates an assignment between the two nodes.
      */
     protected abstract void addAssignment(long ascendant, long descendant);
 
     /**
-     * Removes a previously recorded assignment between this vertex and the given ascendant/descendant.
+     * Deletes an assignment between the two nodes.
      */
     protected abstract void deleteAssignment(long ascendant, long descendant);
 
     /**
-     * Records an association from this vertex, as the user attribute, to the given target.
+     * Adds an association between the two node with the given access rights
      */
     protected abstract void addAssociation(long ua, long target, AccessRightSet accessRightSet);
 
     /**
-     * Removes a previously recorded association between this vertex and the given user attribute/target.
+     * Removes a previously recorded association between this vertex and the given target.
      */
     protected abstract void deleteAssociation(long ua, long target);
 

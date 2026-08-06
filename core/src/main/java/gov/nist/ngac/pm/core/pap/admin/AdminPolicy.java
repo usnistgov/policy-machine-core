@@ -15,18 +15,16 @@ import gov.nist.ngac.pm.core.pap.store.GraphStore;
 import java.util.Collection;
 
 /**
- * Creates and verifies the fixed admin-policy scaffolding (the {@link AdminPolicyNode}s and their
- * assignments) that every policy is expected to have.
+ * Creates and verifies the fixed {@link AdminPolicyNode}s and assignments every policy has.
  */
 public class AdminPolicy {
 
     /**
-     * Checks whether the given assignment is one of the fixed admin-policy structural assignments (e.g.
-     * an admin OA to the base admin OA, or the base admin OA to the admin PC).
+     * Checks whether the given assignment is one of the fixed admin policy assignments.
      *
      * @param asc the ascendant node id
      * @param desc the descendant node id
-     * @return whether this is a fixed admin-policy structural assignment
+     * @return whether the assignment is a fixed admin-policy assignment
      */
     public static boolean isAdminPolicyAssignment(long asc, long desc) {
         boolean isBaseToPc = asc == PM_ADMIN_BASE_OA.nodeId() && desc == PM_ADMIN_PC.nodeId();

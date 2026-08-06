@@ -3,7 +3,7 @@ package gov.nist.ngac.pm.core.pap.operation.arg.type;
 import gov.nist.ngac.pm.core.pap.obligation.event.EventPattern;
 
 /**
- * The PML type of an obligation's {@link EventPattern}.
+ * Supported type for EventPattern.
  */
 public final class EventPatternType extends Type<EventPattern> {
 

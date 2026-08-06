@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * {@link GraphModification} implementation, validating structural invariants (e.g. no assignment cycles,
- * no disconnected nodes, admin policy protections) before delegating to the backing
+ * no disconnected nodes, admin policy protections) before delegating to the backend
  * {@link gov.nist.ngac.pm.core.pap.store.GraphStore}.
  */
 public class GraphModifier extends Modifier implements GraphModification {

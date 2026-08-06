@@ -5,8 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * A {@link Prohibition} on a user acting through a named process, denying that user's access rights only
- * while operating as that process.
+ * A {@link Prohibition} on a process.
  */
 public final class ProcessProhibition extends Prohibition {
 

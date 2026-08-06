@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Base class for the recorded undo commands used to roll back an in-memory transaction; each nested
- * subclass captures the state needed to reverse one policy mutation.
+ * Base class for the undo commands used to roll back an in-memory transaction.
  */
 public abstract class TxCmd implements TxRollbackSupport {
     

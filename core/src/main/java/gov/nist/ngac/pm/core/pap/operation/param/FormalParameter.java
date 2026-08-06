@@ -5,8 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A single declared parameter of an {@link gov.nist.ngac.pm.core.pap.operation.Operation}: its name,
- * type, and whether it's required.
+ * A declared parameter of an {@link gov.nist.ngac.pm.core.pap.operation.Operation}.
  *
  * @param <T> the parameter's Java type
  */
@@ -41,10 +40,10 @@ public class FormalParameter<T> implements Serializable {
 	}
 
 	/**
-	 * Converts an object to the expected type with runtime type safety.
-	 * @param obj The object to convert
-	 * @return The converted object of type T
-	 * @throws IllegalArgumentException if the conversion is not possible
+	 * Casts an object to this parameter's type.
+	 * @param obj the object to convert
+	 * @return the converted object
+	 * @throws IllegalArgumentException if obj is not of the expected type
 	 */
 	public T toExpectedType(Object obj) {
 		return type.cast(obj);

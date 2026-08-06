@@ -14,7 +14,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation that registers a new {@link Operation} definition.
+ * Create an operation.
  */
 public class CreateOperationOp extends AdminOperation<Void>  {
 

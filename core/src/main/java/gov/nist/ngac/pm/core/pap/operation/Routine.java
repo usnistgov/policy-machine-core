@@ -5,9 +5,8 @@ import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
 import java.util.List;
 
 /**
- * Base class for routines: {@link Operation}s that execute with full
- * {@link gov.nist.ngac.pm.core.pap.PAP} access, typically to bundle a sequence of admin operations under
- * one required-capability check.
+ * Base class for routine {@link Operation}s that execute a set of admin operations in a single transaction with
+ * access checks on each operation call.
  *
  * @param <R> the operation's return type
  */

@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * {@link ProhibitionsStore} implementation backed by the in-memory {@link MemoryPolicy} prohibition
- * indexes.
+ * A {@link ProhibitionsStore} implementation backed by in-memory prohibition indexes.
  */
 public class MemoryProhibitionsStore extends MemoryStore implements ProhibitionsStore {
 

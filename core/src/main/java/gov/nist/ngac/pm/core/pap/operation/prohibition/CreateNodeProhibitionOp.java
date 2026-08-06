@@ -12,8 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Admin operation that creates a node prohibition, denying a user's or user attribute's access rights on a
- * node subject to an inclusion/exclusion set.
+ * Create a new node prohibition.
  */
 public class CreateNodeProhibitionOp extends ProhibitionOp {
 

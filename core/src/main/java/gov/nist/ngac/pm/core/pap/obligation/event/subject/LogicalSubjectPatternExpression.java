@@ -7,7 +7,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * PML &amp;&amp; / || subject pattern combinator.
+ * Logical pattern expression using && or ||.
  */
 public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
 

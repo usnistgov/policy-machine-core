@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Base class for query operations: {@link Operation}s restricted to read-only {@link PolicyQuery} access.
+ * Base class for query {@link Operation}s restricted to read-only {@link PolicyQuery} access.
  *
  * @param <R> the operation's return type
  */

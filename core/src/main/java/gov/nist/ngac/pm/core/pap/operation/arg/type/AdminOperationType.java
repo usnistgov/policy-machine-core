@@ -3,7 +3,7 @@ package gov.nist.ngac.pm.core.pap.operation.arg.type;
 import gov.nist.ngac.pm.core.pap.operation.Operation;
 
 /**
- * The PML type of a first-class reference to an {@link Operation}.
+ * Supported type for AdminOperation.
  */
 public final class AdminOperationType extends Type<Operation<?>> {
 

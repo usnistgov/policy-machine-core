@@ -1,8 +1,7 @@
 package gov.nist.ngac.pm.core.pap.admin;
 
 /**
- * The fixed set of admin-policy nodes every policy is bootstrapped with, each carrying a reserved
- * negative id and a fixed name.
+ * The fixed set of admin policy nodes every policy is bootstrapped with.
  */
 public enum AdminPolicyNode {
 
@@ -23,9 +22,9 @@ public enum AdminPolicyNode {
     }
 
     /**
-     * Returns this enum constant's Java name (e.g. "PM_ADMIN_PC"), as distinct from its graph node name.
+     * Returns this constant's Java name, as distinct from its graph node name.
      *
-     * @return this enum constant's Java name
+     * @return this constant's Java name
      */
     public String constantName() {
         return name();

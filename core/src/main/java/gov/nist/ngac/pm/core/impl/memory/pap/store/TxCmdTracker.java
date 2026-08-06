@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Records the undo commands issued during an in-memory transaction so they can be replayed in reverse
- * on rollback.
+ * Tracks the undo commands issued during an in-memory transaction so they can be replayed on rollback.
  */
 public class TxCmdTracker {
 
@@ -17,9 +16,9 @@ public class TxCmdTracker {
     }
 
     /**
-     * Returns the tracked commands in reverse (most-recent-first) order, ready for rollback replay.
+     * Returns the tracked commands in reverse order, for rollback replay.
      *
-     * @return a new list of the tracked commands, reversed
+     * @return the tracked commands, most recent first
      */
     public List<TxCmd> getOperations() {
         List<TxCmd> copy = new ArrayList<>(operations);
@@ -30,8 +29,7 @@ public class TxCmdTracker {
     }
 
     /**
-     * Records an undo command, unless the given transaction is not active — in which case there is
-     * nothing to roll back to and the command is discarded.
+     * Records an undo command for the given transaction. Does nothing if the transaction is not active.
      *
      * @param tx the transaction the command belongs to
      * @param op the undo command to record
@@ -45,7 +43,7 @@ public class TxCmdTracker {
     }
 
     /**
-     * Discards all tracked commands, e.g. after a successful commit.
+     * Discards all tracked commands, e.g. after a commit.
      */
     public void clearOps() {
         this.operations.clear();

@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 /**
- * {@link OperationsStore} implementation backed by the in-memory {@link MemoryPolicy} operation map.
+ * An {@link OperationsStore} implementation backed by an in-memory map of operations.
  */
 public class MemoryOperationsStore extends MemoryStore implements OperationsStore {
 

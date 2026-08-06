@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A record of an operation invocation, passed to the {@link EPP} to check against obligations' event
- * patterns.
+ * A context object for an event that will be processed by the EPP.
  *
  * @param user the user that invoked the operation
  * @param opName the name of the invoked operation

@@ -5,7 +5,7 @@ import gov.nist.ngac.pm.core.pap.PAP;
 import java.util.List;
 
 /**
- * Admin operation "create_object". Creates a new object node.
+ * Creates a new object node.
  */
 public class CreateObjectOp extends CreateNodeOp {
 

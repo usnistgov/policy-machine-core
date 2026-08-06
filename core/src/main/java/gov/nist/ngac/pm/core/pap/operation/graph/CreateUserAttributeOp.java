@@ -5,7 +5,7 @@ import gov.nist.ngac.pm.core.pap.PAP;
 import java.util.List;
 
 /**
- * Admin operation "create_user_attribute". Creates a new user attribute node.
+ * Creates a new user attribute node.
  */
 public class CreateUserAttributeOp extends CreateNodeOp {
 

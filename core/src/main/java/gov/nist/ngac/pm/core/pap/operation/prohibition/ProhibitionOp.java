@@ -11,8 +11,7 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredCapability;
 import java.util.List;
 
 /**
- * Base class for the admin operations that create and delete prohibitions, holding their shared formal
- * parameters.
+ * Base class for the admin operations that create and delete prohibitions.
  */
 public abstract class ProhibitionOp extends AdminOperation<Void> {
 

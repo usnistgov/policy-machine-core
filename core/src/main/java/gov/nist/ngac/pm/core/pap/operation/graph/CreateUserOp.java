@@ -5,7 +5,7 @@ import gov.nist.ngac.pm.core.pap.PAP;
 import java.util.List;
 
 /**
- * Admin operation "create_user". Creates a new user node.
+ * Creates a new user node.
  */
 public class CreateUserOp extends CreateNodeOp {
 

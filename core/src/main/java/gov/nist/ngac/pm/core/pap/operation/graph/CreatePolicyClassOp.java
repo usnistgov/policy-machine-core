@@ -11,9 +11,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "create_policy_class": creates a new policy class. Unlike other {@link CreateNodeOp}s,
- * it takes only a name parameter and overrides {@link #execute} to skip reading a descendants argument,
- * since a policy class has none.
+ * Creates a new policy class node
  */
 public class CreatePolicyClassOp extends CreateNodeOp {
 

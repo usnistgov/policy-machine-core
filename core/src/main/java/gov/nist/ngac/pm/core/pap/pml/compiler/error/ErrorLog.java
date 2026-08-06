@@ -6,7 +6,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Accumulates the {@link CompileError}s found during one PML compilation, deduplicating identical errors.
+ * Aggregates the {@link CompileError}s found during one PML compilation, deduplicating identical errors.
  */
 public class ErrorLog {
 
@@ -17,7 +17,7 @@ public class ErrorLog {
     }
 
     /**
-     * Records an error at the given parse context's position, unless an identical error is already
+     * Adds an error at the given parse context's position, unless an identical error is already
      * recorded.
      *
      * @return this instance, for chaining
@@ -31,7 +31,7 @@ public class ErrorLog {
     }
 
     /**
-     * Records an error at the given explicit position, unless an identical error is already recorded.
+     * Adds an error at the given explicit position, unless an identical error is already recorded.
      *
      * @return this instance, for chaining
      */
@@ -44,7 +44,7 @@ public class ErrorLog {
     }
 
     /**
-     * Records every error in the given list, ignoring a null list.
+     * Adds every error in the given list, ignoring a null list.
      */
     public void addErrors(List<CompileError> errors) {
         if (errors == null) {

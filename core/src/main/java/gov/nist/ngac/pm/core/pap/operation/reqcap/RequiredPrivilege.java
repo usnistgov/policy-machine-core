@@ -9,9 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A single access-right requirement within a {@link RequiredCapability}, checked either against a fixed
- * node ({@link RequiredPrivilegeOnNode}) or against the node(s) an argument resolves to
- * ({@link RequiredPrivilegeOnParameter}).
+ * A single access right requirement within a {@link RequiredCapability}.
  */
 public abstract sealed class RequiredPrivilege implements Serializable permits RequiredPrivilegeOnNode, RequiredPrivilegeOnParameter {
 

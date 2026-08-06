@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.operation.arg.type;
 
 /**
- * The PML boolean type.
+ * Supported type for Boolean.
  */
 public final class BooleanType extends Type<Boolean> {
 

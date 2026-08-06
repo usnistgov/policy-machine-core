@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * {@link GraphStore} implementation backed by the in-memory {@link MemoryPolicy} graph.
+ * A {@link GraphStore} implementation backed by an in-memory graph.
  */
 public class MemoryGraphStore extends MemoryStore implements GraphStore {
 

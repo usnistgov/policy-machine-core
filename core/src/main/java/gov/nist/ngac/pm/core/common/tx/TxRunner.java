@@ -3,8 +3,7 @@ package gov.nist.ngac.pm.core.common.tx;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 
 /**
- * Runs a unit of work within a {@link Transactional}'s transaction, committing on success and rolling back
- * on failure.
+ * Runs a task on a transaction.
  */
 public class TxRunner {
 
@@ -15,7 +14,7 @@ public class TxRunner {
      * @param <T> the transactor type
      * @param <V> the runner's result type
      * @param transactor the transactional resource to begin/commit/rollback
-     * @param runner the unit of work to run within the transaction
+     * @param runner the task to run within the transaction
      * @return the runner's result
      * @throws PMException if the runner throws, or if begin/commit/rollback fails
      */
@@ -35,7 +34,7 @@ public class TxRunner {
     }
 
     /**
-     * A unit of work to run within a transaction managed by {@link TxRunner#runTx}.
+     * A functional interface representing the actual execution of a task.
      *
      * @param <T> the result type
      */
@@ -43,10 +42,10 @@ public class TxRunner {
     public interface Runner<T> {
 
         /**
-         * Runs the unit of work.
+         * Runs the task.
          *
          * @return the result
-         * @throws PMException if the work fails
+         * @throws PMException if the task fails
          */
         T run() throws PMException;
     }

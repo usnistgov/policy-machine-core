@@ -7,7 +7,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * A parenthesized subject pattern, matching its wrapped expression unchanged.
+ * A parenthesized subject pattern that matches whatever its wrapped expression matches.
  */
 public class ParenSubjectPatternExpression extends SubjectPatternExpression {
 

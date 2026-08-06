@@ -7,10 +7,10 @@ import java.util.Set;
 
 /**
  * A {@link MatchesOperationPattern}'s "on (args) { ... }" clause: the event-context argument names bound
- * for the body, and the boolean-returning routine body itself.
+ * for the body, and the routine body that returns boolean.
  *
- * @param patternArgs the event-context argument names bound for the body
- * @param func the boolean-returning routine body
+ * @param patternArgs the event context argument names bound for the body
+ * @param func the pattern body
  */
 public record OnPattern(Set<String> patternArgs, PMLStmtsRoutine<Boolean> func) implements PMLStatementSerializable {
 

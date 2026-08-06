@@ -7,8 +7,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Objects;
 
 /**
- * A live obligation: its author, name, the event pattern that triggers it, and the response to run when
- * it fires.
+ * An object representing an Obligation which has an author, a name (id), event pattern and response.
  */
 public class Obligation {
 

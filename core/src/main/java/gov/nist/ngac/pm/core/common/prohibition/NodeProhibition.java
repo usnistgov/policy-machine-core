@@ -5,8 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * A {@link Prohibition} on a fixed node, denying its access rights to the containing user or user
- * attribute's associated subjects.
+ * A {@link Prohibition} on a node, denying its access rights to the user or the users contained in the user attribute.
  */
 public final class NodeProhibition extends Prohibition {
 

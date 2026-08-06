@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Base class for resource operations: {@link Operation}s that act on resources outside the policy,
+ * Base class for resource {@link Operation}s that act on resources outside the policy,
  * restricted to read-only {@link PolicyQuery} access to the policy itself.
  *
  * @param <T> the operation's return type

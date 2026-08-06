@@ -3,16 +3,16 @@ package gov.nist.ngac.pm.core.pap.operation.arg.type;
 import gov.nist.ngac.pm.core.pap.operation.ResourceOperation;
 
 /**
- * The PML type of a first-class reference to a {@link ResourceOperation}.
+ * Supported type for ResourceOperation.
  */
-public final class ResourceOperationType extends Type<ResourceOperation> {
+public final class ResourceOperationType extends Type<ResourceOperation<?>> {
 
     @Override
-    public ResourceOperation cast(Object obj) {
+    public ResourceOperation<?> cast(Object obj) {
         if (obj == null) {
             throw new IllegalArgumentException("Object cannot be null");
         }
-        if (!(obj instanceof ResourceOperation o)) {
+        if (!(obj instanceof ResourceOperation<?> o)) {
             throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to ResourceOperation");
         }
 

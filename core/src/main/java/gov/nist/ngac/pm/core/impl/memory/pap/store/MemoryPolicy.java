@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The in-memory policy state — graph, prohibitions, obligations, and operations — shared by all of the
- * memory sub-stores.
+ * Holds the in-memory policy state shared by the memory stores.
  */
 public class MemoryPolicy {
 
@@ -36,7 +35,7 @@ public class MemoryPolicy {
     }
 
     /**
-     * Clears all policy state back to an empty policy.
+     * Resets the policy state to empty.
      */
     public void reset() {
         this.graph = new Long2ObjectOpenHashMap<>();
@@ -50,7 +49,7 @@ public class MemoryPolicy {
     }
 
     /**
-     * Adds a vertex to the graph, indexing it by id and name, and tracking it as a policy class if its
+     * Adds a vertex to the graph, indexing it by id and name. Also tracks it as a policy class if its
      * type is PC.
      *
      * @param vertex the vertex to add
@@ -65,7 +64,7 @@ public class MemoryPolicy {
     }
 
     /**
-     * Indexes a prohibition by its subject node id or process, depending on its concrete type.
+     * Indexes a prohibition by its node or process, depending on its type.
      *
      * @param prohibition the prohibition to add
      */
@@ -79,7 +78,7 @@ public class MemoryPolicy {
     }
 
     /**
-     * Removes a prohibition from its subject's index, added by {@link #addProhibition}.
+     * Removes a prohibition added by {@link #addProhibition}.
      *
      * @param prohibition the prohibition to remove
      */

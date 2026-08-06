@@ -9,8 +9,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Base class for pure functions: {@link Operation}s with no access to the PAP or policy state, computing
- * a result from their arguments alone.
+ * Base class for basic {@link Operation}s with no access to the PAP or policy state.
  *
  * @param <R> the function's return type
  */
@@ -23,7 +22,7 @@ public abstract non-sealed class Function<R> extends Operation<R>{
     }
 
     /**
-     * Computes this function's result from its arguments.
+     * Computes this function's result.
      *
      * @param args the function's argument values
      * @return the function's result

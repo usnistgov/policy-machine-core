@@ -6,8 +6,7 @@ import gov.nist.ngac.pm.core.pap.PAP;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 
 /**
- * Base class for the concrete PML subject-pattern expressions (username, process, "in", logical, negate,
- * paren).
+ * Base class for the concrete subject pattern expressions.
  */
 public abstract class SubjectPatternExpression extends SubjectPattern {
 

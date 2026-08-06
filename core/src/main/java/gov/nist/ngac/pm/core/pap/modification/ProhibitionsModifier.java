@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * {@link ProhibitionsModification} implementation, validating a prohibition's access rights and
- * referenced nodes before delegating to the backing
+ * referenced nodes before delegating to the backend
  * {@link gov.nist.ngac.pm.core.pap.store.ProhibitionsStore}.
  */
 public class ProhibitionsModifier extends Modifier implements ProhibitionsModification {

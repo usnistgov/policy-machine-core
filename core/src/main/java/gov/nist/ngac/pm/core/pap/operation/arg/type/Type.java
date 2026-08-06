@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The static type of a PML value, used to type-check expressions and formal parameters at compile time
- * and to cast argument values at runtime.
+ *Supported types in the policy machine.
  *
  * @param <T> the Java type this PML type maps to
  */

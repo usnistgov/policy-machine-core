@@ -9,9 +9,7 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import java.util.List;
 
 /**
- * Base class for admin operations: {@link Operation}s that execute with full
- * {@link gov.nist.ngac.pm.core.pap.PAP} access and can modify the policy graph, prohibitions,
- * obligations, or operations.
+ * Base class for admin operations.
  *
  * @param <R> the operation's return type
  */

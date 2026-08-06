@@ -13,7 +13,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation "set_node_properties". Replaces a node's properties.
+ * Admin operation that overwrites a node's properties.
  */
 public class SetNodePropertiesOp extends AdminOperation<Void> {
 

@@ -16,8 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Admin operation that creates a process prohibition, denying a user's access rights while acting through a
- * named process subject to an inclusion/exclusion set.
+ * Create a new process prohibition.
  */
 public class CreateProcessProhibitionOp extends ProhibitionOp {
 

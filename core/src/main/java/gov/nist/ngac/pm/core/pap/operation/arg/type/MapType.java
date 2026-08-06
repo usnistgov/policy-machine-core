@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * The PML type of a map whose keys and values are each of a single, uniform type.
+ * Supported type for a Map.
  *
  * @param <K> the Java type of the map's keys
  * @param <V> the Java type of the map's values

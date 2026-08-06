@@ -8,7 +8,7 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
 /**
- * PML process &lt;name&gt; subject pattern. Matches an event whose acting process equals the given name.
+ * A subject pattern matching events whose process has the given name.
  */
 public class ProcessSubjectPatternExpression extends SubjectPatternExpression {
 

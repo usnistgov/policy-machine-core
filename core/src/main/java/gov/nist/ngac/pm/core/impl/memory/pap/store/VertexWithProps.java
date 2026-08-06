@@ -6,8 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Decorates a {@link Vertex} with a properties map, delegating all graph-structure behavior to the
- * wrapped vertex.
+ * A {@link Vertex} decorator that adds a properties map.
  */
 public class VertexWithProps extends Vertex{
 

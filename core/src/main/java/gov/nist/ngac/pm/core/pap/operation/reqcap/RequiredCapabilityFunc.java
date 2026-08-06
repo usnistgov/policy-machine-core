@@ -1,20 +1,13 @@
 package gov.nist.ngac.pm.core.pap.operation.reqcap;
 
-import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
-
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.PAP;
-import gov.nist.ngac.pm.core.pap.operation.ResourceOperation;
 import gov.nist.ngac.pm.core.pap.operation.arg.Args;
-import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * A {@link RequiredCapability} satisfied by custom logic (e.g. a PML @ReqCap(...) block) rather than a
- * declared set of {@link gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilege}s.
+ * A {@link RequiredCapability} satisfied by custom logic instead of a declared set of privileges.
  */
 public abstract class RequiredCapabilityFunc extends RequiredCapability {
 

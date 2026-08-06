@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * The PML type of a list whose elements are of a single, uniform type.
+ * Supported type for Lists.
  *
  * @param <E> the Java type of the list's elements
  */

@@ -3,8 +3,7 @@ package gov.nist.ngac.pm.core.common.tx;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 
 /**
- * Something that supports transactional begin/commit/rollback, e.g. a store backed by a database
- * connection.
+ * Interface for supporting transactions.
  */
 public interface Transactional {
 

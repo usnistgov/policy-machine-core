@@ -20,7 +20,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation that creates an obligation from an author, name, event pattern, and response.
+ * Create an obligation.
  */
 public class CreateObligationOp extends AdminOperation<Void> {
 

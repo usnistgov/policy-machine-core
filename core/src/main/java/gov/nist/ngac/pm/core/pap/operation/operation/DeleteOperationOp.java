@@ -14,7 +14,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation that removes an operation definition by name.
+ * Delete an operation.
  */
 public class DeleteOperationOp extends AdminOperation<Void> {
 

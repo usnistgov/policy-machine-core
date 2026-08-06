@@ -5,7 +5,8 @@ import java.util.Objects;
 
 /**
  * The user who triggered an event, identified by either a name or a set of user attributes, plus the
- * process they acted as.
+ * process they acted as. This is required to use the names of nodes in order to make pattern matching
+ * in obligations possible.
  */
 public class EventContextUser {
 

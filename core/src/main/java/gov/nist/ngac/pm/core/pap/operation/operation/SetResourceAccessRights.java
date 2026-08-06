@@ -12,7 +12,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation that replaces the policy's set of resource access rights.
+ * Set the resource access rights.
  */
 public class SetResourceAccessRights extends AdminOperation<Void> {
 

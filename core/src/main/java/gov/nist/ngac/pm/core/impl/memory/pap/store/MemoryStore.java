@@ -4,7 +4,7 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.tx.Transactional;
 
 /**
- * Base class for the in-memory sub-stores, delegating transaction control to a shared {@link MemoryTx}.
+ * Base class for the in-memory stores with transaction support.
  */
 public class MemoryStore implements Transactional {
 

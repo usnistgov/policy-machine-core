@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
 /**
- * A single compile error: its source position and message.
+ * A single compile error with its source position and message.
  *
  * @param position the error's source position
  * @param errorMessage the error message

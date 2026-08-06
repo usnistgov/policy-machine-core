@@ -20,7 +20,7 @@ import java.util.Objects;
 
 /**
  * A {@link RequiredPrivilege} satisfied when the acting user holds the required access rights on every
- * node the given {@link NodeFormalParameter} argument resolves to.
+ * node a parameter resolves to.
  */
 public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
 
@@ -69,7 +69,7 @@ public final class RequiredPrivilegeOnParameter extends RequiredPrivilege {
     }
 
     /**
-     * Returns the formal parameter whose resolved node(s) this requirement checks privileges against.
+     * Returns the parameter this requirement checks privileges against.
      */
     public NodeFormalParameter<?> param() {
         return param;

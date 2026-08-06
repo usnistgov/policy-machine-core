@@ -10,7 +10,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * Admin operation that deletes a prohibition by name.
+ * Create a new delete prohibition.
  */
 public class DeleteProhibitionOp extends ProhibitionOp {
 
