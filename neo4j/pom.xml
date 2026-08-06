@@ -5,20 +5,20 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>gov.nist.ngac.pm.core</groupId>
+        <groupId>gov.nist.ngac.pm</groupId>
         <artifactId>policy-machine-core-parent</artifactId>
         <version>4.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>policy-machine-neo4j</artifactId>
+    <artifactId>policy-machine-core-neo4j</artifactId>
     <packaging>jar</packaging>
-    <name>Policy Machine Neo4j</name>
+    <name>Policy Machine Core Neo4j</name>
     <description>Embedded Neo4j-backed implementation of the NIST Policy Machine.</description>
 
     <dependencies>
         <dependency>
-            <groupId>gov.nist.ngac.pm.core</groupId>
+            <groupId>gov.nist.ngac.pm</groupId>
             <artifactId>policy-machine-core</artifactId>
         </dependency>
         <dependency>
@@ -32,7 +32,7 @@
 
         <!-- Neo4jEmbeddedPAPTest extends core's abstract PAP/query/modification test suites -->
         <dependency>
-            <groupId>gov.nist.ngac.pm.core</groupId>
+            <groupId>gov.nist.ngac.pm</groupId>
             <artifactId>policy-machine-core</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>

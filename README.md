@@ -4,36 +4,36 @@ The core components of the NIST Policy Machine, a reference implementation of th
 
 ## Installation
 
-The library is split into 3 artifacts, all under the groupId `gov.nist.ngac.pm.core`, so consumers only pull the
+The library is split into 3 artifacts, all under the groupId `gov.nist.ngac.pm`, so consumers only pull the
 dependency footprint they need:
 
 - `policy-machine-core` - `pap`/`pdp`/`common`/`epp` interfaces plus the in-memory implementation. No external service
   dependency. Required by the other two artifacts.
-- `policy-machine-neo4j` - the embedded Neo4j-backed implementation of the `PolicyStore`.
+- `policy-machine-core-neo4j` - the embedded Neo4j-backed implementation of the `PolicyStore`.
 - `policy-machine-grpc` - the gRPC client implementation for talking to a remote Policy Machine server.
 
-`policy-machine-neo4j` and `policy-machine-grpc` each depend on `policy-machine-core`, so add either (or both)
+`policy-machine-core-neo4j` and `policy-machine-grpc` each depend on `policy-machine-core`, so add either (or both)
 alongside it, using the same version.
 
 ### From Maven Central
 
 ```xml
 <dependency>
-    <groupId>gov.nist.ngac.pm.core</groupId>
+    <groupId>gov.nist.ngac.pm</groupId>
     <artifactId>policy-machine-core</artifactId>
     <version>x.y.z</version>
 </dependency>
 
 <!-- embedded Neo4j-backed policy store -->
 <dependency>
-    <groupId>gov.nist.ngac.pm.core</groupId>
-    <artifactId>policy-machine-neo4j</artifactId>
+    <groupId>gov.nist.ngac.pm</groupId>
+    <artifactId>policy-machine-core-neo4j</artifactId>
     <version>x.y.z</version>
 </dependency>
 
 <!-- gRPC generated code -->
 <dependency>
-    <groupId>gov.nist.ngac.pm.core</groupId>
+    <groupId>gov.nist.ngac.pm</groupId>
     <artifactId>policy-machine-grpc</artifactId>
     <version>x.y.z</version>
 </dependency>

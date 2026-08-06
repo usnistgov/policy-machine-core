@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>gov.nist.ngac.pm.core</groupId>
+    <groupId>gov.nist.ngac.pm</groupId>
     <artifactId>policy-machine-core-parent</artifactId>
     <version>4.0.0</version>
     <packaging>pom</packaging>
@@ -51,9 +51,8 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- internal: lets neo4j/grpc declare policy-machine-core with no explicit version -->
             <dependency>
-                <groupId>gov.nist.ngac.pm.core</groupId>
+                <groupId>gov.nist.ngac.pm</groupId>
                 <artifactId>policy-machine-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -91,9 +90,6 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>2.0.9</version>
             </dependency>
-            <!-- grpc-java's generated stub code references @javax.annotation.Generated, which
-                 the JDK dropped in 9+; the flat pre-split pom only compiled because this leaked in
-                 transitively via neo4j's classpath -->
             <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
