@@ -13,6 +13,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation that removes an operation definition by name.
+ */
 public class DeleteOperationOp extends AdminOperation<Void> {
 
     public DeleteOperationOp() {

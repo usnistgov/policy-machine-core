@@ -4,6 +4,9 @@ import gov.nist.ngac.pm.core.common.graph.node.NodeType;
 import java.security.SecureRandom;
 import java.util.Random;
 
+/**
+ * An {@link IdGenerator} that assigns a random, non-negative id, ignoring the node's name and type.
+ */
 public class RandomIdGenerator implements IdGenerator {
 
 	private final Random random;

@@ -41,6 +41,10 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Event Processing Point: on each {@link EventContext}, checks every persisted {@link Obligation}'s
+ * event pattern and, for those that match, executes the obligation's response as the obligation's author.
+ */
 public class EPP implements EventSubscriber {
 
     private static final Logger logger = LoggerFactory.getLogger(EPP.class);

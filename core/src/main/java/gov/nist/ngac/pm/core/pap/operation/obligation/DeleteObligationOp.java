@@ -11,6 +11,9 @@ import gov.nist.ngac.pm.core.pap.operation.arg.Args;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation that deletes an obligation by name.
+ */
 public class DeleteObligationOp extends AdminOperation<Void> {
 
     public DeleteObligationOp() {

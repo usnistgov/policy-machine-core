@@ -4,6 +4,10 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * A {@link Prohibition} on a fixed node, denying its access rights to the containing user or user
+ * attribute's associated subjects.
+ */
 public final class NodeProhibition extends Prohibition {
 
     private long nodeId;

@@ -13,6 +13,9 @@ import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation that registers a new {@link Operation} definition.
+ */
 public class CreateOperationOp extends AdminOperation<Void>  {
 
     public static final FormalParameter<Operation<?>> OPERATION_PARAM = new FormalParameter<>("operation", new AdminOperationType());

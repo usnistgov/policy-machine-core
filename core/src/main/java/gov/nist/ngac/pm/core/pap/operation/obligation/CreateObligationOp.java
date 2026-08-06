@@ -19,6 +19,9 @@ import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation that creates an obligation from an author, name, event pattern, and response.
+ */
 public class CreateObligationOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter AUTHOR_PARAM =

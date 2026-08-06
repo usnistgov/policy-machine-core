@@ -3,6 +3,9 @@ package gov.nist.ngac.pm.core.pap.serialization;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 
+/**
+ * Serializes a policy to a string form that a matching {@link PolicyDeserializer} can load.
+ */
 public interface PolicySerializer {
 
     /**

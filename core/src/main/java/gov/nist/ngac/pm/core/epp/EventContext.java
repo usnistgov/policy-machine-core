@@ -8,8 +8,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * A record of an operation invocation, passed to the {@link EPP} to check against obligations' event
+ * patterns.
+ *
+ * @param user the user that invoked the operation
+ * @param opName the name of the invoked operation
+ * @param args the operation's actual argument values, keyed by parameter name
+ */
 public record EventContext(EventContextUser user, String opName, Map<String, Object> args) {
 
+    /**
+     * Returns this event context as a plain map, for use as a PML variable.
+     *
+     * @return the map, with keys "user", "attrs", "process", "opName", and "args"
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("user", user.getName());
