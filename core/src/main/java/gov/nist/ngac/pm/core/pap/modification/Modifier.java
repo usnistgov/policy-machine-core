@@ -20,6 +20,13 @@ abstract class Modifier implements Transactional {
         this.policyStore = policyStore;
     }
 
+    /**
+     * Runs the given callback inside a transaction, committing on success or rolling back and rethrowing
+     * on failure.
+     *
+     * @return the callback's result
+     * @throws PMException if the callback throws, after the transaction has been rolled back
+     */
     protected <T> T runTx(Runner<T> txRunner) throws PMException {
         try {
             beginTx();
@@ -32,6 +39,12 @@ abstract class Modifier implements Transactional {
         }
     }
 
+    /**
+     * Runs the given callback inside a transaction, committing on success or rolling back and rethrowing
+     * on failure.
+     *
+     * @throws PMException if the callback throws, after the transaction has been rolled back
+     */
     protected void runTx(VoidRunner txRunner) throws PMException {
         try {
             beginTx();
@@ -58,10 +71,16 @@ abstract class Modifier implements Transactional {
         policyStore.rollback();
     }
 
+    /**
+     * Callback invoked inside a transaction by {@link #runTx(Runner)}, producing a result.
+     */
     public interface Runner<T> {
         T run() throws PMException;
     }
 
+    /**
+     * Callback invoked inside a transaction by {@link #runTx(VoidRunner)}.
+     */
     public interface VoidRunner {
         void run() throws PMException;
     }

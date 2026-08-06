@@ -12,6 +12,11 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperation;
 import gov.nist.ngac.pm.core.pap.store.PolicyStore;
 
+/**
+ * {@link OperationsModification} implementation, validating operation and access right names before
+ * delegating to the backing {@link gov.nist.ngac.pm.core.pap.store.OperationsStore} and the
+ * {@link JavaOperationRegistry}.
+ */
 public class OperationsModifier extends Modifier implements OperationsModification {
 
     private final JavaOperationRegistry javaOperationRegistry;

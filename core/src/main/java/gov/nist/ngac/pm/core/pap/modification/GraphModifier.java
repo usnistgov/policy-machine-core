@@ -38,6 +38,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * {@link GraphModification} implementation, validating structural invariants (e.g. no assignment cycles,
+ * no disconnected nodes, admin policy protections) before delegating to the backing
+ * {@link gov.nist.ngac.pm.core.pap.store.GraphStore}.
+ */
 public class GraphModifier extends Modifier implements GraphModification {
 
     private IdGenerator idGenerator;

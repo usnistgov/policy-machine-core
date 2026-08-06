@@ -6,6 +6,10 @@ import gov.nist.ngac.pm.core.pap.obligation.Obligation;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import gov.nist.ngac.pm.core.pap.store.PolicyStore;
 
+/**
+ * {@link ObligationsModification} implementation, validating an obligation's author and name before
+ * delegating to the backing {@link gov.nist.ngac.pm.core.pap.store.ObligationsStore}.
+ */
 public class ObligationsModifier extends Modifier implements ObligationsModification {
 
     public ObligationsModifier(PolicyStore store) {

@@ -9,6 +9,11 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import gov.nist.ngac.pm.core.pap.store.PolicyStore;
 import java.util.Set;
 
+/**
+ * {@link ProhibitionsModification} implementation, validating a prohibition's access rights and
+ * referenced nodes before delegating to the backing
+ * {@link gov.nist.ngac.pm.core.pap.store.ProhibitionsStore}.
+ */
 public class ProhibitionsModifier extends Modifier implements ProhibitionsModification {
 
     public ProhibitionsModifier(PolicyStore store) {
@@ -89,6 +94,11 @@ public class ProhibitionsModifier extends Modifier implements ProhibitionsModifi
             }
     }
 
+    /**
+     * Checks that every node referenced in the inclusion or exclusion set exists.
+     *
+     * @throws PMException if any referenced node does not exist
+     */
     protected void checkProhibitionContainersExist(Set<Long> inclusionSet, Set<Long> exclusionSet) throws PMException {
         for (long inc : inclusionSet) {
             if (!policyStore.graph().nodeExists(inc)) {
