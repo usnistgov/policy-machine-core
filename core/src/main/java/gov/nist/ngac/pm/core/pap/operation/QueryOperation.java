@@ -10,6 +10,9 @@ import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Base class for query operations: {@link Operation}s restricted to read-only {@link PolicyQuery} access.
+ */
 public abstract non-sealed class QueryOperation<R> extends Operation<R> {
 
     public QueryOperation(String name,
@@ -44,6 +47,9 @@ public abstract non-sealed class QueryOperation<R> extends Operation<R> {
         super(name, returnType, parameters, eventParameters, req, rest);
     }
 
+    /**
+     * Computes this operation's result using only read-only policy queries.
+     */
     public abstract R execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException;
 
     @Override

@@ -10,6 +10,10 @@ import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Base class for resource operations: {@link Operation}s that act on resources outside the policy,
+ * restricted to read-only {@link PolicyQuery} access to the policy itself.
+ */
 public abstract non-sealed class ResourceOperation<T> extends Operation<T> {
 
     public ResourceOperation(String name,
@@ -44,6 +48,9 @@ public abstract non-sealed class ResourceOperation<T> extends Operation<T> {
         super(name, returnType, parameters, eventParameters, req, rest);
     }
 
+    /**
+     * Computes this operation's result, with only read-only policy queries available.
+     */
     public abstract T execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException;
 
     @Override

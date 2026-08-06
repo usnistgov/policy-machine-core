@@ -22,6 +22,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A callable, named PML/Java operation: its signature (parameters and return type), the capabilities
+ * required to invoke it, and its executable body. The permitted subclasses distinguish what the
+ * operation is allowed to do while executing — {@link AdminOperation}s and {@link Routine}s get the full
+ * {@link gov.nist.ngac.pm.core.pap.PAP} and so can modify the policy, {@link ResourceOperation}s and
+ * {@link QueryOperation}s are restricted to read-only policy queries, and {@link Function}s have no
+ * policy access at all.
+ */
 public abstract sealed class Operation<R> permits AdminOperation, ResourceOperation,
     QueryOperation, Routine, Function {
 

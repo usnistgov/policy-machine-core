@@ -8,6 +8,11 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredCapability;
 import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnNode;
 import java.util.List;
 
+/**
+ * Base class for admin operations: {@link Operation}s that execute with full
+ * {@link gov.nist.ngac.pm.core.pap.PAP} access and can modify the policy graph, prohibitions,
+ * obligations, or operations.
+ */
 public abstract non-sealed class AdminOperation<R> extends Operation<R> {
 
     public AdminOperation(String name,
