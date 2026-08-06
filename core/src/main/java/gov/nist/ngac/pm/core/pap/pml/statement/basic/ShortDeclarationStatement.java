@@ -8,6 +8,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 
+/**
+ * PML ":=" short variable declaration statement: declares a new variable initialized to an expression's
+ * value, with its type inferred from the expression.
+ */
 public class ShortDeclarationStatement extends BasicStatement<VoidResult> {
 
     private String id;

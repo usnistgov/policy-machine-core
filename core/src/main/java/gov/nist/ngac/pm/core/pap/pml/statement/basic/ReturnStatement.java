@@ -11,6 +11,9 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.StatementResult;
 import java.util.Objects;
 
 
+/**
+ * PML "return" statement, with or without a return value.
+ */
 public class ReturnStatement extends BasicStatement<StatementResult> {
 
     private Expression<?> expr;
@@ -26,6 +29,11 @@ public class ReturnStatement extends BasicStatement<StatementResult> {
         return expr;
     }
 
+    /**
+     * Checks whether this return statement is compatible with the given expected return type — a
+     * value-less return only matches {@link VoidType}, otherwise the returned expression's type must be
+     * castable to the expected type.
+     */
     public boolean matchesReturnType(Type<?> match) {
         if (expr == null) {
             return match.equals(new VoidType());

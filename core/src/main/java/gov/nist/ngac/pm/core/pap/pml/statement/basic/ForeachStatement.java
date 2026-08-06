@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * PML "foreach" statement: iterates a list or map, binding each element (and, for maps, its value) to a
+ * loop variable before executing the loop body, stopping early on a {@link BreakResult} and propagating a
+ * {@link ReturnResult} out of the loop.
+ */
 public class ForeachStatement extends BasicStatement<StatementResult> {
 
     private final String varName;

@@ -7,6 +7,10 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
+/**
+ * PML "=" or "+=" variable assignment statement; "+=" is only supported for string variables and casts
+ * the existing value to a String before concatenating.
+ */
 public class VariableAssignmentStatement extends BasicStatement<VoidResult> {
 
     private final String id;

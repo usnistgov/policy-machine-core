@@ -11,6 +11,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML "if / else if / else" statement: executes the block of the first condition (if or else-if) that
+ * evaluates true, falling back to the else block if none do.
+ */
 public class IfStatement extends BasicStatement<StatementResult> {
 
     private final ConditionalBlock ifBlock;
@@ -99,5 +103,8 @@ public class IfStatement extends BasicStatement<StatementResult> {
         return Objects.hash(ifBlock, elseIfBlocks, elseBlockStatements);
     }
 
+    /**
+     * A single "if"/"else if" branch: the condition guarding it and the block to run when it's true.
+     */
     public record ConditionalBlock(Expression<Boolean> condition, PMLStatementBlock block) implements Serializable { }
 } 

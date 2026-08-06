@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML "var (...)" statement: declares one or more variables, each initialized to an expression's value.
+ */
 public class VariableDeclarationStatement extends BasicStatement<VoidResult> {
 
     private final List<Declaration> declarations;
@@ -58,6 +61,9 @@ public class VariableDeclarationStatement extends BasicStatement<VoidResult> {
         return sb.toString();
     }
 
+    /**
+     * A single variable name paired with its initializing expression.
+     */
     public record Declaration(String id, Expression<?> expression) {
 
         @Override
