@@ -38,6 +38,10 @@ import gov.nist.ngac.pm.core.pdp.query.PolicyQueryAdjudicator;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A single administrative transaction: the entry point for privilege-checked policy modification and
+ * querying, and for executing operations/PML, as a specific user.
+ */
 public class PDPTx implements OperationExecutor {
 
     private final TxExecutor txExecutor;
@@ -46,10 +50,16 @@ public class PDPTx implements OperationExecutor {
         this.txExecutor = new TxExecutor(userCtx, pap, epps);
     }
 
+    /**
+     * Returns the entry point for privilege-checked policy modification.
+     */
     public PolicyModificationAdjudicator modify() {
         return this.txExecutor.modify();
     }
 
+    /**
+     * Returns the entry point for privilege-checked policy querying.
+     */
     public PolicyQueryAdjudicator query() {
         return this.txExecutor.query();
     }
@@ -268,6 +278,12 @@ public class PDPTx implements OperationExecutor {
             pap.deserialize(input, policyDeserializer);
         }
 
+        /**
+         * Compiles and executes a PML script as this transaction's user, with each statement subject to
+         * the usual privilege checks.
+         *
+         * @return the script's return value, or null if it returns nothing
+         */
         public Object executePML(String input) throws PMException {
             PMLCompiler pmlCompiler = new PMLCompiler();
             List<PMLStatement<?>> stmts = pmlCompiler.compilePML(pap, input);

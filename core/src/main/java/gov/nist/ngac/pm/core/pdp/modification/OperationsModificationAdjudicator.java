@@ -16,6 +16,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import gov.nist.ngac.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 
+/**
+ * {@link OperationsModification} implementation that checks the acting user's admin privileges before
+ * delegating to the PAP.
+ */
 public class OperationsModificationAdjudicator extends Adjudicator implements OperationsModification {
 
     public OperationsModificationAdjudicator(UserContext userCtx, PAP pap) {

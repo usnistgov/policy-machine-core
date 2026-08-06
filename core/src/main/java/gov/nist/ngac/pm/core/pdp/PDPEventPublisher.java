@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.epp.EventContext;
 import java.util.List;
 
+/**
+ * {@link EventPublisher} that forwards published events to each registered subscriber in order.
+ */
 public class PDPEventPublisher implements EventPublisher {
 
     private final List<EventSubscriber> epps;

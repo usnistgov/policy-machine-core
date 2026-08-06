@@ -5,6 +5,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adjudicates a user's request to execute a single operation or a routine's batch of operations,
+ * enforcing required privileges before executing.
+ */
 public interface AccessAdjudication {
 
     Object adjudicateOperation(UserContext user, String operation, Map<String, Object> args) throws PMException;

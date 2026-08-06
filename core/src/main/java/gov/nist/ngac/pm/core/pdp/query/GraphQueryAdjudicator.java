@@ -19,6 +19,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * {@link GraphQuery} implementation that checks the acting user's admin privileges before delegating to
+ * the PAP.
+ */
 public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 
     public GraphQueryAdjudicator(PAP pap, UserContext userCtx) {

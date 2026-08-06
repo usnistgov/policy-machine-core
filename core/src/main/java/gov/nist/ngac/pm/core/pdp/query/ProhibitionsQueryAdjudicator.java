@@ -13,6 +13,10 @@ import gov.nist.ngac.pm.core.pdp.UnauthorizedException;
 import gov.nist.ngac.pm.core.pdp.adjudication.Adjudicator;
 import java.util.Collection;
 
+/**
+ * {@link ProhibitionsQuery} implementation that checks the acting user's admin privileges before
+ * delegating to the PAP.
+ */
 public class ProhibitionsQueryAdjudicator extends Adjudicator implements ProhibitionsQuery {
 
     public ProhibitionsQueryAdjudicator(PAP pap, UserContext userCtx) {

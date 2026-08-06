@@ -4,6 +4,9 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.PAP;
 import gov.nist.ngac.pm.core.pap.serialization.json.JSONDeserializer;
 
+/**
+ * {@link PolicyBootstrapper} that deserializes a JSON policy document into the PAP.
+ */
 public class JSONBootstrapper extends PolicyBootstrapper{
 
     private String json;

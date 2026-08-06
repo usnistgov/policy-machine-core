@@ -30,6 +30,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * {@link GraphModification} implementation that checks the acting user's admin privileges before
+ * executing each graph modification via its {@link gov.nist.ngac.pm.core.pap.operation.AdminOperation}.
+ */
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 
     private final PAP pap;

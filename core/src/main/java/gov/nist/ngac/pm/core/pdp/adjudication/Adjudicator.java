@@ -10,6 +10,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import gov.nist.ngac.pm.core.pdp.UnauthorizedException;
 import java.util.Collection;
 
+/**
+ * Base class for PDP adjudicators, which wrap a {@link PAP} query/modification sub-area with a required
+ * access-right check before delegating.
+ */
 public abstract class Adjudicator {
 
     protected PAP pap;
@@ -20,6 +24,12 @@ public abstract class Adjudicator {
         this.userCtx = userCtx;
     }
 
+    /**
+     * Checks that the user holds every required access right on the target.
+     *
+     * @throws UnauthorizedException if the user is missing any required access right, or holds none at all
+     * @throws PMException if computing the user's privileges fails
+     */
     protected void check(UserContext userCtx, TargetContext targetCtx, AdminAccessRight ... required) throws PMException {
         AccessRightSet requiredSet = new AccessRightSet(required);
         AccessRightSet computed = pap.query().access().computePrivileges(userCtx, targetCtx);
@@ -32,6 +42,9 @@ public abstract class Adjudicator {
     }
 
     @FunctionalInterface
+    /**
+     * Callback invoked per item by {@link #filterUnauthorized}.
+     */
     protected interface PMConsumer<T> {
         void accept(T t) throws PMException;
     }

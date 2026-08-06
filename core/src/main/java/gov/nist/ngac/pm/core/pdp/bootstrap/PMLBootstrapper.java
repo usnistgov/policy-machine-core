@@ -5,6 +5,10 @@ import gov.nist.ngac.pm.core.pap.PAP;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.List;
 
+/**
+ * {@link PolicyBootstrapper} that executes a PML script as a temporary bootstrap user, tearing the
+ * bootstrap user's scaffolding down afterward.
+ */
 public class PMLBootstrapper extends PolicyBootstrapper {
 
     private final String bootstrapUser;

@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * {@link SelfAccessQuery} implementation that resolves privileges for the acting user themself, with no
+ * additional privilege check needed since a user is always allowed to query their own access.
+ */
 public class SelfAccessQueryAdjudicator extends Adjudicator implements SelfAccessQuery {
 
 	public SelfAccessQueryAdjudicator(PAP pap, UserContext userCtx) {

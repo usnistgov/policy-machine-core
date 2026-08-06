@@ -11,18 +11,32 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Thrown when a user lacks the privileges required to perform an operation.
+ */
 public class UnauthorizedException extends PMException {
 
+    /**
+     * Builds an exception for a user denied a named operation outright (e.g. no target-specific
+     * privileges apply).
+     */
     public static UnauthorizedException of(GraphQuery graphQuery,
                                            UserContext userContext,
                                            String operation) throws PMException {
         return new UnauthorizedException(userContext + " cannot perform operation " + operation);
     }
 
+    /**
+     * Builds an exception with a pre-formatted message.
+     */
     public static UnauthorizedException of(String message) throws PMException {
         return new UnauthorizedException(message);
     }
 
+    /**
+     * Builds an exception for a user missing one or more required access rights on a target, formatting
+     * the target's name(s) and the specific missing rights into the message.
+     */
     public static UnauthorizedException of(GraphQuery graphQuery,
                                            UserContext userContext,
                                            TargetContext targetContext,

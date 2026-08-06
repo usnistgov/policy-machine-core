@@ -9,6 +9,11 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.WildcardAccessRight;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.List;
 
+/**
+ * {@link PolicyBootstrapper} that creates a "super" user with unrestricted admin privileges, obligations
+ * to keep super privileged on newly created policy-class content, and then executes the given PML script
+ * as that user.
+ */
 public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
 
     private final String pml;

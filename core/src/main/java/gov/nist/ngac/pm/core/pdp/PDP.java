@@ -56,6 +56,9 @@ public class PDP implements EventPublisher, AccessAdjudication {
         return runTx(userCtx, tx -> tx.executePML(pml));
     }
 
+    /**
+     * Bootstraps the underlying PAP's policy via the given bootstrapper.
+     */
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
         pap.bootstrap(bootstrapper);
     }

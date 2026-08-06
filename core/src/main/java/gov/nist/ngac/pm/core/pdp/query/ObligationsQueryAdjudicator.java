@@ -14,6 +14,10 @@ import gov.nist.ngac.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * {@link ObligationsQuery} implementation that checks the acting user's admin privileges before
+ * delegating to the PAP.
+ */
 public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
 
     public ObligationsQueryAdjudicator(PAP pap, UserContext userCtx) {
