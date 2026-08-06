@@ -1,5 +1,9 @@
 package gov.nist.ngac.pm.core.pap.admin;
 
+/**
+ * The fixed set of admin-policy nodes every policy is bootstrapped with, each carrying a reserved
+ * negative id and a fixed name.
+ */
 public enum AdminPolicyNode {
 
     PM_ADMIN_PC(-1, "PM_ADMIN"),
@@ -18,18 +22,39 @@ public enum AdminPolicyNode {
         this.name = name;
     }
 
+    /**
+     * Returns this enum constant's Java name (e.g. "PM_ADMIN_PC"), as distinct from its graph node name.
+     *
+     * @return this enum constant's Java name
+     */
     public String constantName() {
         return name();
     }
 
+    /**
+     * Returns this node's name in the graph.
+     *
+     * @return the node's name
+     */
     public String nodeName() {
         return name;
     }
 
+    /**
+     * Returns this node's reserved id in the graph.
+     *
+     * @return the node's id
+     */
     public long nodeId() {
         return id;
     }
 
+    /**
+     * Checks whether the given id belongs to one of the admin policy nodes.
+     *
+     * @param id the node id to check
+     * @return whether the id belongs to an admin policy node
+     */
     public static boolean isAdminPolicyNode(long id) {
         for (AdminPolicyNode node : values()) {
             if (node.id == id) {

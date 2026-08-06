@@ -14,8 +14,20 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.store.GraphStore;
 import java.util.Collection;
 
+/**
+ * Creates and verifies the fixed admin-policy scaffolding (the {@link AdminPolicyNode}s and their
+ * assignments) that every policy is expected to have.
+ */
 public class AdminPolicy {
 
+    /**
+     * Checks whether the given assignment is one of the fixed admin-policy structural assignments (e.g.
+     * an admin OA to the base admin OA, or the base admin OA to the admin PC).
+     *
+     * @param asc the ascendant node id
+     * @param desc the descendant node id
+     * @return whether this is a fixed admin-policy structural assignment
+     */
     public static boolean isAdminPolicyAssignment(long asc, long desc) {
         boolean isBaseToPc = asc == PM_ADMIN_BASE_OA.nodeId() && desc == PM_ADMIN_PC.nodeId();
         boolean isPcsToBase = asc == PM_ADMIN_POLICY_CLASSES.nodeId() && desc == PM_ADMIN_BASE_OA.nodeId();
@@ -26,6 +38,13 @@ public class AdminPolicy {
         return isBaseToPc || isPcsToBase || isOpsToBase || isRoutinesToBase || isObligationsToBase || isProhibitionsToBase;
     }
 
+    /**
+     * Ensures every {@link AdminPolicyNode} exists in the graph, creating and assigning any that are
+     * missing.
+     *
+     * @param graphStore the graph store to verify
+     * @throws PMException if creating a node or assignment fails
+     */
     public static void verifyAdminPolicy(GraphStore graphStore) throws PMException {
         graphStore.beginTx();
 

@@ -3,6 +3,10 @@ package gov.nist.ngac.pm.core.pap.obligation.event;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The user who triggered an event, identified by either a name or a set of user attributes, plus the
+ * process they acted as.
+ */
 public class EventContextUser {
 
     private final String name;

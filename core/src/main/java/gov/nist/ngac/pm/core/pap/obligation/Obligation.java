@@ -6,6 +6,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.CreateObligationStateme
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Objects;
 
+/**
+ * A live obligation: its author, name, the event pattern that triggers it, and the response to run when
+ * it fires.
+ */
 public class Obligation {
 
     private NodeUserContext author;

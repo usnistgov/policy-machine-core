@@ -5,6 +5,13 @@ import gov.nist.ngac.pm.core.pap.pml.statement.PMLStatementSerializable;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * A {@link MatchesOperationPattern}'s "on (args) { ... }" clause: the event-context argument names bound
+ * for the body, and the boolean-returning routine body itself.
+ *
+ * @param patternArgs the event-context argument names bound for the body
+ * @param func the boolean-returning routine body
+ */
 public record OnPattern(Set<String> patternArgs, PMLStmtsRoutine<Boolean> func) implements PMLStatementSerializable {
 
     @Override

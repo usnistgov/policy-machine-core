@@ -7,6 +7,10 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
+/**
+ * PML "user in &lt;container&gt;" subject pattern: matches a named user contained in the given container,
+ * or an anonymous user whose attributes include the container.
+ */
 public class InSubjectPatternExpression extends SubjectPatternExpression {
 
     private final Expression<String> container;

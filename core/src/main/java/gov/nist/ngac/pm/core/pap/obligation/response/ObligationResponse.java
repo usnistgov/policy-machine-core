@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * An obligation's "do (ctx) { ... }" response body: the statements to run and the variable name the
+ * triggering event's context is bound to.
+ */
 public class ObligationResponse implements Serializable {
 
     private final List<PMLStatement<?>> stmts;
@@ -33,6 +37,10 @@ public class ObligationResponse implements Serializable {
         return stmts;
     }
 
+    /**
+     * Executes this response's statements, binding the triggering event's context (as a map) to this
+     * response's event-context variable name.
+     */
     public void execute(ExecutionContext executionCtx, EventContext evtCtx) throws PMException {
         Args args = new Args();
 

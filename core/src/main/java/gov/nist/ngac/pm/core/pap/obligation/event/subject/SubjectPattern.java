@@ -8,6 +8,10 @@ import gov.nist.ngac.pm.core.pap.pml.statement.PMLStatementSerializable;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * The subject half of an {@link gov.nist.ngac.pm.core.pap.obligation.event.EventPattern}: either matches
+ * any user ("any user") or a specific {@link SubjectPatternExpression}.
+ */
 public class SubjectPattern implements Serializable, PMLStatementSerializable {
 
     private final boolean isAny;
@@ -47,6 +51,10 @@ public class SubjectPattern implements Serializable, PMLStatementSerializable {
         return matchesInternal(user, ctx, pap);
     }
 
+    /**
+     * The match logic behind {@link #matches}, invoked only once the user has already been confirmed
+     * non-null.
+     */
     public boolean matchesInternal(EventContextUser user, ExecutionContext ctx, PAP pap) throws PMException {
         return isAny || subjectPatternExpression.matches(user, ctx, pap);
     }

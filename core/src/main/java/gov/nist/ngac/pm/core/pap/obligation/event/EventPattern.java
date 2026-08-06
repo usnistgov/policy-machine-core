@@ -5,6 +5,10 @@ import gov.nist.ngac.pm.core.pap.obligation.event.subject.SubjectPattern;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * An obligation's trigger condition: a subject pattern (who) paired with an operation pattern (what),
+ * both of which must match for the obligation to fire.
+ */
 public class EventPattern implements Serializable {
 
     protected SubjectPattern subjectPattern;

@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.pap.PAP;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
+/**
+ * A parenthesized subject pattern, matching its wrapped expression unchanged.
+ */
 public class ParenSubjectPatternExpression extends SubjectPatternExpression {
 
     private final SubjectPatternExpression expression;

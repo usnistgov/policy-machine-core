@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * PML "matches &lt;name&gt;" pattern, with an optional "on (...) { ... }" clause: matches events for the
+ * named operation, and only if the on-clause (when present) evaluates true.
+ */
 public final class MatchesOperationPattern extends OperationPattern {
 
     private final String opName;
