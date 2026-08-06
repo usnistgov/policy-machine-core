@@ -26,7 +26,7 @@ public abstract class UserContext implements Serializable {
     }
 
     /**
-     * Resolve the IDs of any nodes referenced in this user context. The NodeLookup provides a look-up to get node IDs.
+     * Resolve the IDs of any nodes referenced in this user context. The NodeLookup provides a lookup to get node IDs.
      * @param nodeLookup A NodeLookup implementation used to lookup nodes in the policy store.
      * @return A list of the IDs.
      * @throws PMException if there is an exception resolving a node id.

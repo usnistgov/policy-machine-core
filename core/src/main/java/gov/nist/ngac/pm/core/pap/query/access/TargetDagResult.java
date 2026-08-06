@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The result of walking a target's ascendant graph: the access rights reachable under each policy class,
- * and the prohibition-referenced node ids reached during the walk.
+ * The result of walking a target's ascendant graph, recording the access rights reachable under each
+ * policy class and the prohibition-referenced node ids visited.
  *
  * @param pcMap the access rights reachable under each policy class node id
  * @param reachedTargets the prohibition-referenced node ids reached during the walk

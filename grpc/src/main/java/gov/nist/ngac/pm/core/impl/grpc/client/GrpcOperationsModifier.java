@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * {@link OperationsModification} implementation that submits each operation as an admin adjudication
- * request over gRPC.
+ * A {@link OperationsModification} that submits each operation as an admin adjudication request over
+ * gRPC.
  */
 public class GrpcOperationsModifier implements OperationsModification {
 

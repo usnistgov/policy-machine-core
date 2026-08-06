@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 /**
- * A single association reached on an explain path: the user attribute source, the access rights it
- * grants, and the paths from the user to that user attribute.
+ * A single association reached on an explain path.
  *
  * @param ua the association's user attribute source
  * @param arset the access rights the association grants

@@ -5,8 +5,7 @@ import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 
 /**
- * {@link PolicyQuery} implementation that vends privilege-checked queriers for each policy sub-area,
- * scoped to a single acting user.
+ * A {@link PolicyQuery} that provides privilege-checked queriers for a single acting user.
  */
 public class PolicyQueryAdjudicator implements PolicyQuery {
 

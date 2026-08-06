@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in query self_compute_adjacent_descendant_privileges(node_name). Returns the caller's
- * privileges on each node directly descendant from the given node, keyed by node name.
+ * A PML built-in query that returns the caller's privileges on the nodes directly below a given node.
  */
 public class SelfAccessComputeAdjacentDescendantPrivileges extends QueryOperation<Map<String, List<String>>> {
 

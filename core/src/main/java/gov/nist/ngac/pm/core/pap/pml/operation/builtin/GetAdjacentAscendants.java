@@ -16,8 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * PML built-in query get_adjacent_ascendants(node). Returns the names of the nodes directly ascendant
- * to the given node.
+ * A PML built-in query that returns the names of a node's adjacent ascendants.
  */
 public class GetAdjacentAscendants extends PMLQueryOperation<List<String>> {
 

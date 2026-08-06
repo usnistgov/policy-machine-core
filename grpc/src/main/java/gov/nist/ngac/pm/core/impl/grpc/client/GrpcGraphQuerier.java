@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link GraphQuery} implementation that delegates to a remote PDP over the gRPC policy query service.
+ * A {@link GraphQuery} that delegates to a remote PDP over gRPC.
  */
 public class GrpcGraphQuerier implements GraphQuery {
 

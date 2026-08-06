@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A PML create routine definition's runtime form, executing its {@link PMLStatementBlock} body.
+ * The runtime form of a routine defined in PML.
  *
  * @param <T> the routine's return type
  */

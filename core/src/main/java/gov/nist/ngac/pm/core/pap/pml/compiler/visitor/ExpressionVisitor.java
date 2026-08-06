@@ -67,8 +67,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Compiles a PML expression parse tree into an {@link Expression}, inserting an {@link ExpressionWrapper}
- * when the expression's static type needs coercing to an expected type.
+ * Compiles a PML expression parse tree into an {@link Expression}.
  */
 public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
 
@@ -410,9 +409,9 @@ public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
     }
 
     /**
-     * Strips the surrounding quote characters from a parsed string-literal token's text.
+     * Strips the surrounding quote characters from a parsed string literal token's text.
      *
-     * @param lit the parsed string-literal context
+     * @param lit the parsed string literal context
      * @return the literal's text with the leading and trailing quote removed
      */
     public static String removeQuotes(StringLitContext lit) {

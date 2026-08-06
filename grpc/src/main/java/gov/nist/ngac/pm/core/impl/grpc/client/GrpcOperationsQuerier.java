@@ -31,9 +31,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link OperationsQuery} implementation that delegates to a remote PDP over the gRPC policy query service,
- * reconstructing {@link Operation} signatures from the wire proto since the operation bodies themselves
- * are not executable locally.
+ * A {@link OperationsQuery} that delegates to a remote PDP over gRPC. Operation signatures are
+ * reconstructed from the wire proto since the bodies aren't executable locally.
  */
 public class GrpcOperationsQuerier implements OperationsQuery {
 

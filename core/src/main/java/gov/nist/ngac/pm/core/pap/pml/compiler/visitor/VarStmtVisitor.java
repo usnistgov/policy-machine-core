@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compiles PML variable statements — "var" declarations, ":=" short declarations, and assignments —
- * registering or updating the variable in the current scope as it goes.
+ * Compiles PML variable declarations and assignments, registering or updating the variable in scope.
  */
 public class VarStmtVisitor extends PMLBaseVisitor<PMLStatementSerializable> {
 

@@ -20,9 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * PML foreach statement. Iterates a list or map, binding each element (and, for maps, its value) to a
- * loop variable before executing the loop body, stopping early on a {@link BreakResult} and propagating a
- * {@link ReturnResult} out of the loop.
+ * A PML foreach statement that iterates a list or map, binding each entry to a loop variable.
  */
 public class ForeachStatement extends BasicStatement<StatementResult> {
 

@@ -3,9 +3,7 @@ package gov.nist.ngac.pm.core.pap.graph.dag;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 
 /**
- * A predicate a {@link GraphWalker} evaluates per node to decide whether to halt traversal early; whether
- * a true result stops the whole walk or just the current path depends on which short-circuit slot it's
- * plugged into.
+ * A predicate evaluated per node to decide whether to halt traversal early.
  */
 public interface ShortCircuit {
 

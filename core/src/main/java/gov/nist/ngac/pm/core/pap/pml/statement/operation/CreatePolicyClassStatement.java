@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
 /**
- * PML create PC ... statement. Creates a new policy class.
+ * A PML statement that creates a policy class.
  */
 public class CreatePolicyClassStatement extends OperationStatement {
 

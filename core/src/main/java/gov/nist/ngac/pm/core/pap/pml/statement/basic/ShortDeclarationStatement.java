@@ -9,8 +9,7 @@ import java.util.Objects;
 
 
 /**
- * PML := short variable declaration statement. Declares a new variable initialized to an expression's
- * value, with its type inferred from the expression.
+ * A PML statement that declares a variable using ":=", inferring its type from the initializing expression.
  */
 public class ShortDeclarationStatement extends BasicStatement<VoidResult> {
 

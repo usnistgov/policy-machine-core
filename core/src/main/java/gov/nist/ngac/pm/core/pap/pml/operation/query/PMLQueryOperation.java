@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for query operations defined in PML, carrying the {@link PMLOperationSignature} and
- * {@link ExecutionContext} a {@link PMLOperation} needs.
+ * Base class for query operations defined in PML.
  *
  * @param <T> the operation's return type
  */

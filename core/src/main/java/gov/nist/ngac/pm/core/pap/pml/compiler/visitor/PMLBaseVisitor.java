@@ -5,10 +5,9 @@ import gov.nist.ngac.pm.core.pap.pml.context.VisitorContext;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Base class for PML grammar-context visitors, giving each visitor access to the shared
- * {@link VisitorContext} (symbol scope, error log) for the compilation in progress.
+ * Base class for PML grammar context visitors.
  *
- * @param <S> the type this visitor produces from a grammar context
+ * @param <S> the type produced by this visitor
  */
 public abstract class PMLBaseVisitor<S> extends PMLParserBaseVisitor<S> {
 

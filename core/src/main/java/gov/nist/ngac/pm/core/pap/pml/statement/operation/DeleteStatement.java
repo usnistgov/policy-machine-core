@@ -9,8 +9,8 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 /**
- * Base class for "delete ... if exists" PML statements; when the "if exists" clause is present and the
- * named entity does not exist, execution is skipped instead of failing.
+ * Base class for PML delete statements. When the if exists clause is present and the named entity
+ * does not exist, execution is skipped instead of failing.
  */
 public abstract class DeleteStatement extends OperationStatement {
 
@@ -26,8 +26,7 @@ public abstract class DeleteStatement extends OperationStatement {
     }
 
     /**
-     * Checks whether the named entity of this statement's {@link Type} currently exists, used to
-     * short-circuit execution when the "if exists" clause is present.
+     * Checks whether the named entity currently exists.
      *
      * @param pap the PAP to check against
      * @param name the entity name to check

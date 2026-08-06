@@ -15,8 +15,8 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 /**
- * PML create admin operation statement. Creates the operation in the policy and registers it in the
- * current scope so later statements can call it.
+ * A PML statement that creates an admin operation, registering it in the current scope so later
+ * statements can call it.
  */
 public class AdminOpDefinitionStatement extends OperationStatement implements OperationDefinitionStatement {
 

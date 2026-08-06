@@ -10,8 +10,8 @@ import gov.nist.ngac.pm.proto.v1.pdp.adjudication.OperationRequest;
 import java.util.Map;
 
 /**
- * {@link ObligationsModification} implementation that submits each operation as an admin adjudication
- * request over gRPC.
+ * A {@link ObligationsModification} that submits each operation as an admin adjudication request over
+ * gRPC.
  */
 public class GrpcObligationsModifier implements ObligationsModification {
 

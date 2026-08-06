@@ -10,8 +10,8 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import gov.nist.ngac.pm.core.pap.query.GraphQuery;
 
 /**
- * PML delete node ... statement. If the node does not exist, {@link #prepareArgs} resolves to id 0
- * rather than failing, matching the PAP's own no-op behavior for deleting a nonexistent node.
+ * A PML statement that deletes a node. If the node does not exist, {@link #prepareArgs} resolves to
+ * id 0 rather than failing, matching the PAP's no-op behavior for deleting a nonexistent node.
  */
 public class DeleteNodeStatement extends DeleteStatement {
 

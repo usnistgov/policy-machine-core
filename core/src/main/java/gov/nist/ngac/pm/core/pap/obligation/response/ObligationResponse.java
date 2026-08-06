@@ -39,7 +39,7 @@ public class ObligationResponse implements Serializable {
 
     /**
      * Executes this response's statements, binding the triggering event's context map to this
-     * response's event-context variable name.
+     * response's event context variable name.
      */
     public void execute(ExecutionContext executionCtx, EventContext evtCtx) throws PMException {
         Args args = new Args();

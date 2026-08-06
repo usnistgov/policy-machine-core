@@ -10,7 +10,7 @@ import gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation;
 import java.util.List;
 
 /**
- * PML built-in function is_null(obj). Returns whether obj is null.
+ * A PML built-in function that returns whether a value is null.
  */
 public class IsNull extends PMLFunctionOperation<Boolean> {
 

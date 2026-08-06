@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * PML built-in query get_policy_class_ids(). Returns the ids of all policy classes.
+ * A PML built-in query that returns the ids of all policy classes.
  */
 public class GetPolicyClassIds extends QueryOperation<List<Long>> {
 

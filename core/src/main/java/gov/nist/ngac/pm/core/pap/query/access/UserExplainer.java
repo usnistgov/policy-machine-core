@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Walks the user's ascendant graph, but only along paths that lead to a user attribute referenced by the
- * given target-side association paths, to find how the user reaches each such user attribute.
+ * Walks the user's ascendant graph to find how the user reaches user attributes referenced by target-side
+ * association paths.
  */
 public class UserExplainer {
 
@@ -29,13 +29,10 @@ public class UserExplainer {
 	}
 
 	/**
-	 * Finds every ascendant path from the user to a user attribute that appears as an association source
-	 * in the given target paths, intersecting the user's reachable attributes with the ones the target
-	 * side found relevant.
+	 * Finds every ascendant path from the user to a user attribute referenced by the given target paths.
 	 *
 	 * @param userCtx the user to explain
-	 * @param targetPaths the target-side paths (from {@link TargetExplainer#explainTarget}) to intersect
-	 * against
+	 * @param targetPaths the target-side paths to intersect against
 	 * @return a map from user attribute node to the user's paths reaching it
 	 * @throws PMException if the walk fails
 	 */

@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML associate ... to ... with ... statement. Creates an association between a user attribute and a
- * target with the given access rights.
+ * A PML statement that associates a user attribute with a target using a set of access rights.
  */
 public class AssociateStatement extends OperationStatement {
 

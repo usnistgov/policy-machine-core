@@ -9,9 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A lexical scope of PML variables and callable operations, with an optional parent scope for outer
- * variable/operation lookups; the variable value type and operation type differ between compile-time
- * ({@link CompileScope}) and execution-time ({@link ExecuteScope}) use.
+ * A lexical scope of PML variables and operations, with an optional parent scope for outer lookups.
  *
  * @param <V> the variable value type
  * @param <F> the operation type
@@ -52,20 +50,17 @@ public abstract class Scope<V, F> implements Serializable {
     }
 
     /**
-     * Returns a full copy of this scope, linked as a child of it, for compiling/executing a nested block
-     * that should see all of this scope's variables and operations.
+     * Returns a copy of this scope, linked as a child of it.
      */
     public abstract Scope<V, F> copy();
 
     /**
-     * Returns a copy of this scope containing only its function operations, for compiling/executing a
-     * nested block (e.g. a function body) that should not see admin/resource/query operations.
+     * Returns a copy of this scope containing only its function operations.
      */
     public abstract Scope<V, F> copyFunctionsOnly();
 
     /**
-     * Returns a copy of this scope containing only its function and query operations, for
-     * compiling/executing a nested block that may call queries but not admin/resource operations.
+     * Returns a copy of this scope containing only its function and query operations.
      */
     public abstract Scope<V, F> copyFunctionsAndQueriesOnly();
 
@@ -203,8 +198,7 @@ public abstract class Scope<V, F> implements Serializable {
 
     /**
      * Copies each variable's value from the given scope into this scope, but only for variables that
-     * already exist in this scope — used to merge value updates made in a copied child scope (e.g. an if
-     * branch) back into the parent, without leaking variables newly declared in the child.
+     * already exist here.
      */
     public void overwriteFromScope(Scope<V, F> scope) {
         for (String varName : scope.variables.keySet()) {

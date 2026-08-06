@@ -10,17 +10,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Combines a {@link UserDagResult} and a {@link TargetDagResult} into the final access decision: the
- * privileges granted, the privileges denied by prohibitions, and which prohibitions are satisfied.
+ * Combines a {@link UserDagResult} and a {@link TargetDagResult} into the final access decision.
  */
 public class AccessRightResolver {
 
     private AccessRightResolver() {}
 
     /**
-     * Resolves the access rights a user has on a target: expands wildcard access rights per policy
-     * class, intersects across all reached policy classes, then removes any rights denied by a
-     * satisfied prohibition.
+     * Resolves the access rights a user has on a target.
      *
      * @param userCtx the user's DAG evaluation result
      * @param targetCtx the target's DAG evaluation result
@@ -56,8 +53,8 @@ public class AccessRightResolver {
     }
 
     /**
-     * Returns the union of access rights denied by every prohibition, among the given set, whose
-     * inclusion/exclusion condition is satisfied against the target's reached nodes.
+     * Returns the access rights denied by the given prohibitions that are satisfied against the target's
+     * reached nodes.
      *
      * @param prohibitions the prohibitions to check
      * @param targetCtx the target's DAG evaluation result
@@ -77,8 +74,7 @@ public class AccessRightResolver {
     }
 
     /**
-     * Returns every prohibition of the user's, among those in the given DAG results, whose
-     * inclusion/exclusion condition is satisfied against the target's reached nodes.
+     * Returns the user's prohibitions that are satisfied against the target's reached nodes.
      *
      * @param userDagResult the user's DAG evaluation result, supplying the prohibitions to check
      * @param targetDagResult the target's DAG evaluation result

@@ -72,8 +72,7 @@ public class Neo4jUtil {
 	}
 
 	/**
-	 * Reconstructs a {@link Prohibition} from a Neo4j prohibition node's properties, resolving to a
-	 * {@link ProcessProhibition} or {@link NodeProhibition} depending on whether a process is set.
+	 * Reconstructs a {@link Prohibition} from a Neo4j prohibition node's properties.
 	 *
 	 * @param prohibitionNode the Neo4j node holding the prohibition's properties
 	 * @return the reconstructed prohibition
@@ -93,7 +92,7 @@ public class Neo4jUtil {
 	}
 
 	/**
-	 * Maps a {@link NodeType} to its Neo4j label; types without a dedicated label, such as ANY, fall
+	 * Maps a {@link NodeType} to its Neo4j label. Types without a dedicated label, such as ANY, fall
 	 * back to an empty label.
 	 *
 	 * @param type the node type to map

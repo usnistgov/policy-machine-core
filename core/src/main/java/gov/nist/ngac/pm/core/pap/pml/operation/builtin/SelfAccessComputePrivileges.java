@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PML built-in query self_compute_privileges(node_name). Returns the caller's privileges on the given
- * node.
+ * A PML built-in query that returns the caller's privileges on a node.
  */
 public class SelfAccessComputePrivileges extends QueryOperation<List<String>> {
 

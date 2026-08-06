@@ -21,11 +21,10 @@ abstract class Modifier implements Transactional {
     }
 
     /**
-     * Runs the given callback inside a transaction, committing on success or rolling back and rethrowing
-     * on failure.
+     * Runs the given task in a transaction, committing on success or rolling back on failure.
      *
-     * @return the callback's result
-     * @throws PMException if the callback throws, after the transaction has been rolled back
+     * @return the task's result
+     * @throws PMException if the task fails, after the transaction has been rolled back
      */
     protected <T> T runTx(Runner<T> txRunner) throws PMException {
         try {
@@ -40,10 +39,9 @@ abstract class Modifier implements Transactional {
     }
 
     /**
-     * Runs the given callback inside a transaction, committing on success or rolling back and rethrowing
-     * on failure.
+     * Runs the given task in a transaction, committing on success or rolling back on failure.
      *
-     * @throws PMException if the callback throws, after the transaction has been rolled back
+     * @throws PMException if the task fails, after the transaction has been rolled back
      */
     protected void runTx(VoidRunner txRunner) throws PMException {
         try {
@@ -72,14 +70,14 @@ abstract class Modifier implements Transactional {
     }
 
     /**
-     * Callback invoked inside a transaction by {@link #runTx(Runner)}, producing a result.
+     * A task run inside a transaction that produces a result.
      */
     public interface Runner<T> {
         T run() throws PMException;
     }
 
     /**
-     * Callback invoked inside a transaction by {@link #runTx(VoidRunner)}.
+     * A task run inside a transaction.
      */
     public interface VoidRunner {
         void run() throws PMException;

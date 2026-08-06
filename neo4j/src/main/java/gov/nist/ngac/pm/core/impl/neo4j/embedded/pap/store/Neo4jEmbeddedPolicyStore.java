@@ -10,8 +10,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * {@link PolicyStore} implementation backed by an embedded Neo4j database, vending sub-stores that all
- * share a single {@link TxHandler} so operations across sub-areas participate in the same transaction.
+ * A {@link PolicyStore} backed by an embedded Neo4j database. Its sub-stores share a single
+ * {@link TxHandler} so they participate in the same transaction.
  */
 public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 
@@ -36,9 +36,9 @@ public class Neo4jEmbeddedPolicyStore implements PolicyStore {
 	private TxHandler txHandler;
 
 	/**
-	 * Constructor starts a new transaction
-	 * @param graphDb The graph database service
-	 * @throws PMException If an error occurs initializing the policy store
+	 * Creates a policy store backed by the given database.
+	 * @param graphDb the graph database service
+	 * @throws PMException if an error occurs initializing the policy store
 	 */
 	public Neo4jEmbeddedPolicyStore(GraphDatabaseService graphDb) throws PMException {
 		this.txHandler = new TxHandler(graphDb);

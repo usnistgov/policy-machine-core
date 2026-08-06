@@ -1,8 +1,7 @@
 package gov.nist.ngac.pm.core.pap.pml.statement.result;
 
 /**
- * Tagged variant of a break/continue/return outcome with an optional value, built via its static
- * factories.
+ * Represents a break, continue, or return outcome, built via its static factories.
  */
 public class PMLResult {
 

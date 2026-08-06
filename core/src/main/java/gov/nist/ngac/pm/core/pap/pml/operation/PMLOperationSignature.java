@@ -19,8 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * The compiled signature of a PML operation: its kind, name, return type, formal and event parameters,
- * and required capabilities. Renders back to PML source via {@link #toFormattedString}.
+ * The compiled signature of a PML operation. Renders back to PML source via {@link #toFormattedString}.
  */
 public class PMLOperationSignature implements PMLStatementSerializable {
 
@@ -80,8 +79,7 @@ public class PMLOperationSignature implements PMLStatementSerializable {
     }
 
     /**
-     * Formats the "@EventCtx(...)" annotation, or an empty string if the event parameters are identical
-     * to the formal parameters (i.e. no annotation is needed).
+     * Formats the @EventCtx(...) annotation, or an empty string if none is needed.
      */
     protected String serializeEventArgs() {
         if (eventParameters.equals(formalParameters)) {
@@ -110,8 +108,8 @@ public class PMLOperationSignature implements PMLStatementSerializable {
     }
 
     /**
-     * Formats the comma-separated formal parameter list for the operation's PML source, prefixing
-     * node-typed parameters with "@Node" and suffixing optional parameters with "?".
+     * Formats the operation's formal parameter list for PML source, prefixing node parameters with the
+     * "@Node" annotation and suffixing optional ones with "?".
      */
     protected String serializeFormalArgs() {
         String pml = "";

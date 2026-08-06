@@ -13,8 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link ObligationsQuery} implementation backed by the
- * {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s obligations store.
+ * An {@link ObligationsQuery} implementation backed by the policy store's obligations store.
  */
 public class ObligationsQuerier extends Querier implements ObligationsQuery {
 

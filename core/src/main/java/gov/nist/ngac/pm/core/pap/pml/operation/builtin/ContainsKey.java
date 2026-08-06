@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in function contains_key(map, key). Returns whether map contains key.
+ * A PML built-in function that returns whether a map contains a key.
  */
 public class ContainsKey extends PMLFunctionOperation<Boolean> {
 

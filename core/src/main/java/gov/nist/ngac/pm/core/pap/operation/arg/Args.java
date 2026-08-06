@@ -9,14 +9,12 @@ import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 /**
- * A type-safe, immutable-keyed map of an operation invocation's argument values, keyed by
- * {@link FormalParameter} rather than name.
+ * A map of an operation invocation's argument values, keyed by {@link FormalParameter} instead of name.
  */
 public class Args {
 
 	/**
-	 * Builds an {@link Args} by matching each of the operation's formal parameters to its actual value by
-	 * name, casting each value to its formal parameter's type.
+	 * Builds an {@link Args} by matching the operation's formal parameters to actual values by name.
 	 *
 	 * @param function the operation whose formal parameters to match against
 	 * @param actualArgs the actual argument values, keyed by parameter name

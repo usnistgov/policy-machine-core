@@ -6,8 +6,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
 /**
- * Wraps a single Neo4j {@link Transaction} with reference-counted begin/commit/rollback, so nested calls
- * from different stores share one transaction and only the outermost commit or rollback actually applies.
+ * Wraps a Neo4j {@link Transaction} with reference-counted begin/commit/rollback, so nested calls share
+ * one transaction and only the outermost commit or rollback applies.
  */
 public class TxHandler implements Transactional {
 
@@ -21,8 +21,8 @@ public class TxHandler implements Transactional {
 	}
 
 	/**
-	 * Runs the given callback against the current (or a newly begun) transaction, committing on success
-	 * or rolling back and rethrowing on failure.
+	 * Runs a callback within the current or a newly begun transaction, committing on success or rolling
+	 * back on failure.
 	 *
 	 * @param runner the callback to execute against the transaction
 	 * @throws PMException if the callback throws, after the transaction has been rolled back
@@ -78,7 +78,7 @@ public class TxHandler implements Transactional {
 	}
 
 	/**
-	 * Callback invoked with the active Neo4j transaction by {@link TxHandler#runTx}.
+	 * A callback that runs against the active Neo4j transaction.
 	 */
 	public interface Neo4jTxRunner {
 		void runTx(Transaction tx) throws PMException;

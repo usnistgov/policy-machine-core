@@ -17,7 +17,7 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.ArrayList;
 
 /**
- * PML delete prohibition ... statement.
+ * A PML statement that deletes a prohibition.
  */
 public class DeleteProhibitionStatement extends DeleteStatement {
 

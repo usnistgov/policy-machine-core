@@ -16,9 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compiles a PML statement block (function/operation body, on-pattern block, or a nested statement
- * block) into a {@link Result}, checking whether every control-flow path through the block returns a
- * value matching the expected return type.
+ * Compiles a PML statement block into a {@link Result}. Checks that every path returns a value matching
+ * the expected return type.
  */
 public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.Result> {
 
@@ -179,7 +178,7 @@ public class StatementBlockVisitor extends PMLBaseVisitor<StatementBlockVisitor.
     /**
      * A compiled statement block, plus whether every control-flow path through it returns a value.
      *
-     * @param allPathsReturned whether every control-flow path through the block returns a value
+     * @param allPathsReturned whether every path returns a value
      * @param stmts the compiled statement block
      */
     public record Result(boolean allPathsReturned, PMLStatementBlock stmts) {

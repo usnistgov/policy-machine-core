@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in query get_associations_with_target(node). Returns the associations targeting the given
- * node, each as a map with "ua", "target", and "arset" entries.
+ * A PML built-in query that returns the associations targeting a node.
  */
 public class GetAssociationsWithTarget extends PMLQueryOperation<List<Map<String, Object>>> {
 

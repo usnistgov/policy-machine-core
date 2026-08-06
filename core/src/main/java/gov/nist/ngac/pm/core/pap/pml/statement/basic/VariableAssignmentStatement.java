@@ -8,8 +8,8 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 /**
- * PML = or += variable assignment statement; += is only supported for string variables and casts
- * the existing value to a String before concatenating.
+ * A PML statement that assigns or appends to a variable. The += operator only works on string
+ * variables, casting the existing value to a string before concatenating.
  */
 public class VariableAssignmentStatement extends BasicStatement<VoidResult> {
 

@@ -10,9 +10,8 @@ import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.List;
 
 /**
- * {@link PolicyBootstrapper} that creates a "super" user with unrestricted admin privileges, obligations
- * to keep super privileged on newly created policy-class content, and then executes the given PML script
- * as that user.
+ * A {@link PolicyBootstrapper} that creates a super user with unrestricted admin privileges and runs the
+ * given PML script as that user.
  */
 public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
 
@@ -23,12 +22,10 @@ public class PMLBootstrapperWithSuper extends PolicyBootstrapper {
     }
 
     /**
-     * Apply the stored PML to the given PAP. This will create a super user called "super" which will have privileges
-     * to do everything in the policy machine. This method will also create obligations to be stored in the policy store
-     * that creates an association when any user creates or assigns a node to a PC node. This will ensure the super user
-     * retains access to the node and its ascendants.
-     * @param pap the PAP to execute the bootstrap PML.
-     * @throws PMException if there is an exception configuring the policy
+     * Creates the super user and obligations to keep it privileged on new policy class content, then runs
+     * the stored PML as that user.
+     * @param pap the PAP to bootstrap
+     * @throws PMException if configuring the policy fails
      */
     @Override
     public void bootstrap(PAP pap) throws PMException {

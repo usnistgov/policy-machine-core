@@ -24,8 +24,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 
 /**
- * {@link OperationsStore} implementation backed by an embedded Neo4j database, storing PML operations
- * and the resource access right set as labeled Neo4j nodes.
+ * A {@link OperationsStore} backed by an embedded Neo4j database, storing operations and the resource
+ * access right set as labeled nodes.
  */
 public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 
@@ -135,9 +135,8 @@ public class Neo4jEmbeddedOperationsStore implements OperationsStore {
 	}
 
 	/**
-	 * Reads a row's kind and PML text (if any) while the underlying Neo4j transaction is still open — a
-	 * {@link Node} becomes unusable once the transaction closes, so every property read must happen inside
-	 * the lambda.
+	 * Reads a row's kind and PML text while the transaction is still open. A {@link Node} becomes unusable
+	 * once the transaction closes, so every property read must happen inside the lambda.
 	 */
 	private OperationRow readRow(String name) throws PMException {
 		AtomicReference<OperationRow> rowRef = new AtomicReference<>();

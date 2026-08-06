@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link SelfAccessQuery} implementation that delegates to a remote PDP over the gRPC policy query
- * service, resolving privileges for the caller identified by the gRPC request headers.
+ * A {@link SelfAccessQuery} that delegates to a remote PDP over gRPC. The caller is identified by the
+ * gRPC request headers.
  */
 public class GrpcSelfAccessQuerier implements SelfAccessQuery {
 

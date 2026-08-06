@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link AccessQuery} implementation that computes access decisions by walking the graph's user and
- * target DAGs and resolving the results against the policy's prohibitions.
+ * An {@link AccessQuery} implementation that computes access decisions by walking the graph and
+ * applying prohibitions.
  */
 public class AccessQuerier extends Querier implements AccessQuery {
 

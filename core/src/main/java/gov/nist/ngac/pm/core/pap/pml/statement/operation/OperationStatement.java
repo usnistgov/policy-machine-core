@@ -9,8 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.PMLStatement;
 import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 
 /**
- * Base class for PML statements that execute a single {@link Operation}, translating the statement's
- * parsed arguments into the operation's {@link Args} before invoking it.
+ * Base class for PML statements that execute a single {@link Operation}.
  */
 public abstract class OperationStatement extends PMLStatement<VoidResult> {
 
@@ -25,11 +24,10 @@ public abstract class OperationStatement extends PMLStatement<VoidResult> {
     }
 
     /**
-     * Builds the {@link Args} to invoke this statement's operation with, resolving any expressions
-     * against the current execution context.
+     * Builds the arguments to invoke this statement's operation with.
      *
      * @param ctx the execution context to resolve expressions against
-     * @param pap the PAP to resolve names (e.g. node names to ids) against
+     * @param pap the PAP to resolve names against
      * @return the arguments to invoke the operation with
      * @throws PMException if resolving an expression or name fails
      */

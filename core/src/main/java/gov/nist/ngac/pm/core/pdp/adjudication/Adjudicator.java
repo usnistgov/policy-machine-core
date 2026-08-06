@@ -12,7 +12,7 @@ import java.util.Collection;
 
 /**
  * Base class for PDP adjudicators, which wrap a {@link PAP} query/modification sub-area with a required
- * access-right check before delegating.
+ * access right check before delegating.
  */
 public abstract class Adjudicator {
 

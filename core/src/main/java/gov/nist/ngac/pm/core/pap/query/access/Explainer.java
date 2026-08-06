@@ -25,8 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Builds a full {@link Explain} for a user's access to a target: the granted and denied privileges, the
- * satisfied prohibitions, and the per-policy-class paths (with associations) that justify them.
+ * Builds a full {@link Explain} of a user's access to a target.
  */
 public class Explainer {
 

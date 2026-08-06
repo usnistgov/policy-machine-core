@@ -13,8 +13,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 /**
- * PML create function statement. Creates the function operation in the policy and registers it in the
- * current scope so later statements can call it.
+ * A PML statement that defines a function.
  */
 public class FunctionDefinitionStatement extends OperationStatement implements OperationDefinitionStatement {
 

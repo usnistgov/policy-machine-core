@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for routines defined in PML, carrying the {@link PMLOperationSignature} and
- * {@link ExecutionContext} a {@link PMLOperation} needs.
+ * Base class for routines defined in PML.
  *
  * @param <T> the routine's return type
  */

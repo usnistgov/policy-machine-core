@@ -21,8 +21,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.operation.ResourceOpDefinitionSta
 import gov.nist.ngac.pm.core.pap.pml.statement.operation.RoutineDefinitionStatement;
 
 /**
- * Compiles a PML admin/resource/query operation definition into its
- * {@link OperationDefinitionStatement} subtype, dispatching by the parsed context's specific kind.
+ * Compiles a PML operation definition into the matching {@link OperationDefinitionStatement} subtype.
  */
 public class OperationDefinitionVisitor extends PMLBaseVisitor<OperationDefinitionStatement> {
 

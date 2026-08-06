@@ -39,8 +39,8 @@ import org.neo4j.graphdb.traversal.Traverser;
 import org.neo4j.graphdb.traversal.Uniqueness;
 
 /**
- * {@link GraphStore} implementation backed by an embedded Neo4j database, with nodes represented as
- * labeled Neo4j nodes and assignments/associations as relationships.
+ * A {@link GraphStore} backed by an embedded Neo4j database, with nodes as labeled Neo4j nodes and
+ * assignments/associations as relationships.
  */
 public class Neo4jEmbeddedGraphStore implements GraphStore {
 

@@ -48,8 +48,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * Compiles a PML create obligation statement — its name, event pattern, and response body — into a
- * {@link CreateObligationStatement}.
+ * Compiles a PML create obligation statement into a {@link CreateObligationStatement}.
  */
 public class CreateObligationStmtVisitor extends PMLBaseVisitor<CreateObligationStatement> {
 

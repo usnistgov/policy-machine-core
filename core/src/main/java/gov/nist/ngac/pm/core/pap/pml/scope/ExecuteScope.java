@@ -12,8 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link Scope} used during PML execution, tracking each variable's runtime value and each operation as
- * a callable {@link Operation}.
+ * A {@link Scope} used during PML execution.
  */
 public class ExecuteScope extends Scope<Object, Operation<?>> {
 

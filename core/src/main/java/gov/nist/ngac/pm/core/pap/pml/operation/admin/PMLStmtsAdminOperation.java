@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A PML create admin operation definition's runtime form. Executes its {@link PMLStatementBlock} body
- * and casts the result to the declared return type.
+ * The runtime form of a PML admin operation definition.
  *
  * @param <T> the operation's return type
  */

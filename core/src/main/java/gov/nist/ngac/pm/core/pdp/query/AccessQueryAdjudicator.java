@@ -22,8 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link AccessQuery} implementation that checks the acting user's admin privileges before delegating to
- * the PAP.
+ * A {@link AccessQuery} that checks the acting user's admin privileges before delegating to the PAP.
  */
 public class AccessQueryAdjudicator extends Adjudicator implements AccessQuery {
 

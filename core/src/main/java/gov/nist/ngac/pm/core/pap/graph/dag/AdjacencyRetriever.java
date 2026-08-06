@@ -4,8 +4,7 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import java.util.Collection;
 
 /**
- * Supplies the nodes adjacent to a node for a {@link GraphWalker} to traverse next — ascendants or
- * descendants, depending on the direction the walker is configured for.
+ * Supplies the nodes adjacent to a node for a {@link GraphWalker} to traverse next.
  */
 @FunctionalInterface
 public interface AdjacencyRetriever {

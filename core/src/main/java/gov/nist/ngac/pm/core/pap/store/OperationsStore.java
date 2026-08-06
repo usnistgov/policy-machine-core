@@ -22,11 +22,12 @@ public interface OperationsStore extends OperationsModification, Transactional {
     boolean operationExists(String name) throws PMException;
 
     /**
-     * The persisted PML text for an operation row. Empty if the row doesn't exist or is
-     * {@link OperationKind#JAVA}, which has no PML body.
-     * @param name The name of the operation.
-     * @return The operation's PML text, or empty.
-     * @throws PMException If there is an error in the PM.
+     * The persisted PML text for an operation. Empty if the operation doesn't exist or is a
+     * {@link OperationKind#JAVA} operation, which has no PML body.
+     *
+     * @param name the operation's name
+     * @return the operation's PML text, or empty
+     * @throws PMException if the lookup fails
      */
     Optional<String> getOperationPml(String name) throws PMException;
 

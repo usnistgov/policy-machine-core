@@ -28,9 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Computes, per policy class, the privileges a user's {@link UserDagResult} grants on a target by
- * depth-first walking the target's ascendant graph and merging in the border-target access rights
- * reached along the way.
+ * Computes the privileges a user has on a target, per policy class, by walking the target's ascendant
+ * graph.
  */
 public class TargetEvaluator {
 
@@ -41,11 +40,7 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Perform a depth first search on the object side of the graph.  Start at the target node and recursively visit nodes
-	 * until a policy class is reached.  On each node visited, collect any operation the user has on the target. At the
-	 * end of each dfs iteration the visitedNodes map will contain the operations the user is permitted on the target under
-	 * each policy class. If the target has one or more PCs as adjacent descendants, first check the users privileges on
-	 * those PCs and add them to the entries of those PCs in the resulting TargetDagResult
+	 * Evaluates a user's privileges on a target, per policy class.
 	 */
 	public TargetDagResult evaluate(UserDagResult userDagResult, TargetContext targetContext) throws PMException {
 		targetContext = prepareTargetCtx(targetContext);
@@ -88,9 +83,7 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Builds the mutable traversal state for one {@link #evaluate} call: the target's first-level
-	 * ascendants to seed the walk, the node ids the user's prohibitions reference, and empty maps to
-	 * accumulate visited privileges and prohibition hits into.
+	 * Builds the traversal state used by one {@link #evaluate} call.
 	 */
 	protected TraversalState initializeEvaluationState(UserDagResult userDagResult, TargetContext targetCtx) throws PMException {
 		Collection<Long> firstLevelDescs = new LongArrayList();
@@ -137,8 +130,7 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Builds the depth-first {@link GraphWalker} used to traverse the target's ascendant graph, wired
-	 * with this evaluator's visitor and propagator.
+	 * Builds the depth-first {@link GraphWalker} used to traverse the target's ascendant graph.
 	 */
 	protected GraphWalker createDepthFirstWalker(UserDagResult userDagResult, TraversalState state) throws PMException {
 		Visitor nodeVisitor = createVisitor(userDagResult, state);
@@ -150,9 +142,8 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Builds the {@link Visitor} that, for each ascendant node visited, records it as a reached
-	 * prohibition target if applicable, seeds its privileges when it's a policy class, and merges in the
-	 * user's border-target access rights when the node is itself a border target.
+	 * Builds the {@link Visitor} that records privileges and prohibition hits for each ascendant node
+	 * visited.
 	 */
 	protected Visitor createVisitor(UserDagResult userDagResult, TraversalState state) throws PMException {
 		Collection<Long> policyClasses = policyStore.graph().getPolicyClasses();
@@ -176,8 +167,7 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Builds the {@link Propagator} that merges a visited descendant's per-policy-class privileges into
-	 * its ascendant as the walk moves up the target graph.
+	 * Builds the {@link Propagator} that merges a descendant's privileges into its ascendant.
 	 */
 	protected Propagator createPropagator(TraversalState state) {
 		return (descendantId, ascendantId) -> {
@@ -195,9 +185,8 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Redirects a target context that resolves to a policy class node to the PM_ADMIN_POLICY_CLASSES
-	 * node, since a policy class has no ascendants of its own to walk; other target contexts pass through
-	 * unchanged.
+	 * Redirects a target context for a policy class node to the admin policy classes node, since a policy
+	 * class has no ascendants to walk.
 	 */
 	protected TargetContext prepareTargetCtx(TargetContext targetContext) throws PMException {
 		// if already a list of attributes, nothing to prepare
@@ -217,8 +206,7 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Collects every node id referenced in the inclusion or exclusion set of any of the given
-	 * prohibitions.
+	 * Collects the node ids referenced in the inclusion or exclusion set of the given prohibitions.
 	 */
 	protected Set<Long> collectUserProhibitionAttributes(Set<Prohibition> prohibitions) {
 		Set<Long> userProhibitionAttrs = new HashSet<>();
@@ -231,14 +219,12 @@ public class TargetEvaluator {
 	}
 
 	/**
-	 * Mutable state threaded through one target-side traversal: the target's first-level ascendants, the
-	 * node ids referenced by the user's prohibitions, the per-node per-policy-class privileges
-	 * accumulated so far, and the prohibition targets reached during the walk.
+	 * Mutable state threaded through one target-side traversal.
 	 *
 	 * @param firstLevelDescs the target's first-level ascendants, seeding the walk
 	 * @param userProhibitionTargets node ids referenced by the user's prohibitions
-	 * @param visitedNodes per-node, per-policy-class privileges accumulated so far
-	 * @param visitedProhibitionTargets prohibition-referenced node ids reached during the walk
+	 * @param visitedNodes privileges accumulated so far, per node and policy class
+	 * @param visitedProhibitionTargets prohibition node ids reached during the walk
 	 */
 	protected record TraversalState(Collection<Long> firstLevelDescs,
 									Set<Long> userProhibitionTargets,

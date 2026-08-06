@@ -12,8 +12,8 @@ import gov.nist.ngac.pm.core.pap.pml.statement.result.VoidResult;
 import java.util.Objects;
 
 /**
- * PML create query operation statement. Creates the operation in the policy and registers it in the
- * current scope so later statements can call it.
+ * A PML statement that creates a query operation, registering it in the current scope so later
+ * statements can call it.
  */
 public class QueryOperationDefinitionStatement extends OperationStatement implements OperationDefinitionStatement {
 

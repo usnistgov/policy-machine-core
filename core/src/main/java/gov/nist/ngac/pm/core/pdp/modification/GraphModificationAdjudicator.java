@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * {@link GraphModification} implementation that checks the acting user's admin privileges before
- * executing each graph modification via its {@link gov.nist.ngac.pm.core.pap.operation.AdminOperation}.
+ * A {@link GraphModification} that checks the acting user's admin privileges before executing each
+ * modification.
  */
 public class GraphModificationAdjudicator extends Adjudicator implements GraphModification {
 

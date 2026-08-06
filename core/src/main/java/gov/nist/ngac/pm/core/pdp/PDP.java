@@ -32,11 +32,12 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     /**
-     * Run a transaction as the given user.
-     * @param userCtx The user.
-     * @param txRunner The tx runner to execute the transaction.
-     * @return an Object if the tx runner returns something.
-     * @throws PMException if there is an error executing the transaction.
+     * Runs a transaction as the given user.
+     *
+     * @param userCtx the user
+     * @param txRunner the tx runner to execute the transaction
+     * @return the tx runner's result
+     * @throws PMException if the transaction fails
      */
     public <T> T runTx(UserContext userCtx, PDPTxRunner<T> txRunner) throws PMException {
         return TxRunner.runTx(pap, () -> {
@@ -46,11 +47,12 @@ public class PDP implements EventPublisher, AccessAdjudication {
     }
 
     /**
-     * Execute PML on behalf of the user. The entire PML string will be executed in a transaction.
-     * @param userCtx the user.
-     * @param pml the PML.
-     * @return an Object containing the result of executing the PML.
-     * @throws PMException tf there is an error executing the PML.
+     * Executes PML on behalf of the user, in a single transaction.
+     *
+     * @param userCtx the user
+     * @param pml the PML to execute
+     * @return the value returned by the PML, or null
+     * @throws PMException if execution fails
      */
     public Object executePML(UserContext userCtx, String pml) throws PMException {
         return runTx(userCtx, tx -> tx.executePML(pml));

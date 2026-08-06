@@ -9,11 +9,12 @@ import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
 public interface PolicySerializer {
 
     /**
-     * Serialize the policy accessible by the PolicyQuery interface. FOr operations, only those defined using PML will
-     * be serialized. Java or other implementations of Operations will not be included in the output.
-     * @param policyQuery The PolicyQuery interface to retrieve the policy information.
-     * @return A String representation of the policy.
-     * @throws PMException If there is an error during serialization.
+     * Serializes the policy accessible through the given query. Only operations defined in PML are
+     * included; Java-defined operations are not serialized.
+     *
+     * @param policyQuery used to retrieve the policy information
+     * @return a string representation of the policy
+     * @throws PMException if serialization fails
      */
     String serialize(PolicyQuery policyQuery) throws PMException;
 

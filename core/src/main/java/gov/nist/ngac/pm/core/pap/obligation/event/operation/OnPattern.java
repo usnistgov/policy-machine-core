@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * A {@link MatchesOperationPattern}'s "on (args) { ... }" clause: the event-context argument names bound
+ * A {@link MatchesOperationPattern}'s "on (args) { ... }" clause: the event context argument names bound
  * for the body, and the routine body that returns boolean.
  *
  * @param patternArgs the event context argument names bound for the body

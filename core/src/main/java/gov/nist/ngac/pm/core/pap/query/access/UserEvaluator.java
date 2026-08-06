@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Computes a {@link UserDagResult} for a user by breadth-first walking their ascendant graph and
- * collecting the border targets reached via associations and the prohibitions that apply to them.
+ * Computes a {@link UserDagResult} for a user by walking their ascendant graph.
  */
 public class UserEvaluator {
 
@@ -26,13 +25,9 @@ public class UserEvaluator {
 	}
 
 	/**
-	 * Find the target nodes that are reachable by the subject via an association. This is done by a breadth first search
-	 * starting at the subject node and walking up the user side of the graph until all user attributes the subject is assigned
-	 * to have been visited.  For each user attribute visited, get the associations it is the source of and store the
-	 * target of that association as well as the operations in a map. If a target node is reached multiple times, add any
-	 * new operations to the already existing ones.
+	 * Evaluates the user's ascendant graph.
 	 *
-	 * @return a UserEvaluationResult containing one UserDagResult per (sub-)context.
+	 * @return the border targets and prohibitions reachable by the user
 	 */
 	public UserDagResult evaluate(UserContext ctx) throws PMException {
 		Map<Long, AccessRightSet> borderTargets = new HashMap<>();

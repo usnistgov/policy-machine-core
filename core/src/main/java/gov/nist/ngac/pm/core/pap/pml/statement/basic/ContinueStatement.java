@@ -6,7 +6,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.statement.result.ContinueResult;
 
 /**
- * PML continue statement, signaling a {@link ForeachStatement} to skip to the next iteration.
+ * A PML continue statement that skips to the next iteration of the enclosing loop.
  */
 public class ContinueStatement extends BasicStatement<ContinueResult> {
 

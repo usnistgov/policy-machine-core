@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 /**
- * Compiles a PML set properties of ... to ... statement into a {@link SetNodePropertiesStatement}.
+ * Compiles a PML set properties statement into a {@link SetNodePropertiesStatement}.
  */
 public class SetNodePropertiesStmtVisitor extends PMLBaseVisitor<SetNodePropertiesStatement> {
 

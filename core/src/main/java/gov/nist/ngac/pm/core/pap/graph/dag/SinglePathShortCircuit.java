@@ -3,8 +3,7 @@ package gov.nist.ngac.pm.core.pap.graph.dag;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 
 /**
- * Delegates directly to a wrapped {@link ShortCircuit} without latching — intended for the
- * {@link GraphWalker} single-path short circuit slot, where a trigger only halts the current path.
+ * A {@link ShortCircuit} that delegates to a wrapped one without latching.
  */
 public class SinglePathShortCircuit implements ShortCircuit {
 

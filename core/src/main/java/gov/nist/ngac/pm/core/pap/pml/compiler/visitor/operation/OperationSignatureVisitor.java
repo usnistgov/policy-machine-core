@@ -36,9 +36,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Compiles an operation's signature — name, parameters, return type, required capabilities, and event
- * context annotations — into a {@link PMLOperationSignature}, optionally registering it in scope as it
- * goes so the operation can be referenced by later statements (e.g. recursive calls).
+ * Compiles an operation's signature into a {@link PMLOperationSignature}.
  */
 public class OperationSignatureVisitor extends PMLBaseVisitor<PMLOperationSignature> {
 

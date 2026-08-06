@@ -5,8 +5,7 @@ import gov.nist.ngac.pm.core.pap.operation.arg.Args;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 
 /**
- * Executes an {@link Operation} with a given set of arguments, as implemented by {@link
- * gov.nist.ngac.pm.core.pap.PAP}.
+ * Executes an {@link Operation} with a given set of arguments.
  */
 public interface OperationExecutor {
 

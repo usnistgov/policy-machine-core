@@ -7,8 +7,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.VisitorContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 
 /**
- * Compiles a bare PML operation-invocation statement (an operation call used for its side effects) into
- * an {@link Expression}.
+ * Compiles a PML operation invocation statement into an {@link Expression}.
  */
 public class OperationInvokeStmtVisitor extends PMLBaseVisitor<Expression<?>> {
 

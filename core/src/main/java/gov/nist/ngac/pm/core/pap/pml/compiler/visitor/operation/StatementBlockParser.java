@@ -12,9 +12,7 @@ import gov.nist.ngac.pm.core.pap.pml.statement.PMLStatementBlock;
 import java.util.List;
 
 /**
- * Compiles the body of an operation, function, or obligation response into a {@link PMLStatementBlock},
- * seeding a child scope with the enclosing formal parameters and rejecting a non-void body whose
- * control-flow paths don't all return.
+ * Compiles the body of an operation, function, or obligation response into a {@link PMLStatementBlock}.
  */
 public class StatementBlockParser {
 

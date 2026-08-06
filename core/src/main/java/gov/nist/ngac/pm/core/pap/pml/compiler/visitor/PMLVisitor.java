@@ -21,8 +21,7 @@ import java.util.function.Consumer;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Compiles a full PML source file into its list of top-level statements, sorting operation/routine/
- * function definitions ahead of the remaining statements so later statements can reference them.
+ * Compiles a full PML source file into its list of top-level statements.
  */
 public class PMLVisitor extends PMLBaseVisitor<List<PMLStatement<?>>> {
 

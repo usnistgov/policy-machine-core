@@ -17,8 +17,8 @@ import gov.nist.ngac.pm.core.pdp.adjudication.Adjudicator;
 import java.util.ArrayList;
 
 /**
- * {@link OperationsModification} implementation that checks the acting user's admin privileges before
- * delegating to the PAP.
+ * A {@link OperationsModification} that checks the acting user's admin privileges before delegating to
+ * the PAP.
  */
 public class OperationsModificationAdjudicator extends Adjudicator implements OperationsModification {
 

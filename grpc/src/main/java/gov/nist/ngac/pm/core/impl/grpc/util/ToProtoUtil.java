@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Converts core policy-machine model types into their corresponding gRPC wire proto messages.
+ * Converts core policy machine model types into their corresponding gRPC wire proto messages.
  */
 public class ToProtoUtil {
 
@@ -191,9 +191,8 @@ public class ToProtoUtil {
     }
 
     /**
-     * Converts a plain Java value (Long, Boolean, String, List, or Map) into its proto {@link Value},
-     * recursing into list and map elements. Map keys that aren't strings are converted via
-     * {@link Object#toString()}; any other unrecognized type produces an empty value.
+     * Converts a plain Java value into its proto {@link Value}, recursing into list and map elements.
+     * Non-string map keys are converted to strings, and unrecognized types produce an empty value.
      *
      * @param o the value to convert
      * @return the converted proto value
@@ -234,8 +233,8 @@ public class ToProtoUtil {
     }
 
     /**
-     * Converts a core obligation into its proto representation, resolving the author to a single node id
-     * and serializing the whole obligation back to PML for the proto's PML field.
+     * Converts a core obligation into its proto representation, resolving the author to a node id and
+     * serializing the obligation to PML.
      *
      * @param obligation the obligation to convert
      * @param pap the PAP used to resolve the author's node id
@@ -275,8 +274,7 @@ public class ToProtoUtil {
     }
 
     /**
-     * Converts a core prohibition into its proto representation, setting the node or process field
-     * depending on whether it is a {@link NodeProhibition} or {@link ProcessProhibition}.
+     * Converts a core prohibition into its proto representation.
      *
      * @param prohibition the prohibition to convert
      * @param query used to resolve the inclusion/exclusion set and subject node ids to full nodes

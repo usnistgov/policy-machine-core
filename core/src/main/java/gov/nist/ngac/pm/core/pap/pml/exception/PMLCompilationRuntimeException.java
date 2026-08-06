@@ -7,9 +7,7 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Unchecked counterpart to {@link PMLCompilationException}, thrown by compiler visitors (whose ANTLR
- * override signatures can't declare checked exceptions) and converted back to a checked exception at the
- * top-level compile entry point.
+ * Unchecked counterpart to {@link PMLCompilationException}, used inside compiler visitors.
  */
 public class PMLCompilationRuntimeException extends RuntimeException {
 

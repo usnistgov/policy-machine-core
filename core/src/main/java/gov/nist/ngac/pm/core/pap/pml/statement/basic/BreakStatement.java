@@ -6,7 +6,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.statement.result.BreakResult;
 
 /**
- * PML break statement, signaling a {@link ForeachStatement} to stop iterating.
+ * A PML break statement that stops the enclosing loop's iteration.
  */
 public class BreakStatement extends BasicStatement<BreakResult> {
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML set resource access rights ... statement. Replaces the policy's resource access right set.
+ * A PML statement that replaces the policy's resource access right set.
  */
 public class SetResourceAccessRightsStatement extends OperationStatement {
 

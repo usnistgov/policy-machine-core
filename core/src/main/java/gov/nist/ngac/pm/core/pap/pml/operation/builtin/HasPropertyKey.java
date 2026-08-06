@@ -14,7 +14,7 @@ import java.util.List;
 
 
 /**
- * PML built-in query has_property_key(node, key). Returns whether the node has the given property key.
+ * A PML built-in query that returns whether a node has a given property key.
  */
 public class HasPropertyKey extends PMLQueryOperation<Boolean> {
 

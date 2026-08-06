@@ -4,8 +4,7 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.common.exception.UnknownAccessRightException;
 
 /**
- * Validates that a set of access right names are all known — either declared resource access rights,
- * admin access rights, or wildcards.
+ * Validates that a set of access right names are all known.
  */
 public class AccessRightValidator {
 

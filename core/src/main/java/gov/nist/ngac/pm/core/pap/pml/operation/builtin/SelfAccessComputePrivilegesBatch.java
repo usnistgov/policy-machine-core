@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PML built-in query self_compute_privileges_batch(node_names). Returns the caller's privileges on each
- * of the given nodes, in the same order.
+ * A PML built-in query that returns the caller's privileges on a list of nodes.
  */
 public class SelfAccessComputePrivilegesBatch extends QueryOperation<List<List<String>>> {
 

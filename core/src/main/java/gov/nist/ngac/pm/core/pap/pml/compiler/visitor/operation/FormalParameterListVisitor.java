@@ -26,8 +26,7 @@ import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * Compiles an operation's parsed formal parameter list into {@link FormalParameter}s, resolving each
- * parameter's declared type.
+ * Compiles an operation's formal parameter list into {@link FormalParameter}s.
  */
 public class FormalParameterListVisitor extends PMLBaseVisitor<List<FormalParameter<?>>> {
 

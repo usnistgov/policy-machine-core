@@ -1,8 +1,7 @@
 package gov.nist.ngac.pm.core.pap.pml.statement.result;
 
 /**
- * The result of a statement that neither breaks, continues, nor returns — execution simply continues to
- * the next statement.
+ * The result of a statement that neither breaks, continues, nor returns.
  */
 public class VoidResult extends StatementResult {
 

@@ -1,8 +1,7 @@
 package gov.nist.ngac.pm.core.pap.graph.dag;
 
 /**
- * {@link ShortCircuit} that never triggers; the default used by {@link GraphWalker} when none is
- * configured.
+ * A {@link ShortCircuit} that never triggers.
  */
 public class NoopShortCircuit implements ShortCircuit{
     @Override

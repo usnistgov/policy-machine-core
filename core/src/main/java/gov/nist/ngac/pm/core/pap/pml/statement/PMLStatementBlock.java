@@ -62,7 +62,7 @@ public class PMLStatementBlock extends PMLStatement<StatementResult> {
     }
 
     /**
-     * Executes this block's statements in order via {@link ExecutionContext#executeStatements}.
+     * Executes this block's statements in order.
      */
     public StatementResult execute(ExecutionContext ctx, PAP pap) throws PMException {
         return ctx.executeStatements(stmts, new Args());

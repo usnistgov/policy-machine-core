@@ -20,8 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link ProhibitionsQuery} implementation that delegates to a remote PDP over the gRPC policy query
- * service.
+ * A {@link ProhibitionsQuery} that delegates to a remote PDP over gRPC.
  */
 public class GrpcProhibitionsQuerier implements ProhibitionsQuery {
 

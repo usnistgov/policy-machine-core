@@ -9,8 +9,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.stub.MetadataUtils;
 
 /**
- * {@link PolicyQuery} implementation backed by a gRPC channel, attaching the user/process headers to
- * every call via a shared {@link GrpcPolicyQuerier}.
+ * A {@link PolicyQuery} backed by a gRPC channel that attaches user/process headers to every call.
  */
 public class GrpcQueryPDP implements PolicyQuery {
 

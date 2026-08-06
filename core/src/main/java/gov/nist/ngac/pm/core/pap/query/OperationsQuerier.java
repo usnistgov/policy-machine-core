@@ -12,8 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * {@link OperationsQuery} implementation backed by the
- * {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s operations store.
+ * An {@link OperationsQuery} implementation backed by the policy store's operations store.
  */
 public class OperationsQuerier extends Querier implements OperationsQuery {
 
@@ -75,8 +74,8 @@ public class OperationsQuerier extends Querier implements OperationsQuery {
     }
 
     /**
-     * Resolve a persisted operation by name: JAVA-kind through the registry, PML-kind by
-     * recompiling the store's persisted PML text.
+     * Resolves a persisted operation by name, using the registry for JAVA-kind operations and
+     * recompiling the stored PML text for PML-kind ones.
      */
     private Operation<?> resolveStoreOperation(String name) throws PMException {
         if (store.operations().getOperationKind(name) == OperationKind.JAVA) {

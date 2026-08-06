@@ -6,8 +6,7 @@ import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc;
 import gov.nist.ngac.pm.proto.v1.pdp.query.PolicyQueryServiceGrpc.PolicyQueryServiceBlockingStub;
 
 /**
- * {@link PolicyQuery} implementation that vends gRPC-backed queriers for each policy sub-area, all
- * sharing the same policy query stub.
+ * A {@link PolicyQuery} that provides gRPC-backed queriers for each policy sub-area.
  */
 public class GrpcPolicyQuerier implements PolicyQuery {
 
@@ -23,7 +22,7 @@ public class GrpcPolicyQuerier implements PolicyQuery {
     }
 
     /**
-     * Returns a self-access querier; the user context argument is unused since self-access is always
+     * Returns a self-access querier. The user context argument is unused since self-access is always
      * resolved server-side from the caller's gRPC identity.
      *
      * @param userCtx unused

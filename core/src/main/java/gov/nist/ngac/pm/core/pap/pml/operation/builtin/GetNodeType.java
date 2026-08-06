@@ -13,7 +13,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
 /**
- * PML built-in query get_node_type(node). Returns the node's type as a string.
+ * A PML built-in query that returns a node's type.
  */
 public class GetNodeType extends PMLQueryOperation<String> {
 

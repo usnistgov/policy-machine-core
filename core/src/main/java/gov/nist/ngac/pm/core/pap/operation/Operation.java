@@ -23,12 +23,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A callable, named PML/Java operation: its signature (parameters and return type), the capabilities
- * required to invoke it, and its executable body. The permitted subclasses distinguish what the
- * operation is allowed to do while executing — {@link AdminOperation}s and {@link Routine}s get the full
- * {@link gov.nist.ngac.pm.core.pap.PAP} and so can modify the policy, {@link ResourceOperation}s and
- * {@link QueryOperation}s are restricted to read-only policy queries, and {@link Function}s have no
- * policy access at all.
+ * A named, callable operation with parameters, required capabilities, and a body to execute. Subclasses
+ * differ in how much policy access they're allowed during execution.
  *
  * @param <R> the operation's return type
  */
@@ -93,12 +89,13 @@ public abstract sealed class Operation<R> permits AdminOperation, ResourceOperat
     }
 
     /**
-     * Execute the function with the given arguments and PAP object. This method allows for modification and querying of
-     * the underlying policy.
+     * Executes the operation with the given arguments.
      *
-     * @param pap  The PAP object to execute on.
-     * @param args The arguments passed to the function execution.
-     * @return The function return value.
+     * @param pap the PAP to execute against
+     * @param userCtx the user executing the operation
+     * @param args the operation's arguments
+     * @return the operation's return value
+     * @throws PMException if execution fails
      */
     public abstract R execute(PAP pap, UserContext userCtx, Args args) throws PMException;
 
@@ -127,10 +124,11 @@ public abstract sealed class Operation<R> permits AdminOperation, ResourceOperat
     }
 
     /**
-     * Convert the given map of raw args to an Arg object with type checking on arg values. Only NodeFormalParameters
-     * are required.
-     * @param rawArgs The raw args to validate and prepare.
-     * @return An Args object.
+     * Converts raw argument values to a type-checked {@link Args}.
+     *
+     * @param rawArgs the raw argument values, keyed by parameter name
+     * @return the type-checked args
+     * @throws IllegalArgumentException if the args don't match the operation's parameters, or a value has the wrong type
      */
     public Args validateArgs(Map<String, Object> rawArgs) {
         Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
@@ -157,10 +155,12 @@ public abstract sealed class Operation<R> permits AdminOperation, ResourceOperat
     }
 
     /**
-     * Convert the given map of raw args to an Arg object with type checking on arg values. This method allows a subset
-     * of the required parameters to be present in the rawArgs.
-     * @param rawArgs The raw args to validate and prepare.
-     * @return An Args object.
+     * Converts raw event context values to a type-checked {@link Args}, allowing a subset of the event
+     * parameters to be present.
+     *
+     * @param rawArgs the raw argument values, keyed by parameter name
+     * @return the type-checked args
+     * @throws IllegalArgumentException if an argument isn't one of the operation's event parameters
      */
     public Args validateEventContextArgs(Map<String, Object> rawArgs) {
         Set<String> rawArgNames = new HashSet<>(rawArgs.keySet());
@@ -178,12 +178,13 @@ public abstract sealed class Operation<R> permits AdminOperation, ResourceOperat
     }
 
     /**
-     * Checks if the given user can perform this operation with the given args.
-     * @param pap The PAP object used to query the access state of the policy.
-     * @param userCtx The user trying to execute the operation.
-     * @param args The args passed to the operation.
-     * @throws UnauthorizedException if the user does not satisfy the required capabilities of the operation.
-     * @throws PMException If there is an error checking access.
+     * Checks that the given user can perform this operation with the given args.
+     *
+     * @param pap the PAP to query access against
+     * @param userCtx the user trying to execute the operation
+     * @param args the operation's arguments
+     * @throws UnauthorizedException if the user doesn't satisfy any required capability
+     * @throws PMException if checking access fails
      */
     public void canExecute(PAP pap, UserContext userCtx, Args args) throws PMException {
         if (requiredCapabilities.isEmpty()) {

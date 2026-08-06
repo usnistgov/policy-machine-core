@@ -24,14 +24,14 @@ alongside it, using the same version.
     <version>x.y.z</version>
 </dependency>
 
-<!-- optional: embedded Neo4j-backed policy store -->
+<!-- embedded Neo4j-backed policy store -->
 <dependency>
     <groupId>gov.nist.ngac.pm.core</groupId>
     <artifactId>policy-machine-neo4j</artifactId>
     <version>x.y.z</version>
 </dependency>
 
-<!-- optional: gRPC client for a remote Policy Machine server -->
+<!-- gRPC generated code -->
 <dependency>
     <groupId>gov.nist.ngac.pm.core</groupId>
     <artifactId>policy-machine-grpc</artifactId>

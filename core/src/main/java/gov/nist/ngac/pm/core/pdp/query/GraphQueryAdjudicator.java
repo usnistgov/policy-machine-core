@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link GraphQuery} implementation that checks the acting user's admin privileges before delegating to
- * the PAP.
+ * A {@link GraphQuery} that checks the acting user's admin privileges before delegating to the PAP.
  */
 public class GraphQueryAdjudicator extends Adjudicator implements GraphQuery {
 

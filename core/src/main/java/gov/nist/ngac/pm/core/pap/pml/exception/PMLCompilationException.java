@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Thrown when PML compilation fails, carrying the full list of {@link CompileError}s encountered.
+ * Thrown when PML compilation fails, carrying the {@link CompileError}s encountered.
  */
 public class PMLCompilationException extends PMException {
 

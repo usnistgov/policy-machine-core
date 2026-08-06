@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link AccessQuery} implementation that delegates to a remote PDP over the gRPC policy query service.
+ * A {@link AccessQuery} that delegates to a remote PDP over gRPC.
  */
 public class GrpcAccessQuerier implements AccessQuery {
 

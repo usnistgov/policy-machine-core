@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * PML built-in query node_exists(node). Returns whether a node with the given name exists.
+ * A PML built-in query that returns whether a node with a given name exists.
  */
 public class NodeExists extends PMLQueryOperation<Boolean> {
 

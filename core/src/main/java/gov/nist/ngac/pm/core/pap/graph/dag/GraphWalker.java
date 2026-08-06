@@ -6,10 +6,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.TargetContext;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 
 /**
- * Traverses the ascendant or descendant DAG from a starting node, calling back into a {@link Visitor}
- * per node, a {@link Propagator} to carry information from a visited child back to its parent, and two
- * {@link ShortCircuit} strategies that can halt the walk early: one that stops the entire walk once
- * triggered on any node, and one that only stops the current path.
+ * Traverses a DAG from a starting node, calling a {@link Visitor} for each node visited.
  */
 public abstract class GraphWalker {
 
@@ -53,7 +50,7 @@ public abstract class GraphWalker {
     }
 
     /**
-     * Sets the short circuit that, once triggered on any node, halts the entire walk across all paths.
+     * Sets the short circuit that halts the entire walk once triggered on any node.
      */
     public GraphWalker withAllPathShortCircuit(ShortCircuit shortCircuit) {
         this.allPathsShortCircuit = shortCircuit;
@@ -61,7 +58,7 @@ public abstract class GraphWalker {
     }
 
     /**
-     * Sets the short circuit that, once triggered on a node, halts only the path currently being walked.
+     * Sets the short circuit that halts only the current path once triggered.
      */
     public GraphWalker withSinglePathShortCircuit(ShortCircuit shortCircuit) {
         this.singlePathShortCircuit = shortCircuit;
@@ -89,9 +86,10 @@ public abstract class GraphWalker {
     }
     
     /**
-     * Traverse the graph starting at the given node.
-     * @param start The node to start traversing at.
-     * @throws PMException If there is an exception in the PM.
+     * Traverses the graph starting at the given node.
+     *
+     * @param start the node to start traversing at
+     * @throws PMException if traversal fails
      */
     public abstract void walk(long start) throws PMException;
 

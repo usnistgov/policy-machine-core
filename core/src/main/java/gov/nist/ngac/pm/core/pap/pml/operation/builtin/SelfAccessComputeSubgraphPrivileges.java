@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in query self_compute_subgraph_privileges(node_name). Returns the caller's privileges over
- * the given node and its descendant subgraph, flattened into a map keyed by node name.
+ * A PML built-in query that returns the caller's privileges over a node and its descendant subgraph.
  */
 public class SelfAccessComputeSubgraphPrivileges extends QueryOperation<Map<String, List<String>>> {
 

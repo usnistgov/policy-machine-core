@@ -30,9 +30,7 @@ public class ReturnStatement extends BasicStatement<StatementResult> {
     }
 
     /**
-     * Checks whether this return statement is compatible with the given expected return type — a
-     * value-less return only matches {@link VoidType}, otherwise the returned expression's type must be
-     * castable to the expected type.
+     * Checks whether this statement's return type matches the given expected type.
      */
     public boolean matchesReturnType(Type<?> match) {
         if (expr == null) {

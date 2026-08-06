@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Runtime context for executing PML statements: the acting user, the current variable/operation
- * {@link Scope}, and the {@link PAP} to execute against.
+ * Runtime context for executing PML statements.
  */
 public class ExecutionContext implements Serializable {
 
@@ -54,16 +53,16 @@ public class ExecutionContext implements Serializable {
     }
 
     /**
-     * Returns a new context with a full copy of this context's scope, for executing a nested block that
-     * should see all of this scope's variables and operations without mutating it.
+     * Returns a new context with a full copy of this context's scope, for executing a nested block
+     * without mutating this one.
      */
     public ExecutionContext copy() throws PMException {
         return new ExecutionContext(author, pap, scope.copy());
     }
 
     /**
-     * Returns a new context copied from this scope's parent scope (or a fresh empty scope if there is no
-     * parent), used when leaving a nested block back to its enclosing scope.
+     * Returns a new context copied from the parent scope, for leaving a nested block back to its
+     * enclosing scope.
      */
     public ExecutionContext copyWithParentScope() throws PMException {
         return new ExecutionContext(
@@ -74,14 +73,11 @@ public class ExecutionContext implements Serializable {
     }
 
     /**
-     * Executes a block of statements in a fresh copy of this scope seeded with the given arguments,
-     * merging variable updates back into this scope after each statement and stopping early on a
-     * return, break, or continue result.
+     * Executes a block of statements, stopping early on a return, break, or continue result.
      *
      * @param stmts the statements to execute in order
      * @param args the arguments to bind into the block's scope before executing
-     * @return the block's result: a {@link ReturnResult}, {@link BreakResult}, or {@link ContinueResult}
-     * if one was hit, otherwise a {@link VoidResult}
+     * @return the block's result, or a {@link VoidResult} if none of the statements returned one
      * @throws PMException if executing a statement fails
      */
     public StatementResult executeStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
@@ -103,8 +99,7 @@ public class ExecutionContext implements Serializable {
     }
 
     /**
-     * Executes an admin/resource/query operation's body via {@link #executeStatements}, unwrapping its
-     * return value.
+     * Executes an operation's body, unwrapping its return value.
      *
      * @return the operation's return value, or null if it doesn't return one
      */
@@ -119,7 +114,7 @@ public class ExecutionContext implements Serializable {
     }
 
     /**
-     * Executes a routine's body via {@link #executeStatements}, unwrapping its return value.
+     * Executes a routine's body, unwrapping its return value.
      *
      * @return the routine's return value, or null if it doesn't return one
      */
@@ -134,7 +129,7 @@ public class ExecutionContext implements Serializable {
     }
 
     /**
-     * Copies this context and binds each argument into the copy's scope, ready to execute a block's body.
+     * Copies this context and binds each argument into the copy's scope.
      */
     protected ExecutionContext writeArgsToScope(Args args) throws PMException {
         ExecutionContext copy = this.copy();

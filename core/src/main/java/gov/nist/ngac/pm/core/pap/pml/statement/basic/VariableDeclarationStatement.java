@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML var (...) statement. Declares one or more variables, each initialized to an expression's value.
+ * A PML statement that declares one or more variables, each initialized to an expression's value.
  */
 public class VariableDeclarationStatement extends BasicStatement<VoidResult> {
 

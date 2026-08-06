@@ -81,7 +81,7 @@ public class PMLBuiltinOperations {
     /**
      * Returns a copy of the built-in operations, keyed by their PML operation name.
      *
-     * @return a new map of built-in operations
+     * @return the built-in operations
      */
     public static Map<String, Operation<?>> builtinOperations() {
         return new HashMap<>(BUILTIN_OPERATIONS);

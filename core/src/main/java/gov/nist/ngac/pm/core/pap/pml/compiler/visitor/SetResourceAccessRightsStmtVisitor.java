@@ -11,8 +11,7 @@ import java.util.List;
 
 
 /**
- * Compiles a PML set resource access rights ... statement into a
- * {@link SetResourceAccessRightsStatement}.
+ * Compiles a PML set resource access rights statement into a {@link SetResourceAccessRightsStatement}.
  */
 public class SetResourceAccessRightsStmtVisitor extends PMLBaseVisitor<SetResourceAccessRightsStatement> {
 

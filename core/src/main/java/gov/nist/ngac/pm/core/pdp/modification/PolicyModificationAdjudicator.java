@@ -6,8 +6,7 @@ import gov.nist.ngac.pm.core.pap.modification.PolicyModification;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 
 /**
- * {@link PolicyModification} implementation that vends privilege-checked modifiers for each policy
- * sub-area, scoped to a single acting user.
+ * A {@link PolicyModification} that provides privilege-checked modifiers for a single acting user.
  */
 public class PolicyModificationAdjudicator implements PolicyModification {
 

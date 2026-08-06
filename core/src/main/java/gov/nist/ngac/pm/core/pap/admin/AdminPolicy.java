@@ -24,7 +24,7 @@ public class AdminPolicy {
      *
      * @param asc the ascendant node id
      * @param desc the descendant node id
-     * @return whether the assignment is a fixed admin-policy assignment
+     * @return whether the assignment is a fixed admin policy assignment
      */
     public static boolean isAdminPolicyAssignment(long asc, long desc) {
         boolean isBaseToPc = asc == PM_ADMIN_BASE_OA.nodeId() && desc == PM_ADMIN_PC.nodeId();

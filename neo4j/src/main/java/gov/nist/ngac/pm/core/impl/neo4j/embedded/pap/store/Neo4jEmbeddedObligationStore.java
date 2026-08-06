@@ -20,8 +20,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 
 /**
- * {@link ObligationsStore} implementation backed by an embedded Neo4j database, storing each obligation
- * as a labeled Neo4j node with its PML source and author properties.
+ * A {@link ObligationsStore} backed by an embedded Neo4j database, storing each obligation as a labeled
+ * node with its PML source and author properties.
  */
 public class Neo4jEmbeddedObligationStore implements ObligationsStore {
 

@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A PML function definition's runtime form: executes its {@link PMLStatementBlock} body and casts the
- * result to the declared return type.
+ * The runtime form of a PML function definition.
  *
  * @param <T> the function's return type
  */

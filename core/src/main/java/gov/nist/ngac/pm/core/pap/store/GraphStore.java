@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * The persistence layer for the policy graph: nodes, assignments, and associations.
+ * The persistence layer for the policy graph.
  */
 public interface GraphStore extends Transactional, NodeLookup {
 

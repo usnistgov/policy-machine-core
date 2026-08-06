@@ -16,8 +16,8 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import gov.nist.ngac.pm.core.pdp.adjudication.Adjudicator;
 
 /**
- * {@link ObligationsModification} implementation that checks the acting user's admin privileges before
- * delegating to the PAP.
+ * A {@link ObligationsModification} that checks the acting user's admin privileges before delegating to
+ * the PAP.
  */
 public class ObligationsModificationAdjudicator extends Adjudicator implements ObligationsModification {
 

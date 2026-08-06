@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link GraphQuery} implementation backed by the {@link gov.nist.ngac.pm.core.pap.store.PolicyStore}'s
- * graph store.
+ * A {@link GraphQuery} implementation backed by the policy store's graph store.
  */
 public class GraphQuerier extends Querier implements GraphQuery {
 
@@ -130,8 +129,9 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     /**
-     * Check that the given nodes exists.
-     * @param node The node to check.
+     * Checks that the given node exists.
+     *
+     * @param node the node to check
      */
     protected void checkNodeExists(long node) throws PMException {
         if (!store.graph().nodeExists(node)) {
@@ -140,8 +140,9 @@ public class GraphQuerier extends Querier implements GraphQuery {
     }
 
     /**
-     * Check that the given nodes exists.
-     * @param node The node to check.
+     * Checks that the given node exists.
+     *
+     * @param node the node to check
      */
     protected void checkNodeExists(String node) throws PMException {
         if (!store.graph().nodeExists(node)) {

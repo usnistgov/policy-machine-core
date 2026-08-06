@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in query get_node_properties(node). Returns the node's properties.
+ * A PML built-in query that returns a node's properties.
  */
 public class GetNodeProperties extends QueryOperation<Map<String, String>> {
 

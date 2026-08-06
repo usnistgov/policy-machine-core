@@ -49,18 +49,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Converts gRPC wire proto messages into their corresponding core policy-machine model types.
+ * Converts gRPC wire proto messages into their corresponding core policy machine model types.
  */
 public class FromProtoUtil {
 
     /**
-     * Converts a proto user context into its core {@link UserContext} variant; conjunctive user contexts
+     * Converts a proto user context into its core {@link UserContext} variant. Conjunctive user contexts
      * are rejected since they are no longer supported.
      *
      * @param pap unused
      * @param userCtxProto the proto user context to convert
      * @return the converted user context
-     * @throws PMException never; declared for parity with other conversion methods
+     * @throws PMException not thrown, kept for parity with other conversion methods
      */
     public static UserContext fromUserContextProto(PAP pap,
                                                    gov.nist.ngac.pm.proto.v1.pdp.query.UserContext userCtxProto) throws PMException {
@@ -82,7 +82,7 @@ public class FromProtoUtil {
      * @param pap unused
      * @param targetCtxProto the proto target context to convert
      * @return the converted target context
-     * @throws PMException never; declared for parity with other conversion methods
+     * @throws PMException not thrown, kept for parity with other conversion methods
      */
     public static TargetContext fromTargetContextProto(PAP pap,
                                                        gov.nist.ngac.pm.proto.v1.pdp.query.TargetContext targetCtxProto) throws PMException {
@@ -149,9 +149,9 @@ public class FromProtoUtil {
     }
 
     /**
-     * Flattens a list of proto node-privileges entries into a map keyed by node id.
+     * Flattens a list of proto node privileges entries into a map keyed by node id.
      *
-     * @param nodePrivilegesList the proto node-privileges entries to convert
+     * @param nodePrivilegesList the proto node privileges entries to convert
      * @return a map from node id to the node's access rights
      */
     public static Map<Long, AccessRightSet> nodePrivilegesToIdMap(List<NodePrivileges> nodePrivilegesList) {
@@ -163,9 +163,9 @@ public class FromProtoUtil {
     }
 
     /**
-     * Flattens a list of proto node-privileges entries into a map keyed by the full {@link Node}.
+     * Flattens a list of proto node privileges entries into a map keyed by the full {@link Node}.
      *
-     * @param nodePrivilegesList the proto node-privileges entries to convert
+     * @param nodePrivilegesList the proto node privileges entries to convert
      * @return a map from node to the node's access rights
      */
     public static Map<Node, AccessRightSet> nodePrivilegesToNodeMap(List<NodePrivileges> nodePrivilegesList) {
@@ -177,11 +177,11 @@ public class FromProtoUtil {
     }
 
     /**
-     * Recursively converts a proto subgraph-privileges tree into its core {@link SubgraphPrivileges}
+     * Recursively converts a proto subgraph privileges tree into its core {@link SubgraphPrivileges}
      * representation.
      *
-     * @param proto the proto subgraph-privileges tree to convert
-     * @return the converted subgraph-privileges tree
+     * @param proto the proto subgraph privileges tree to convert
+     * @return the converted subgraph privileges tree
      */
     public static SubgraphPrivileges fromProtoSubgraphPrivileges(
             gov.nist.ngac.pm.proto.v1.pdp.query.SubgraphPrivileges proto) {
@@ -215,10 +215,10 @@ public class FromProtoUtil {
     }
 
     /**
-     * Converts a proto policy-class explanation into its core {@link PolicyClassExplain} representation.
+     * Converts a proto policy class explanation into its core {@link PolicyClassExplain} representation.
      *
-     * @param proto the proto policy-class explanation to convert
-     * @return the converted policy-class explanation
+     * @param proto the proto policy class explanation to convert
+     * @return the converted policy class explanation
      */
     public static PolicyClassExplain fromProtoPolicyClassExplain(
             gov.nist.ngac.pm.proto.v1.pdp.query.PolicyClassExplain proto) {
@@ -269,8 +269,7 @@ public class FromProtoUtil {
     }
 
     /**
-     * Converts a proto prohibition into its core {@link Prohibition} representation, resolving to a
-     * {@link ProcessProhibition} or {@link NodeProhibition} depending on whether a process is set.
+     * Converts a proto prohibition into its core {@link Prohibition} representation.
      *
      * @param proto the proto prohibition to convert
      * @return the converted prohibition
@@ -324,7 +323,7 @@ public class FromProtoUtil {
 
     /**
      * Converts a proto obligation into its core {@link Obligation} representation. Only the name and
-     * author are populated; the proto's PML source field is not parsed back into rules here.
+     * author are populated, since the PML source isn't parsed back into rules here.
      *
      * @param proto the proto obligation to convert
      * @return the converted obligation, with rules left empty
@@ -340,7 +339,7 @@ public class FromProtoUtil {
 
     /**
      * Converts a proto parameter type into its core {@link Type}, recursing into list and map element
-     * types; an unset type case is treated as {@link BasicTypes#ANY_TYPE}.
+     * types. An unset type case is treated as any type.
      *
      * @param paramType the proto parameter type to convert
      * @return the converted type
@@ -361,8 +360,8 @@ public class FromProtoUtil {
     }
 
     /**
-     * Converts a proto formal parameter into its core {@link FormalParameter}, mapping the node-id and
-     * node-name parameter kinds to their underlying long/string types.
+     * Converts a proto formal parameter into its core {@link FormalParameter}, mapping the node id and
+     * node name parameter kinds to their underlying long/string types.
      *
      * @param param the proto formal parameter to convert
      * @return the converted formal parameter
@@ -417,8 +416,7 @@ public class FromProtoUtil {
     }
 
     /**
-     * Converts a proto value to its plain Java equivalent (long, String, boolean, List, or Map),
-     * recursing into list and map values.
+     * Converts a proto value to its plain Java equivalent, recursing into list and map values.
      *
      * @param value the proto value to convert
      * @return the converted value

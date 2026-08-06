@@ -24,8 +24,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
 
 /**
- * {@link ProhibitionsStore} implementation backed by an embedded Neo4j database, storing each
- * prohibition as a labeled Neo4j node linked to its subject and container nodes.
+ * A {@link ProhibitionsStore} backed by an embedded Neo4j database, storing each prohibition as a
+ * labeled node linked to its subject and container nodes.
  */
 public class Neo4jEmbeddedProhibitionStore implements ProhibitionsStore {
 

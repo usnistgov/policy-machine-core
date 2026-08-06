@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link ProhibitionsModification} implementation that submits each operation as an admin adjudication
- * request over gRPC.
+ * A {@link ProhibitionsModification} that submits each operation as an admin adjudication request over
+ * gRPC.
  */
 public class GrpcProhibitionsModifier implements ProhibitionsModification {
 

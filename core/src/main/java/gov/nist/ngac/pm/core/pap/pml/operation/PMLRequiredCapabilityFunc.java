@@ -11,7 +11,7 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.Map;
 
 /**
- * A @ReqCap(...) required-capability check written as a PML statement block. Satisfied if the block
+ * A @ReqCap(...) required capability check written as a PML statement block. Satisfied if the block
  * executes to completion without throwing.
  */
 public class PMLRequiredCapabilityFunc extends RequiredCapabilityFunc implements PMLStatementSerializable {

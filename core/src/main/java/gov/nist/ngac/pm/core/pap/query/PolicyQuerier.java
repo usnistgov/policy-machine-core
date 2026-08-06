@@ -1,7 +1,7 @@
 package gov.nist.ngac.pm.core.pap.query;
 
 /**
- * {@link PolicyQuery} implementation that vends the queriers for each policy sub-area.
+ * A {@link PolicyQuery} implementation that vends the queriers for each policy sub-area.
  */
 public class PolicyQuerier implements PolicyQuery {
 

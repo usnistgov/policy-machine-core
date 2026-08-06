@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * The subject part of an event pattern, matching either any user or a specific subject-pattern expression.
+ * The subject part of an event pattern, matching either any user or a specific subject pattern expression.
  */
 public class SubjectPattern implements Serializable, PMLStatementSerializable {
 

@@ -4,8 +4,7 @@ import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
- * A source-text location: a line number and start/end character offsets, used to point compile errors
- * back to the offending PML source.
+ * A source text location, made of a line number and start/end character offsets.
  */
 public class Position {
 

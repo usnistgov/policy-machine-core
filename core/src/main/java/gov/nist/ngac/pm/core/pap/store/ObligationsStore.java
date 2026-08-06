@@ -14,24 +14,26 @@ public interface ObligationsStore extends ObligationsModification, Transactional
     boolean obligationExists(String name) throws PMException;
 
     /**
-     * The persisted PML text for an obligation plus its name and author.
-     * @param name The name of the obligation.
-     * @return The obligation's name, PML text, and author, or null if no obligation with this name exists.
-     * @throws PMException If there is an error in the PM.
+     * The persisted PML text for an obligation, along with its name and author.
+     *
+     * @param name the obligation's name
+     * @return the obligation's name, PML text, and author, or null if it doesn't exist
+     * @throws PMException if the lookup fails
      */
     ObligationPml getObligationPml(String name) throws PMException;
 
     /**
-     * @return The name, PML text, and author for every persisted obligation.
-     * @throws PMException If there is an error in the PM.
+     * @return the name, PML text, and author for every persisted obligation
+     * @throws PMException if the lookup fails
      */
     Collection<ObligationPml> getObligationPmls() throws PMException;
 
     /**
-     * The names of every persisted obligation authored by the provided author.
-     * @param author The author to match.
-     * @return The names of every obligation with this author.
-     * @throws PMException If there is an error in the PM.
+     * The names of every persisted obligation authored by the given author.
+     *
+     * @param author the author to match
+     * @return the names of every obligation with this author
+     * @throws PMException if the lookup fails
      */
     Collection<String> getObligationNamesWithAuthor(NodeUserContext author) throws PMException;
 

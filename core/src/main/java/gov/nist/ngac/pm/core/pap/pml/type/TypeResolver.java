@@ -21,8 +21,8 @@ import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.StringTypeContext;
 public class TypeResolver {
 
     /**
-     * Converts a parsed variable-type context into its core {@link Type}, recursing into list and map
-     * element types; an unrecognized context resolves to ANY_TYPE.
+     * Converts a parsed variable type context into its core {@link Type}, recursing into list and map
+     * element types. An unrecognized context resolves to ANY_TYPE.
      */
     public static Type<?> resolveFromParserCtx(PMLParser.VariableTypeContext ctx) {
         return switch (ctx) {

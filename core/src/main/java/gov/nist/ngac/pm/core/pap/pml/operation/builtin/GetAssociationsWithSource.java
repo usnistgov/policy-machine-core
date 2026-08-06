@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PML built-in query get_associations_with_source(node). Returns the associations sourced from the
- * given user attribute, each as a map with "ua", "target", and "arset" entries.
+ * A PML built-in query that returns the associations sourced from a node.
  */
 public class GetAssociationsWithSource extends PMLQueryOperation<List<Map<String, Object>>> {
 

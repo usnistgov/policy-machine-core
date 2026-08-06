@@ -4,8 +4,7 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.PAP;
 
 /**
- * Builds a starting policy against an empty (or near-empty) {@link PAP}, invoked by
- * {@link PAP#bootstrap}.
+ * Builds a starting policy for a {@link PAP}.
  */
 public abstract class PolicyBootstrapper {
 

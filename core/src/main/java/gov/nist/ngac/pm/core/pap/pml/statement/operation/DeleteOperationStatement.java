@@ -9,7 +9,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 
 /**
- * PML delete operation ... statement.
+ * A PML statement that deletes an operation.
  */
 public class DeleteOperationStatement extends DeleteStatement{
 

@@ -22,8 +22,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 /**
- * Dispatches a single PML statement parse context to the visitor for its specific statement kind,
- * compiling it into a {@link PMLStatement}.
+ * Compiles a single PML statement into a {@link PMLStatement} by dispatching to the visitor for its kind.
  */
 public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
 
@@ -32,12 +31,12 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     /**
-     * Recompiles a single already-persisted operation/obligation statement, using a {@link NarrowCompileScope}
-     * so it doesn't eagerly seed the full symbol table and recurse back into every other stored PML row.
-     * @param operationsQuery The query to lazily resolve cross-references against.
-     * @param input A single statement's PML text.
-     * @return The compiled statement.
-     * @throws PMException If the input fails to compile.
+     * Recompiles a single already-persisted statement, using a {@link NarrowCompileScope} to avoid
+     * loading the full symbol table.
+     * @param operationsQuery the query to resolve cross-references against
+     * @param input a single statement's PML text
+     * @return the compiled statement
+     * @throws PMException if the input fails to compile
      */
     public static PMLStatement<?> fromString(OperationsQuery operationsQuery, String input) throws PMException {
         PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
@@ -75,14 +74,15 @@ public class StatementVisitor extends PMLBaseVisitor<PMLStatement<?>> {
     }
 
     /**
-     * Like {@link #fromString(OperationsQuery, String)}, but casts the result to statementType and pulls the
-     * domain object back out via extractor. A wrong statementType fails with {@link ClassCastException}.
-     * @param operationsQuery The query to lazily resolve cross-references against.
-     * @param input A single statement's PML text.
-     * @param statementType The concrete statement type input is expected to compile to.
-     * @param extractor Pulls the live domain object out of the compiled statement.
-     * @return The extracted domain object.
-     * @throws PMException If the input fails to compile.
+     * Like {@link #fromString(OperationsQuery, String)}, but casts the result to statementType and pulls
+     * the domain object back out via extractor.
+     * @param operationsQuery the query to resolve cross-references against
+     * @param input a single statement's PML text
+     * @param statementType the concrete statement type input is expected to compile to
+     * @param extractor pulls the domain object out of the compiled statement
+     * @return the extracted domain object
+     * @throws PMException if the input fails to compile
+     * @throws ClassCastException if statementType is wrong
      */
     public static <S, T> T fromString(OperationsQuery operationsQuery, String input, Class<S> statementType,
                                       Function<S, T> extractor) throws PMException {

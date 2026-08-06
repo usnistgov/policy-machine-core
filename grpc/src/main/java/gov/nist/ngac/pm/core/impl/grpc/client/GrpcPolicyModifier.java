@@ -5,8 +5,7 @@ import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc;
 import gov.nist.ngac.pm.proto.v1.pdp.adjudication.AdminAdjudicationServiceGrpc.AdminAdjudicationServiceBlockingStub;
 
 /**
- * {@link PolicyModification} implementation that vends gRPC-backed modifiers for each policy sub-area,
- * all sharing the same admin adjudication stub.
+ * A {@link PolicyModification} that provides gRPC-backed modifiers for each policy sub-area.
  */
 public class GrpcPolicyModifier implements PolicyModification {
 

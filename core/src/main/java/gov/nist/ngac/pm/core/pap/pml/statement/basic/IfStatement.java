@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PML if / else if / else statement. Executes the block of the first condition (if or else-if) that
- * evaluates true, falling back to the else block if none do.
+ * A PML if / else if / else statement.
  */
 public class IfStatement extends BasicStatement<StatementResult> {
 

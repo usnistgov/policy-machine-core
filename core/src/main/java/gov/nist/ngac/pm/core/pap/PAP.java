@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * PAP exposes the APIs used to interact with the policy in the PIP.
+ * The main entry point for reading and modifying a policy.
  */
 public abstract class PAP implements OperationExecutor, Transactional {
 
@@ -145,7 +145,7 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Returns the registry of Java operation implementations available to this PAP.
+     * Returns the registry of Java operation implementations for this PAP.
      */
     public JavaOperationRegistry javaOperations() {
         return javaOperationRegistry;
@@ -179,12 +179,10 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Bootstrap the policy with the given PolicyBootstrapper object. The bootstrapping user is the user that will
-     * go no record as being the author of any obligations created by the bootstrapper. This user will be created outside
-     * the PolicyBootstrapper and already exists when the bootstrapper is executed. The bootstrap user must be assigned
-     * to attributes within the PolicyBootstrapper or an exception will be thrown.
-     * @param bootstrapper the PolicyBootstrapper that will build the custom bootstrap policy.
-     * @throws PMException if there is an error bootstrapping.
+     * Bootstraps an empty policy using the given {@link PolicyBootstrapper}.
+     *
+     * @param bootstrapper the bootstrapper that builds the initial policy
+     * @throws PMException if the policy is not empty, or if bootstrapping fails
      */
     public void bootstrap(PolicyBootstrapper bootstrapper) throws PMException {
         if(!isPolicyEmpty()) {
@@ -207,27 +205,23 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Serialize the current policy state with the given PolicySerializer.
+     * Serializes the current policy state using the given serializer.
      *
-     * @param serializer The PolicySerializer used to generate the output String.
-     * @return The string representation of the policy.
-     * @throws PMException If there is an error during the serialization process.
+     * @param serializer the serializer to use
+     * @return the serialized policy
+     * @throws PMException if serialization fails
      */
     public String serialize(PolicySerializer serializer) throws PMException {
         return serializer.serialize(query());
     }
 
     /**
-     * Deserialize the given input string into the current policy state. The user defined in the UserContext needs to exist
-     * in the graph created if any obligations are created. If the user does not exist before an obligation is created
-     * an exception will be thrown. This method also resets the policy before deserialization. However, the
-     * {@link gov.nist.ngac.pm.core.pap.admin.AdminPolicyNode} nodes are assumed to be created and can be referenced in
-     * the input string without explicit creation. If any of the admin policy nodes are created in the input string an
-     * exception will be thrown.
+     * Deserializes the given input into the current policy state, first resetting existing state. Admin
+     * policy nodes are assumed to already exist and must not be created by the input.
      *
-     * @param input The string representation of the policy to deserialize.
-     * @param policyDeserializer The PolicyDeserializer to apply the input string to the policy.
-     * @throws PMException If there is an error deserializing the given inputs string.
+     * @param input the policy content to deserialize
+     * @param policyDeserializer the deserializer to apply
+     * @throws PMException if deserialization fails
      */
     public void deserialize(String input, PolicyDeserializer policyDeserializer) throws PMException {
         beginTx();
@@ -277,11 +271,10 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Runs the given callback inside a transaction, committing on success or rolling back and rethrowing
-     * on any exception.
+     * Runs the given task in a transaction, committing on success or rolling back on failure.
      *
-     * @param tx the callback to run
-     * @throws PMException if the callback throws, after the transaction has been rolled back
+     * @param tx the task to run
+     * @throws PMException if the task fails, after the transaction has been rolled back
      */
     public void runTx(TxRunner tx) throws PMException {
         beginTx();
@@ -312,7 +305,7 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Callback invoked with the active PAP by {@link #runTx}.
+     * A task run against the active PAP.
      */
     public interface TxRunner {
         void runTx(PAP pap) throws PMException;
@@ -347,8 +340,7 @@ public abstract class PAP implements OperationExecutor, Transactional {
     }
 
     /**
-     * Cross-check every persisted Java-operation reference against {@link #javaOperationRegistry}, throwing
-     * immediately if any name has no live implementation registered.
+     * Verifies every persisted Java operation has a registered implementation.
      */
     private void validateJavaOperationsAreRegistered() throws PMException {
         for (Operation<?> operation : query().operations().getOperations()) {

@@ -3,7 +3,7 @@ package gov.nist.ngac.pm.core.pap.graph.dag;
 import gov.nist.ngac.pm.core.common.exception.PMException;
 
 /**
- * Callback invoked by a {@link GraphWalker} for each node it visits.
+ * Callback invoked for each visited node.
  */
 public interface Visitor {
 
