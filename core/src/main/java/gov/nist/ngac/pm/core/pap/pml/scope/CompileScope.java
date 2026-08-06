@@ -11,6 +11,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@link Scope} used during PML compilation, tracking each variable's static {@link Variable} type and
+ * each operation's {@link PMLOperationSignature} rather than a runtime value.
+ */
 public class CompileScope extends Scope<Variable, PMLOperationSignature> {
 
     public CompileScope(PAP pap) throws PMException {

@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * A lexical scope of PML variables and callable operations, with an optional parent scope for outer
+ * variable/operation lookups; the variable value type and operation type differ between compile-time
+ * ({@link CompileScope}) and execution-time ({@link ExecuteScope}) use.
+ */
 public abstract class Scope<V, F> implements Serializable {
 
     private PAP pap;
@@ -43,8 +48,22 @@ public abstract class Scope<V, F> implements Serializable {
         this.parentScope = parentScope;
     }
 
+    /**
+     * Returns a full copy of this scope, linked as a child of it, for compiling/executing a nested block
+     * that should see all of this scope's variables and operations.
+     */
     public abstract Scope<V, F> copy();
+
+    /**
+     * Returns a copy of this scope containing only its function operations, for compiling/executing a
+     * nested block (e.g. a function body) that should not see admin/resource/query operations.
+     */
     public abstract Scope<V, F> copyFunctionsOnly();
+
+    /**
+     * Returns a copy of this scope containing only its function and query operations, for
+     * compiling/executing a nested block that may call queries but not admin/resource operations.
+     */
     public abstract Scope<V, F> copyFunctionsAndQueriesOnly();
 
     public PAP getPap() {
@@ -87,6 +106,13 @@ public abstract class Scope<V, F> implements Serializable {
         this.parentScope = parentScope;
     }
 
+    /**
+     * Looks up an operation by name in this scope only (not the parent chain).
+     *
+     * @param name the operation name
+     * @return the operation
+     * @throws UnknownOperationInScopeException if no operation with that name is in this scope
+     */
     public F getOperation(String name) throws UnknownOperationInScopeException {
         F operation = operations.get(name);
         if (operation == null) {
@@ -96,10 +122,21 @@ public abstract class Scope<V, F> implements Serializable {
         return operation;
     }
 
+    /**
+     * Checks whether an operation with the given name exists in this scope only (not the parent chain).
+     */
     public boolean operationExists(String name) {
         return operations.containsKey(name);
     }
 
+    /**
+     * Registers an operation in this scope.
+     *
+     * @param name the operation name
+     * @param f the operation
+     * @throws OperationAlreadyDefinedInScopeException if an operation with that name already exists in
+     * this scope or an ancestor scope
+     */
     public void addOperation(String name, F f) throws OperationAlreadyDefinedInScopeException {
         if (parentHasOperation(name) || operations.containsKey(name)) {
             throw new OperationAlreadyDefinedInScopeException(name);
@@ -108,6 +145,13 @@ public abstract class Scope<V, F> implements Serializable {
         operations.put(name, f);
     }
 
+    /**
+     * Looks up a variable by name in this scope's constants, then its variables (not the parent chain).
+     *
+     * @param name the variable name
+     * @return the variable value
+     * @throws UnknownVariableInScopeException if no constant or variable with that name is in this scope
+     */
     public V getVariable(String name) throws UnknownVariableInScopeException {
         V variable = constants.get(name);
         if (variable != null) {
@@ -122,10 +166,22 @@ public abstract class Scope<V, F> implements Serializable {
         throw new UnknownVariableInScopeException(name);
     }
 
+    /**
+     * Checks whether a variable with the given name exists in this scope's variables — unlike
+     * {@link #getVariable}, this does not check constants.
+     */
     public boolean variableExists(String name) {
         return variables.containsKey(name);
     }
 
+    /**
+     * Declares a new variable in this scope.
+     *
+     * @param name the variable name
+     * @param v the initial value
+     * @throws VariableAlreadyDefinedInScopeException if a variable with that name already exists in this
+     * scope or an ancestor scope
+     */
     public void addVariable(String name, V v) throws VariableAlreadyDefinedInScopeException {
         if (parentHasVariable(name) || variables.containsKey(name)) {
             throw new VariableAlreadyDefinedInScopeException(name);
@@ -134,10 +190,19 @@ public abstract class Scope<V, F> implements Serializable {
         variables.put(name, v);
     }
 
+    /**
+     * Assigns a new value to an already-declared variable in this scope, or declares it if it doesn't
+     * already exist here.
+     */
     public void updateVariable(String name, V value) {
         variables.put(name, value);
     }
 
+    /**
+     * Copies each variable's value from the given scope into this scope, but only for variables that
+     * already exist in this scope — used to merge value updates made in a copied child scope (e.g. an if
+     * branch) back into the parent, without leaking variables newly declared in the child.
+     */
     public void overwriteFromScope(Scope<V, F> scope) {
         for (String varName : scope.variables.keySet()) {
             if (!this.variables.containsKey(varName)) {
