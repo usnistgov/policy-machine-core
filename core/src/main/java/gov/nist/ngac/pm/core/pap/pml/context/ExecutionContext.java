@@ -17,6 +17,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Runtime context for executing PML statements: the acting user, the current variable/operation
+ * {@link Scope}, and the {@link PAP} to execute against.
+ */
 public class ExecutionContext implements Serializable {
 
     protected final UserContext author;
@@ -35,18 +39,32 @@ public class ExecutionContext implements Serializable {
         this.pap = pap;
     }
 
+    /**
+     * Returns the user this context executes statements as.
+     */
     public UserContext author() {
         return author;
     }
 
+    /**
+     * Returns the current variable/operation scope.
+     */
     public Scope<Object, Operation<?>> scope() {
         return scope;
     }
 
+    /**
+     * Returns a new context with a full copy of this context's scope, for executing a nested block that
+     * should see all of this scope's variables and operations without mutating it.
+     */
     public ExecutionContext copy() throws PMException {
         return new ExecutionContext(author, pap, scope.copy());
     }
 
+    /**
+     * Returns a new context copied from this scope's parent scope (or a fresh empty scope if there is no
+     * parent), used when leaving a nested block back to its enclosing scope.
+     */
     public ExecutionContext copyWithParentScope() throws PMException {
         return new ExecutionContext(
                 author,
@@ -55,6 +73,17 @@ public class ExecutionContext implements Serializable {
         );
     }
 
+    /**
+     * Executes a block of statements in a fresh copy of this scope seeded with the given arguments,
+     * merging variable updates back into this scope after each statement and stopping early on a
+     * return, break, or continue result.
+     *
+     * @param stmts the statements to execute in order
+     * @param args the arguments to bind into the block's scope before executing
+     * @return the block's result: a {@link ReturnResult}, {@link BreakResult}, or {@link ContinueResult}
+     * if one was hit, otherwise a {@link VoidResult}
+     * @throws PMException if executing a statement fails
+     */
     public StatementResult executeStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         ExecutionContext copy = writeArgsToScope(args);
 
@@ -73,6 +102,12 @@ public class ExecutionContext implements Serializable {
         return new VoidResult();
     }
 
+    /**
+     * Executes an admin/resource/query operation's body via {@link #executeStatements}, unwrapping its
+     * return value.
+     *
+     * @return the operation's return value, or null if it doesn't return one
+     */
     public Object executeOperationStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         StatementResult result = executeStatements(stmts, args);
 
@@ -83,6 +118,11 @@ public class ExecutionContext implements Serializable {
         return null;
     }
 
+    /**
+     * Executes a routine's body via {@link #executeStatements}, unwrapping its return value.
+     *
+     * @return the routine's return value, or null if it doesn't return one
+     */
     public Object executeRoutineStatements(List<PMLStatement<?>> stmts, Args args) throws PMException {
         StatementResult result = executeStatements(stmts, args);
 
@@ -93,6 +133,9 @@ public class ExecutionContext implements Serializable {
         return null;
     }
 
+    /**
+     * Copies this context and binds each argument into the copy's scope, ready to execute a block's body.
+     */
     protected ExecutionContext writeArgsToScope(Args args) throws PMException {
         ExecutionContext copy = this.copy();
 
