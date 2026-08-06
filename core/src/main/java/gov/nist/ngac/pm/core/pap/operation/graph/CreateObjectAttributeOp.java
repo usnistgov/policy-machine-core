@@ -4,6 +4,9 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.PAP;
 import java.util.List;
 
+/**
+ * Admin operation "create_object_attribute": creates a new object attribute node.
+ */
 public class CreateObjectAttributeOp extends CreateNodeOp {
 
     public CreateObjectAttributeOp() {

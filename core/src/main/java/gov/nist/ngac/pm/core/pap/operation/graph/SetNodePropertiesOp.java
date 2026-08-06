@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation "set_node_properties": replaces a node's properties.
+ */
 public class SetNodePropertiesOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter SET_NODE_PROPS_NODE_ID_PARAM =

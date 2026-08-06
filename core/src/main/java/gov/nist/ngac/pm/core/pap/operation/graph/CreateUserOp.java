@@ -4,6 +4,9 @@ import gov.nist.ngac.pm.core.common.exception.PMException;
 import gov.nist.ngac.pm.core.pap.PAP;
 import java.util.List;
 
+/**
+ * Admin operation "create_user": creates a new user node.
+ */
 public class CreateUserOp extends CreateNodeOp {
 
     public CreateUserOp() {

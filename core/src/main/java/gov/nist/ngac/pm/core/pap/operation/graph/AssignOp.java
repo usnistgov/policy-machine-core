@@ -14,6 +14,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation "assign": assigns an ascendant node to one or more descendant nodes.
+ */
 public class AssignOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter ASSIGN_ASCENDANT_PARAM = new NodeIdFormalParameter("ascendant");

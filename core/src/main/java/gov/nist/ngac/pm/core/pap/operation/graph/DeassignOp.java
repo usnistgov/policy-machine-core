@@ -13,6 +13,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation "deassign": removes an ascendant node's assignment from one or more descendant nodes.
+ */
 public class DeassignOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DEASSIGN_ASCENDANT_PARAM =

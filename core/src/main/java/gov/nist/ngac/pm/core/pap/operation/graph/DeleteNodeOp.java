@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation "delete_node": deletes a node by id.
+ */
 public class DeleteNodeOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DELETE_NODE_NODE_ID_PARAM =

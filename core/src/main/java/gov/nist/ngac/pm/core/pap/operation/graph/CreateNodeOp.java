@@ -13,6 +13,10 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Base class for the admin operations that create a graph node with a name and initial descendant
+ * assignments, returning the new node's id.
+ */
 public abstract class CreateNodeOp extends AdminOperation<Long> {
 
     public static final NodeIdListFormalParameter CREATE_NODE_DESCENDANTS_PARAM = new NodeIdListFormalParameter("descendants");
@@ -37,6 +41,15 @@ public abstract class CreateNodeOp extends AdminOperation<Long> {
         );
     }
 
+    /**
+     * Creates the node of this operation's specific type in the graph.
+     *
+     * @param pap the PAP to create the node in
+     * @param name the new node's name
+     * @param descs the ids of the new node's initial descendant assignments
+     * @return the new node's id
+     * @throws PMException if creation fails
+     */
     protected abstract long createNode(PAP pap, String name, List<Long> descs) throws PMException;
 
     @Override

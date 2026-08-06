@@ -12,6 +12,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation "dissociate": removes the association between a user attribute and a target.
+ */
 public class DissociateOp extends AdminOperation<Void> {
 
     public static final NodeIdFormalParameter DISSOCIATE_UA_PARAM = new NodeIdFormalParameter("ua");
