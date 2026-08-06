@@ -93,47 +93,87 @@ public abstract class PAP implements OperationExecutor, Transactional {
         this.javaOperationRegistry = pap.javaOperationRegistry;
     }
 
+    /**
+     * Swaps this PAP's backing policy store.
+     *
+     * @return this instance, for chaining
+     */
     public PAP withPolicyStore(PolicyStore policyStore) {
         this.policyStore = policyStore;
         return this;
     }
 
+    /**
+     * Swaps this PAP's policy modifier.
+     *
+     * @return this instance, for chaining
+     */
     public PAP withPolicyModifier(PolicyModifier policyModifier) {
         this.modifier = policyModifier;
         return this;
     }
 
+    /**
+     * Swaps this PAP's policy querier.
+     *
+     * @return this instance, for chaining
+     */
     public PAP withPolicyQuerier(PolicyQuerier policyQuerier) {
         this.querier = policyQuerier;
         return this;
     }
 
+    /**
+     * Returns the entry point for querying the current policy state.
+     */
     public PolicyQuery query() {
         return querier;
     }
 
+    /**
+     * Returns the entry point for modifying the current policy state.
+     */
     public PolicyModification modify() {
         return modifier;
     }
 
+    /**
+     * Returns the backing policy store.
+     */
     public PolicyStore policyStore() {
         return policyStore;
     }
 
+    /**
+     * Returns the registry of Java operation implementations available to this PAP.
+     */
     public JavaOperationRegistry javaOperations() {
         return javaOperationRegistry;
     }
 
+    /**
+     * Sets the id generator used when creating new nodes.
+     *
+     * @return this instance, for chaining
+     */
     public PAP withIdGenerator(IdGenerator idGenerator) {
         this.modifier.graph().setIdGenerator(idGenerator);
         return this;
     }
 
+    /**
+     * Clears all policy state and re-verifies the admin policy structure.
+     *
+     * @throws PMException if resetting the store or re-verifying the admin policy fails
+     */
     public void reset() throws PMException {
         policyStore.reset();
         AdminPolicy.verifyAdminPolicy(policyStore().graph());
     }
 
+    /**
+     * Builds an {@link ExecutionContext} for running PML statements as the given user against this PAP.
+     */
     public ExecutionContext buildExecutionContext(UserContext userCtx) throws PMException {
         return new ExecutionContext(userCtx, this);
     }
@@ -202,6 +242,14 @@ public abstract class PAP implements OperationExecutor, Transactional {
         commit();
     }
 
+    /**
+     * Compiles and executes a PML script as the given user.
+     *
+     * @param author the user to execute the script as
+     * @param input the PML source to compile and execute
+     * @return the script's return value, or null if it returns nothing
+     * @throws PMException if compilation or execution fails
+     */
     public Object executePML(UserContext author, String input) throws PMException {
         List<PMLStatement<?>> compiledPML = compilePML(input);
 
@@ -215,12 +263,26 @@ public abstract class PAP implements OperationExecutor, Transactional {
         return null;
     }
 
+    /**
+     * Compiles a PML script against this PAP's current policy state without executing it.
+     *
+     * @param input the PML source to compile
+     * @return the compiled statements
+     * @throws PMException if compilation fails
+     */
     public List<PMLStatement<?>> compilePML(String input) throws PMException {
         PMLCompiler pmlCompiler = new PMLCompiler();
 
         return pmlCompiler.compilePML(this, input);
     }
 
+    /**
+     * Runs the given callback inside a transaction, committing on success or rolling back and rethrowing
+     * on any exception.
+     *
+     * @param tx the callback to run
+     * @throws PMException if the callback throws, after the transaction has been rolled back
+     */
     public void runTx(TxRunner tx) throws PMException {
         beginTx();
 
@@ -249,6 +311,9 @@ public abstract class PAP implements OperationExecutor, Transactional {
         policyStore.rollback();
     }
 
+    /**
+     * Callback invoked with the active PAP by {@link #runTx}.
+     */
     public interface TxRunner {
         void runTx(PAP pap) throws PMException;
     }
