@@ -9,10 +9,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Combines a {@link UserDagResult} and a {@link TargetDagResult} into the final access decision: the
+ * privileges granted, the privileges denied by prohibitions, and which prohibitions are satisfied.
+ */
 public class AccessRightResolver {
 
     private AccessRightResolver() {}
 
+    /**
+     * Resolves the access rights a user has on a target: expands wildcard access rights per policy
+     * class, intersects across all reached policy classes, then removes any rights denied by a
+     * satisfied prohibition.
+     *
+     * @param userCtx the user's DAG evaluation result
+     * @param targetCtx the target's DAG evaluation result
+     * @param resourceAccessRights the full set of resource access rights, used to expand wildcards
+     * @return the resolved, granted access rights
+     */
     public static AccessRightSet resolvePrivileges(UserDagResult userCtx, TargetDagResult targetCtx, AccessRightSet resourceAccessRights) {
         // resolve any access rights with "*" to their enumerated rights
         Map<Long, AccessRightSet> resolvedPcMap = resolvePcMap(targetCtx.pcMap(), resourceAccessRights);
@@ -41,6 +55,10 @@ public class AccessRightResolver {
         return resolvedPcMap;
     }
 
+    /**
+     * Returns the union of access rights denied by every prohibition, among the given set, whose
+     * inclusion/exclusion condition is satisfied against the target's reached nodes.
+     */
     public static AccessRightSet resolveDeniedAccessRights(Set<Prohibition> prohibitions, TargetDagResult targetCtx) {
         AccessRightSet denied = new AccessRightSet();
         Set<Long> reachedTargets = targetCtx.reachedTargets();
@@ -54,6 +72,10 @@ public class AccessRightResolver {
         return denied;
     }
 
+    /**
+     * Returns every prohibition of the user's, among those in the given DAG results, whose
+     * inclusion/exclusion condition is satisfied against the target's reached nodes.
+     */
     public static List<Prohibition> computeSatisfiedProhibitions(UserDagResult userDagResult, TargetDagResult targetDagResult) {
         List<Prohibition> satisfied = new ArrayList<>();
 

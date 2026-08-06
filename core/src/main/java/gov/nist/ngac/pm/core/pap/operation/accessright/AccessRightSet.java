@@ -4,6 +4,9 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.Arrays;
 import java.util.Collection;
 
+/**
+ * A set of access right names.
+ */
 public class AccessRightSet extends ObjectOpenHashSet<String> {
 
     public AccessRightSet(){
@@ -33,14 +36,23 @@ public class AccessRightSet extends ObjectOpenHashSet<String> {
         this.addAll(b);
     }
 
+    /**
+     * Returns a set containing only the "*" wildcard, matching every access right.
+     */
     public static AccessRightSet wildcard() {
         return new AccessRightSet(WildcardAccessRight.WILDCARD.toString());
     }
 
+    /**
+     * Returns a set containing only the "admin:*" wildcard, matching every admin access right.
+     */
     public static AccessRightSet adminWildcard() {
         return new AccessRightSet(WildcardAccessRight.ADMIN_WILDCARD.toString());
     }
 
+    /**
+     * Returns a set containing only the "resource:*" wildcard, matching every resource access right.
+     */
     public static AccessRightSet resourceWildcard() {
         return new AccessRightSet(WildcardAccessRight.RESOURCE_WILDCARD.toString());
     }
