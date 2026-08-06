@@ -12,12 +12,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * PML map literal expression, evaluating each key/value expression pair into a map.
+ */
 public class MapLiteralExpression<K, V> extends Expression<Map<K, V>> {
 
+    /**
+     * Builds a map literal from same-typed key and value expressions.
+     */
     public static <K, V> MapLiteralExpression<K, V> of(Map<Expression<K>, Expression<V>> map, Type<K> keyType, Type<V> valueType) {
         return new MapLiteralExpression<>(new HashMap<>(map), keyType, valueType);
     }
-    
+
+    /**
+     * Builds a map literal with ANY_TYPE keys and values.
+     */
     public static MapLiteralExpression<?, ?> of(Map<Expression<?>, Expression<?>> map) {
         return new MapLiteralExpression<>(map, ANY_TYPE, ANY_TYPE);
     }

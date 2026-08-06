@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * PML dot-index expression (e.g. "ctx.args.name"): looks up a fixed string key on a map-typed value.
+ */
 public class DotIndexExpression<T> extends Expression<T> {
     private final Expression<?> baseExpr;
     private final String key;

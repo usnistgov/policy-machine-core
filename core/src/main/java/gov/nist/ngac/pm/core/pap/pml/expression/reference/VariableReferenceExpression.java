@@ -7,6 +7,9 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
+/**
+ * PML expression that reads the current value of a named variable from scope.
+ */
 public class VariableReferenceExpression<T> extends Expression<T> {
     private final String varName;
     private final Type<T> type;

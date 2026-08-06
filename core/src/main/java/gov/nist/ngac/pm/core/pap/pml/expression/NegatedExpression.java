@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
+/**
+ * PML "!" boolean negation expression.
+ */
 public class NegatedExpression extends Expression<Boolean> {
 
     private final Expression<Boolean> expression;

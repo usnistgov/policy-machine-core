@@ -11,8 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * PML array literal expression, evaluating each element expression into a list.
+ */
 public class ArrayLiteralExpression<E> extends Expression<List<E>> {
 
+    /**
+     * Builds an array literal from a list of same-typed element expressions.
+     */
     public static <E> ArrayLiteralExpression<E> of(List<Expression<E>> expressions, Type<E> elementType) {
         return new ArrayLiteralExpression<>(new ArrayList<>(expressions), elementType);
     }

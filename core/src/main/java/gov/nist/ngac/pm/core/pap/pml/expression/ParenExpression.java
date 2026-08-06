@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
+/**
+ * A parenthesized PML expression, evaluating to its wrapped expression's value unchanged.
+ */
 public class ParenExpression<T> extends Expression<T> {
 
     private final Expression<T> expression;

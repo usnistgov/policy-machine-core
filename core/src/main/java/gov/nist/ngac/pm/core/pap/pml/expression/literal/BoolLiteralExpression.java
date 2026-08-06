@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
+/**
+ * PML boolean literal expression.
+ */
 public class BoolLiteralExpression extends Expression<Boolean> {
 
     private Boolean value;

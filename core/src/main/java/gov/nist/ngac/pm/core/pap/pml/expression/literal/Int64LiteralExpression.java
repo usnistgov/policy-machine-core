@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
+/**
+ * PML integer literal expression.
+ */
 public class Int64LiteralExpression  extends Expression<Long> {
 
     long value;

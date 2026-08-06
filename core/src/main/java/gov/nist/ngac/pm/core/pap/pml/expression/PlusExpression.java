@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
+/**
+ * PML "+" string concatenation expression.
+ */
 public class PlusExpression extends Expression<String> {
 
     private final Expression<String> left;

@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
+/**
+ * PML operation-call expression: invokes a named operation with the given argument expressions and
+ * evaluates to its return value.
+ */
 public class OperationInvokeExpression<T> extends Expression<T> {
 
     private final String name;

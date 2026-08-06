@@ -18,6 +18,12 @@ public abstract class Expression<T> extends PMLStatement<T> {
      */
     public abstract Type<T> getType();
 
+    /**
+     * Returns this expression viewed as the target type, without converting any value.
+     *
+     * @throws UnexpectedExpressionTypeException if this expression's type is not castable to the target
+     * type
+     */
     public <S> Expression<S> asType(Type<S> targetType) throws UnexpectedExpressionTypeException {
         if (!getType().isCastableTo(targetType)) {
             throw new UnexpectedExpressionTypeException(getType(), targetType);

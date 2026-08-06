@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
 import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
+/**
+ * PML "==" / "!=" expression.
+ */
 public class EqualsExpression extends Expression<Boolean> {
 
     private final Expression<?> left;

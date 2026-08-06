@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
 import java.util.Objects;
 
+/**
+ * PML string literal expression.
+ */
 public class StringLiteralExpression extends Expression<String> {
 
     private String value;
