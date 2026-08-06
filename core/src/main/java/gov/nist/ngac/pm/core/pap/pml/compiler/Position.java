@@ -3,6 +3,10 @@ package gov.nist.ngac.pm.core.pap.pml.compiler;
 import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+/**
+ * A source-text location: a line number and start/end character offsets, used to point compile errors
+ * back to the offending PML source.
+ */
 public class Position {
 
     private final int line;
@@ -21,14 +25,23 @@ public class Position {
         this.end = end;
     }
 
+    /**
+     * Returns the 1-based source line.
+     */
     public int line() {
         return line;
     }
 
+    /**
+     * Returns the start character offset within the source.
+     */
     public int start() {
         return start;
     }
 
+    /**
+     * Returns the end character offset within the source.
+     */
     public int end() {
         return end;
     }

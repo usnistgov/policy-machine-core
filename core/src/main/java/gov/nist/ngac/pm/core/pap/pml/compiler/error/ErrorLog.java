@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
+/**
+ * Accumulates the {@link CompileError}s found during one PML compilation, deduplicating identical errors.
+ */
 public class ErrorLog {
 
     private final List<CompileError> errors;
@@ -13,6 +16,12 @@ public class ErrorLog {
         this.errors = new ArrayList<>();
     }
 
+    /**
+     * Records an error at the given parse context's position, unless an identical error is already
+     * recorded.
+     *
+     * @return this instance, for chaining
+     */
     public ErrorLog addError(ParserRuleContext ctx, String message) {
         CompileError compileError = CompileError.fromParserRuleContext(ctx, message);
 
@@ -21,6 +30,11 @@ public class ErrorLog {
         return this;
     }
 
+    /**
+     * Records an error at the given explicit position, unless an identical error is already recorded.
+     *
+     * @return this instance, for chaining
+     */
     public ErrorLog addError(int line, int charPos, int end, String msg) {
         CompileError compileError = new CompileError(new Position(line, charPos, end), msg);
 
@@ -29,6 +43,9 @@ public class ErrorLog {
         return this;
     }
 
+    /**
+     * Records every error in the given list, ignoring a null list.
+     */
     public void addErrors(List<CompileError> errors) {
         if (errors == null) {
             return;

@@ -5,8 +5,14 @@ import java.util.Objects;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 
+/**
+ * A single compile error: its source position and message.
+ */
 public record CompileError(Position position, String errorMessage) {
 
+    /**
+     * Returns the source text spanned by the given parse context.
+     */
     public static String getText(ParserRuleContext ctx) {
         int startIndex = ctx.start.getStartIndex();
         int stopIndex = ctx.stop.getStopIndex();
@@ -14,6 +20,9 @@ public record CompileError(Position position, String errorMessage) {
         return ctx.start.getInputStream().getText(interval);
     }
 
+    /**
+     * Builds a compile error at the given parse context's position.
+     */
     public static CompileError fromParserRuleContext(ParserRuleContext ctx, String message) {
         return new CompileError(
                 new Position(ctx),

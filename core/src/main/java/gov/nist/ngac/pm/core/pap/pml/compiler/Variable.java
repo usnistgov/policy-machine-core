@@ -4,6 +4,9 @@ import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A compile-time record of a PML variable's name, static type, and whether it is a constant.
+ */
 public record Variable(String name, Type<?> type, boolean isConst) implements Serializable {
 
     @Override
