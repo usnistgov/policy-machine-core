@@ -11,6 +11,9 @@ import gov.nist.ngac.pm.core.pap.query.model.subgraph.Subgraph;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * The persistence layer for the policy graph: nodes, assignments, and associations.
+ */
 public interface GraphStore extends Transactional, NodeLookup {
 
     void createNode(long id, String name, NodeType type) throws PMException;

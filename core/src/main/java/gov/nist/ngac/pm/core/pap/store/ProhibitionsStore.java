@@ -7,6 +7,9 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * The persistence layer for prohibitions.
+ */
 public interface ProhibitionsStore extends Transactional {
 
     void createNodeProhibition(String name,

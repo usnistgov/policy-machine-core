@@ -8,6 +8,9 @@ import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * The persistence layer for operations.
+ */
 public interface OperationsStore extends OperationsModification, Transactional {
 
     AccessRightSet getResourceAccessRights() throws PMException;

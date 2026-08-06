@@ -6,6 +6,9 @@ import gov.nist.ngac.pm.core.pap.modification.ObligationsModification;
 import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
 import java.util.Collection;
 
+/**
+ * The persistence layer for obligations.
+ */
 public interface ObligationsStore extends ObligationsModification, Transactional {
 
     boolean obligationExists(String name) throws PMException;

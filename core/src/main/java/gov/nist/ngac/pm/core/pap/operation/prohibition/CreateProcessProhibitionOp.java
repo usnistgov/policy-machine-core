@@ -15,6 +15,10 @@ import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Admin operation that creates a process prohibition, denying a user's access rights while acting through a
+ * named process subject to an inclusion/exclusion set.
+ */
 public class CreateProcessProhibitionOp extends ProhibitionOp {
 
     public static NodeIdFormalParameter USER_ID_PARAM = new NodeIdFormalParameter("user_id");

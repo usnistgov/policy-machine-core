@@ -10,6 +10,10 @@ import gov.nist.ngac.pm.core.pap.operation.param.NodeIdListFormalParameter;
 import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredCapability;
 import java.util.List;
 
+/**
+ * Base class for the admin operations that create and delete prohibitions, holding their shared formal
+ * parameters.
+ */
 public abstract class ProhibitionOp extends AdminOperation<Void> {
 
     public static NodeIdFormalParameter NODE_ID_PARAM = new NodeIdFormalParameter("node_id");

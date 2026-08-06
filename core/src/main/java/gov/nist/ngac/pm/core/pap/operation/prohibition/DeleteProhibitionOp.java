@@ -9,6 +9,9 @@ import gov.nist.ngac.pm.core.pap.operation.reqcap.RequiredPrivilegeOnParameter;
 import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
 import java.util.List;
 
+/**
+ * Admin operation that deletes a prohibition by name.
+ */
 public class DeleteProhibitionOp extends ProhibitionOp {
 
     public DeleteProhibitionOp() {
