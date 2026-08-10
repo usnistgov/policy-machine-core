@@ -1,0 +1,15 @@
+package gov.nist.ngac.pm.core.pap.pml.statement;
+
+import gov.nist.ngac.pm.core.pap.operation.Operation;
+import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperationSignature;
+
+/**
+ * A PML statement that defines a callable operation.
+ */
+public interface OperationDefinitionStatement {
+
+    PMLOperationSignature getSignature();
+
+    Operation<?> getOperation();
+
+}

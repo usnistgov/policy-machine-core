@@ -1,0 +1,49 @@
+package gov.nist.ngac.pm.core.pap.pml.statement.operation;
+
+
+import static gov.nist.ngac.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.ngac.pm.core.util.TestPAP;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+class SetResourceAccessRightsStatementTest {
+
+    @Test
+    void testSuccess() throws PMException {
+        SetResourceAccessRightsStatement stmt = new SetResourceAccessRightsStatement(
+                buildArrayLiteral("a", "b", "c", "d")
+        );
+
+        PAP pap = new TestPAP();
+
+        stmt.execute(new ExecutionContext(NodeUserContext.of(0), pap), pap);
+
+        assertEquals(
+                new AccessRightSet("a", "b", "c", "d"),
+                pap.query().operations().getResourceAccessRights()
+        );
+    }
+
+    @Test
+    void testToFormattedString() {
+        SetResourceAccessRightsStatement stmt = new SetResourceAccessRightsStatement(
+                buildArrayLiteral("a", "b", "c", "d")
+        );
+
+        assertEquals(
+                "set resource access rights [\"a\", \"b\", \"c\", \"d\"]",
+                stmt.toFormattedString(0)
+        );
+        assertEquals(
+                "    set resource access rights [\"a\", \"b\", \"c\", \"d\"]",
+                stmt.toFormattedString(1)
+        );
+    }
+
+}

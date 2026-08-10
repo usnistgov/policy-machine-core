@@ -1,0 +1,21 @@
+package gov.nist.ngac.pm.core.pap.operation.arg.type;
+
+import gov.nist.ngac.pm.core.pap.operation.Function;
+
+/**
+ * Supported type for Function.
+ */
+public final class FunctionType extends Type<Function<?>> {
+
+    @Override
+    public Function<?> cast(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+        if (!(obj instanceof Function<?> o)) {
+            throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to Function");
+        }
+
+        return o;
+    }
+}

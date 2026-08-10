@@ -1,0 +1,87 @@
+package gov.nist.ngac.pm.core.pap.pml.operation.admin;
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.ngac.pm.core.pap.operation.ResourceOperation;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+
+class PMLStmtsResourceOperationTest {
+
+    @Test
+    void testNonPMLResourceOpInvokedInPML() throws PMException {
+        MemoryPAP memoryPAP = new MemoryPAP();
+        memoryPAP.modify().operations().setResourceAccessRights(new AccessRightSet("read"));
+        ResourceOperation<String> op1 = new ResourceOperation<>("op1", STRING_TYPE, List.of(), List.of()) {
+            @Override
+            public String execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
+                return "test";
+            }
+        };
+        memoryPAP.javaOperations().register(op1);
+        memoryPAP.modify().operations().createOperation(op1);
+
+        memoryPAP.executePML(NodeUserContext.of("u1"), """
+            t := op1()
+            create pc t
+            """);
+
+        assertTrue(memoryPAP.query().graph().nodeExists("test"));
+    }
+
+    @Test
+    void testPMLResourceOpInvokedInPML() throws PMException {
+        MemoryPAP memoryPAP = new MemoryPAP();
+        memoryPAP.executePML(NodeUserContext.of("u1"), """
+            set resource access rights ["read"]
+            
+            resourceop op1() string {
+                return "test"
+            }
+            
+            t := op1()
+            create pc t
+            """);
+
+        assertTrue(memoryPAP.query().graph().nodeExists("test"));
+    }
+
+    @Test
+    void testPMLResourceOpCanOnlyCallQueryOrFunctions() throws PMException {
+        MemoryPAP memoryPAP = new MemoryPAP();
+        Object actual = memoryPAP.executePML(NodeUserContext.of("u1"), """
+            set resource access rights ["read"]
+            
+            create pc "a"
+            create pc "b"
+            
+            resourceop op1([]string a) map[string]any {
+                if contains(arr=a, element="a") {
+                    return get_node(node_name="a")
+                }
+                
+                return {}
+            }
+            
+            return op1(a=["a", "b"])
+            
+            """);
+
+        Map<String, Object> actualMap = (Map<String, Object>) actual;
+        assertEquals("a", actualMap.get("name"));
+        assertEquals("PC", actualMap.get("type"));
+        assertEquals(new HashMap<>(), new HashMap<>((Map) actualMap.get("properties")));
+    }
+
+}

@@ -1,0 +1,86 @@
+package gov.nist.ngac.pm.core.pap.serialization.json;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.obligation.Obligation;
+import gov.nist.ngac.pm.core.pap.query.NodeLookup;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+import java.util.Objects;
+
+/**
+ * JSON DTO for an obligation, storing its author as a resolved node id and its body as raw PML text.
+ */
+public class JSONObligation {
+
+    /**
+     * Converts a live obligation into its JSON DTO, resolving its author to a node id.
+     *
+     * @param o the obligation to convert; its author must be a {@link NodeUserContext}
+     * @param graphQuery used to resolve the author's node id
+     * @return the JSON DTO
+     * @throws PMException if resolving the author's node id fails
+     */
+    public static JSONObligation fromObligation(Obligation o, NodeLookup graphQuery) throws PMException {
+        long authorId = ((NodeUserContext) o.getAuthor()).resolveNodeIds(graphQuery).iterator().next();
+        return new JSONObligation(o.getName(), authorId, o.toString());
+    }
+
+    private String name;
+    private long author;
+    private String pml;
+
+    public JSONObligation() {
+    }
+
+    public JSONObligation(String name, long author, String pml) {
+        this.name = name;
+        this.author = author;
+        this.pml = pml;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public long getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(long author) {
+        this.author = author;
+    }
+
+    public String getPml() {
+        return pml;
+    }
+
+    public void setPml(String pml) {
+        this.pml = pml;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JSONObligation that)) return false;
+        return author == that.author && 
+               Objects.equals(name, that.name) && 
+               Objects.equals(pml, that.pml);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, author, pml);
+    }
+
+    @Override
+    public String toString() {
+        return "JSONObligation{" +
+                "name='" + name + '\'' +
+                ", author=" + author +
+                ", pml='" + pml + '\'' +
+                '}';
+    }
+} 

@@ -1,0 +1,52 @@
+package gov.nist.ngac.pm.core.pap.pml.statement.operation;
+
+import static gov.nist.ngac.pm.core.pap.operation.Operation.NAME_PARAM;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.operation.graph.CreatePolicyClassOp;
+import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
+import java.util.Objects;
+
+/**
+ * A PML statement that creates a policy class.
+ */
+public class CreatePolicyClassStatement extends OperationStatement {
+
+    private final Expression<String> name;
+
+    public CreatePolicyClassStatement(Expression<String> name) {
+        super(new CreatePolicyClassOp());
+
+        this.name = name;
+    }
+
+    @Override
+    public Args prepareArgs(ExecutionContext ctx, PAP pap) throws PMException {
+        String pcName = name.execute(ctx, pap);
+
+        return new Args()
+            .put(NAME_PARAM, pcName);
+    }
+
+    @Override
+    public String toFormattedString(int indentLevel) {
+        return indent(indentLevel) + String.format("create PC %s", name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof CreatePolicyClassStatement that))
+            return false;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
+}

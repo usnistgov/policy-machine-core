@@ -1,0 +1,21 @@
+package gov.nist.ngac.pm.core.pap.operation.arg.type;
+
+import gov.nist.ngac.pm.core.pap.operation.Operation;
+
+/**
+ * Supported type for AdminOperation.
+ */
+public final class AdminOperationType extends Type<Operation<?>> {
+
+    @Override
+    public Operation<?> cast(Object obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException("Object cannot be null");
+        }
+        if (!(obj instanceof Operation<?> o)) {
+            throw new IllegalArgumentException("Cannot cast " + obj.getClass() + " to Operation");
+        }
+
+        return o;
+    }
+}

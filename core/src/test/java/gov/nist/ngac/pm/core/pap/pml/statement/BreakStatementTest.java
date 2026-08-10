@@ -1,0 +1,71 @@
+package gov.nist.ngac.pm.core.pap.pml.statement;
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.pml.statement.basic.BreakStatement;
+import gov.nist.ngac.pm.core.util.TestPAP;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+class BreakStatementTest {
+
+    @Test
+    void testSuccess() throws PMException {
+        String pml = """
+                foreach x in ["a", "b", "c"] {
+                    create PC x
+                    
+                    if x == "b" {
+                        break
+                    }                  
+                }
+                """;
+        PAP pap = new TestPAP();
+        pap.executePML(NodeUserContext.of(0), pml);
+
+        assertTrue(pap.query().graph().nodeExists("a"));
+        assertTrue(pap.query().graph().nodeExists("b"));
+        assertFalse(pap.query().graph().nodeExists("c"));
+    }
+
+    @Test
+    void testMultipleLevels() throws PMException {
+        String pml = """
+                foreach x in ["a", "b", "c"] {
+                    create PC x
+                    
+                    if x == "b" {
+                        if x == "b" {
+                            break
+                        }
+                    }                 
+                }
+                """;
+        PAP pap = new TestPAP();
+        pap.executePML(NodeUserContext.of(0), pml);
+
+        assertTrue(pap.query().graph().nodeExists("a"));
+        assertTrue(pap.query().graph().nodeExists("b"));
+        assertFalse(pap.query().graph().nodeExists("c"));
+    }
+
+    @Test
+    void testToFormattedString() {
+        BreakStatement stmt = new BreakStatement();
+
+        assertEquals(
+                "break",
+                stmt.toFormattedString(0)
+        );
+        assertEquals(
+                "    break",
+                stmt.toFormattedString(1)
+        );
+    }
+
+}

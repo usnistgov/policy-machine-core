@@ -1,0 +1,13 @@
+package gov.nist.ngac.pm.core.pap.obligation.event.operation;
+
+import gov.nist.ngac.pm.core.pap.pml.statement.PMLStatementSerializable;
+import java.io.Serializable;
+
+/**
+ * The operation half of an event pattern.
+ */
+public abstract sealed class OperationPattern implements Serializable, PMLStatementSerializable
+    permits AnyOperationPattern, MatchesOperationPattern {
+
+
+}
