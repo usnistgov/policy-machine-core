@@ -1,34 +1,11 @@
-name: Java CI with Maven
+name: Publish to Maven Central
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   release:
     types: [ published ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: maven
-      - name: Build and test reactor
-        run: mvn -B verify --file pom.xml
-
   release:
-    if: github.event_name == 'release' && github.event.action == 'published'
-    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,6 +24,8 @@ jobs:
           server-password: CENTRAL_TOKEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Build and test reactor
+        run: mvn -B verify --file pom.xml
       - name: Publish to Central
         run: mvn -B -Prelease deploy --file pom.xml
         env:

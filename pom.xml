@@ -16,7 +16,7 @@
     <licenses>
         <license>
             <name>NIST Software License</name>
-            <url>https://github.com/usnistgov/policy-machine-core/blob/master/LICENSE.md</url>
+            <url>https://github.com/usnistgov/policy-machine-core/blob/main/LICENSE.md</url>
             <distribution>repo</distribution>
         </license>
     </licenses>

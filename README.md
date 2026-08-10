@@ -18,13 +18,14 @@ alongside it, using the same version.
 ### From Maven Central
 
 ```xml
+<!-- core interfaces with in memory implementation -->
 <dependency>
     <groupId>gov.nist.ngac.pm</groupId>
     <artifactId>policy-machine-core</artifactId>
     <version>x.y.z</version>
 </dependency>
 
-<!-- embedded Neo4j-backed policy store -->
+<!-- core interfaces with in memory and neo4j implementations -->
 <dependency>
     <groupId>gov.nist.ngac.pm</groupId>
     <artifactId>policy-machine-core-neo4j</artifactId>
