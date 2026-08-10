@@ -1,0 +1,29 @@
+package gov.nist.ngac.pm.core.pap.pml.statement;
+
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.util.TestPAP;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+class ReturnStatementTest {
+
+    @Test
+    void testReturnValueIsUnwrapped() throws PMException {
+        String pml = """
+                adminop f1() string {
+                    return f2()
+                }
+                
+                adminop f2() string {
+                    return "test"
+                }
+                
+                create PC f1()
+                """;
+        PAP pap = new TestPAP();
+        pap.executePML(NodeUserContext.of(0), pml);
+    }
+
+}

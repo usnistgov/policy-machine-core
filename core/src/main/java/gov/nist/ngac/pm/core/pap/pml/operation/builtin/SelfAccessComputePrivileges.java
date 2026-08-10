@@ -1,0 +1,34 @@
+package gov.nist.ngac.pm.core.pap.pml.operation.builtin;
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.operation.QueryOperation;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.ngac.pm.core.pap.operation.param.NodeNameFormalParameter;
+import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeTargetContext;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A PML built-in query that returns the caller's privileges on a node.
+ */
+public class SelfAccessComputePrivileges extends QueryOperation<List<String>> {
+
+    private static final NodeNameFormalParameter NODE_NAME_PARAM =
+        new NodeNameFormalParameter("node_name");
+
+    public SelfAccessComputePrivileges() {
+        super("self_compute_privileges", ListType.of(STRING_TYPE), List.of(NODE_NAME_PARAM), List.of());
+    }
+
+    @Override
+    public List<String> execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
+        String nodeName = args.get(NODE_NAME_PARAM);
+        long nodeId = query.graph().getNodeId(nodeName);
+        return new ArrayList<>(query.access().self(userCtx).computePrivileges(NodeTargetContext.of(nodeId)));
+    }
+}

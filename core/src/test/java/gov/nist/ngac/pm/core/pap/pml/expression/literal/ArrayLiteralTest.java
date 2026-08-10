@@ -1,0 +1,44 @@
+package gov.nist.ngac.pm.core.pap.pml.expression.literal;
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static gov.nist.ngac.pm.core.pap.pml.PMLUtil.buildArrayLiteral;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.ngac.pm.core.pap.pml.TestPMLParser;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.ngac.pm.core.pap.pml.compiler.visitor.ExpressionVisitor;
+import gov.nist.ngac.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
+import gov.nist.ngac.pm.core.pap.pml.scope.CompileScope;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
+class ArrayLiteralTest {
+
+    @Test
+    void testSuccess() throws PMException {
+        PMLParser.ExpressionContext ctx = TestPMLParser.parseExpression(
+                """
+                ["a", "b", "c"]
+                """);
+
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
+        Expression<List<String>> expression = ExpressionVisitor.compile(visitorContext, ctx, ListType.of(STRING_TYPE));
+	    assertInstanceOf(ArrayLiteralExpression.class, expression);
+
+        assertEquals(
+                buildArrayLiteral("a", "b", "c"),
+                expression
+        );
+        assertEquals(
+                ListType.of(STRING_TYPE),
+                expression.getType()
+        );
+
+    }
+
+}

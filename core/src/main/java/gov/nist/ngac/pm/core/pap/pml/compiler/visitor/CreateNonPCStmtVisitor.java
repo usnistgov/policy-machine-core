@@ -1,0 +1,44 @@
+package gov.nist.ngac.pm.core.pap.pml.compiler.visitor;
+
+import static gov.nist.ngac.pm.core.common.graph.node.NodeType.OA;
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+
+import gov.nist.ngac.pm.core.common.graph.node.NodeType;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.ngac.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
+import gov.nist.ngac.pm.core.pap.pml.statement.operation.CreateNonPCStatement;
+import java.util.List;
+
+
+/**
+ * Compiles a PML create OA/UA/O/U ... in ... statement into a {@link CreateNonPCStatement}.
+ */
+public class CreateNonPCStmtVisitor extends PMLBaseVisitor<CreateNonPCStatement> {
+
+    public CreateNonPCStmtVisitor(VisitorContext visitorCtx) {
+        super(visitorCtx);
+    }
+
+    @Override
+    public CreateNonPCStatement visitCreateNonPCStatement(PMLParser.CreateNonPCStatementContext ctx) {
+        NodeType type = getNodeType(ctx.nonPCNodeType());
+        Expression<String> name = ExpressionVisitor.compile(visitorCtx, ctx.name, STRING_TYPE);
+        Expression<List<String>> assignTo = ExpressionVisitor.compile(visitorCtx, ctx.in, ListType.of(STRING_TYPE));
+
+        return new CreateNonPCStatement(name, type, assignTo);
+    }
+
+    private NodeType getNodeType(PMLParser.NonPCNodeTypeContext nodeType) {
+        if (nodeType.OA() != null) {
+            return OA;
+        } else if (nodeType.UA() != null) {
+            return NodeType.UA;
+        } else if (nodeType.O() != null) {
+            return NodeType.O;
+        } else {
+            return NodeType.U;
+        }
+    }
+}

@@ -1,0 +1,132 @@
+package gov.nist.ngac.pm.core.pap.pml.expression.reference;
+
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.ListType;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.MapType;
+import gov.nist.ngac.pm.core.pap.pml.compiler.Variable;
+import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.ngac.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.ngac.pm.core.pap.pml.exception.PMLCompilationException;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.scope.CompileScope;
+import gov.nist.ngac.pm.core.util.TestPAP;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+class ReferenceByBracketIndexTest {
+
+    @Test
+    void testGetType() throws PMException {
+        BracketIndexExpression<?> a = new BracketIndexExpression<>(
+            new VariableReferenceExpression<>("a", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE))),
+            new StringLiteralExpression("b"),
+            ListType.of(STRING_TYPE)
+        );
+        VisitorContext visitorContext = new VisitorContext(new CompileScope(new MemoryPAP()));
+        visitorContext.scope().addVariable("a", new Variable("a", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE)), false));
+
+        assertEquals(
+                ListType.of(STRING_TYPE),
+                a.getType()
+        );
+    }
+
+    @Test
+    void testExecute() throws PMException {
+        BracketIndexExpression<?> a = new BracketIndexExpression<>(
+            new VariableReferenceExpression<>("a", MapType.of(STRING_TYPE, ListType.of(STRING_TYPE))),
+            new StringLiteralExpression("b"),
+            ListType.of(STRING_TYPE)
+        );
+        ExecutionContext executionContext = new ExecutionContext(NodeUserContext.of(0), new MemoryPAP());
+        List<String> expected = List.of("1","2");
+        Map<String, List<String>> mapValue = Map.of("b", expected);
+        executionContext.scope().addVariable("a", mapValue);
+
+        PAP pap = new TestPAP();
+        Object actual = a.execute(executionContext, pap);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testIndexChain() throws PMException {
+        String pml = """
+                a := {
+                    "b": {
+                        "c": {
+                            "d": "e"
+                        }
+                    }
+                }
+                
+                create PC a["b"]["c"]["d"]
+                """;
+        PAP pap = new TestPAP();
+        pap.executePML(NodeUserContext.of(0), pml);
+
+        assertTrue(pap.query().graph().nodeExists("e"));
+    }
+
+    @Test
+    void testWrongKeyType() throws PMException {
+        String pml = """
+                a := {
+                    "b": {
+                        "c": {
+                            "d": "e"
+                        }
+                    }
+                }
+                
+                create PC a[true]["c"]["d"]
+                """;
+        PAP pap = new TestPAP();
+        PMLCompilationException e = assertThrows(PMLCompilationException.class,
+                                                 () -> pap.executePML(NodeUserContext.of("u1"), pml));
+        assertEquals("expected expression type bool, got string", e.getErrors().get(0).errorMessage());
+    }
+
+    @Test
+    void testKeyDoesNotExist() throws PMException {
+        String pml = """
+                a := {
+                    "b": {
+                        "c": {
+                            "d": "e"
+                        }  
+                    }
+                }
+                
+                create PC a["z"]["c"]["d"]
+                """;
+        PAP pap = new TestPAP();
+        assertThrows(IllegalArgumentException.class,
+                     () -> pap.executePML(NodeUserContext.of(0), pml));
+    }
+
+    @Test
+    void testArrayKey() throws PMException {
+        String pml = """
+                a := {
+                    ["a"]: "test"
+                }
+                
+                create PC a[["a"]]
+                """;
+        PAP pap = new TestPAP();
+        pap.executePML(NodeUserContext.of(0), pml);
+
+        assertTrue(pap.query().graph().nodeExists("test"));
+    }
+
+}

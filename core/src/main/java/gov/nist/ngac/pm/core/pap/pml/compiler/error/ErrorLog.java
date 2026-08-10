@@ -1,0 +1,77 @@
+package gov.nist.ngac.pm.core.pap.pml.compiler.error;
+
+import gov.nist.ngac.pm.core.pap.pml.compiler.Position;
+import java.util.ArrayList;
+import java.util.List;
+import org.antlr.v4.runtime.ParserRuleContext;
+
+/**
+ * Aggregates the {@link CompileError}s found during one PML compilation, deduplicating identical errors.
+ */
+public class ErrorLog {
+
+    private final List<CompileError> errors;
+
+    public ErrorLog() {
+        this.errors = new ArrayList<>();
+    }
+
+    /**
+     * Adds an error at the given parse context's position, unless an identical error is already
+     * recorded.
+     *
+     * @return this instance, for chaining
+     */
+    public ErrorLog addError(ParserRuleContext ctx, String message) {
+        CompileError compileError = CompileError.fromParserRuleContext(ctx, message);
+
+        addError(compileError);
+
+        return this;
+    }
+
+    /**
+     * Adds an error at the given explicit position, unless an identical error is already recorded.
+     *
+     * @return this instance, for chaining
+     */
+    public ErrorLog addError(int line, int charPos, int end, String msg) {
+        CompileError compileError = new CompileError(new Position(line, charPos, end), msg);
+
+        addError(compileError);
+
+        return this;
+    }
+
+    /**
+     * Adds every error in the given list, ignoring a null list.
+     */
+    public void addErrors(List<CompileError> errors) {
+        if (errors == null) {
+            return;
+        }
+
+        this.errors.addAll(errors);
+    }
+
+    private void addError(CompileError error) {
+        if (this.errors.contains(error)) {
+            return;
+        }
+
+        this.errors.add(error);
+    }
+
+    public List<CompileError> getErrors() {
+        return errors;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("errors: \n");
+        for (CompileError error : errors) {
+            s.append(error.toString()).append("\n");
+        }
+        return s.toString();
+    }
+}

@@ -1,0 +1,108 @@
+package gov.nist.ngac.pm.core.pap.query.model.context;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.common.graph.node.Node;
+import gov.nist.ngac.pm.core.pap.query.NodeLookup;
+import gov.nist.ngac.pm.core.pap.obligation.event.EventContextUser;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Represents an anonymous user context identified by a set of user attribute ids or names, rather than
+ * a specific user node.
+ */
+public class AnonymousUserContext extends UserContext{
+
+    /**
+     * Builds an anonymous user context identified by user attribute ids, acting as the given process.
+     *
+     * @param attributeIds the user attribute ids identifying the context
+     * @param process the acting process
+     * @return the built context
+     */
+    public static AnonymousUserContext ofIds(Set<Long> attributeIds, String process) {
+        return new AnonymousUserContext(process, attributeIds, null);
+    }
+
+    /**
+     * Builds an anonymous user context identified by user attribute ids.
+     *
+     * @param attributeIds the user attribute ids identifying the context
+     * @return the built context
+     */
+    public static AnonymousUserContext ofIds(Set<Long> attributeIds) {
+        return new AnonymousUserContext(null, attributeIds, null);
+    }
+
+    /**
+     * Builds an anonymous user context identified by user attribute names, acting as the given process.
+     *
+     * @param attributeNames the user attribute names identifying the context
+     * @param process the acting process
+     * @return the built context
+     */
+    public static AnonymousUserContext ofNames(Set<String> attributeNames, String process) {
+        return new AnonymousUserContext(process, null, attributeNames);
+    }
+
+    /**
+     * Builds an anonymous user context identified by user attribute names.
+     *
+     * @param attributeNames the user attribute names identifying the context
+     * @return the built context
+     */
+    public static AnonymousUserContext ofNames(Set<String> attributeNames) {
+        return new AnonymousUserContext(null, null, attributeNames);
+    }
+
+    private final Set<Long> attributeIds;
+    private final Set<String> attributeNames;
+
+    private AnonymousUserContext(String process, Set<Long> attributeIds, Set<String> attributeNames) {
+        super(process);
+        this.attributeIds = attributeIds;
+        this.attributeNames = attributeNames;
+    }
+
+    public Set<Long> getAttributeIds() {
+        return attributeIds;
+    }
+
+    public Set<String> getAttributeNames() {
+        return attributeNames;
+    }
+
+    @Override
+    public Collection<Long> resolveNodeIds(NodeLookup nodeLookup) throws PMException {
+        if (attributeIds != null) {
+            return attributeIds;
+        }
+
+        return namesToIds(nodeLookup);
+    }
+
+    private Collection<Long> namesToIds(NodeLookup nodeLookup) throws PMException {
+        List<Long> ids = new ArrayList<>();
+
+        for (String attributeName : attributeNames) {
+            Node node = nodeLookup.getNodeByName(attributeName);
+            ids.add(node.getId());
+        }
+
+        return ids;
+    }
+
+    @Override
+    public EventContextUser toEventContextUser(NodeLookup lookup) throws PMException {
+        if (attributeNames != null) {
+            return new EventContextUser(new ArrayList<>(attributeNames), getProcess());
+        }
+        List<String> names = new ArrayList<>();
+        for (long attrId : attributeIds) {
+            names.add(lookup.getNodeById(attrId).getName());
+        }
+        return new EventContextUser(names, getProcess());
+    }
+}

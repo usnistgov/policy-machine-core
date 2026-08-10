@@ -1,0 +1,34 @@
+package gov.nist.ngac.pm.core.pap.pml.operation.builtin;
+
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation.NODE_NAME_PARAM;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.pml.operation.query.PMLQueryOperation;
+import gov.nist.ngac.pm.core.pap.query.PolicyQuery;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import java.util.List;
+
+
+/**
+ * A PML built-in query that returns whether a node with a given name exists.
+ */
+public class NodeExists extends PMLQueryOperation<Boolean> {
+
+    public NodeExists() {
+        super(
+                "node_exists",
+                BOOLEAN_TYPE,
+                List.of(NODE_NAME_PARAM),
+            List.of()
+        );
+    }
+
+    @Override
+    public Boolean execute(PolicyQuery query, UserContext userCtx, Args args) throws PMException {
+        String value = args.get(NODE_NAME_PARAM);
+        return query.graph().nodeExists(value);
+    }
+}

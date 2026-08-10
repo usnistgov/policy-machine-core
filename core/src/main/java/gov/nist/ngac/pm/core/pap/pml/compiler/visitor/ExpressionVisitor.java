@@ -1,0 +1,469 @@
+package gov.nist.ngac.pm.core.pap.pml.compiler.visitor;
+
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.ANY_TYPE;
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.BOOLEAN_TYPE;
+import static gov.nist.ngac.pm.core.pap.operation.arg.type.BasicTypes.STRING_TYPE;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.AnyType;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.MapType;
+import gov.nist.ngac.pm.core.pap.operation.arg.type.Type;
+import gov.nist.ngac.pm.core.pap.operation.param.FormalParameter;
+import gov.nist.ngac.pm.core.pap.pml.PMLErrorHandler;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLLexer;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.BracketIndexContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.DotIndexContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.EqualsExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.ExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.ExpressionListContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.IndexContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.IndexExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.Int64LiteralContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.LogicalAndExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.LogicalOrExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.NegateExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.OperationInvokeArgContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.OperationInvokeContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.ParenExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.PlusExpressionContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.StringLitContext;
+import gov.nist.ngac.pm.core.pap.pml.antlr.PMLParser.VariableReferenceContext;
+import gov.nist.ngac.pm.core.pap.pml.compiler.Variable;
+import gov.nist.ngac.pm.core.pap.pml.compiler.error.CompileError;
+import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
+import gov.nist.ngac.pm.core.pap.pml.context.VisitorContext;
+import gov.nist.ngac.pm.core.pap.pml.exception.PMLCompilationRuntimeException;
+import gov.nist.ngac.pm.core.pap.pml.exception.UnexpectedExpressionTypeException;
+import gov.nist.ngac.pm.core.pap.pml.expression.EqualsExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.Expression;
+import gov.nist.ngac.pm.core.pap.pml.expression.LogicalExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.NegatedExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.OperationInvokeExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.ParenExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.PlusExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.ArrayLiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.BoolLiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.Int64LiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.MapLiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.literal.StringLiteralExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.reference.BracketIndexExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.reference.DotIndexExpression;
+import gov.nist.ngac.pm.core.pap.pml.expression.reference.VariableReferenceExpression;
+import gov.nist.ngac.pm.core.pap.pml.operation.PMLOperationSignature;
+import gov.nist.ngac.pm.core.pap.pml.scope.UnknownOperationInScopeException;
+import gov.nist.ngac.pm.core.pap.pml.scope.UnknownVariableInScopeException;
+import gov.nist.ngac.pm.core.pap.pml.type.TypeStringer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+
+/**
+ * Compiles a PML expression parse tree into an {@link Expression}.
+ */
+public class ExpressionVisitor extends PMLBaseVisitor<Expression<?>> {
+
+    public static <T> Expression<T> compile(VisitorContext visitorCtx,
+                                            ExpressionContext ctx,
+                                            Type<T> expectedType) {
+        ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
+        Expression<?> compiledExpression = visitor.visit(ctx);
+        Type<?> resultType = compiledExpression.getType();
+
+        if (expectedType.equals(ANY_TYPE) || resultType.equals(expectedType)) {
+            return (Expression<T>) compiledExpression;
+        } else if ((resultType.equals(ANY_TYPE) && !expectedType.equals(ANY_TYPE))
+                || resultType.isCastableTo(expectedType)) {
+            return new ExpressionWrapper<>(compiledExpression, expectedType);
+        } else {
+            throw new PMLCompilationRuntimeException(ctx,
+                    new UnexpectedExpressionTypeException(resultType, expectedType).getMessage());
+        }
+    }
+
+    public static Expression<?> compile(VisitorContext visitorCtx,
+            ExpressionContext ctx) {
+        Objects.requireNonNull(visitorCtx);
+        Objects.requireNonNull(ctx);
+
+        ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
+        return visitor.visit(ctx);
+    }
+
+    /**
+     * Lexes, parses, and compiles a single PML expression from its source text.
+     *
+     * @param visitorCtx the shared compiler context to compile against
+     * @param input the expression's PML source text
+     * @param expectedType the type the expression must produce (or be coercible to)
+     * @return the compiled expression
+     * @throws PMLCompilationRuntimeException if lexing, parsing, or compiling the expression fails
+     */
+    public static <T> Expression<T> fromString(VisitorContext visitorCtx, String input, Type<T> expectedType) {
+        PMLErrorHandler pmlErrorHandler = new PMLErrorHandler();
+
+        PMLLexer lexer = new PMLLexer(CharStreams.fromString(input));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(pmlErrorHandler);
+
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        PMLParser parser = new PMLParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(pmlErrorHandler);
+
+        PMLParser.ExpressionContext exprCtx = parser.expression();
+
+        Expression<T> expression = compile(visitorCtx, exprCtx, expectedType);
+
+        if (!visitorCtx.errorLog().getErrors().isEmpty()) {
+            throw new PMLCompilationRuntimeException(pmlErrorHandler.getErrors());
+        }
+
+        return expression;
+    }
+
+    public static <T> Expression<T> compileOperationInvoke(VisitorContext visitorCtx,
+                                                           OperationInvokeContext ctx,
+                                                           Type<T> expectedType) {
+        Objects.requireNonNull(visitorCtx);
+        Objects.requireNonNull(ctx);
+
+        ExpressionVisitor visitor = new ExpressionVisitor(visitorCtx);
+        OperationInvokeExpression<?> compiled = visitor.visitOperationInvoke(ctx);
+
+        try {
+            return compiled.asType(expectedType);
+        } catch (UnexpectedExpressionTypeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+    }
+
+    private ExpressionVisitor(VisitorContext visitorCtx) {
+        super(visitorCtx);
+    }
+
+    @Override
+    public Expression<?> visitNegateExpression(NegateExpressionContext ctx) {
+        Expression<Boolean> expression = ExpressionVisitor.compile(visitorCtx, ctx.expression(), BOOLEAN_TYPE);
+
+        return new NegatedExpression(expression);
+    }
+
+    @Override
+    public Expression<?> visitLogicalAndExpression(LogicalAndExpressionContext ctx) {
+        Expression<Boolean> left = ExpressionVisitor.compile(visitorCtx, ctx.left, BOOLEAN_TYPE);
+        Expression<Boolean> right = ExpressionVisitor.compile(visitorCtx, ctx.right, BOOLEAN_TYPE);
+
+        return new LogicalExpression(left, right, true);
+    }
+
+    @Override
+    public Expression<?> visitLogicalOrExpression(LogicalOrExpressionContext ctx) {
+        Expression<Boolean> left = ExpressionVisitor.compile(visitorCtx, ctx.left, BOOLEAN_TYPE);
+        Expression<Boolean> right = ExpressionVisitor.compile(visitorCtx, ctx.right, BOOLEAN_TYPE);
+
+        return new LogicalExpression(left, right, false);
+    }
+
+    @Override
+    public Expression<?> visitPlusExpression(PlusExpressionContext ctx) {
+        return new PlusExpression(
+                ExpressionVisitor.compile(visitorCtx, ctx.left, STRING_TYPE),
+                ExpressionVisitor.compile(visitorCtx, ctx.right, STRING_TYPE));
+    }
+
+    @Override
+    public OperationInvokeExpression<?> visitOperationInvoke(OperationInvokeContext ctx) {
+        String funcName = ctx.ID().getText();
+
+        PMLOperationSignature operation;
+        try {
+            operation = visitorCtx.scope().getOperation(funcName);
+        } catch (UnknownOperationInScopeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+
+        PMLParser.OperationInvokeArgsContext funcCallArgsCtx = ctx.operationInvokeArgs();
+        List<OperationInvokeArgContext> operationInvokeArgs = funcCallArgsCtx.operationInvokeArg();
+        List<FormalParameter<?>> formalParams = operation.getFormalParameters();
+        Map<String, Expression<?>> argExprs = new HashMap<>();
+        List<CompileError> argErrors = new ArrayList<>();
+        for (OperationInvokeArgContext argCtx : operationInvokeArgs) {
+            String paramName = argCtx.ID().getText();
+
+            if (argExprs.containsKey(paramName)) {
+                argErrors.add(CompileError.fromParserRuleContext(argCtx,
+                    "duplicate argument '" + paramName + "' for operation '" + funcName + "'"));
+                continue;
+            }
+
+            FormalParameter<?> formalParam;
+            try {
+                formalParam = validateParam(argCtx, operation.getName(), paramName, formalParams);
+            } catch (PMLCompilationRuntimeException e) {
+                argErrors.addAll(e.getErrors());
+                continue;
+            }
+
+            try {
+                Expression<?> expr = ExpressionVisitor.compile(visitorCtx, argCtx.expression(), formalParam.getType());
+                argExprs.put(paramName, expr);
+            } catch (PMLCompilationRuntimeException e) {
+                argErrors.addAll(e.getErrors());
+            }
+        }
+
+        if (!argErrors.isEmpty()) {
+            throw new PMLCompilationRuntimeException(argErrors);
+        }
+
+        Set<String> requiredFormalParameters = operation.getRequiredFormalParameters()
+            .stream()
+            .map(FormalParameter::getName)
+            .collect(Collectors.toSet());
+        if (!argExprs.keySet().containsAll(requiredFormalParameters)) {
+            throw new PMLCompilationRuntimeException(ctx, "required formal parameters: "
+                + requiredFormalParameters + ", got: " + argExprs.keySet());
+        }
+
+        return new OperationInvokeExpression<>(funcName, argExprs, operation.getReturnType());
+    }
+
+    private FormalParameter<?> validateParam(ParserRuleContext argCtx, String opName, String name,
+                                             List<FormalParameter<?>> formalParams) {
+        for (FormalParameter<?> formalParam : formalParams) {
+            if (formalParam.getName().equals(name)) {
+                return formalParam;
+            }
+        }
+
+        throw new PMLCompilationRuntimeException(argCtx,
+            "unknown parameter '" + name + "' for operation '" + opName + "'");
+    }
+
+    @Override
+    public Expression<?> visitVariableReference(VariableReferenceContext ctx) {
+        String varName = ctx.ID().getText();
+        Variable variable;
+        try {
+            variable = visitorCtx.scope().getVariable(varName);
+        } catch (UnknownVariableInScopeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+
+        return new VariableReferenceExpression<>(varName, variable.type());
+    }
+
+    @Override
+    public Expression<?> visitParenExpression(ParenExpressionContext ctx) {
+        return new ParenExpression<>(ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE));
+    }
+
+    @Override
+    public Expression<?> visitEqualsExpression(EqualsExpressionContext ctx) {
+        Expression<Object> left = ExpressionVisitor.compile(visitorCtx, ctx.left, ANY_TYPE);
+        Expression<Object> right = ExpressionVisitor.compile(visitorCtx, ctx.right, ANY_TYPE);
+        boolean isEquals = ctx.EQUALS() != null;
+
+        return new EqualsExpression(left, right, isEquals);
+    }
+
+    @Override
+    public Expression<?> visitIndexExpression(IndexExpressionContext ctx) {
+        Expression<?> baseExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
+
+        try {
+            IndexContext indexCtx = ctx.index();
+            if (indexCtx instanceof BracketIndexContext bracketIndexContext) {
+                return createBracketIndexExpression(baseExpr, bracketIndexContext);
+            } else if (indexCtx instanceof DotIndexContext dotIndexContext) {
+                return createDotIndexExpression(baseExpr, dotIndexContext);
+            }
+        } catch (UnexpectedExpressionTypeException e) {
+            throw new PMLCompilationRuntimeException(ctx, e.getMessage());
+        }
+
+        throw new PMLCompilationRuntimeException(ctx, "Unknown index type");
+    }
+
+    @Override
+    public Expression<?> visitStringLiteral(PMLParser.StringLiteralContext ctx) {
+        return new StringLiteralExpression(removeQuotes(ctx.stringLit()));
+    }
+
+    @Override
+    public Expression<?> visitInt64Literal(Int64LiteralContext ctx) {
+        String text = ctx.int64Lit().getText();
+        return new Int64LiteralExpression(Long.parseLong(text));
+    }
+
+    @Override
+    public Expression<?> visitBoolLiteral(PMLParser.BoolLiteralContext ctx) {
+        boolean value = Boolean.parseBoolean(ctx.getText());
+        return new BoolLiteralExpression(value);
+    }
+
+    @Override
+    public Expression<?> visitArrayLiteral(PMLParser.ArrayLiteralContext ctx) {
+        ExpressionListContext expressionListContext = ctx.arrayLit().expressionList();
+        if (expressionListContext == null || expressionListContext.expression().isEmpty()) {
+            return new ArrayLiteralExpression<>(new ArrayList<>(), ANY_TYPE);
+        }
+
+        Type<?> elementType = null;
+        List<Expression<?>> elements = new ArrayList<>();
+
+        for (PMLParser.ExpressionContext elementCtx : ctx.arrayLit().expressionList().expression()) {
+            Expression<?> element = ExpressionVisitor.compile(visitorCtx, elementCtx);
+            elements.add(element);
+
+            if (elementType == null) {
+                elementType = element.getType();
+            } else if (!elementType.equals(element.getType())) {
+                elementType = ANY_TYPE;
+            }
+        }
+
+        return new ArrayLiteralExpression<>(elements, elementType);
+    }
+
+    @Override
+    public Expression<?> visitMapLiteral(PMLParser.MapLiteralContext ctx) {
+        Type<?> keyType = null;
+        Type<?> valueType = null;
+
+        if (ctx.mapLit().element() == null || ctx.mapLit().element().isEmpty()) {
+            return new MapLiteralExpression<>(new HashMap<>(), ANY_TYPE, ANY_TYPE);
+        }
+
+        Map<Expression<?>, Expression<?>> entries = new HashMap<>();
+
+        for (PMLParser.ElementContext elementCtx : ctx.mapLit().element()) {
+            Expression<?> key = ExpressionVisitor.compile(visitorCtx, elementCtx.key);
+            Expression<?> value = ExpressionVisitor.compile(visitorCtx, elementCtx.value);
+            entries.put(key, value);
+
+            if (keyType == null) {
+                keyType = key.getType();
+            } else if (!keyType.equals(key.getType())) {
+                keyType = ANY_TYPE;
+            }
+
+            if (valueType == null) {
+                valueType = value.getType();
+            } else if (!valueType.equals(value.getType())) {
+                valueType = ANY_TYPE;
+            }
+        }
+
+        return new MapLiteralExpression<>(entries, keyType, valueType);
+    }
+
+    private Expression<?> createDotIndexExpression(Expression<?> baseExpr, PMLParser.DotIndexContext ctx)
+            throws UnexpectedExpressionTypeException {
+        String key = ctx.key.getText();
+        MapType<?, ?> mapType = validateMapType(baseExpr.getType(), ctx);
+
+        // check that the key type of this map is string which is the only type
+        // supported for dot indexes
+        assertIsCastableTo(mapType.getKeyType(), STRING_TYPE);
+
+        Type<?> valueType = mapType.getValueType();
+
+        return new DotIndexExpression<>(baseExpr, key, valueType);
+    }
+
+    private Expression<?> createBracketIndexExpression(Expression<?> baseExpr, PMLParser.BracketIndexContext ctx)
+            throws UnexpectedExpressionTypeException {
+        Expression<?> indexExpr = ExpressionVisitor.compile(visitorCtx, ctx.expression(), ANY_TYPE);
+        MapType<?, ?> mapType = validateMapType(baseExpr.getType(), ctx);
+
+        // check taht the maps key type is castable to the index expressions type
+        assertIsCastableTo(mapType.getKeyType(), indexExpr.getType());
+
+        Type<?> valueType = mapType.getValueType();
+
+        return new BracketIndexExpression<>(baseExpr, indexExpr, valueType);
+    }
+
+    private MapType<?, ?> validateMapType(Type<?> type, ParserRuleContext ctx) {
+        if (type instanceof AnyType) {
+            return MapType.of(ANY_TYPE, ANY_TYPE);
+        }
+
+        if (!(type instanceof MapType<?, ?> mapType)) {
+            throw new PMLCompilationRuntimeException(ctx,
+                    String.format("Type mismatch: Cannot apply indexing to type %s. Expected Map.",
+                            TypeStringer.toPMLString(type)));
+        }
+
+        return mapType;
+    }
+
+    /**
+     * Strips the surrounding quote characters from a parsed string literal token's text.
+     *
+     * @param lit the parsed string literal context
+     * @return the literal's text with the leading and trailing quote removed
+     */
+    public static String removeQuotes(StringLitContext lit) {
+        String str = lit.getText();
+        return str.trim().substring(1, str.length() - 1);
+    }
+
+    private static void assertIsCastableTo(Type<?> type, Type<?> targetType) throws UnexpectedExpressionTypeException {
+        if (type.isCastableTo(targetType)) {
+            return;
+        }
+
+        throw new UnexpectedExpressionTypeException(type, targetType);
+    }
+
+    private static class ExpressionWrapper<T> extends Expression<T> {
+        private final Expression<?> wrapped;
+        private final Type<T> expectedType;
+
+        ExpressionWrapper(Expression<?> wrapped, Type<T> expectedType) {
+            this.wrapped = wrapped;
+            this.expectedType = expectedType;
+        }
+
+        @Override
+        public Type<T> getType() {
+            return expectedType;
+        }
+
+        @Override
+        public T execute(ExecutionContext ctx, PAP pap) throws PMException {
+            Object result = wrapped.execute(ctx, pap);
+            return expectedType.cast(result);
+        }
+
+        @Override
+        public String toFormattedString(int indentLevel) {
+            return wrapped.toFormattedString(indentLevel);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (!(o instanceof ExpressionWrapper<?> that))
+                return false;
+            return wrapped.equals(that.wrapped) && expectedType.equals(that.expectedType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(wrapped, expectedType);
+        }
+    }
+}

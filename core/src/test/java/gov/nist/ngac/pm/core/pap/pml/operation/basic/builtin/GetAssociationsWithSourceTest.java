@@ -1,0 +1,65 @@
+package gov.nist.ngac.pm.core.pap.pml.operation.basic.builtin;
+
+import static gov.nist.ngac.pm.core.pap.pml.operation.basic.PMLFunctionOperation.NODE_NAME_PARAM;
+import static gov.nist.ngac.pm.core.util.TestIdGenerator.id;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.impl.memory.pap.MemoryPAP;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.modification.GraphModification;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AccessRightSet;
+import gov.nist.ngac.pm.core.pap.operation.arg.Args;
+import gov.nist.ngac.pm.core.pap.pml.operation.builtin.GetAssociationsWithSource;
+import gov.nist.ngac.pm.core.util.TestPAP;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+
+class GetAssociationsWithSourceTest {
+
+    @Test
+    void testOk() throws PMException {
+        PAP pap = new MemoryPAP();
+        GraphModification graph = pap.modify().graph();
+        long pc1 = graph.createPolicyClass("pc1");
+        long ua1 = graph.createUserAttribute("ua1", List.of(pc1));
+        long oa1 = graph.createObjectAttribute("oa1", List.of(pc1));
+        graph.associate(ua1, oa1, new AccessRightSet("*"));
+
+        GetAssociationsWithSource getAssociationsWithSource = new GetAssociationsWithSource();
+        List<Map<String, Object>> result = getAssociationsWithSource.execute(pap.query(), null, new Args(Map.of(NODE_NAME_PARAM, "ua1")));
+
+        assertEquals(1, result.size());
+        assertEquals(Map.of("ua", "ua1", "target", "oa1", "arset", List.of("*")), result.getFirst());
+    }
+
+    @Test
+    void testWithPML() throws PMException {
+        String pml = """
+            create pc "pc1"
+            create ua "ua1" in ["pc1"]
+            create ua "ua2" in ["pc1"]
+            create oa "oa1" in ["pc1"]
+            associate "ua1" to "oa1" with ["*"]
+            
+            assocs := get_associations_with_source(node_name="ua1")
+            
+            foreach assoc in assocs {
+                associate "ua2" to "oa1" with assoc.arset
+            }
+           
+            create conjunctive node prohibition "p1"
+            deny "ua1"
+            arset ["*"]
+           
+            """;
+        MemoryPAP pap = new TestPAP();
+
+        pap.executePML(NodeUserContext.of(0), pml);
+
+        assertEquals(2, pap.query().graph().getAssociationsWithTarget(id("oa1")).size());
+    }
+
+}

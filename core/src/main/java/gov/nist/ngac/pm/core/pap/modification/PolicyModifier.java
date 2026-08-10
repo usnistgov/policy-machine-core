@@ -1,0 +1,49 @@
+package gov.nist.ngac.pm.core.pap.modification;
+
+import gov.nist.ngac.pm.core.pap.id.IdGenerator;
+
+/**
+ * {@link PolicyModification} implementation used by the PAP.
+ */
+public class PolicyModifier implements PolicyModification {
+
+    private final GraphModifier graphModifier;
+    private final ProhibitionsModifier prohibitionsModifier;
+    private final ObligationsModifier obligationsModifier;
+    private final OperationsModifier operationsModifier;
+
+    public PolicyModifier(GraphModifier graphModifier,
+                          ProhibitionsModifier prohibitionsModifier,
+                          ObligationsModifier obligationsModifier,
+                          OperationsModifier operationsModifier) {
+        this.graphModifier = graphModifier;
+        this.prohibitionsModifier = prohibitionsModifier;
+        this.obligationsModifier = obligationsModifier;
+        this.operationsModifier = operationsModifier;
+    }
+
+    public void setIdGenerator(IdGenerator idGenerator) {
+        this.graphModifier.setIdGenerator(idGenerator);
+    }
+
+    @Override
+    public GraphModifier graph() {
+        return graphModifier;
+    }
+
+    @Override
+    public ProhibitionsModifier prohibitions() {
+        return prohibitionsModifier;
+    }
+
+    @Override
+    public ObligationsModifier obligations() {
+        return obligationsModifier;
+    }
+
+    @Override
+    public OperationsModifier operations() {
+        return operationsModifier;
+    }
+
+}

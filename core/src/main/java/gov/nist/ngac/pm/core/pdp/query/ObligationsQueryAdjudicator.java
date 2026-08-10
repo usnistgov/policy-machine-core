@@ -1,0 +1,78 @@
+package gov.nist.ngac.pm.core.pdp.query;
+
+import gov.nist.ngac.pm.core.common.exception.PMException;
+import gov.nist.ngac.pm.core.pap.PAP;
+import gov.nist.ngac.pm.core.pap.obligation.Obligation;
+import gov.nist.ngac.pm.core.pap.operation.accessright.AdminAccessRight;
+import gov.nist.ngac.pm.core.pap.query.ObligationsQuery;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeTargetContext;
+import gov.nist.ngac.pm.core.pap.query.model.context.NodeUserContext;
+import gov.nist.ngac.pm.core.pap.query.model.context.TargetContext;
+import gov.nist.ngac.pm.core.pap.query.model.context.UserContext;
+import gov.nist.ngac.pm.core.pdp.UnauthorizedException;
+import gov.nist.ngac.pm.core.pdp.adjudication.Adjudicator;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * A {@link ObligationsQuery} that checks the acting user's admin privileges before delegating to the
+ * PAP.
+ */
+public class ObligationsQueryAdjudicator extends Adjudicator implements ObligationsQuery {
+
+    public ObligationsQueryAdjudicator(PAP pap, UserContext userCtx) {
+        super(pap, userCtx);
+    }
+
+    @Override
+    public Collection<Obligation> getObligations() throws PMException {
+        Collection<Obligation> obligations = pap.query().obligations().getObligations();
+        return filterObligations(obligations);
+    }
+
+    @Override
+    public boolean obligationExists(String name) throws PMException {
+        boolean exists = pap.query().obligations().obligationExists(name);
+        if (!exists) {
+            return false;
+        }
+
+        try {
+            getObligation(name);
+        } catch (UnauthorizedException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public Obligation getObligation(String name) throws PMException {
+        Obligation obligation = pap.query().obligations().getObligation(name);
+
+        check(userCtx, toTargetCtx(obligation.getAuthor()), AdminAccessRight.ADMIN_OBLIGATION_LIST);
+
+        return obligation;
+    }
+
+    @Override
+    public Collection<Obligation> getObligationsWithAuthor(NodeUserContext authorCtx) throws PMException {
+        check(userCtx, toTargetCtx(authorCtx), AdminAccessRight.ADMIN_OBLIGATION_LIST);
+
+        Collection<Obligation> obligationsWithAuthor = new ArrayList<>(pap.query().obligations().getObligationsWithAuthor(
+            authorCtx));
+        return filterObligations(obligationsWithAuthor);
+    }
+
+    private TargetContext toTargetCtx(NodeUserContext author) throws PMException {
+        long id = author.resolveNodeIds(pap.query().graph()).iterator().next();
+        return NodeTargetContext.of(id);
+    }
+
+    Collection<Obligation> filterObligations(Collection<Obligation> obligations) throws PMException {
+        filterUnauthorized(obligations, obligation ->
+            check(userCtx, toTargetCtx(obligation.getAuthor()), AdminAccessRight.ADMIN_OBLIGATION_LIST));
+
+        return obligations;
+    }
+}
