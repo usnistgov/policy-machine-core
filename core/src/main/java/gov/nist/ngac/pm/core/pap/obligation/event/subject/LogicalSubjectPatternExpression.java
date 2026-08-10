@@ -7,7 +7,7 @@ import gov.nist.ngac.pm.core.pap.pml.context.ExecutionContext;
 import java.util.Objects;
 
 /**
- * Logical pattern expression using && or ||.
+ * Logical pattern expression evaluating with AND or OR of the left and right expressions.
  */
 public class LogicalSubjectPatternExpression extends SubjectPatternExpression {
 
