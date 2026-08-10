@@ -13,6 +13,11 @@
     <description>Reactor parent for the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard.</description>
     <url>https://github.com/usnistgov/policy-machine-core</url>
 
+    <organization>
+        <name>National Institute of Standards and Technology</name>
+        <url>https://www.nist.gov</url>
+    </organization>
+
     <licenses>
         <license>
             <name>NIST Software License</name>
@@ -46,6 +51,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>21</maven.compiler.release>
         <antlr.version>4.13.1</antlr.version>
     </properties>
 
@@ -234,6 +240,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.6.3</version>
+                        <configuration>
+                            <failOnWarnings>false</failOnWarnings>
+                        </configuration>
                         <executions>
                             <execution>
                                 <goals>

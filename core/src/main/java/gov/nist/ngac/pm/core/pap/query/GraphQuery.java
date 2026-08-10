@@ -41,7 +41,7 @@ public interface GraphQuery extends NodeLookup {
     long getNodeId(String name) throws PMException;
 
     /**
-     * Search for nodes with the given type and/or properties. To return all nodes, use type=NodeType.ANY and properties=new HashMap<>().
+     * Search for nodes with the given type and/or properties. To return all nodes, use type=NodeType.ANY and properties=new HashMap().
      * <p>
      * Supports wildcard property values i.e. {"prop1": "*"} which will match any nodes with the "prop1" property key.
      *
