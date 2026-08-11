@@ -7,7 +7,7 @@
     <parent>
         <groupId>gov.nist.ngac.pm</groupId>
         <artifactId>policy-machine-core-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.0-rc.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

@@ -476,3 +476,16 @@ git push
 
 ## Developed with AI Coding Assistants
 This library was developed with the assistance of AI coding agents. Agents were used to review, plan, and update parts of the codebase. All content, has been reviewed and verified by the authors to ensure accuracy.
+
+## Releasing
+
+Before tagging and publishing a release, bump the version across the root pom and all modules with the
+`versions-maven-plugin` (no setup required, resolved from Maven Central on first use):
+
+```
+mvn versions:set -DnewVersion=<new-version> -DprocessAllModules=true -DgenerateBackupPoms=false
+git diff
+git add pom.xml core/pom.xml neo4j/pom.xml grpc/pom.xml
+git commit -m "Bump version to <new-version>"
+git push
+```
