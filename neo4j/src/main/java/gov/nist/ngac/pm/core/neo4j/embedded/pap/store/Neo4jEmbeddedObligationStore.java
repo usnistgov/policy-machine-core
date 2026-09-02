@@ -1,3 +1,5 @@
+// This file is part of the policy-machine-core-neo4j module, which links against
+// org.neo4j:neo4j (GPLv3) and is distributed under GPLv3. See neo4j/LICENSE.
 package gov.nist.ngac.pm.core.neo4j.embedded.pap.store;
 
 import static gov.nist.ngac.pm.core.neo4j.embedded.pap.store.Neo4jUtil.AUTHOR_ID_PROPERTY;

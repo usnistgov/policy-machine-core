@@ -55,69 +55,35 @@
         <antlr.version>4.13.1</antlr.version>
     </properties>
 
+    <!--
+      Only dependencies shared by more than one submodule are managed here.
+      A dependency used by exactly one submodule is declared, with its version,
+      in that submodule's own pom.xml instead.
+    -->
     <dependencyManagement>
         <dependencies>
+            <!-- core <- neo4j, grpc -->
             <dependency>
                 <groupId>gov.nist.ngac.pm</groupId>
                 <artifactId>policy-machine-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-bom</artifactId>
-                <version>1.71.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>4.28.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.9.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-runtime</artifactId>
-                <version>${antlr.version}</version>
-            </dependency>
+            <!-- core, neo4j -->
             <dependency>
                 <groupId>it.unimi.dsi</groupId>
                 <artifactId>fastutil</artifactId>
                 <version>8.5.13</version>
             </dependency>
+
+            <!-- core, grpc -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>2.0.9</version>
             </dependency>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.3.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.15</version>
-            </dependency>
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j</artifactId>
-                <version>2026.01.3</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.neo4j</groupId>
-                        <artifactId>neo4j-slf4j-provider</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
 
+            <!-- core, neo4j, grpc (test) -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
@@ -130,12 +96,8 @@
                 <version>5.9.0</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.14.0</version>
-                <scope>test</scope>
-            </dependency>
+
+            <!-- core, neo4j (test) -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
