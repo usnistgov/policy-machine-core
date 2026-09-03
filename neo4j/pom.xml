@@ -16,14 +16,37 @@
     <name>Policy Machine Core Neo4j</name>
     <description>Embedded Neo4j-backed implementation of the NIST Policy Machine.</description>
 
+    <!--
+      This module compiles against and embeds org.neo4j:neo4j (GPLv3, Community Edition),
+      so the module as distributed is a combined work under GPLv3 - not the NIST Software
+      Licensing Statement that covers the other modules in this repo. See neo4j/LICENSE.
+    -->
+    <licenses>
+        <license>
+            <name>GNU General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <dependencies>
         <dependency>
             <groupId>gov.nist.ngac.pm</groupId>
             <artifactId>policy-machine-core</artifactId>
         </dependency>
+        <!-- Version pinned here, not in the parent POM's dependencyManagement: this
+             module is the GPLv3-linked boundary in the reactor (see neo4j/README.md),
+             and the NIST-licensed parent should not carry GPLv3 dependency coordinates. -->
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
+            <version>2026.01.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-slf4j-provider</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>

@@ -16,6 +16,19 @@
     <name>Policy Machine gRPC</name>
     <description>gRPC client implementation of the NIST Policy Machine.</description>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- pins versions for grpc-protobuf, grpc-stub, and their transitive deps below -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>1.71.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>gov.nist.ngac.pm</groupId>
@@ -24,6 +37,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
+            <version>4.28.2</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
@@ -37,10 +51,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        <!-- see dependencyManagement in the parent pom for why this is needed -->
+        <!-- see dependencyManagement in this pom for why this is needed -->
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
         </dependency>
 
         <dependency>
