@@ -2,6 +2,9 @@
 
 The core components of the NIST Policy Machine, a reference implementation of the Next Generation Access Control (NGAC) standard.
 
+## Current Release Status
+Release 4.0.1 with ongoing development and improvement.
+
 ## Installation
 
 The library is split into 3 artifacts, all under the groupId `gov.nist.ngac.pm`, so consumers only pull the
