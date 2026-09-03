@@ -20,9 +20,10 @@
 
     <licenses>
         <license>
-            <name>NIST Software License</name>
+            <name>NIST Software License + CC BY 4.0</name>
             <url>https://github.com/usnistgov/policy-machine-core/blob/main/LICENSE.md</url>
             <distribution>repo</distribution>
+            <comments>The neo4j module overrides this with its own GPLv3 license (see neo4j/LICENSE).</comments>
         </license>
     </licenses>
 
